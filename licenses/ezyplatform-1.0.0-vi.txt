@@ -1,0 +1,68 @@
+                    Giấy phép EzyPlatform
+                    Phiên bản 1.0, Tháng 3 2022
+        http://www.youngmonkeys.org/licenses/ezyplatform-1.0.0-vi.txt
+
+ĐIỀU KHOẢN SỬ DỤNG, TÁI TẠO VÀ PHÂN PHỐI
+
+1. Định nghĩa
+Chúng tôi: Là tổ chức youngmonkeys.org.
+Bạn: Là người sử dụng EzyPlatform hoặc bất kỳ ai tái tạo và phân phối EzyPlatform.
+EzyPlatform: Là tất cả các tập tin mã nguồn, mã nhị phân của EzyPlatform và các sản phẩm phái sinh.
+Phân phối: Là hành động trao đổi, mua bán dưới mọi hình thức bao gồm cả miễn phí và có tính phí.
+Sản phẩm phái sinh: Là các sản phẩm tạo ra từ EzyPlatform.
+Sản phẩm của bạn: Là các sản phẩm bạn tạo ra dựa trên, hoặc không dựa trên EzyPlatform.
+Sản phẩm đầu cuối: Là sản phẩm được tạo ra từ EzyPlatform nhưng không bao gồm EzyPlatform.
+
+2. Hiệu lực
+Giấy phép này có hiệu lực khi bạn sử dụng, tái tạo hoặc phân phối EzyPlatform và các sản phẩm phái sinh.
+
+3. Quyền tác giả
+Bạn có thể tuyên bố quyền tác giả đối với các sản phẩm phái sinh của bạn.
+Tuy nhiên, EzyPlatform thuộc quyền sở hữu của chúng tôi và bạn không thể tuyên bố quyền tác giả
+đối với EzyPlatform và các sản phẩm phái sinh do chúng tôi tạo ra, việc vi phạm sẽ dẫn đến việc
+bạn phải bồi thường thiệt hại cho chúng tôi (xem mục bồi thường).
+
+4. Phân phối
+Bạn có thể phân phối các sản phẩm phái sinh của bạn dưới bất kỳ phương tiện và hình thức nào.
+Tuy nhiên, bạn không được phép phân phối EzyPlatform và các sản phẩm phái sinh do chúng tôi tạo ra
+trên bất kỳ phương tiện và hình thức nào khi chưa có sự đồng ý của chúng tôi. Việc vi phạm sẽ dẫn đến việc
+bạn phải bồi thường thiệt hại cho chúng tôi (xem mục bồi thường).
+
+5. Thay đổi
+Bạn có thể tạo mới và tuỳ ý thay đổi các sản phẩm phái sinh của bạn nhưng không thể thay đổi EzyPlatform
+hoặc sản phẩm phái sinh do chúng tôi tạo ra dưới bất kỳ hình thức và mục đích nào khi chưa có sự đồng ý
+của chúng tôi. Việc vi phạm sẽ dẫn đến việc bạn phải bồi thường thiệt hại cho chúng tôi (xem mục bồi thường).
+
+6. Sử dụng thương hiệu
+Bạn không được sử dụng thương hiệu EzyPlatform cho bất kỳ sản phẩm nào của bạn.
+Việc vi phạm sẽ dẫn đến việc bạn phải bồi thường thiệt hại cho chúng tôi (xem mục bồi thường).
+
+7. Trách nhiệm pháp lý
+Chúng tôi sẽ không chịu trách nhiệm và sẽ từ chối bất kỳ trách nhiệm pháp lý cho bất kỳ sản phẩm nào của bạn,
+cũng như mục đích sử dụng EzyPlatform và các sản phẩm phái sinh. Trong mọi trường hợp chúng tôi sẽ
+không chịu trách nhiệm và từ chối bất kỳ trách nhiệm pháp lý nào đối với bất kỳ lỗi trực tiếp,
+gián tiếp, ngẫu nhiên, do hậu quả trực tiếp, gián tiếp và đặc biệt nào gây ra bởi hoặc liên quan đến việc
+sử dụng EzyPlatform và các sản phẩm phái sinh.
+
+8. Bảo hành
+Chúng tôi từ chối bảo hành cho EzyPlatform và các sản phẩm phái sinh. Tuy nhiên chúng tôi sẽ thường xuyên nâng cấp chúng.
+
+9. Sử dụng cho mục đích cá nhân
+Bạn có thể sử dụng EzyPlatform và sản phẩm phái sinh do chúng tôi tạo ra cho mục đích phát triển
+các sản phẩm cá nhân và cung cấp sản phẩm đầu cuối cho khách hàng của bạn. Tuy nhiên bạn sẽ không thể
+phân phối sản phẩm của bạn cùng với EzyPlatform và sản phẩm phái sinh do chúng tôi tạo ra.
+Việc vi phạm sẽ dẫn đến việc bạn phải bồi thường thiệt hại cho chúng tôi (xem mục bồi thường).
+
+10. Sử dụng trong thương mại hoá
+Bạn có thể sử dụng EzyPlatform và sản phẩm phái sinh do chúng tôi tạo ra cho các sản phẩm thương mại
+mà chỉ được sử dụng trong tổ chức của bạn hoặc sử dụng để cung cấp sản phẩm đầu cuối cho khách hàng của bạn.
+Tuy nhiên bạn không được phân phối sản phẩm của bạn cùng với EzyPlatform và sản phẩm phái sinh do chúng tôi tạo ra.
+Việc vi phạm sẽ dẫn đến việc bạn phải bồi thường thiệt hại cho chúng tôi (xem mục bồi thường).
+
+11. Bồi thường
+Việc vi phạm bất kỳ điều khoản nào trong giấy phép này sẽ dẫn đến việc bạn phải bồi thường cho chúng tôi
+tối thiểu 100.000 (một trăm nghìn) đô la mỹ cho chi phí bản quyền. Thêm vào là toàn bộ doanh thu đến từ việc
+phân phối của EzyPlatform hoặc các sản phẩm phái sinh. Chi phí bồi thường có thể thay đổi thông qua đàm phán
+và phù hợp với luật pháp tại quốc gia bạn và quốc tế. Trong trường hợp giải quyết tranh chấp thông qua khởi kiện,
+chúng tôi sẽ tiến hành tại quốc gia bạn đang sinh sống. Tuy nhiên, nếu quốc gia của bạn không có luật để bảo vệ
+lợi ích của chúng tôi, chúng tôi sẽ giải quyết thông qua một toà án quốc tế.

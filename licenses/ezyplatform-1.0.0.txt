@@ -1,0 +1,64 @@
+                        License EzyPlatform
+                        Version 1.0, March 2022
+            http://www.youngmonkeys.org/licenses/ezyplatform-1.0.0.txt
+
+TERMS AND CONDITIONS FOR USE, REPRODUCTION AND DISTRIBUTION
+
+1. Definition
+We: shall mean youngmonkeys.org.
+You: shall mean a user of EzyPlatform or anyone who reproduces and distributes EzyPlatform.
+EzyPlatform: shall mean all the source code files, binaries of EzyPlatform and derivative products.
+Distribution: shall mean the act of exchanging, buying and selling in any form including free and paid options.
+Derivative products: shall mean the products that are based on (or derived from) EzyPlatform.
+Your Products: shall mean the products you create that are based on (or not based on) EzyPlatform.
+End Product: shall mean a product created from EzyPlatform excluding the EzyPlatform.
+
+2. Effect
+This license is in effect when you use, reproduce or distribute EzyPlatform and its derivative works.
+
+3. Copyrights
+You may claim copyright of the derivative products created by you. However, EzyPlatform is owned by us,
+and you cannot claim copyright of EzyPlatform and the derivative products created by us.
+Violations of claiming copyright will result in you having to pay compensation to us (see 11. Compensation).
+
+4. Distribution
+You may distribute the derivative products created by you in any form. However, you are not allowed
+to distribute EzyPlatform and the derivative products created by us in any form without our consent.
+Violations of distribution will result in you having to pay compensation to us (see 11. Compensation).
+
+5. Modification
+You may create new or modify the derivative products created by you, but you are not allowed
+to change EzyPlatform and the derivative products created by us in any form and for any purposes without
+our consent. Violations of change will result in you having to pay compensation to us (see 11. Compensation).
+
+6. Use the brand
+You cannot use the EzyPlatform brand in any of your products.
+Violation of using the brand will result in you having to pay compensation to us (see 11. Compensation).
+
+7. Liability
+We are not responsible for and will disclaim liabilities for any of your products and the intended use
+of EzyPlatform and its derivative products. In all cases, we are not responsible and will disclaim liabilities
+for any direct, indirect, incidental, consequential errors and any direct, indirect or special consequences
+caused by or related to the use of EzyPlatform and its derivative products.
+
+8. Warranty
+We disclaim warranty for EzyPlatform and its derivative products. However, we will regularly upgrade them.
+
+9. Use for personal purposes
+You may use EzyPlatform and the derivative products created by us for the purpose of developing personal products
+and delivering end products to your customers. However, you cannot distribute your products along with EzyPlatform
+and the derivative products created by us.
+Violations of personal use will result in you having to pay compensation to us (see 11. Compensation).
+
+10. Use in commercialization
+You may use EzyPlatform and the derivative products for commercial products that are only used within
+your organization or used to deliver end products to your customers. However, you cannot distribute
+your products along with EzyPlatform and the derivative products created by us.
+Violations of commercial use will result in you having to pay compensation to us (see 11. Compensation).
+
+11. Compensation
+Violation of any terms of this license will result in you indemnifying us at least 100,000 (one hundred thousand) USD
+for copyright fees and all revenue from the distribution of EzyPlatform or its derivative products.
+Compensation costs are subjected to change through negotiation and in accordance with local and international laws.
+In the case of going to court to resolve conflicts, we will proceed in your country of residence.
+However, if your country does not have a law to protect our interests, we will settle it through an international court.
