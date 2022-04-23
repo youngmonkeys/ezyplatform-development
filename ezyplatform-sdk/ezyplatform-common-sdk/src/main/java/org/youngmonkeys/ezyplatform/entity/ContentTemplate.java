@@ -16,14 +16,14 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "ezy_content_templates")
 @AllArgsConstructor

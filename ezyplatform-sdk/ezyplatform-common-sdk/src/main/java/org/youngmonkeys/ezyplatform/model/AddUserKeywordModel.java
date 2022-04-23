@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.entity;
+package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
 import lombok.Getter;

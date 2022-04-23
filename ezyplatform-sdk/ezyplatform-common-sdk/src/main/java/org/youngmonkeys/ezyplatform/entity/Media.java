@@ -23,7 +23,9 @@ import java.time.LocalDateTime;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "ezy_medias")
 @AllArgsConstructor

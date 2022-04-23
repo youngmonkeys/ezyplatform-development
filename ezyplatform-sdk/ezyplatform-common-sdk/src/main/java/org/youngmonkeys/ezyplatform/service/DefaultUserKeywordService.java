@@ -19,7 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
-import org.youngmonkeys.ezyplatform.entity.AddUserKeywordModel;
+import org.youngmonkeys.ezyplatform.model.AddUserKeywordModel;
 import org.youngmonkeys.ezyplatform.entity.UserKeyword;
 import org.youngmonkeys.ezyplatform.repo.UserKeywordRepository;
 

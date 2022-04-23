@@ -21,7 +21,9 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "ezy_users")
 @AllArgsConstructor

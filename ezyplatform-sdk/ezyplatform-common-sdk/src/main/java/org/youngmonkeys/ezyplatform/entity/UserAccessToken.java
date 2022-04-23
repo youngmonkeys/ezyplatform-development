@@ -24,7 +24,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "ezy_user_access_tokens")
 @AllArgsConstructor

@@ -19,8 +19,9 @@ package org.youngmonkeys.ezyplatform.pagination;
 import com.tvd12.ezyfox.reflect.EzyClasses;
 import com.tvd12.ezyfox.sercurity.EzyBase64;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.*;
 import java.util.function.Function;
@@ -124,7 +125,8 @@ public abstract class ComplexPaginationParameterConverter<S, M> {
         Map<S, Function<M, Object>> map
     );
 
-    @Data
+    @Getter
+    @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     public static class PaginationParameterWrapper<S> {

@@ -16,7 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import org.youngmonkeys.ezyplatform.entity.AddUserKeywordModel;
+import org.youngmonkeys.ezyplatform.model.AddUserKeywordModel;
 import org.youngmonkeys.ezyplatform.rx.Reactive;
 
 import java.util.Collection;
