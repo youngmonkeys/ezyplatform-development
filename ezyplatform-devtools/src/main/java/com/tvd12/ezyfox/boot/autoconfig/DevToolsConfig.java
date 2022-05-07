@@ -71,9 +71,6 @@ public class DevToolsConfig extends EzyLoggable {
             try {
                 clearThymeleafCache();
                 copyFileToFolder(srcFolder, file, desFolder);
-                if (!file.toString().endsWith("~")) {
-                    // refreshBrowser();
-                }
             } catch (Exception e) {
                 logger.error("FileListener.onFileModified error", e);
             }
