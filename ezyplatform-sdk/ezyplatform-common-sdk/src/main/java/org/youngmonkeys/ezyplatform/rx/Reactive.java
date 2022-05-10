@@ -28,8 +28,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import static com.tvd12.ezyfox.io.EzyStrings.exceptionsToString;
 import static com.tvd12.ezyfox.io.EzyStrings.traceStackToString;
-import static org.youngmonkeys.ezyplatform.util.Exceptions.exceptionsToString;
 
 public final class Reactive {
 

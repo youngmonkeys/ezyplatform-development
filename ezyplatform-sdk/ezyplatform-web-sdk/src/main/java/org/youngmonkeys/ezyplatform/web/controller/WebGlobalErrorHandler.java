@@ -30,8 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Collections;
 
+import static com.tvd12.ezyfox.io.EzyStrings.exceptionToSimpleString;
 import static com.tvd12.ezyhttp.server.core.constant.CoreConstants.ATTRIBUTE_MATCHED_URI;
-import static org.youngmonkeys.ezyplatform.util.Exceptions.exceptionToSimpleString;
 
 /**
  * Handle all errors happen in when handle client's requests.
