@@ -25,23 +25,19 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Entity
+@IdClass(AdminRoleId.class)
 @Table(name = "ezy_admin_roles")
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminRole {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
     @Column(name = "role_id")
     private long roleId;
 
+    @Id
     @Column(name = "admin_id")
     private long adminId;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
 }

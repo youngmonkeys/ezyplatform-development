@@ -14,30 +14,17 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.entity;
+package org.youngmonkeys.ezyplatform.result;
 
-import lombok.*;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-@ToString
-@Entity
-@IdClass(UserRoleId.class)
-@Table(name = "ezy_user_roles")
-@AllArgsConstructor
-@NoArgsConstructor
-public class UserRole {
-    @Id
-    @Column(name = "role_id")
-    private long roleId;
-
-    @Id
-    @Column(name = "user_id")
-    private long userId;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+@EzyQueryResult
+public class AdminNameResult {
+    private long adminId;
+    private String username;
+    private String displayName;
 }

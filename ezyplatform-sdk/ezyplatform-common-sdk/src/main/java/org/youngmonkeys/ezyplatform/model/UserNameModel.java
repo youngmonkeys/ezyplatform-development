@@ -22,6 +22,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class UserNameModel {
+    private long userId;
     private String username;
     private String displayName;
 

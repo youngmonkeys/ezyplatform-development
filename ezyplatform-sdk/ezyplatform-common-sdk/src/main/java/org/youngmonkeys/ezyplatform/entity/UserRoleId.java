@@ -18,26 +18,20 @@ package org.youngmonkeys.ezyplatform.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import javax.persistence.Column;
+import java.io.Serializable;
 
 @Getter
 @Setter
 @ToString
-@Entity
-@IdClass(UserRoleId.class)
-@Table(name = "ezy_user_roles")
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserRole {
-    @Id
+public class UserRoleId implements Serializable {
+
     @Column(name = "role_id")
     private long roleId;
 
-    @Id
     @Column(name = "user_id")
     private long userId;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 }

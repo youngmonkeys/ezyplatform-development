@@ -17,6 +17,10 @@
 package org.youngmonkeys.ezyplatform.converter;
 
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.model.AdminNameModel;
+import org.youngmonkeys.ezyplatform.model.UserNameModel;
+import org.youngmonkeys.ezyplatform.result.AdminNameResult;
+import org.youngmonkeys.ezyplatform.result.UserNameResult;
 import org.youngmonkeys.ezyplatform.util.LocalDateTimes;
 
 import java.time.LocalDateTime;
@@ -27,7 +31,23 @@ public abstract class DefaultResultToModelConverter {
 
     protected final ZoneId zoneId;
 
-    public long toTimestamp(LocalDateTime localDateTime) {
+    public AdminNameModel toModel(AdminNameResult result) {
+        return AdminNameModel.builder()
+            .adminId(result.getAdminId())
+            .username(result.getUsername())
+            .displayName(result.getDisplayName())
+            .build();
+    }
+
+    public UserNameModel toModel(UserNameResult result) {
+        return UserNameModel.builder()
+            .userId(result.getUserId())
+            .username(result.getUsername())
+            .displayName(result.getDisplayName())
+            .build();
+    }
+
+    protected long toTimestamp(LocalDateTime localDateTime) {
         return LocalDateTimes.toTimestamp(localDateTime, zoneId);
     }
 }

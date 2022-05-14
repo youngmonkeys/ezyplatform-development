@@ -179,6 +179,28 @@ public abstract class DefaultEntityToModelConverter {
             .build();
     }
 
+    public AdminRoleModel toModel(AdminRole entity) {
+        if (entity == null) {
+            return null;
+        }
+        return AdminRoleModel.builder()
+            .adminId(entity.getAdminId())
+            .roleId(entity.getRoleId())
+            .createdAt(toTimestamp(entity.getCreatedAt()))
+            .build();
+    }
+
+    public UserRoleModel toModel(UserRole entity) {
+        if (entity == null) {
+            return null;
+        }
+        return UserRoleModel.builder()
+            .userId(entity.getUserId())
+            .roleId(entity.getRoleId())
+            .createdAt(toTimestamp(entity.getCreatedAt()))
+            .build();
+    }
+
     public long toTimestamp(LocalDateTime localDateTime) {
         return LocalDateTimes.toTimestamp(localDateTime, zoneId);
     }
