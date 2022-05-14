@@ -29,6 +29,8 @@ public enum AdminViewName {
     INBOX("inbox"),
     INDEX("index"),
     LIST("list"),
+    ROLES("roles"),
+    ROLE_DETAILS("role-details"),
     PROFILE("profile");
 
     @Getter
