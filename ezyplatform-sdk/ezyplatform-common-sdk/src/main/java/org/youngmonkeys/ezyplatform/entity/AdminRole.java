@@ -40,4 +40,8 @@ public class AdminRole {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public AdminRoleId identifier() {
+        return new AdminRoleId(roleId, adminId);
+    }
 }

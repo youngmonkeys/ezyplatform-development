@@ -40,4 +40,11 @@ public class UserRole {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public UserRoleId identifier() {
+        return new UserRoleId(
+            roleId,
+            userId
+        );
+    }
 }

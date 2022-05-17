@@ -47,4 +47,14 @@ public class AdminRoleFeature {
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Transient
+    public AdminRoleFeatureId identifier() {
+        return new AdminRoleFeatureId(
+            roleId,
+            feature,
+            featureUri,
+            featureMethod
+        );
+    }
 }
