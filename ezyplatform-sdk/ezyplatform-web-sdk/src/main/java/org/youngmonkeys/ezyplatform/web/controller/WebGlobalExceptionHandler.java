@@ -23,6 +23,7 @@ import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.exception.DeserializeBodyException;
+import com.tvd12.ezyhttp.core.exception.HttpForbiddenException;
 import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
 import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
@@ -38,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ACCESS_TOKEN;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN;
 
@@ -198,6 +200,42 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .build();
         }
         return Redirect.to("/not-found");
+    }
+
+    @TryCatch(PermissionDeniedException.class)
+    public Object handle(
+        RequestArguments arguments,
+        PermissionDeniedException e
+    ) {
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        HttpMethod method = arguments.getMethod();
+        String uriTemplate = arguments.getUriTemplate();
+        if (requestUriManager.isApiURI(method, uriTemplate)) {
+            return ResponseEntity.status(
+                    StatusCodes.FORBIDDEN
+                )
+                .body(singletonMap("permission", "denied"))
+                .build();
+        }
+        return Redirect.to("/permission-denied");
+    }
+
+    @TryCatch(HttpForbiddenException.class)
+    public Object handle(
+        RequestArguments arguments,
+        HttpForbiddenException e
+    ) {
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        HttpMethod method = arguments.getMethod();
+        String uriTemplate = arguments.getUriTemplate();
+        if (requestUriManager.isApiURI(method, uriTemplate)) {
+            return ResponseEntity.status(
+                    StatusCodes.FORBIDDEN
+                )
+                .body(e.getData())
+                .build();
+        }
+        return Redirect.to("/permission-denied");
     }
 
     @TryCatch(DeserializeBodyException.class)
