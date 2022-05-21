@@ -68,5 +68,6 @@
 		<module>ezyplatform-socket-sdk</module>
 		<module>ezyplatform-web-sdk</module>
 		<module>ezyplatform-common-sdk</module>
-	</modules>
+        <module>ezyplatform-http-sdk</module>
+    </modules>
 </project>

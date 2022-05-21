@@ -36,7 +36,7 @@
         </dependency>
         <dependency>
             <groupId>org.youngmonkeys</groupId>
-            <artifactId>ezyplatform-common-sdk</artifactId>
+            <artifactId>ezyplatform-http-sdk</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
