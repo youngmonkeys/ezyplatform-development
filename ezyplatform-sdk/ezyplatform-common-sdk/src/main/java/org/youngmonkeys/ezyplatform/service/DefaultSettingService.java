@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 import static java.nio.file.Files.readAllLines;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FILE_ENCRYPTION_KEYS;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FOLDER_SETTINGS;
@@ -58,15 +59,18 @@ public abstract class DefaultSettingService
         = new AtomicReference<>();
     private final Map<String, Object> cachedValues
         = new ConcurrentHashMap<>();
+    private final Map<String, Long> lastUpdatedTimeBySettingName
+        = new ConcurrentHashMap<>();
     private final Map<String, LocalDateTime> lastChangedTimeBySettingName
         = new ConcurrentHashMap<>();
     private final Map<String, EzyExceptionFunction<String, Object>> converters
         = new ConcurrentHashMap<>();
 
-    private static final LocalDateTime DEFAULT_LAST_CHANGED_TIME
+    public static final LocalDateTime DEFAULT_LAST_CHANGED_TIME
         = LocalDateTime.of(1970, 1, 1, 0, 0);
-    private static final int DEFAULT_CACHE_PERIOD_IN_SECOND = 5;
-    private static final String DEFAULT_ENCRYPTION_KEY = "KSYzjcc8nqrBk8jXtW4QaMpr2suBU9vY";
+    public static final int DEFAULT_CACHE_PERIOD_IN_SECOND = 5;
+    public static final String DEFAULT_ENCRYPTION_KEY = "KSYzjcc8nqrBk8jXtW4QaMpr2suBU9vY";
+    public static final String LAST_UPDATE_TIME_SUFFIX = "_last_updated_time";
 
     public DefaultSettingService(
         Scheduler scheduler,
@@ -121,6 +125,25 @@ public abstract class DefaultSettingService
                 }
             },
             0L,
+            periodInSecond,
+            TimeUnit.SECONDS
+        );
+    }
+
+    @Override
+    public void watchLastUpdatedTime(
+        String settingName,
+        int periodInSecond,
+        Runnable onLastUpdatedTimeChange
+    ) {
+        Runnable func = () -> fetchAndUpdateLastUpdatedTime(
+            settingName,
+            onLastUpdatedTimeChange
+        );
+        func.run();
+        scheduler.scheduleAtFixRate(
+            func,
+            periodInSecond,
             periodInSecond,
             TimeUnit.SECONDS
         );
@@ -258,5 +281,23 @@ public abstract class DefaultSettingService
             }
         }
         return null;
+    }
+
+    private void fetchAndUpdateLastUpdatedTime(
+        String settingName,
+        Runnable onLastUpdatedTimeChange
+    ) {
+        String key = settingName + LAST_UPDATE_TIME_SUFFIX;
+        long settingValue = getLongValue(key);
+        long currentValue = lastUpdatedTimeBySettingName.getOrDefault(
+            settingName,
+            0L
+        );
+        if ((currentValue == 0 && settingValue > 0)
+            || (currentValue != 0 && settingValue > currentValue)
+        ) {
+            lastUpdatedTimeBySettingName.put(settingName, settingValue);
+            processWithLogException(onLastUpdatedTimeChange::run, true);
+        }
     }
 }

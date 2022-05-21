@@ -26,7 +26,14 @@ import java.util.Set;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 
+@SuppressWarnings("MethodCount")
 public interface SettingService {
+
+    void watchLastUpdatedTime(
+        String settingName,
+        int periodInSecond,
+        Runnable onLastUpdatedTimeChange
+    );
 
     String getDecryptionValue(String settingName);
 

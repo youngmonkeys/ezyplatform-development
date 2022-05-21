@@ -16,13 +16,28 @@
 
 package org.youngmonkeys.ezyplatform.constant;
 
+import com.tvd12.ezyfox.collect.Sets;
+
+import java.util.Collections;
+import java.util.Set;
+
 public final class AdminRoles {
 
     public static final String ROLE_NAME_ADMIN = "admin";
+    public static final String ROLE_NAME_DEVOPS = "devops";
     public static final String ROLE_NAME_SUPPER_ADMIN = "supper_admin";
 
     public static final String ROLE_DISPLAY_SUPPER_ADMIN = "Administrator";
+    public static final String ROLE_DISPLAY_DEVOPS = "DevOps";
     public static final String ROLE_DISPLAY_NAME_SUPPER_ADMIN = "Super Administrator";
+
+    public static final Set<String> UNMODIFIABLE_ROLE_NAMES =
+        Collections.unmodifiableSet(
+            Sets.newHashSet(
+                ROLE_NAME_SUPPER_ADMIN,
+                ROLE_NAME_DEVOPS
+            )
+        );
 
     private AdminRoles() {}
 }

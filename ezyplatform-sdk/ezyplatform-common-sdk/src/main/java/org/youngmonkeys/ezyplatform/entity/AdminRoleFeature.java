@@ -35,6 +35,9 @@ public class AdminRoleFeature {
     private long roleId;
 
     @Id
+    private String target;
+
+    @Id
     private String feature;
 
     @Id
@@ -52,6 +55,7 @@ public class AdminRoleFeature {
     public AdminRoleFeatureId identifier() {
         return new AdminRoleFeatureId(
             roleId,
+            target,
             feature,
             featureUri,
             featureMethod

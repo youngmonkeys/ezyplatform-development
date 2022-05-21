@@ -14,30 +14,14 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.entity;
+package org.youngmonkeys.ezyplatform.annotation;
 
-import lombok.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.persistence.Column;
-import java.io.Serializable;
-
-@Getter
-@Setter
-@ToString
-@EqualsAndHashCode
-@AllArgsConstructor
-@NoArgsConstructor
-public class AdminRoleFeatureId implements Serializable {
-    @Column(name = "role_id")
-    private long roleId;
-
-    private String target;
-
-    private String feature;
-
-    @Column(name = "feature_uri")
-    private String featureUri;
-
-    @Column(name = "feature_method")
-    private String featureMethod;
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.PARAMETER })
+public @interface AdminRoles {
 }

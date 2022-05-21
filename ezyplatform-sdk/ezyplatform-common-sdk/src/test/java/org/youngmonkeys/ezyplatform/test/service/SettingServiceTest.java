@@ -44,6 +44,13 @@ public class SettingServiceTest {
     private static class InternalSettingService implements SettingService {
 
         @Override
+        public void watchLastUpdatedTime(
+            String settingName,
+            int periodInSecond,
+            Runnable onLastUpdatedTimeChange
+        ) {}
+
+        @Override
         public String getDecryptionValue(String settingName) {
             return null;
         }
