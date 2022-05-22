@@ -118,12 +118,10 @@ public abstract class DefaultSettingService
         int periodInSecond
     ) {
         scheduler.scheduleAtFixRate(
-            () -> {
-                Object value = getAndParseValueToCache(settingName);
-                if (value != null) {
-                    cachedValues.put(settingName, value);
-                }
-            },
+            () -> cacheValueIfNotNull(
+                settingName,
+                fetchAndCacheLastChangedTimeAndParseValue(settingName)
+            ),
             0L,
             periodInSecond,
             TimeUnit.SECONDS
@@ -146,6 +144,20 @@ public abstract class DefaultSettingService
             periodInSecond,
             periodInSecond,
             TimeUnit.SECONDS
+        );
+    }
+
+    public void watchLastUpdatedTimeAndCache(
+        String settingName,
+        int periodInSecond
+    ) {
+        watchLastUpdatedTime(
+            settingName,
+            periodInSecond,
+            () -> cacheValueIfNotNull(
+                settingName,
+                fetchAndCacheLastChangedTimeAndParseValue(settingName)
+            )
         );
     }
 
@@ -229,7 +241,9 @@ public abstract class DefaultSettingService
         }
     }
 
-    private <T> T getAndParseValueToCache(String settingName) {
+    private <T> T fetchAndCacheLastChangedTimeAndParseValue(
+        String settingName
+    ) {
         LocalDateTime lastChangedTime = lastChangedTimeBySettingName.getOrDefault(
             settingName,
             DEFAULT_LAST_CHANGED_TIME
@@ -281,6 +295,12 @@ public abstract class DefaultSettingService
             }
         }
         return null;
+    }
+
+    private void cacheValueIfNotNull(String settingName, Object value) {
+        if (value != null) {
+            cachedValues.put(settingName, value);
+        }
     }
 
     private void fetchAndUpdateLastUpdatedTime(

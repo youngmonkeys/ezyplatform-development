@@ -69,6 +69,15 @@ public class AdminRolesProxy {
         return false;
     }
 
+    public boolean isAccessibleAll(List<String> urls) {
+        for (String url : urls) {
+            if (!isAccessible(url)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static AdminRolesProxy create(
         Set<Long> roleIds,
         long superAdminRoleId,
