@@ -20,23 +20,44 @@ import com.tvd12.ezyfox.concurrent.EzyExecutors;
 import com.tvd12.ezyfox.util.EzyLoggable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Scheduler extends EzyLoggable {
 
-    private final List<Task> tasks;
+    private final boolean stoppable;
     private final Set<Task> runningTasks;
+    private final Map<Runnable, Task> tasks;
     private final ExecutorService executorService;
     private final ScheduledExecutorService inspector;
 
+    private static final int DEFAULT_PERIOD_IN_MILLIS = 5;
+
     public Scheduler(int maxExecutionThread) {
-        this.tasks = Collections.synchronizedList(
-            new ArrayList<>()
+        this(maxExecutionThread, false);
+    }
+
+    public Scheduler(
+        int maxExecutionThread,
+        boolean stoppable
+    ) {
+        this(
+            maxExecutionThread,
+            DEFAULT_PERIOD_IN_MILLIS,
+            stoppable
         );
+    }
+
+    public Scheduler(
+        int maxExecutionThread,
+        int periodInMillis,
+        boolean stoppable
+    ) {
+        this.stoppable = stoppable;
+        this.tasks = new ConcurrentHashMap<>();
         this.runningTasks = ConcurrentHashMap.newKeySet();
         this.inspector = EzyExecutors.newSingleThreadScheduledExecutor(
             DefaultThreadFactory.create("scheduler")
@@ -45,25 +66,55 @@ public class Scheduler extends EzyLoggable {
             maxExecutionThread,
             DefaultThreadFactory.create("scheduler-executor")
         );
+        List<Task> taskBuffer = new ArrayList<>();
         this.inspector.scheduleAtFixedRate(
-            this::run,
-            5,
-            5,
+            () -> run(taskBuffer),
+            periodInMillis,
+            periodInMillis,
             TimeUnit.MILLISECONDS
         );
     }
 
-    private void run() {
-        for (Task task : tasks) {
+    private void run(List<Task> taskBuffer) {
+        taskBuffer.addAll(tasks.values());
+        for (Task task : taskBuffer) {
             if (!runningTasks.contains(task)) {
-                long currentTime = System.currentTimeMillis();
-                if (currentTime >= task.nexRunTime.get()) {
-                    task.calculateNextRunTime();
-                    runningTasks.add(task);
-                    executorService.execute(() -> runTask(task));
-                }
+                doRunTask(task);
             }
         }
+        taskBuffer.clear();
+    }
+
+    private void doRunTask(Task task) {
+        try {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime >= task.nexRunTime.get()) {
+                task.calculateNextRunTime();
+                runningTasks.add(task);
+                executorService.execute(() -> {
+                    runTask(task);
+                    if (!task.runForever) {
+                        tasks.remove(task.command);
+                    }
+                });
+            }
+        } catch (Throwable e) {
+            logger.warn("run task: {} error", task, e);
+        }
+    }
+
+    public void scheduleOneTime(
+        Runnable command,
+        long delayTime,
+        TimeUnit unit
+    ) {
+        this.scheduleAtFixRate(
+            command,
+            false,
+            delayTime,
+            0,
+            unit
+        );
     }
 
     public void scheduleAtFixRate(
@@ -72,17 +123,46 @@ public class Scheduler extends EzyLoggable {
         long period,
         TimeUnit unit
     ) {
-        Task task = new Task(command, initialDelay, period, unit);
-        tasks.add(task);
-        if (initialDelay <= 0) {
-            runningTasks.add(task);
-            executorService.execute(() -> runTask(task));
+        this.scheduleAtFixRate(
+            command,
+            true,
+            initialDelay,
+            period,
+            unit
+        );
+    }
+
+    private void scheduleAtFixRate(
+        Runnable command,
+        boolean runForever,
+        long initialDelay,
+        long period,
+        TimeUnit unit
+    ) {
+        if (initialDelay < 0) {
+            throw new IllegalArgumentException("delay time must be >= 0");
         }
+        Task task = new Task(
+            command,
+            runForever,
+            initialDelay,
+            period,
+            unit
+        );
+        tasks.put(task.command, task);
+    }
+
+    public void cancelSchedule(Runnable command) {
+        tasks.remove(command);
     }
 
     public void stop() {
-        this.inspector.shutdown();
-        this.executorService.shutdown();
+        if (stoppable) {
+            this.inspector.shutdown();
+            this.executorService.shutdown();
+        } else {
+            throw new IllegalStateException("can not stop unstoppable scheduler");
+        }
     }
 
     private void runTask(Task task) {
@@ -97,16 +177,19 @@ public class Scheduler extends EzyLoggable {
 
     private static class Task {
         final Runnable command;
+        final boolean runForever;
         final long periodMillis;
         final AtomicLong nexRunTime = new AtomicLong();
 
         Task(
             Runnable command,
+            boolean runForever,
             long initialDelay,
             long period,
             TimeUnit unit
         ) {
             this.command = command;
+            this.runForever = runForever;
             this.periodMillis = unit.toMillis(period);
             this.nexRunTime.set(System.currentTimeMillis() + unit.toMillis(initialDelay));
         }

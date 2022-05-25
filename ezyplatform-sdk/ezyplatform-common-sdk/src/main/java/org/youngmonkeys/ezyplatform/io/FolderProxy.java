@@ -19,26 +19,59 @@ package org.youngmonkeys.ezyplatform.io;
 import com.tvd12.ezyfox.util.EzyArrayUtil;
 import com.tvd12.ezyfox.util.EzyDirectories;
 import com.tvd12.ezyfox.util.EzyFileUtil;
+import org.youngmonkeys.ezyplatform.data.FileItem;
+import org.youngmonkeys.ezyplatform.data.FileItem.FileItemMutable;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.util.Collections.singletonList;
 import static org.youngmonkeys.ezyplatform.exception.FilePermissionException.fromFileAction;
 import static org.youngmonkeys.ezyplatform.exception.FilePermissionException.fromFolderAction;
-import org.youngmonkeys.ezyplatform.data.FileItem;
-import org.youngmonkeys.ezyplatform.data.FileItem.FileItemMutable;
 
 public final class FolderProxy {
 
     private FolderProxy() {}
+
+    public static void writeDistinctLines(
+        File file,
+        String newLine
+    ) {
+        writeDistinctLines(file, singletonList(newLine));
+    }
+
+    public static void writeDistinctLines(
+        File file,
+        Collection<String> newLines
+    ) {
+        Path filePath = file.toPath();
+        createNewFile(file);
+        List<String> lines;
+        try {
+            lines = Stream.concat(
+                    newLines.stream(),
+                    Files.lines(filePath)
+                )
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw fromFileAction(file, "read");
+        }
+        try {
+            Files.write(filePath, lines);
+        } catch (Exception e) {
+            throw fromFileAction(file, "write");
+        }
+    }
 
     public static List<File> listFolders(File folder) {
         File[] files = null;
