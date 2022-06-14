@@ -17,7 +17,6 @@
 package org.youngmonkeys.ezyplatform.rx;
 
 import com.tvd12.ezyfox.concurrent.EzyExecutors;
-import com.tvd12.ezyfox.io.EzyLists;
 import lombok.Getter;
 
 import java.util.*;
@@ -171,12 +170,12 @@ public final class Reactive {
             return blockingGet(RxValueMap::valueSet);
         }
 
-        public RxValueMap blockingGet() {
-            return blockingGet(it -> it);
-        }
-
         public <T> T blockingCastGet() {
             return blockingGet(it -> it.castGet(returnType));
+        }
+
+        public RxValueMap blockingGet() {
+            return blockingGet(it -> it);
         }
 
         public <T> T blockingGet(Function<RxValueMap, T> mapper) {
@@ -291,7 +290,7 @@ public final class Reactive {
                         ++ rxMapCount;
                     }
                 }
-                if (rxMapCount == 0) {
+                if (rxMapCount == 0 && stack.size() > 0) {
                     Entry<Object, Object> e = (Entry<Object, Object>) stack.pop();
                     RxValueMap parent = (RxValueMap) stack.pop();
                     parent.put(e.getKey(), resultMap);
