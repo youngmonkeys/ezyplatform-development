@@ -19,6 +19,8 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.repo.PaginationResultRepository;
 import org.youngmonkeys.ezyplatform.rx.Reactive;
+import org.youngmonkeys.ezyplatform.rx.RxOperationSupplier;
+import org.youngmonkeys.ezyplatform.rx.RxSingle;
 
 import java.util.List;
 
@@ -80,10 +82,22 @@ public abstract class DefaultPaginationResultService<T, F, P, I, E, R>
     }
 
     protected List<T> convertEntities(List<R> entities) {
-        return Reactive.single(entities)
-            .map(this::convertEntity)
-            .blockingGetList();
+        RxSingle<R> single = Reactive.single(entities);
+        RxOperationSupplier<R> supplier = convertEntityRxSupplier();
+        if (supplier != null) {
+            single.mapItemRx(supplier);
+        } else {
+            single.mapItem(this::convertEntity);
+        }
+        return single.blockingGetList();
     }
 
-    protected abstract T convertEntity(R entity);
+    @SuppressWarnings("unchecked")
+    protected T convertEntity(R entity) {
+        return (T) entity;
+    }
+
+    protected RxOperationSupplier<R> convertEntityRxSupplier() {
+        return null;
+    }
 }
