@@ -11,6 +11,8 @@ public interface RxMultiple extends RxOperation {
 
     void blockingConsume(Consumer<RxValueMap> consumer);
 
+    <T> T blockingGet(int timeout, TimeUnit timeUnit);
+
     <T> T blockingGet(RxFunction<RxValueMap, T> mapper);
 
     <T> T blockingGet(

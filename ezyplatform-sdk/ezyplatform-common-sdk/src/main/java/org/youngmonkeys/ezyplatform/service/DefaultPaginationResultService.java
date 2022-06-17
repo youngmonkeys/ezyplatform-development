@@ -89,7 +89,7 @@ public abstract class DefaultPaginationResultService<T, F, P, I, E, R>
         } else {
             single.mapItem(this::convertEntity);
         }
-        return single.blockingGetList();
+        return single.blockingGet();
     }
 
     @SuppressWarnings("unchecked")

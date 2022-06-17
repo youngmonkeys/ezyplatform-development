@@ -9,20 +9,11 @@ public class RxValueMap {
     protected final List<Object> taskKeys;
     private final List<RxFunction> mappers;
     protected final Map<Object, Object> map;
-    protected final Reactive.ReturnType returnType;
-
-    public static final RxValueMap EMPTY_MAP = new RxValueMap(
-        Collections.emptyList(),
-        Reactive.ReturnType.DEFAULT,
-        Collections.emptyList()
-    ) {
-        @Override
-        public void put(Object key, Object value) {}
-    };
+    protected final RxReturnType returnType;
 
     public RxValueMap(
         List<Object> taskKeys,
-        Reactive.ReturnType returnType,
+        RxReturnType returnType,
         List<RxFunction> mappers
     ) {
         this.mappers = mappers;
@@ -45,7 +36,7 @@ public class RxValueMap {
     }
 
     public <T> T firstValue() {
-        return (T) map.values().iterator().next();
+        return (T) map.get(taskKeys.get(0));
     }
 
     public <T> T firstValueOrNull() {
@@ -73,19 +64,19 @@ public class RxValueMap {
     }
 
     public <T> T castGet() {
-        if (returnType == Reactive.ReturnType.FIST) {
+        if (returnType == RxReturnType.FIST) {
             return firstValue();
         }
-        if (returnType == Reactive.ReturnType.FIST_OR_NULL) {
+        if (returnType == RxReturnType.FIST_OR_NULL) {
             return firstValueOrNull();
         }
-        if (returnType == Reactive.ReturnType.LIST) {
+        if (returnType == RxReturnType.LIST) {
             return (T) valueList();
         }
-        if (returnType == Reactive.ReturnType.SET) {
+        if (returnType == RxReturnType.SET) {
             return (T) valueSet();
         }
-        if (returnType == Reactive.ReturnType.MAP) {
+        if (returnType == RxReturnType.MAP) {
             return (T) map;
         }
         Object finalResult = this;
