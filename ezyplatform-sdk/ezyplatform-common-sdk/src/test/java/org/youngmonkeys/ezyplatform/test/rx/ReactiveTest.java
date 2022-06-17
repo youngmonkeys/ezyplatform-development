@@ -2,6 +2,7 @@ package org.youngmonkeys.ezyplatform.test.rx;
 
 import com.tvd12.ezyfox.concurrent.EzyExecutors;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
+import com.tvd12.ezyfox.util.EzyThreads;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.reflect.FieldUtil;
@@ -11,6 +12,8 @@ import org.youngmonkeys.ezyplatform.rx.*;
 
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -428,6 +431,68 @@ public class ReactiveTest extends BaseTest {
 
         // then
         Asserts.assertEqualsType(e, IllegalArgumentException.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void blockingConsumeTest() throws Exception {
+        // given
+        int value = RandomUtil.randomSmallInt();
+        RxConsumer<RxValueMap> consumer = mock(RxConsumer.class);
+
+        // when
+        Reactive.single(value)
+            .returnType(RxReturnType.DEFAULT)
+            .toMultiple()
+            .blockingConsume(consumer);
+
+        // then
+        verify(consumer, times(1)).accept(any(RxValueMap.class));
+    }
+
+    @Test
+    public void blockingGetFailedTest() {
+        // given
+        int value = RandomUtil.randomSmallInt();
+        RuntimeException exception = new RuntimeException("just test");
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            Reactive.single(value)
+                .mapItem(it -> { throw exception; })
+                .blockingGet()
+        );
+
+        // then
+        Asserts.assertEqualsType(e, RxException.class);
+        Asserts.assertEquals(
+            ((RxException) e).getExceptions(),
+            Collections.singletonList(exception),
+            false
+        );
+    }
+
+    @Test
+    public void blockingGetTimeoutTest() {
+        // given
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            Reactive.multiple()
+                .register("hello", () -> "world")
+                .register("foo", () -> {
+                    EzyThreads.sleep(200);
+                    return "bar";
+                })
+                .register("1", () -> "2")
+                .blockingGet(10, TimeUnit.MILLISECONDS)
+        );
+
+        // then
+        Asserts.assertEqualsType(e, RxException.class);
+        Asserts.assertEqualsType(
+            ((RxException) e).getExceptions().get(0),
+            TimeoutException.class
+        );
     }
 
     @Test

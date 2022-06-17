@@ -85,7 +85,7 @@ public class RxValueMap {
                 try {
                     finalResult = mapperItem.apply(finalResult);
                 } catch (Exception e) {
-                    throw new Reactive.RxException(e);
+                    throw new RxException(e);
                 }
             }
         }

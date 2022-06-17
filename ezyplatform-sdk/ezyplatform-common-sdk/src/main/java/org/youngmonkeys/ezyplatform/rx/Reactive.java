@@ -17,7 +17,6 @@
 package org.youngmonkeys.ezyplatform.rx;
 
 import com.tvd12.ezyfox.concurrent.EzyExecutors;
-import lombok.Getter;
 
 import java.util.*;
 import java.util.Map.Entry;
@@ -26,11 +25,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
-
-import static com.tvd12.ezyfox.io.EzyStrings.exceptionsToString;
-import static com.tvd12.ezyfox.io.EzyStrings.traceStackToString;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public final class Reactive {
@@ -295,7 +290,7 @@ public final class Reactive {
         }
 
         @Override
-        public void blockingConsume(Consumer<RxValueMap> consumer) {
+        public void blockingConsume(RxConsumer<RxValueMap> consumer) {
             blockingGet(it -> {
                 consumer.accept(it);
                 return null;
@@ -453,23 +448,6 @@ public final class Reactive {
                 }
                 resultMap = (RxValueMap) ((Entry) stack.peek()).getValue();
             }
-        }
-    }
-
-    @Getter
-    public static class RxException extends RuntimeException {
-        private static final long serialVersionUID = -8667468848025369677L;
-        
-        private final List<Exception> exceptions;
-
-        public RxException(Exception exception) {
-            super(traceStackToString(exception));
-            this.exceptions = Collections.singletonList(exception);
-        }
-
-        public RxException(List<Exception> exceptions) {
-            super(exceptionsToString(exceptions));
-            this.exceptions = exceptions;
         }
     }
 

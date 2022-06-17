@@ -1,7 +1,6 @@
 package org.youngmonkeys.ezyplatform.rx;
 
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 public interface RxMultiple extends RxOperation {
 
@@ -9,7 +8,7 @@ public interface RxMultiple extends RxOperation {
 
     <T, R> RxMultiple map(RxFunction<T, R> mapper);
 
-    void blockingConsume(Consumer<RxValueMap> consumer);
+    void blockingConsume(RxConsumer<RxValueMap> consumer);
 
     <T> T blockingGet(int timeout, TimeUnit timeUnit);
 
