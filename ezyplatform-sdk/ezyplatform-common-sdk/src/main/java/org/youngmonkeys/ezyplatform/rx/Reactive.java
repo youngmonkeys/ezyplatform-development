@@ -226,7 +226,6 @@ public final class Reactive {
             Object name,
             RxRunnable operation
         ) {
-            taskKeys.add(name);
             return register(name, () -> {
                 operation.run();
                 return null;
@@ -255,7 +254,6 @@ public final class Reactive {
             Collection<T> values,
             RxConsumer<T> itemConsumer
         ) {
-            taskKeys.addAll(values);
             return registers(values, it -> {
                 itemConsumer.accept(it);
                 return null;
