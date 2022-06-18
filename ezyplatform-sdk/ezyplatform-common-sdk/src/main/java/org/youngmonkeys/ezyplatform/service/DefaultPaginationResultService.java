@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.repo.PaginationResultRepository;
 import org.youngmonkeys.ezyplatform.rx.Reactive;
+import org.youngmonkeys.ezyplatform.rx.RxOperation;
 import org.youngmonkeys.ezyplatform.rx.RxOperationSupplier;
 import org.youngmonkeys.ezyplatform.rx.RxSingle;
 
@@ -41,14 +42,14 @@ public abstract class DefaultPaginationResultService<T, F, P, I, E, R>
     protected final PaginationResultRepository<F, P, I, E, R> repository;
 
     @Override
-    protected List<T> getFirstItems(F filter, int limit) {
+    protected RxOperation getFirstItems(F filter, int limit) {
         return convertEntities(
             repository.findFirstElements(filter, limit)
         );
     }
 
     @Override
-    protected List<T> getNextItemsExclusive(
+    protected RxOperation getNextItemsExclusive(
         F filter,
         P paginationParameter,
         int limit
@@ -59,14 +60,14 @@ public abstract class DefaultPaginationResultService<T, F, P, I, E, R>
     }
 
     @Override
-    protected List<T> getLastItems(F filter, int limit) {
+    protected RxOperation getLastItems(F filter, int limit) {
         return convertEntities(
             repository.findLastElements(filter, limit)
         );
     }
 
     @Override
-    protected List<T> getPreviousItemsExclusive(
+    protected RxOperation getPreviousItemsExclusive(
         F filter,
         P paginationParameter,
         int limit
@@ -81,7 +82,7 @@ public abstract class DefaultPaginationResultService<T, F, P, I, E, R>
         return repository.countElements(filter);
     }
 
-    protected List<T> convertEntities(List<R> entities) {
+    protected RxOperation convertEntities(List<R> entities) {
         RxSingle<R> single = Reactive.single(entities);
         RxOperationSupplier<R> supplier = convertEntityRxSupplier();
         if (supplier != null) {
@@ -89,7 +90,7 @@ public abstract class DefaultPaginationResultService<T, F, P, I, E, R>
         } else {
             single.mapItem(this::convertEntity);
         }
-        return single.blockingGet();
+        return single;
     }
 
     @SuppressWarnings("unchecked")

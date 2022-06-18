@@ -21,6 +21,8 @@ import lombok.AllArgsConstructor;
 import lombok.ToString;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
+import org.youngmonkeys.ezyplatform.rx.Reactive;
+import org.youngmonkeys.ezyplatform.rx.RxOperation;
 import org.youngmonkeys.ezyplatform.service.PaginationService;
 
 import java.util.ArrayList;
@@ -248,26 +250,28 @@ public class PaginationServiceTest {
         );
 
         @Override
-        protected List<Model> getFirstItems(Void matchingValue, int limit) {
-            return models.subList(0, limit);
+        protected RxOperation getFirstItems(Void matchingValue, int limit) {
+            return Reactive.single(
+                models.subList(0, limit)
+            );
         }
 
         @Override
-        protected List<Model> getNextItemsExclusive(Void matchingValue, Integer paginationValue, int limit) {
+        protected RxOperation getNextItemsExclusive(Void matchingValue, Integer paginationValue, int limit) {
             List<Model> answer = new ArrayList<>();
-            for (int i = 0 ; i < models.size() ; ++i) {
-                if (models.get(i).index > paginationValue) {
-                    answer.add(models.get(i));
+            for (Model model : models) {
+                if (model.index > paginationValue) {
+                    answer.add(model);
                 }
                 if (answer.size() >= limit) {
                     break;
                 }
             }
-            return answer;
+            return Reactive.single(answer);
         }
 
         @Override
-        protected List<Model> getPreviousItemsExclusive(Void matchingValue, Integer paginationValue, int limit) {
+        protected RxOperation getPreviousItemsExclusive(Void matchingValue, Integer paginationValue, int limit) {
             List<Model> answer = new ArrayList<>();
             for (int i = models.size() - 1 ; i >= 0 ; --i) {
                 if (models.get(i).index < paginationValue) {
@@ -277,14 +281,14 @@ public class PaginationServiceTest {
                     break;
                 }
             }
-            return answer;
+            return Reactive.single(answer);
         }
 
         @Override
-        protected List<Model> getLastItems(Void matchingValue, int limit) {
+        protected RxOperation getLastItems(Void matchingValue, int limit) {
             List<Model> answer = models.subList(models.size() - limit, models.size());
             Collections.reverse(answer);
-            return answer;
+            return Reactive.single(answer);
         }
 
         @Override

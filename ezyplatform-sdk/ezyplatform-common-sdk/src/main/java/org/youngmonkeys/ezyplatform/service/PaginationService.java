@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.io.EzyLists;
 import com.tvd12.ezyfox.sercurity.EzyBase64;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.rx.Reactive;
+import org.youngmonkeys.ezyplatform.rx.RxOperation;
 import org.youngmonkeys.ezyplatform.rx.RxValueMap;
 
 import java.util.Collections;
@@ -60,9 +61,9 @@ public abstract class PaginationService<T, F, P> {
         P paginationParameter = doDeserializePageToken(pageToken);
         int limitPlusOne = limit + 1;
         return Reactive.multiple()
-            .register(
+            .registerRx(
                 "listPlusOne",
-                () -> getNextItems(filter, paginationParameter, limitPlusOne)
+                getNextItems(filter, paginationParameter, limitPlusOne)
             )
             .register(
                 "total",
@@ -99,9 +100,9 @@ public abstract class PaginationService<T, F, P> {
         P paginationParameter = doDeserializePageToken(pageToken);
         int limitPlusOne = limit + 1;
         return Reactive.multiple()
-            .register(
+            .registerRx(
                 "listPlusOne",
-                () -> getPreviousItems(filter, paginationParameter, limitPlusOne)
+                getPreviousItems(filter, paginationParameter, limitPlusOne)
             )
             .register(
                 "total",
@@ -175,7 +176,7 @@ public abstract class PaginationService<T, F, P> {
             .build();
     }
 
-    private List<T> getNextItems(
+    private RxOperation getNextItems(
         F filter,
         P paginationParameter,
         int limit
@@ -185,21 +186,21 @@ public abstract class PaginationService<T, F, P> {
             : getNextItemsExclusive(filter, paginationParameter, limit);
     }
 
-    protected abstract List<T> getFirstItems(F filter, int limit);
+    protected abstract RxOperation getFirstItems(F filter, int limit);
 
-    protected abstract List<T> getNextItemsExclusive(
+    protected abstract RxOperation getNextItemsExclusive(
         F filter,
         P paginationParameter,
         int limit
     );
 
-    protected abstract List<T> getPreviousItemsExclusive(
+    protected abstract RxOperation getPreviousItemsExclusive(
         F filter,
         P paginationParameter,
         int limit
     );
 
-    private List<T> getPreviousItems(
+    private RxOperation getPreviousItems(
         F filter,
         P paginationParameter,
         int limit
@@ -209,7 +210,7 @@ public abstract class PaginationService<T, F, P> {
             : getPreviousItemsExclusive(filter, paginationParameter, limit);
     }
 
-    protected abstract List<T> getLastItems(F filter, int limit);
+    protected abstract RxOperation getLastItems(F filter, int limit);
 
     protected abstract long getTotalItems(F filter);
 
