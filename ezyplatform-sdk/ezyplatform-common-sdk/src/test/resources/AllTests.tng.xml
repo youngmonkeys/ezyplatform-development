@@ -22,6 +22,7 @@
 			<package name="org.youngmonkeys.ezyplatform.test.concurrent"/>
 			<package name="org.youngmonkeys.ezyplatform.test.data"/>
 			<package name="org.youngmonkeys.ezyplatform.test.extractor"/>
+			<package name="org.youngmonkeys.ezyplatform.test.rx"/>
 			<package name="org.youngmonkeys.ezyplatform.test.security"/>
 			<package name="org.youngmonkeys.ezyplatform.test.service"/>
 			<package name="org.youngmonkeys.ezyplatform.test.util"/>
