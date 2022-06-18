@@ -5,7 +5,6 @@ import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyfox.util.EzyThreads;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
-import com.tvd12.test.reflect.FieldUtil;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.rx.*;
@@ -14,6 +13,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -250,21 +250,10 @@ public class ReactiveTest extends BaseTest {
             .blockingGet();
 
         // then
-        @SuppressWarnings({"rawtypes", "unchecked"})
-        RxValueMap expectation = new RxValueMap(
-            (List) values,
-            RxReturnType.DEFAULT,
-            null
-        );
         Map<Integer, String> map = values
             .stream()
             .collect(Collectors.toMap(it -> it, String::valueOf));
-        FieldUtil.setFieldValue(expectation, "map", map);
-        Asserts.assertEquals(
-            actual,
-            expectation,
-            false
-        );
+        Asserts.assertEquals(actual.typedValueMap(), map, false);
     }
 
     @Test
@@ -492,6 +481,39 @@ public class ReactiveTest extends BaseTest {
         Asserts.assertEqualsType(
             ((RxException) e).getExceptions().get(0),
             TimeoutException.class
+        );
+    }
+
+    @Test
+    public void blockingGetInteruptTest() {
+        // given
+        // when
+        AtomicReference<Throwable> ref = new AtomicReference<>();
+        Thread newThread = new Thread(() -> {
+            try {
+                Reactive.multiple()
+                    .register("hello", () -> "world")
+                    .register("foo", () -> {
+                        EzyThreads.sleep(200);
+                        return "bar";
+                    })
+                    .register("1", () -> "2")
+                    .blockingGet();
+            } catch (Throwable e) {
+                ref.set(e);
+            }
+        });
+        newThread.start();
+        EzyThreads.sleep(90);
+        newThread.interrupt();
+        EzyThreads.sleep(100);
+
+        // then
+        Throwable e = ref.get();
+        Asserts.assertEqualsType(e, RxException.class);
+        Asserts.assertEqualsType(
+            ((RxException) e).getExceptions().get(0),
+            InterruptedException.class
         );
     }
 

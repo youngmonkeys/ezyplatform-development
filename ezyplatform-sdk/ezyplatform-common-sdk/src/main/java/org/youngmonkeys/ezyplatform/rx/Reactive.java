@@ -20,10 +20,7 @@ import com.tvd12.ezyfox.concurrent.EzyExecutors;
 
 import java.util.*;
 import java.util.Map.Entry;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -327,10 +324,14 @@ public final class Reactive {
         @Override
         public <T> T blockingGet(int timeout, TimeUnit timeUnit) {
             if (tasks.isEmpty()) {
-                return new RxValueMap(taskKeys, returnType, mappers)
+                return new ResultValueMap(taskKeys, returnType, mappers)
                     .castGet();
             }
-            RxValueMap result = new RxValueMap(taskKeys, returnType, mappers);
+            ResultValueMap result = new ResultValueMap(
+                taskKeys,
+                returnType,
+                mappers
+            );
             List<InternalTask> flattenTasks = flatTasks(result);
             List<Exception> exceptions = Collections.synchronizedList(
                 new ArrayList<>()
@@ -372,9 +373,9 @@ public final class Reactive {
         }
 
         private List<InternalTask> flatTasks(
-            RxValueMap rootValueMap
+            ResultValueMap rootValueMap
         ) {
-            RxValueMap parentResultMap = rootValueMap;
+            ResultValueMap parentResultMap = rootValueMap;
             List<InternalTask> flattenTasks = new ArrayList<>();
             Queue<MultipleTask> taskQueue = new LinkedList<>();
             Set<Entry<Object, Object>> taskEntries = tasks.entrySet();
@@ -394,7 +395,7 @@ public final class Reactive {
                         Multiple multiple = task instanceof Multiple
                             ? (Multiple) task
                             : ((Single) task).toMultiple();
-                        RxValueMap resultMap = new RxValueMap(
+                        ResultValueMap resultMap = new ResultValueMap(
                             multiple.taskKeys,
                             multiple.returnType,
                             multiple.mappers
@@ -425,9 +426,9 @@ public final class Reactive {
                 .collect(Collectors.toList());
         }
 
-        private void convertRxMapValues(RxValueMap rootValueMap) {
+        private void convertRxMapValues(ResultValueMap rootValueMap) {
             Stack<Object> stack = new Stack<>();
-            RxValueMap resultMap = rootValueMap;
+            ResultValueMap resultMap = rootValueMap;
             while (true) {
                 int rxMapCount = 0;
                 for (Entry<Object, Object> e : resultMap.map.entrySet()) {
@@ -440,24 +441,131 @@ public final class Reactive {
                 }
                 if (rxMapCount == 0 && stack.size() > 0) {
                     Object taskKey = ((Entry) stack.pop()).getKey();
-                    RxValueMap parent = (RxValueMap) stack.pop();
+                    ResultValueMap parent = (ResultValueMap) stack.pop();
                     parent.put(taskKey, resultMap.castGet());
                 }
                 if (stack.isEmpty()) {
                     break;
                 }
-                resultMap = (RxValueMap) ((Entry) stack.peek()).getValue();
+                resultMap = (ResultValueMap) ((Entry) stack.peek()).getValue();
             }
+        }
+    }
+
+    private static class ResultValueMap implements RxValueMap {
+
+        private final List<Object> taskKeys;
+        private final List<RxFunction> mappers;
+        private final Map<Object, Object> map;
+        private final RxReturnType returnType;
+
+        private ResultValueMap(
+            List<Object> taskKeys,
+            RxReturnType returnType,
+            List<RxFunction> mappers
+        ) {
+            this.mappers = mappers;
+            this.taskKeys = taskKeys;
+            this.returnType = returnType;
+            this.map = new ConcurrentHashMap<>(taskKeys.size());
+        }
+
+        private void put(Object key, Object value) {
+            this.map.put(key, value);
+        }
+
+        @Override
+        public <T> T get(Object key) {
+            return (T) map.get(key);
+        }
+
+        @Override
+        public <T> T get(Object key, T defaultValue) {
+            return (T) map.getOrDefault(key, defaultValue);
+        }
+
+        @Override
+        public <T> T firstValue() {
+            return (T) map.get(taskKeys.get(0));
+        }
+
+        @Override
+        public <T> T firstValueOrNull() {
+            return isEmpty() ? null : firstValue();
+        }
+
+        @Override
+        public <T> List<T> valueList() {
+            List<T> answer = new ArrayList<>();
+            for (Object taskKey : taskKeys) {
+                answer.add((T) map.get(taskKey));
+            }
+            return answer;
+        }
+
+        @Override
+        public <T> Set<T> valueSet() {
+            return new HashSet<>((Collection<T>) map.values());
+        }
+
+        @Override
+        public Map<String, Object> valueMap() {
+            return (Map) map;
+        }
+
+        @Override
+        public <K, V> Map<K, V> typedValueMap() {
+            return (Map) map;
+        }
+
+        @Override
+        public <T> T castGet() {
+            if (returnType == RxReturnType.FIST) {
+                return firstValue();
+            }
+            if (returnType == RxReturnType.FIST_OR_NULL) {
+                return firstValueOrNull();
+            }
+            if (returnType == RxReturnType.LIST) {
+                return (T) valueList();
+            }
+            if (returnType == RxReturnType.SET) {
+                return (T) valueSet();
+            }
+            if (returnType == RxReturnType.MAP) {
+                return (T) map;
+            }
+            Object finalResult = this;
+            if (mappers != null) {
+                for (RxFunction mapperItem : mappers) {
+                    try {
+                        finalResult = mapperItem.apply(finalResult);
+                    } catch (Exception e) {
+                        throw new RxException(e);
+                    }
+                }
+            }
+            return (T) finalResult;
+        }
+
+        @Override
+        public int size() {
+            return map.size();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return map.isEmpty();
         }
     }
 
     private static class MultipleTask {
 
-        private final RxValueMap resultMap;
+        private final ResultValueMap resultMap;
         private final Set<Entry<Object, Object>> taskEntries;
 
         private MultipleTask(
-            RxValueMap resultMap,
+            ResultValueMap resultMap,
             Set<Entry<Object, Object>> taskEntries
         ) {
             this.resultMap = resultMap;
@@ -469,11 +577,11 @@ public final class Reactive {
 
         private final Object taskKey;
         private final RxSupplier supplier;
-        private final RxValueMap resultMap;
+        private final ResultValueMap resultMap;
         private final AtomicBoolean done;
 
         private InternalTask(
-            RxValueMap resultMap,
+            ResultValueMap resultMap,
             Object taskKey,
             RxSupplier supplier
         ) {

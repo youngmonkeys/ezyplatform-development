@@ -1,102 +1,30 @@
 package org.youngmonkeys.ezyplatform.rx;
 
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
-public class RxValueMap {
+public interface RxValueMap {
 
-    protected final List<Object> taskKeys;
-    private final List<RxFunction> mappers;
-    protected final Map<Object, Object> map;
-    protected final RxReturnType returnType;
+    <T> T get(Object key);
 
-    public RxValueMap(
-        List<Object> taskKeys,
-        RxReturnType returnType,
-        List<RxFunction> mappers
-    ) {
-        this.mappers = mappers;
-        this.taskKeys = taskKeys;
-        this.returnType = returnType;
-        this.map = new ConcurrentHashMap<>(taskKeys.size());
-    }
+    <T> T get(Object key, T defaultValue);
 
-    public void put(Object key, Object value) {
-        this.map.put(key, value);
-    }
+    <T> T firstValue();
 
-    public <T> T get(Object key) {
-        return (T) map.get(key);
-    }
+    <T> T firstValueOrNull();
 
-    public <T> T get(Object key, T defaultValue) {
-        T value = (T) map.get(key);
-        return value != null ? value : defaultValue;
-    }
+    <T> List<T> valueList();
 
-    public <T> T firstValue() {
-        return (T) map.get(taskKeys.get(0));
-    }
+    <T> Set<T> valueSet();
 
-    public <T> T firstValueOrNull() {
-        return isEmpty() ? null : firstValue();
-    }
+    Map<String, Object> valueMap();
 
-    public <T> List<T> valueList() {
-        List<T> answer = new ArrayList<>();
-        for (Object taskKey : taskKeys) {
-            answer.add((T) map.get(taskKey));
-        }
-        return answer;
-    }
+    <K, V> Map<K, V> typedValueMap();
 
-    public <T> Set<T> valueSet() {
-        return new HashSet<>((Collection<T>) map.values());
-    }
+    <T> T castGet();
 
-    public Map<String, Object> valueMap() {
-        return (Map) map;
-    }
+    int size();
 
-    public <K, V> Map<K, V> typedValueMap() {
-        return (Map) map;
-    }
-
-    public <T> T castGet() {
-        if (returnType == RxReturnType.FIST) {
-            return firstValue();
-        }
-        if (returnType == RxReturnType.FIST_OR_NULL) {
-            return firstValueOrNull();
-        }
-        if (returnType == RxReturnType.LIST) {
-            return (T) valueList();
-        }
-        if (returnType == RxReturnType.SET) {
-            return (T) valueSet();
-        }
-        if (returnType == RxReturnType.MAP) {
-            return (T) map;
-        }
-        Object finalResult = this;
-        if (mappers != null) {
-            for (RxFunction mapperItem : mappers) {
-                try {
-                    finalResult = mapperItem.apply(finalResult);
-                } catch (Exception e) {
-                    throw new RxException(e);
-                }
-            }
-        }
-        return (T) finalResult;
-    }
-
-    public int size() {
-        return map.size();
-    }
-
-    public boolean isEmpty() {
-        return map.isEmpty();
-    }
+    boolean isEmpty();
 }
