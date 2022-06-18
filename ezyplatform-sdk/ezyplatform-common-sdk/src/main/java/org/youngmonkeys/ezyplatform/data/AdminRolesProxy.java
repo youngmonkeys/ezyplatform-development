@@ -28,7 +28,7 @@ import static com.tvd12.ezyfox.io.EzyCollections.containsAny;
 @Builder
 public class AdminRolesProxy {
     @Getter
-    private boolean supperAdmin;
+    private boolean superAdmin;
     @Getter
     private boolean specialAdmin;
     private FeatureURIManager featureUriManager;
@@ -108,7 +108,7 @@ public class AdminRolesProxy {
             .featureUriManager(featureUriManager)
             .accessibleMethodsByUri(accessibleMethodsByUri)
             .specialAdmin(containsAny(roleIds, specialRoleIds))
-            .supperAdmin(roleIds.contains(superAdminRoleId))
+            .superAdmin(roleIds.contains(superAdminRoleId))
             .build();
     }
 }
