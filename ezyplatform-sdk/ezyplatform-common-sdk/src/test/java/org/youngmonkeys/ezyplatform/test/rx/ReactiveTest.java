@@ -273,6 +273,23 @@ public class ReactiveTest extends BaseTest {
     }
 
     @Test
+    public void blockingGetDefaultLambdaTest() {
+        // given
+        List<Integer> values = RandomUtil.randomList(10, int.class);
+
+        // when
+        Object actual = Reactive.multiple()
+            .registersRx(values, Reactive::single)
+            .blockingGet(RxValueMap::valueMap);
+
+        // then
+        Map<Integer, Integer> map = values
+            .stream()
+            .collect(Collectors.toMap(it -> it, it -> it));
+        Asserts.assertEquals(actual, map, false);
+    }
+
+    @Test
     public void blockingGetSetTest() {
         // given
         List<Integer> values = RandomUtil.randomList(10, int.class);
