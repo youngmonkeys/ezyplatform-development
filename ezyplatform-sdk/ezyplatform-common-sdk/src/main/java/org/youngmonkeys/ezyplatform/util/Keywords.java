@@ -33,21 +33,23 @@ public final class Keywords {
             return nullIfBlank ? null : Collections.emptySet();
         }
         Set<String> answer = new HashSet<>();
-        answer.add(str.toLowerCase());
         List<String> words = splitString(str);
         StringBuilder keyword = null;
         for (String word : words) {
             if (isBlank(word)) {
                 continue;
             }
-            String wordLowerCase = word.trim().toLowerCase();
+            String wordTrim = word.trim();
             if (keyword == null) {
-                keyword = new StringBuilder(wordLowerCase);
+                keyword = new StringBuilder(wordTrim);
             } else {
-                keyword.append(' ').append(wordLowerCase);
+                keyword.append(' ').append(wordTrim);
             }
-            answer.add(wordLowerCase);
-            answer.add(keyword.toString());
+            answer.add(wordTrim);
+            answer.add(wordTrim.toLowerCase());
+            String keywordString = keyword.toString();
+            answer.add(keywordString);
+            answer.add(keywordString.toLowerCase());
 
         }
         return answer;
@@ -74,6 +76,9 @@ public final class Keywords {
             } else {
                 buffer.append(ch);
             }
+        }
+        if (buffer.length() > 0) {
+            answer.add(buffer.toString());
         }
         return answer;
     }

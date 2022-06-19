@@ -35,12 +35,17 @@ public class KeywordsTest {
 
         // then
         Set<String> expectation = Sets.newHashSet(
-            "luck",
+            "lucky",
+            "Lucky",
             "wheel",
+            "Wheel",
             "game",
-            "luck wheel",
-            "luck wheel game"
+            "Game",
+            "lucky wheel",
+            "Lucky Wheel",
+            "lucky wheel game",
+            "Lucky Wheel Game"
         );
-        Asserts.assertNotEquals(actual, expectation);
+        Asserts.assertEquals(actual, expectation);
     }
 }
