@@ -331,9 +331,7 @@ public final class Reactive {
                 mappers
             );
             List<InternalTask> flattenTasks = flatTasks(result);
-            List<Exception> exceptions = Collections.synchronizedList(
-                new ArrayList<>()
-            );
+            List<Exception> exceptions = new CopyOnWriteArrayList<>();
             CountDownLatch countDown = new CountDownLatch(flattenTasks.size());
             for (InternalTask task : flattenTasks) {
                 executorService.execute(() -> {
