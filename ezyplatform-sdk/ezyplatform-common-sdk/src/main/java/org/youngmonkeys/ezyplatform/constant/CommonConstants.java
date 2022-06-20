@@ -42,6 +42,7 @@ public final class CommonConstants {
     public static final String PATTERN_PROPERTY_NAME = "[\\d\\w_\\-\\.\\+\\$]+";
     public static final String PATTERN_SHA256_STRING = "[a-fA-F0-9\\s]{64}";
     public static final String PATTERN_PACKAGE_NAME = "[a-z0-9\\.]+";
+    public static final String PATTERN_HIDDEN_PASSWORD = "[*]+";
     public static final int MIN_LENGTH_PASSWORD = 6;
     public static final int MAX_LENGTH_PASSWORD = 128;
     public static final int MIN_LENGTH_PHONE = 6;
@@ -94,6 +95,7 @@ public final class CommonConstants {
     public static final String DEFAULT_WEB_URL = "http://localhost:8080";
     public static final String DEFAULT_WEB_MANAGEMENT_URL = "http://localhost:18080";
     public static final String DEFAULT_WEBSOCKET_URL = "ws://localhost:2208/ws";
+    public static final String DEFAULT_HIDDEN_PASSWORD = "************";
     public static final long DEFAULT_TOKEN_EXPIRED_IN_DAY = 7;
     public static final String DEFAULT_MAX_UPLOAD_FILE_SIZE = "5MB";
     public static final Set<String> DEFAULT_ACCEPTED_IMAGE_TYPES =
