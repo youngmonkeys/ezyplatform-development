@@ -38,6 +38,8 @@ public interface UserService {
 
     List<UserModel> getUserListByIds(Collection<Long> userIds);
 
+    Long getUserIdByAccessToken(String accessToken);
+
     long validateAccessToken(String accessToken);
 
     default Map<Long, UserModel> getUserMapByIds(Collection<Long> userIds) {

@@ -83,9 +83,21 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public Long getUserIdByAccessToken(String accessToken) {
+        if (accessToken != null) {
+            UserAccessToken entity =
+                accessTokenRepository.findById(accessToken);
+            if (entity != null) {
+                return entity.getUserId();
+            }
+        }
+        return null;
+    }
+
+    @Override
     public long validateAccessToken(String accessToken) {
         if (accessToken == null) {
-            throw new UserInvalidAccessTokenException(accessToken);
+            throw new UserInvalidAccessTokenException(null);
         }
         UserAccessToken entity = accessTokenRepository.findById(accessToken);
         if (entity == null) {
