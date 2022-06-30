@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -25,4 +26,8 @@ public class AdminNameModel {
     private long adminId;
     private String username;
     private String displayName;
+
+    public String getName() {
+        return EzyStrings.isBlank(displayName) ? username : displayName;
+    }
 }

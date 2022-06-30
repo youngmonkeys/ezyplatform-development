@@ -50,6 +50,8 @@ public final class CommonConstants {
     public static final int MAX_LENGTH_EMAIL = 128;
     public static final int MIN_LENGTH_URL = 10;
     public static final int MAX_LENGTH_URL = 256;
+    public static final int MAX_SEARCH_KEYWORD_LENGTH = 50;
+    public static final int MAX_SEARCH_KEYWORD_WORDS = 6;
 
     public static final int MIN_PAGE_SIZE = 1;
     public static final int MAX_PAGE_SIZE = 300;
