@@ -35,6 +35,8 @@ public interface MediaService {
 
     String getMediaName(long mediaId);
 
+    boolean containsMedia(long mediaId);
+
     List<MediaModel> getMediaListByIds(
         Collection<Long> mediaIds
     );
@@ -46,10 +48,6 @@ public interface MediaService {
             getMediaListByIds(mediaIds),
             MediaModel::getId
         );
-    }
-
-    default boolean containsMedia(long mediaId) {
-        return getMediaById(mediaId) != null;
     }
 
     default String generateMediaFileName() {

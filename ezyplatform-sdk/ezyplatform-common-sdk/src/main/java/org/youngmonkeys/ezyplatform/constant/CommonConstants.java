@@ -41,7 +41,8 @@ public final class CommonConstants {
     public static final String PATTERN_VERSION = "[0-9]+[\\.][0-9]+[\\.][0-9]+";
     public static final String PATTERN_PROPERTY_NAME = "[\\d\\w_\\-\\.\\+\\$]+";
     public static final String PATTERN_SHA256_STRING = "[a-fA-F0-9\\s]{64}";
-    public static final String PATTERN_PACKAGE_NAME = "[a-z0-9\\.]+";
+    public static final String PATTERN_PACKAGE_NAME = "[a-z0-9_\\.]+";
+    public static final String PATTERN_TAG = "[a-z0-9\\-\\s]+";
     public static final String PATTERN_HIDDEN_PASSWORD = "[*]+";
     public static final int MIN_LENGTH_PASSWORD = 6;
     public static final int MAX_LENGTH_PASSWORD = 128;

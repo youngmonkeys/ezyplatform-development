@@ -93,6 +93,11 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
+    public boolean containsMedia(long mediaId) {
+        return mediaRepository.containsById(mediaId);
+    }
+
+    @Override
     public MediaModel getMediaById(long mediaId) {
         if (mediaId <= 0) {
             return null;
