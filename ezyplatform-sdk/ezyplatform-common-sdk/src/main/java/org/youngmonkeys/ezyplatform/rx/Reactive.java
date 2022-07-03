@@ -210,6 +210,10 @@ public final class Reactive {
             super(returnType);
         }
 
+        public Multiple register(RxSupplier supplier) {
+            return register(supplier, supplier);
+        }
+
         public Multiple register(Object name, RxSupplier supplier) {
             taskKeys.add(name);
             tasks.put(name, supplier);
@@ -220,6 +224,12 @@ public final class Reactive {
             taskKeys.add(name);
             tasks.put(name, operation);
             return this;
+        }
+
+        public Multiple registerOperation(
+            RxRunnable operation
+        ) {
+            return registerOperation(operation, operation);
         }
 
         public Multiple registerOperation(
