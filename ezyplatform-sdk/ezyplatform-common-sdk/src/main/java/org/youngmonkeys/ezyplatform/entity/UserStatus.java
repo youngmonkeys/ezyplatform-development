@@ -20,5 +20,6 @@ public enum UserStatus {
     ACTIVATED,
     INACTIVATED,
     ARCHIVED,
-    BLOCKED;
+    BLOCKED,
+    DELETED;
 }
