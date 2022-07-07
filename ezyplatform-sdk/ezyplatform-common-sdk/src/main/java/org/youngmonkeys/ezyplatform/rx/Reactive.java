@@ -32,7 +32,7 @@ public final class Reactive {
 
     static {
         executorService = EzyExecutors.newFixedThreadPool(
-            1,
+            Runtime.getRuntime().availableProcessors() * 4,
             "reactive"
         );
     }
