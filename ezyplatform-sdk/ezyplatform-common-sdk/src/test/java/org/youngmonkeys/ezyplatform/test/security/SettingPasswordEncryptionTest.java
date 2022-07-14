@@ -16,8 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.test.security;
 
-import com.tvd12.ezyfox.sercurity.EzyAesCrypt;
-import com.tvd12.ezyfox.sercurity.EzyBase64;
+import com.tvd12.ezyfox.security.EzyAesCrypt;
+import com.tvd12.ezyfox.security.EzyBase64;
 import org.testng.annotations.Test;
 
 import java.security.SecureRandom;

@@ -17,8 +17,8 @@
 package org.youngmonkeys.ezyplatform.test.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tvd12.ezyfox.sercurity.EzyAesCrypt;
-import com.tvd12.ezyfox.sercurity.EzyBase64;
+import com.tvd12.ezyfox.security.EzyAesCrypt;
+import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.test.assertion.Asserts;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;

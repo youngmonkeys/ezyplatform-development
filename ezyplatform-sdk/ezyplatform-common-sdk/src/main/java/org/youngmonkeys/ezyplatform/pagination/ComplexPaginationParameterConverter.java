@@ -17,7 +17,7 @@
 package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezyfox.reflect.EzyClasses;
-import com.tvd12.ezyfox.sercurity.EzyBase64;
+import com.tvd12.ezyfox.security.EzyBase64;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

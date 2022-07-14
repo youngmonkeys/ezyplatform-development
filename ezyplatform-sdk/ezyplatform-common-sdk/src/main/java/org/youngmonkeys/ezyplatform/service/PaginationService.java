@@ -17,7 +17,7 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyfox.io.EzyLists;
-import com.tvd12.ezyfox.sercurity.EzyBase64;
+import com.tvd12.ezyfox.security.EzyBase64;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.rx.Reactive;
 import org.youngmonkeys.ezyplatform.rx.RxOperation;

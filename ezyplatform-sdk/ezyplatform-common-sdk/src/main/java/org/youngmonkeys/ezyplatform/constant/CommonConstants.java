@@ -44,6 +44,7 @@ public final class CommonConstants {
     public static final String PATTERN_PACKAGE_NAME = "[a-z0-9_\\.]+";
     public static final String PATTERN_TAG = "[a-z0-9\\-\\s]+";
     public static final String PATTERN_HIDDEN_PASSWORD = "[*]+";
+    public static final String PASSWORD_SALT = "$2a$10$48rTBuvOefj6u2o4IXJ3ve";
     public static final int MIN_LENGTH_PASSWORD = 6;
     public static final int MAX_LENGTH_PASSWORD = 128;
     public static final int MIN_LENGTH_PHONE = 6;

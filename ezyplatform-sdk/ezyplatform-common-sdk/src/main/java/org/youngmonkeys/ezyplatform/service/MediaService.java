@@ -16,7 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import com.tvd12.ezyfox.sercurity.EzySHA256;
+import com.tvd12.ezyfox.security.EzySHA256;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 import java.util.Collection;
