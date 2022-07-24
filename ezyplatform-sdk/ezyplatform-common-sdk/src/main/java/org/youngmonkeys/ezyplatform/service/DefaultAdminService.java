@@ -30,40 +30,46 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @AllArgsConstructor
-public class DefaultAdminService {
+public class DefaultAdminService implements AdminService {
 
     private final ClockProxy clock;
     private final AdminRepository adminRepository;
     private final AdminAccessTokenRepository accessTokenRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
 
+    @Override
     public Optional<AdminModel> getAdminByIdOptional(long id) {
         return adminRepository.findByIdOptional(id)
             .map(entityToModelConverter::toModel);
     }
 
+    @Override
     public AdminModel getAdminById(long adminId) {
         return entityToModelConverter.toModel(
             adminRepository.findById(adminId)
         );
     }
-    
+
+    @Override
     public AdminModel getAdminByUsername(String username) {
         return entityToModelConverter.toModel(
             adminRepository.findByField("username", username)
         );
     }
-    
+
+    @Override
     public Optional<AdminModel> getAdminByUsernameOptional(String username) {
         return adminRepository.findByFieldOptional("username", username)
             .map(entityToModelConverter::toModel);
     }
-    
+
+    @Override
     public AdminModel getAdminByAccessToken(String accessToken) {
         long adminId = validateAccessToken(accessToken);
         return getAdminById(adminId);
     }
 
+    @Override
     public long validateAccessToken(String accessToken) {
         if (accessToken == null) {
             throw new AdminInvalidAccessTokenException(accessToken);
