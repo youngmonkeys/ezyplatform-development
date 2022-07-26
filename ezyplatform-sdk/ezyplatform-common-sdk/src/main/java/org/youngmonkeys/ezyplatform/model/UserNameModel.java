@@ -27,14 +27,11 @@ public class UserNameModel {
     private String username;
     private String displayName;
 
-    public static UserNameModel fromUserModel(
-        UserModel model
-    ) {
+    public static UserNameModel fromUserModel(UserModel model) {
         if (model == null) {
             return null;
         }
         return UserNameModel.builder()
-            .userId(model.getId())
             .username(model.getUsername())
             .displayName(model.getDisplayName())
             .build();

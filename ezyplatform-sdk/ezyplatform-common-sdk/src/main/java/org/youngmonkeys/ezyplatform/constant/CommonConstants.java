@@ -94,7 +94,9 @@ public final class CommonConstants {
     public static final String SETTING_NAME_WEB_URL = "web_url";
     public static final String SETTING_NAME_WEB_MANAGEMENT_URL = "web_management_url";
     public static final String SETTING_NAME_WEBSOCKET_URL = "websocket_url";
+    public static final String SETTING_NAME_SOCKET_ENABLE = "socket_enable";
 
+    public static final boolean DEFAULT_SOCKET_ENABLE = true;
     public static final String DEFAULT_WEB_SITE_ICON_URL = "/images/favicon.ico";
     public static final String DEFAULT_ADMIN_URL = "http://localhost:9090";
     public static final String DEFAULT_WEB_URL = "http://localhost:8080";
