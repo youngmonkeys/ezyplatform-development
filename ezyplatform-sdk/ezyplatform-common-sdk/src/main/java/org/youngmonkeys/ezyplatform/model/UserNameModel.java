@@ -32,6 +32,7 @@ public class UserNameModel {
             return null;
         }
         return UserNameModel.builder()
+            .userId(model.getId())
             .username(model.getUsername())
             .displayName(model.getDisplayName())
             .build();
