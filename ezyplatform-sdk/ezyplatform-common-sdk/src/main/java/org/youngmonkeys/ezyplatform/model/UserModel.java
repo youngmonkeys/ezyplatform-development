@@ -19,7 +19,6 @@ package org.youngmonkeys.ezyplatform.model;
 import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.Builder;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.UserStatus;
 
 @Getter
 @Builder
@@ -33,7 +32,7 @@ public class UserModel {
     private String url;
     private long avatarImageId;
     private long coverImageId;
-    private UserStatus status;
+    private String status;
     private String activationKey;
     private long createdAt;
     private long updatedAt;

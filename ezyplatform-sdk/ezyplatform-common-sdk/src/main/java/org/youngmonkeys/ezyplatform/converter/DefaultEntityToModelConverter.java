@@ -96,7 +96,7 @@ public abstract class DefaultEntityToModelConverter {
             .avatarImageId(entity.getAvatarImageId())
             .coverImageId(entity.getCoverImageId())
             .activationKey(includeActivationKey ? entity.getActivationKey() : EMPTY_STRING)
-            .status(UserStatus.valueOf(entity.getStatus()))
+            .status(entity.getStatus())
             .createdAt(toTimestamp(entity.getCreatedAt()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
             .build();
