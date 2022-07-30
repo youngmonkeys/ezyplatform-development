@@ -201,12 +201,12 @@ public abstract class DefaultEntityToModelConverter {
             .build();
     }
 
-    public LinkModel toModel(Link link) {
+    public LinkModel toModel(Link link, String imageName) {
         return LinkModel.builder()
             .id(link.getId())
             .linkType(link.getLinkType())
             .linkUri(link.getLinkUri())
-            .imageId(link.getImageId())
+            .imageName(imageName)
             .createdAt(toTimestamp(link.getCreatedAt()))
             .updatedAt(toTimestamp(link.getUpdatedAt()))
             .build();

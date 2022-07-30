@@ -44,6 +44,8 @@ public class Link {
     @Column(name = "image_id")
     private Long imageId;
 
+    private String description;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

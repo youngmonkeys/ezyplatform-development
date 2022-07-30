@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
+import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
 public interface MediaService {
@@ -47,6 +48,15 @@ public interface MediaService {
         return newHashMap(
             getMediaListByIds(mediaIds),
             MediaModel::getId
+        );
+    }
+
+    default Map<Long, String> getMediaNameMapByIds(
+        Collection<Long> mediaIds
+    ) {
+        return newHashMapNewValues(
+            getMediaMapByIds(mediaIds),
+            MediaModel::getName
         );
     }
 
