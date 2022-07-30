@@ -207,6 +207,7 @@ public abstract class DefaultEntityToModelConverter {
             .linkType(link.getLinkType())
             .linkUri(link.getLinkUri())
             .imageName(imageName)
+            .description(link.getDescription())
             .createdAt(toTimestamp(link.getCreatedAt()))
             .updatedAt(toTimestamp(link.getUpdatedAt()))
             .build();
