@@ -201,6 +201,17 @@ public abstract class DefaultEntityToModelConverter {
             .build();
     }
 
+    public LinkModel toModel(Link link) {
+        return LinkModel.builder()
+            .id(link.getId())
+            .linkType(link.getLinkType())
+            .linkUri(link.getLinkUri())
+            .imageId(link.getImageId())
+            .createdAt(toTimestamp(link.getCreatedAt()))
+            .updatedAt(toTimestamp(link.getUpdatedAt()))
+            .build();
+    }
+
     public long toTimestamp(LocalDateTime localDateTime) {
         return LocalDateTimes.toTimestamp(localDateTime, zoneId);
     }
