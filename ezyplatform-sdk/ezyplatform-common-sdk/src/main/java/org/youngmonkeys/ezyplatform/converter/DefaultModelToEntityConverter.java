@@ -137,6 +137,18 @@ public abstract class DefaultModelToEntityConverter {
         return entity;
     }
 
+    public Link toEntity(SaveLinkModel model) {
+        Link entity = new Link();
+        entity.setLinkUri(model.getLinkUri());
+        entity.setLinkType(model.getLinkType());
+        entity.setImageId(model.getLinkImageId());
+        entity.setDescription(model.getDescription());
+        LocalDateTime now = clock.nowDateTime();
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
+        return entity;
+    }
+
     public List<NotificationReceiver> toEntities(
         long notificationId,
         AddNotificationModel model
@@ -210,6 +222,14 @@ public abstract class DefaultModelToEntityConverter {
         entity.setAlternativeText(model.getAlternativeText());
         entity.setTitle(model.getTitle());
         entity.setCaption(model.getCaption());
+        entity.setDescription(model.getDescription());
+        entity.setUpdatedAt(clock.nowDateTime());
+    }
+
+    public void mergeToEntity(SaveLinkModel model, Link entity) {
+        entity.setLinkUri(model.getLinkUri());
+        entity.setLinkType(model.getLinkType());
+        entity.setImageId(model.getLinkImageId());
         entity.setDescription(model.getDescription());
         entity.setUpdatedAt(clock.nowDateTime());
     }
