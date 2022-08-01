@@ -30,7 +30,6 @@ public class DurationsTest {
     public void test() {
         // given
         List<String> input = Arrays.asList(
-            "1ns",
             "10ms",
             "100s",
             "1000m",
@@ -39,6 +38,7 @@ public class DurationsTest {
             "1000000w",
             "10000000M",
             "100000000y",
+            "1ms22s333m",
             "1",
             "ms",
             "1abc"
@@ -52,7 +52,6 @@ public class DurationsTest {
 
         // then
         List<Long> expectation = Arrays.asList(
-            0L,
             10L,
             100 * 1000L,
             1000 * 60 * 1000L,
@@ -61,6 +60,7 @@ public class DurationsTest {
             1000000L * 7 * 24 * 60 * 60 * 1000L,
             10000000L * 30 * 24 * 60 * 60 * 1000L,
             100000000L * 365 * 24 * 60 * 60 * 1000L,
+            1 + 22 * 1000 +  333 * 60 * 1000L,
             -1L,
             -1L,
             -1L

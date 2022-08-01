@@ -45,7 +45,6 @@ public final class CommonConstants {
     public static final String PATTERN_TAG = "[a-z0-9\\-\\s]+";
     public static final String PATTERN_HIDDEN_PASSWORD = "[*]+";
     public static final String PATTERN_ENUM_NAME = "[A-Z0-9_\\s]+";
-    public static final String PATTERN_DURATION_STRING = "[0-9]+(ns|ms|s|m|h|d|w|M|y)";
 
     public static final String PASSWORD_SALT = "$2a$10$48rTBuvOefj6u2o4IXJ3ve";
 
