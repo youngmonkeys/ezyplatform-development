@@ -28,10 +28,10 @@ import org.youngmonkeys.ezyplatform.manager.EnvironmentManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Collections;
 
 import static com.tvd12.ezyfox.io.EzyStrings.exceptionToSimpleString;
 import static com.tvd12.ezyhttp.server.core.constant.CoreConstants.ATTRIBUTE_MATCHED_URI;
+import static java.util.Collections.singletonMap;
 
 /**
  * Handle all errors happen in when handle client's requests.
@@ -84,7 +84,11 @@ public class WebGlobalErrorHandler implements UnhandledErrorHandler {
         if (environmentManager.isDebugMode()) {
             return toResponseEntity(errorStatusCode, exception);
         }
-        if (errorStatusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
+        if (errorStatusCode == StatusCodes.NOT_ACCEPTABLE) {
+            return ResponseEntity
+                .status(StatusCodes.NOT_ACCEPTABLE)
+                .build();
+        } else if (errorStatusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
             return Redirect.builder()
                 .uri("/server-error")
                 .addAttribute(
@@ -114,7 +118,7 @@ public class WebGlobalErrorHandler implements UnhandledErrorHandler {
     ) {
         return ResponseEntity.status(errorStatusCode)
             .body(
-                Collections.singletonMap(
+                singletonMap(
                     "error",
                     exception != null
                         ? exception.getClass().getName()
