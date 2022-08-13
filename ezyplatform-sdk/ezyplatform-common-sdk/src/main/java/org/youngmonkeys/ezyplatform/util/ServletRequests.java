@@ -24,10 +24,6 @@ public final class ServletRequests {
 
     private ServletRequests() {}
 
-    public static String getClientIp(HttpServletRequest request) {
-        return getClientIp(request, false);
-    }
-
     public static String getClientIp(
         HttpServletRequest request,
         boolean requestDirectly
