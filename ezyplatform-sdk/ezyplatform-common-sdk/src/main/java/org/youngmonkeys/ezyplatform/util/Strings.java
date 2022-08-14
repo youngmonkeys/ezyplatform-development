@@ -22,6 +22,10 @@ public final class Strings {
 
     private Strings() {}
 
+    public static String from(Object value) {
+        return value != null ? value.toString() : null;
+    }
+
     public static String entryToString(Map.Entry<?, ?> entry) {
         String key = entry.getKey().toString();
         String value = entry.getValue() != null
