@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.test.service;
 
+import com.tvd12.ezyfox.function.EzyExceptionFunction;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
@@ -49,6 +50,15 @@ public class SettingServiceTest {
             int periodInSecond,
             Runnable onLastUpdatedTimeChange
         ) {}
+
+        @Override
+        public void addValueConverter(
+            String settingName,
+            EzyExceptionFunction<String, Object> converter
+        ) {}
+
+        @Override
+        public void scheduleCacheValue(String settingName, int periodInSecond) {}
 
         @Override
         public String getDecryptionValue(String settingName) {

@@ -99,6 +99,7 @@ public abstract class DefaultSettingService
         }, 5000, 300, TimeUnit.MILLISECONDS);
     }
 
+    @Override
     public void addValueConverter(
         String settingName,
         EzyExceptionFunction<String, Object> converter
@@ -106,13 +107,7 @@ public abstract class DefaultSettingService
         this.converters.put(settingName, converter);
     }
 
-    public void scheduleCacheValue(String settingName) {
-        scheduleCacheValue(
-            settingName,
-            DEFAULT_CACHE_PERIOD_IN_SECOND
-        );
-    }
-
+    @Override
     public void scheduleCacheValue(
         String settingName,
         int periodInSecond

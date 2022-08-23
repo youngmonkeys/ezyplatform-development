@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.exception.MaxRetryCountException;
 
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 @AllArgsConstructor
 public class Retry<T> {
@@ -89,5 +90,10 @@ public class Retry<T> {
         } catch (InterruptedException e) {
             return defaultValue;
         }
+    }
+
+    public T getOrSuppliedValue(Supplier<T> defaultValueSupplier) {
+        T value = getOrNull();
+        return value != null ? value : defaultValueSupplier.get();
     }
 }

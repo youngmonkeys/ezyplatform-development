@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.function.EzyExceptionFunction;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import org.youngmonkeys.ezyplatform.util.Uris;
 
@@ -25,6 +26,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.service.DefaultSettingService.DEFAULT_CACHE_PERIOD_IN_SECOND;
 
 @SuppressWarnings("MethodCount")
 public interface SettingService {
@@ -34,6 +36,23 @@ public interface SettingService {
         int periodInSecond,
         Runnable onLastUpdatedTimeChange
     );
+
+    void addValueConverter(
+        String settingName,
+        EzyExceptionFunction<String, Object> converter
+    );
+
+    void scheduleCacheValue(
+        String settingName,
+        int periodInSecond
+    );
+
+    default void scheduleCacheValue(String settingName) {
+        scheduleCacheValue(
+            settingName,
+            DEFAULT_CACHE_PERIOD_IN_SECOND
+        );
+    }
 
     String getDecryptionValue(String settingName);
 
