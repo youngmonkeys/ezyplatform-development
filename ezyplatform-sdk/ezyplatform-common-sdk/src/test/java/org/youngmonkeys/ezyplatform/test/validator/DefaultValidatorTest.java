@@ -25,6 +25,12 @@ public class DefaultValidatorTest {
     @Test
     public void isValidPhoneTest() {
         Asserts.assertTrue(
+            DefaultValidator.isValidUIntNumber("123")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidUIntNumber("a123")
+        );
+        Asserts.assertTrue(
             DefaultValidator.isValidPhone("+841234567890")
         );
         Asserts.assertTrue(

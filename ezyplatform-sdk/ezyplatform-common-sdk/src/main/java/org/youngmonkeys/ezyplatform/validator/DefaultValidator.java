@@ -27,6 +27,12 @@ public final class DefaultValidator {
 
     private DefaultValidator() {}
 
+    @SuppressWarnings("AbbreviationAsWordInName")
+    public static boolean isValidUIntNumber(String value) {
+        return value != null
+            && value.matches(PATTERN_U_INT_NUMBER);
+    }
+
     public static boolean isValidEmail(String email) {
         return email != null
             && email.length() <= MAX_LENGTH_EMAIL
