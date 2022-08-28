@@ -168,4 +168,9 @@ public interface AdminMetaService {
     }
 
     Map<String, String> getAdminMetaValues(long adminId);
+
+    Map<String, Long> getAdminIdMapByMetaValues(
+        String metaKey,
+        Collection<String> metaValues
+    );
 }

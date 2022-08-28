@@ -19,7 +19,9 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
+import org.youngmonkeys.ezyplatform.entity.UserMeta;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,5 +50,10 @@ public interface AdminMetaRepository
         long adminId,
         String metaKey,
         String metaValue
+    );
+
+    List<UserMeta> findByMetaKeyAndMetaValueIn(
+        String metaKey,
+        Collection<String> metaValues
     );
 }

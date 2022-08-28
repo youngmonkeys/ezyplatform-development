@@ -18,17 +18,22 @@ package org.youngmonkeys.ezyplatform.service;
 
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 import org.youngmonkeys.ezyplatform.exception.UserAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.UserInvalidAccessTokenException;
 import org.youngmonkeys.ezyplatform.model.UserModel;
+import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.repo.UserAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRepository;
+import org.youngmonkeys.ezyplatform.result.UserNameResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 
@@ -39,6 +44,7 @@ public class DefaultUserService implements UserService {
     private final UserRepository userRepository;
     private final UserAccessTokenRepository accessTokenRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+    private final DefaultResultToModelConverter resultToModelConverter;
 
     @Override
     public UserModel getUserById(long id) {
@@ -80,6 +86,27 @@ public class DefaultUserService implements UserService {
             userRepository.findListByIds(userIds),
             entityToModelConverter::toModel
         );
+    }
+
+    @Override
+    public UserNameModel getUsernameById(long userId) {
+        return resultToModelConverter.toModel(
+            userRepository.findUserIdAndNameById(userId)
+        );
+    }
+
+    public Map<Long, UserNameModel> getUsernameMapByIds(
+        Collection<Long> userIds
+    ) {
+        List<UserNameResult> results = userRepository
+            .findUserIdAndNameByIds(userIds);
+        return results.stream()
+            .collect(
+                Collectors.toMap(
+                    UserNameResult::getUserId,
+                    resultToModelConverter::toModel
+                )
+            );
     }
 
     @Override

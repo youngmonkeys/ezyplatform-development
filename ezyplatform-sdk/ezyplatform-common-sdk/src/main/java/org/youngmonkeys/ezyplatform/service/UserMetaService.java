@@ -168,4 +168,9 @@ public interface UserMetaService {
     }
 
     Map<String, String> getUserMetaValues(long userId);
+
+    Map<String, Long> getUserIdMapByMetaValues(
+        String metaKey,
+        Collection<String> metaValues
+    );
 }

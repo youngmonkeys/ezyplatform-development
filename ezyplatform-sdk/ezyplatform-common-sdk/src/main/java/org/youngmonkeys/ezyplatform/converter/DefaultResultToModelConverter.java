@@ -32,6 +32,9 @@ public abstract class DefaultResultToModelConverter {
     protected final ZoneId zoneId;
 
     public AdminNameModel toModel(AdminNameResult result) {
+        if (result == null) {
+            return null;
+        }
         return AdminNameModel.builder()
             .adminId(result.getAdminId())
             .username(result.getUsername())
@@ -40,6 +43,9 @@ public abstract class DefaultResultToModelConverter {
     }
 
     public UserNameModel toModel(UserNameResult result) {
+        if (result == null) {
+            return null;
+        }
         return UserNameModel.builder()
             .userId(result.getUserId())
             .username(result.getUsername())

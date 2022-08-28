@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.repo.UserMetaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -129,6 +130,24 @@ public class DefaultUserMetaService implements UserMetaService {
                 Collectors.toMap(
                     UserMeta::getMetaKey,
                     UserMeta::getMetaValue
+                )
+            );
+    }
+
+    @Override
+    public Map<String, Long> getUserIdMapByMetaValues(
+        String metaKey,
+        Collection<String> metaValues
+    ) {
+        return userMetaRepository.findByMetaKeyAndMetaValueIn(
+            metaKey,
+            metaValues
+        )
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    UserMeta::getMetaValue,
+                    UserMeta::getUserId
                 )
             );
     }
