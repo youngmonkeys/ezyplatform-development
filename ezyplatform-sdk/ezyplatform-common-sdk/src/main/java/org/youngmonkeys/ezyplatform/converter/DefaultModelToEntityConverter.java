@@ -98,6 +98,7 @@ public abstract class DefaultModelToEntityConverter {
         entity.setStatus(model.getSendStatus());
         entity.setConfidenceLevel(model.getConfidenceLevel());
         entity.setImportantLevel(model.getImportantLevel());
+        entity.setNotificationReceiverId(model.getNotificationReceiverId());
         entity.setSentAt(now);
         return entity;
     }
@@ -183,7 +184,7 @@ public abstract class DefaultModelToEntityConverter {
     }
 
     public List<LetterReceiver> toEntities(
-        long notificationId,
+        long letterId,
         AddLetterModel model
     ) {
         LocalDateTime now = clock.nowDateTime();
@@ -193,7 +194,7 @@ public abstract class DefaultModelToEntityConverter {
                 continue;
             }
             LetterReceiver entity = toEntity(
-                notificationId,
+                letterId,
                 model,
                 now
             );
@@ -205,7 +206,7 @@ public abstract class DefaultModelToEntityConverter {
                 continue;
             }
             LetterReceiver entity = toEntity(
-                notificationId,
+                letterId,
                 model,
                 now
             );

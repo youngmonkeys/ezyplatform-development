@@ -31,6 +31,7 @@ public class LetterModel {
     private String status;
     private long toAdminId;
     private long toUserId;
+    private long notificationReceiverId;
     private String confidenceLevel;
     private String importantLevel;
     private String receiveStatus;

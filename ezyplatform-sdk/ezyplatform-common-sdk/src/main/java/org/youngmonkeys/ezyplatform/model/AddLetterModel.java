@@ -36,6 +36,7 @@ public class AddLetterModel {
     private final String confidenceLevel;
     private final String importantLevel;
     private final String sendStatus;
+    private final long notificationReceiverId;
 
     protected AddLetterModel(Builder builder) {
         this.type = builder.type;
@@ -49,6 +50,7 @@ public class AddLetterModel {
         this.confidenceLevel = builder.confidenceLevel;
         this.importantLevel = builder.importantLevel;
         this.sendStatus = builder.sendStatus;
+        this.notificationReceiverId = builder.notificationReceiverId;
     }
 
     public static Builder builder() {
@@ -65,6 +67,7 @@ public class AddLetterModel {
         protected String confidenceLevel;
         protected String importantLevel;
         protected String sendStatus;
+        private long notificationReceiverId;
         protected Set<Long> toAdminIds = new HashSet<>();
         protected Set<Long> toUserIds = new HashSet<>();
 
@@ -92,6 +95,7 @@ public class AddLetterModel {
             this.fromUserId = fromUserId;
             return this;
         }
+
 
         public Builder letterStatus(String letterStatus) {
             this.letterStatus = letterStatus;
@@ -130,6 +134,11 @@ public class AddLetterModel {
 
         public Builder sendStatus(String sendStatus) {
             this.sendStatus = sendStatus;
+            return this;
+        }
+
+        public Builder notificationReceiverId(long notificationReceiverId) {
+            this.notificationReceiverId = notificationReceiverId;
             return this;
         }
 

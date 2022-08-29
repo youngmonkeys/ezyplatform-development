@@ -42,6 +42,9 @@ public class LetterReceiver {
     @Column(name = "to_user_id")
     private long toUserId;
 
+    @Column(name = "notification_receiver_id")
+    private long notificationReceiverId;
+
     @Column(name = "confidence_level")
     private String confidenceLevel;
 

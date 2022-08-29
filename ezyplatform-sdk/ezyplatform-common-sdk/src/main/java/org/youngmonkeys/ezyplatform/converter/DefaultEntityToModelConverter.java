@@ -116,7 +116,7 @@ public abstract class DefaultEntityToModelConverter {
 
     public NotificationModel toModel(
         Notification notification,
-        NotificationReceiver notificationReceiver,
+        NotificationReceiver entity,
         boolean includeFromAdmin
     ) {
         return NotificationModel.builder()
@@ -128,20 +128,20 @@ public abstract class DefaultEntityToModelConverter {
             .status(notification.getStatus())
             .fromAdminId(includeFromAdmin ? notification.getFromAdminId() : 0L)
             .fromUserId(notification.getFromUserId())
-            .toAdminId(notificationReceiver.getToAdminId())
-            .toUserId(notificationReceiver.getToUserId())
-            .confidenceLevel(notificationReceiver.getConfidenceLevel())
-            .importantLevel(notificationReceiver.getImportantLevel())
-            .receiveStatus(notificationReceiver.getStatus())
-            .sentAt(toTimestamp(notificationReceiver.getSentAt()))
-            .receivedAt(toTimestamp(notificationReceiver.getReceivedAt()))
-            .readAt(toTimestamp(notificationReceiver.getReadAt()))
+            .toAdminId(entity.getToAdminId())
+            .toUserId(entity.getToUserId())
+            .confidenceLevel(entity.getConfidenceLevel())
+            .importantLevel(entity.getImportantLevel())
+            .receiveStatus(entity.getStatus())
+            .sentAt(toTimestamp(entity.getSentAt()))
+            .receivedAt(toTimestamp(entity.getReceivedAt()))
+            .readAt(toTimestamp(entity.getReadAt()))
             .build();
     }
 
     public LetterModel toModel(
         Letter letter,
-        LetterReceiver letterReceiver,
+        LetterReceiver entity,
         boolean includeFromAdmin
     ) {
         return LetterModel.builder()
@@ -151,14 +151,15 @@ public abstract class DefaultEntityToModelConverter {
             .status(letter.getStatus())
             .fromAdminId(includeFromAdmin ? letter.getFromAdminId() : 0L)
             .fromUserId(letter.getFromUserId())
-            .toAdminId(letterReceiver.getToAdminId())
-            .toUserId(letterReceiver.getToUserId())
-            .confidenceLevel(letterReceiver.getConfidenceLevel())
-            .importantLevel(letterReceiver.getImportantLevel())
-            .receiveStatus(letterReceiver.getStatus())
-            .sentAt(toTimestamp(letterReceiver.getSentAt()))
-            .receivedAt(toTimestamp(letterReceiver.getReceivedAt()))
-            .readAt(toTimestamp(letterReceiver.getReadAt()))
+            .toAdminId(entity.getToAdminId())
+            .toUserId(entity.getToUserId())
+            .notificationReceiverId(entity.getNotificationReceiverId())
+            .confidenceLevel(entity.getConfidenceLevel())
+            .importantLevel(entity.getImportantLevel())
+            .receiveStatus(entity.getStatus())
+            .sentAt(toTimestamp(entity.getSentAt()))
+            .receivedAt(toTimestamp(entity.getReceivedAt()))
+            .readAt(toTimestamp(entity.getReadAt()))
             .build();
     }
 
@@ -201,16 +202,16 @@ public abstract class DefaultEntityToModelConverter {
             .build();
     }
 
-    public LinkModel toModel(Link link, String imageName) {
+    public LinkModel toModel(Link entity, String imageName) {
         return LinkModel.builder()
-            .id(link.getId())
-            .linkType(link.getLinkType())
-            .linkUri(link.getLinkUri())
-            .imageId(link.getImageId())
+            .id(entity.getId())
+            .linkType(entity.getLinkType())
+            .linkUri(entity.getLinkUri())
+            .imageId(entity.getImageId())
             .imageName(imageName)
-            .description(link.getDescription())
-            .createdAt(toTimestamp(link.getCreatedAt()))
-            .updatedAt(toTimestamp(link.getUpdatedAt()))
+            .description(entity.getDescription())
+            .createdAt(toTimestamp(entity.getCreatedAt()))
+            .updatedAt(toTimestamp(entity.getUpdatedAt()))
             .build();
     }
 
