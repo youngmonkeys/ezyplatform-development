@@ -27,7 +27,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @AllArgsConstructor
-public abstract class DefaultResultToModelConverter {
+public class DefaultResultToModelConverter {
 
     protected final ZoneId zoneId;
 

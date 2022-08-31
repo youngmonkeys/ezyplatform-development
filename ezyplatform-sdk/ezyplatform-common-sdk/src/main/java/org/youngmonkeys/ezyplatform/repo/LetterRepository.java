@@ -14,14 +14,9 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.service;
+package org.youngmonkeys.ezyplatform.repo;
 
-import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
-import org.youngmonkeys.ezyplatform.model.AddNotificationReceiverModel;
+import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import org.youngmonkeys.ezyplatform.entity.Letter;
 
-public interface NotificationService {
-
-    long addNotification(AddNotificationModel model);
-
-    long addNotificationReceiver(AddNotificationReceiverModel model);
-}
+public interface LetterRepository extends EzyDatabaseRepository<Long, Letter> {}

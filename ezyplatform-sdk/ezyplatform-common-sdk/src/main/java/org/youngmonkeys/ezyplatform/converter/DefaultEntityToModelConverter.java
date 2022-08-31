@@ -27,7 +27,7 @@ import java.time.ZoneId;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 @AllArgsConstructor
-public abstract class DefaultEntityToModelConverter {
+public class DefaultEntityToModelConverter {
 
     protected final ZoneId zoneId;
 

@@ -17,8 +17,11 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.model.AddLetterModel;
+import org.youngmonkeys.ezyplatform.model.AddLetterReceiverModel;
 
 public interface LetterService {
 
     long addLetter(AddLetterModel model);
+
+    long addLetterReceiver(AddLetterReceiverModel model);
 }

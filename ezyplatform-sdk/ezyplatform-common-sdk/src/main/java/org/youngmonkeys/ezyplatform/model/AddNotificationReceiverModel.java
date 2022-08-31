@@ -14,14 +14,18 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.service;
+package org.youngmonkeys.ezyplatform.model;
 
-import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
-import org.youngmonkeys.ezyplatform.model.AddNotificationReceiverModel;
+import lombok.Builder;
+import lombok.Getter;
 
-public interface NotificationService {
-
-    long addNotification(AddNotificationModel model);
-
-    long addNotificationReceiver(AddNotificationReceiverModel model);
+@Getter
+@Builder
+public class AddNotificationReceiverModel {
+    private long notificationId;
+    private long toAdminId;
+    private long toUserId;
+    private String confidenceLevel;
+    private String importantLevel;
+    private String status;
 }

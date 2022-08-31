@@ -30,7 +30,7 @@ import java.util.List;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 @AllArgsConstructor
-public abstract class DefaultModelToEntityConverter {
+public class DefaultModelToEntityConverter {
 
     protected final ClockProxy clock;
     protected final ObjectMapper objectMapper; 
@@ -88,6 +88,19 @@ public abstract class DefaultModelToEntityConverter {
         return notification;
     }
 
+    public LetterReceiver toEntity(AddLetterReceiverModel model) {
+        LetterReceiver entity = new LetterReceiver();
+        entity.setLetterId(model.getLetterId());
+        entity.setToUserId(model.getToUserId());
+        entity.setToAdminId(model.getToAdminId());
+        entity.setStatus(model.getStatus());
+        entity.setConfidenceLevel(model.getConfidenceLevel());
+        entity.setImportantLevel(model.getImportantLevel());
+        entity.setNotificationReceiverId(model.getNotificationReceiverId());
+        entity.setSentAt(clock.nowDateTime());
+        return entity;
+    }
+
     public LetterReceiver toEntity(
         long letterId,
         AddLetterModel model,
@@ -100,6 +113,20 @@ public abstract class DefaultModelToEntityConverter {
         entity.setImportantLevel(model.getImportantLevel());
         entity.setNotificationReceiverId(model.getNotificationReceiverId());
         entity.setSentAt(now);
+        return entity;
+    }
+
+    public NotificationReceiver toEntity(
+        AddNotificationReceiverModel model
+    ) {
+        NotificationReceiver entity = new NotificationReceiver();
+        entity.setNotificationId(model.getNotificationId());
+        entity.setToUserId(model.getToUserId());
+        entity.setToAdminId(model.getToAdminId());
+        entity.setStatus(model.getStatus());
+        entity.setConfidenceLevel(model.getConfidenceLevel());
+        entity.setImportantLevel(model.getImportantLevel());
+        entity.setSentAt(clock.nowDateTime());
         return entity;
     }
 
