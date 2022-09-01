@@ -205,6 +205,13 @@ public interface SettingService {
         );
     }
 
+    default boolean isAllowSendStatisticsData() {
+        return getBooleanValue(
+            SETTING_NAME_ALLOW_SEND_STATISTICS_DATA,
+            true
+        );
+    }
+
     default boolean containSetting(String settingName) {
         return getSettingValue(settingName)
             .isPresent();
