@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.*;
 
 import javax.persistence.*;
@@ -62,4 +63,8 @@ public class User {
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    public String getName() {
+        return EzyStrings.isBlank(displayName) ? username : displayName;
+    }
 }
