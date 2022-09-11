@@ -14,9 +14,28 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.repo;
+package org.youngmonkeys.ezyplatform.data;
 
-import com.tvd12.ezydata.database.EzyDatabaseRepository;
-import org.youngmonkeys.ezyplatform.entity.Media;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {}
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
+public class ImageSize {
+    private int width;
+    private int height;
+    private long size;
+
+    public static final ImageSize ZERO = new ImageSize(0, 0);
+
+    public ImageSize(int width, int height) {
+        this(width, height, 0L);
+    }
+
+    public boolean isEqualsDimension(ImageSize other) {
+        return width == other.width
+            && height == other.height;
+    }
+}

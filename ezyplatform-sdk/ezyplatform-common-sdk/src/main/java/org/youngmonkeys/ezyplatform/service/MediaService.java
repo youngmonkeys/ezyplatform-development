@@ -17,8 +17,11 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyfox.security.EzySHA256;
+import org.youngmonkeys.ezyplatform.data.ImageSize;
+import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +61,21 @@ public interface MediaService {
             getMediaMapByIds(mediaIds),
             MediaModel::getName
         );
+    }
+
+    ImageSize getMediaImageSize(
+        long mediaId
+    ) throws IOException;
+
+    ImageSize getMediaImageSize(
+        String imageName,
+        MediaType mediaType
+    ) throws IOException;
+
+    default ImageSize getMediaImageSize(
+        String imageName
+    ) throws IOException {
+        return getMediaImageSize(imageName, MediaType.IMAGE);
     }
 
     default String generateMediaFileName() {

@@ -19,14 +19,21 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
+import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.entity.Media;
+import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
+import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
+import org.youngmonkeys.ezyplatform.io.ImageProxy;
+import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -35,6 +42,7 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 @AllArgsConstructor
 public class DefaultMediaService implements MediaService {
 
+    private final FileSystemManager fileSystemManager;
     private final MediaRepository mediaRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultModelToEntityConverter modelToEntityConverter;
@@ -131,6 +139,38 @@ public class DefaultMediaService implements MediaService {
         return newArrayList(
             mediaRepository.findListByIds(mediaIds),
             entityToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public ImageSize getMediaImageSize(
+        String imageName,
+        MediaType mediaType
+    ) throws IOException {
+        File mediaFile = fileSystemManager.getMediaFilePath(
+            mediaType.getFolder(),
+            imageName
+        );
+        if (!mediaFile.exists()) {
+            throw new ResourceNotFoundException("media");
+        }
+        return ImageProxy.getImageSize(mediaFile);
+    }
+
+    @Override
+    public ImageSize getMediaImageSize(
+        long mediaId
+    ) throws IOException {
+        if (mediaId <= 0) {
+            throw new ResourceNotFoundException("media");
+        }
+        Media media = mediaRepository.findById(mediaId);
+        if (media == null) {
+            throw new ResourceNotFoundException("media");
+        }
+        return getMediaImageSize(
+            media.getName(),
+            media.getType()
         );
     }
 }
