@@ -70,9 +70,21 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
+    public Long getAdminIdByAccessToken(String accessToken) {
+        if (accessToken != null) {
+            AdminAccessToken entity = accessTokenRepository
+                .findById(accessToken);
+            if (entity != null) {
+                return entity.getAdminId();
+            }
+        }
+        return null;
+    }
+
+    @Override
     public long validateAccessToken(String accessToken) {
         if (accessToken == null) {
-            throw new AdminInvalidAccessTokenException(accessToken);
+            throw new AdminInvalidAccessTokenException("null");
         }
         AdminAccessToken entity = accessTokenRepository.findById(accessToken);
         if (entity == null) {

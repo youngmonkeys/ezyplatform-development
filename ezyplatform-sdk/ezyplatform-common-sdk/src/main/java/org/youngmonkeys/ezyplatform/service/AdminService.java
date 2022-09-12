@@ -32,5 +32,7 @@ public interface AdminService {
     
     AdminModel getAdminByAccessToken(String accessToken);
 
+    Long getAdminIdByAccessToken(String accessToken);
+
     long validateAccessToken(String accessToken);
 }

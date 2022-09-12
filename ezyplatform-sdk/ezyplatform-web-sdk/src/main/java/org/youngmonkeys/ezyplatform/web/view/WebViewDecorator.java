@@ -63,7 +63,7 @@ public class WebViewDecorator implements ViewDecorator {
                 COOKIE_NAME_ACCESS_TOKEN
             );
             if (EzyStrings.isNotBlank(accessToken)) {
-                userId = userService.validateAccessToken(accessToken);
+                userId = userService.getUserIdByAccessToken(accessToken);
             }
         }
         if (userId == null) {
