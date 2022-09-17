@@ -47,24 +47,29 @@ public class DefaultMediaService implements MediaService {
     private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
+    @Override
     public MediaModel addMedia(AddMediaModel model) {
         return addMedia(model, UploadFrom.ADMIN);
     }
 
+    @Override
     public MediaModel addMedia(AddMediaModel model, UploadFrom uploadFrom) {
         Media entity = modelToEntityConverter.toEntity(model, uploadFrom);
         mediaRepository.save(entity);
         return entityToModelConverter.toModel(entity);
     }
 
+    @Override
     public void updateMedia(UpdateMediaModel model) {
         updateMedia(false, 0L, model);
     }
 
+    @Override
     public void updateMedia(long userId, UpdateMediaModel model) {
         updateMedia(true, userId, model);
     }
 
+    @Override
     public void updateMedia(boolean byUser, long userId, UpdateMediaModel model) {
         Media entity = model.getMediaId() > 0
             ? mediaRepository.findById(model.getMediaId())
@@ -76,14 +81,22 @@ public class DefaultMediaService implements MediaService {
         mediaRepository.save(entity);
     }
 
+    @Override
+    public void updateMediaOwner(long mediaId, long ownerUserId) {
+        mediaRepository.updateOwnerUserId(mediaId, ownerUserId);
+    }
+
+    @Override
     public MediaModel removeMedia(long mediaId) {
         return removeMedia(false, 0L, mediaId, null);
     }
 
+    @Override
     public MediaModel removeMedia(long userId, String mediaName) {
         return removeMedia(true, userId, 0L, mediaName);
     }
 
+    @Override
     public MediaModel removeMedia(
         boolean byUser,
         long userId,
