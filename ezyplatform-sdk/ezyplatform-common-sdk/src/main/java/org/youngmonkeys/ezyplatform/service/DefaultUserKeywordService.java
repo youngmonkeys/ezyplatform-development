@@ -42,7 +42,7 @@ public class DefaultUserKeywordService
             try {
                 userKeywordRepository.save(entity);
             } catch (Exception e) {
-                logger.info("add user keyword: {} failed", entity, e);
+                logger.info("add user keyword: {} failed: {}", entity, e.getMessage());
             }
         }
     }
