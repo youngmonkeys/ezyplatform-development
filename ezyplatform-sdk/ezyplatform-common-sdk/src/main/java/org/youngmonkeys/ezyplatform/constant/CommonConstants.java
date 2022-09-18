@@ -104,6 +104,7 @@ public final class CommonConstants {
     public static final String SETTING_NAME_ADMIN_ENABLE = "admin_enable";
     public static final String SETTING_NAME_SOCKET_ENABLE = "socket_enable";
     public static final String SETTING_NAME_WEB_ENABLE = "web_enable";
+    public static final String SETTING_NAME_WEB_LANGUAGES = "web_languages";
     public static final String SETTING_NAME_ALLOW_SEND_STATISTICS_DATA =
         "allow_send_statistics_data";
 
