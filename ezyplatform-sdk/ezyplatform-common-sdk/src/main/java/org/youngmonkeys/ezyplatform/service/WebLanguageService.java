@@ -29,6 +29,12 @@ public interface WebLanguageService {
         return Arrays.asList(getLanguages());
     }
 
+    default List<WebLanguageModel> getActiveLanguages() {
+        return Arrays.stream(getLanguages())
+            .filter(WebLanguageModel::isActive)
+            .collect(Collectors.toList());
+    }
+
     default WebLanguageModel getLanguageByCode(String code) {
         for (WebLanguageModel language : getLanguages()) {
             if (language.getCode().equals(code)) {

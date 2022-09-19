@@ -26,6 +26,7 @@ public class WebLanguageModel implements Comparable<WebLanguageModel> {
     protected String name;
     protected String flag;
     protected int displayOrder;
+    protected boolean active;
 
     @Override
     public int compareTo(WebLanguageModel o) {
@@ -39,7 +40,7 @@ public class WebLanguageModel implements Comparable<WebLanguageModel> {
     public static class Mutable extends WebLanguageModel {
 
         public Mutable() {
-            super(null, null, null, 0);
+            super(null, null, null, 0, false);
         }
 
         public void setCode(String code) {
@@ -56,6 +57,10 @@ public class WebLanguageModel implements Comparable<WebLanguageModel> {
 
         public void setDisplayOrder(int displayOrder) {
             this.displayOrder = displayOrder;
+        }
+
+        public void setActive(boolean active) {
+            this.active = active;
         }
     }
 }
