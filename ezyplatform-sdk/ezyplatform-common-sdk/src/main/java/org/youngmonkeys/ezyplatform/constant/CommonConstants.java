@@ -37,7 +37,9 @@ public final class CommonConstants {
     public static final String PATTERN_PHONE =
         "(^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$)|(^(\\+\\d{1,2})?[\\d]{6,15})";
     public static final String PATTERN_HTTP_URL =
-        "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
+        "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.?[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
+    public static final String PATTERN_WEBSOCKET_URL =
+        "wss?:\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.?[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
     public static final String PATTERN_MEDIA_NAME = "[a-zA-Z0-9]+\\.[a-zA-Z]+";
     public static final String PATTERN_VERSION = "[0-9]+[\\.][0-9]+[\\.][0-9]+";
     public static final String PATTERN_PROPERTY_NAME = "[\\d\\w_\\-\\.\\+\\$]+";
@@ -51,12 +53,15 @@ public final class CommonConstants {
 
     public static final String PASSWORD_SALT = "$2a$10$48rTBuvOefj6u2o4IXJ3ve";
 
+    public static final String PREFIX_HTTP_URL = "http://";
+    public static final String PREFIX_HTTPS_URL = "https://";
+
     public static final int MIN_LENGTH_PASSWORD = 6;
     public static final int MAX_LENGTH_PASSWORD = 128;
     public static final int MIN_LENGTH_PHONE = 6;
     public static final int MAX_LENGTH_PHONE = 20;
     public static final int MAX_LENGTH_EMAIL = 128;
-    public static final int MIN_LENGTH_URL = 10;
+    public static final int MIN_LENGTH_URL = 8;
     public static final int MAX_LENGTH_URL = 256;
     public static final int MAX_ENUM_NAME_LENGTH = 25;
     public static final int MAX_SEARCH_KEYWORD_LENGTH = 50;

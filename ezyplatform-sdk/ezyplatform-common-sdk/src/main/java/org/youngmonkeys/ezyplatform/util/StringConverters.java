@@ -30,7 +30,7 @@ public final class StringConverters {
     private StringConverters() {}
 
     public static String trimOrNull(String str) {
-        return str != null ? str.trim() : null;
+        return isBlank(str) ? null : str.trim();
     }
 
     public static String toNotNull(String str) {

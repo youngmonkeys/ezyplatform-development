@@ -73,6 +73,13 @@ public final class DefaultValidator {
             && url.matches(PATTERN_HTTP_URL);
     }
 
+    public static boolean isValidWebsocketUrl(String url) {
+        return url != null
+            && url.length() >= MIN_LENGTH_URL
+            && url.length() <= MAX_LENGTH_URL
+            && url.matches(PATTERN_WEBSOCKET_URL);
+    }
+
     public static boolean isValidMediaName(String mediaName) {
         return mediaName != null
             && mediaName.matches(PATTERN_MEDIA_NAME);

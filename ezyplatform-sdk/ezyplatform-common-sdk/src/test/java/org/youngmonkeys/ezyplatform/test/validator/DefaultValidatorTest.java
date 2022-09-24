@@ -73,8 +73,39 @@ public class DefaultValidatorTest {
         Asserts.assertTrue(
             DefaultValidator.isValidHttpUrl("http://google.com")
         );
+        Asserts.assertTrue(
+            DefaultValidator.isValidHttpUrl("http://google.com:9090")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidHttpUrl("http://localhost:9090")
+        );
         Asserts.assertFalse(
             DefaultValidator.isValidHttpUrl("wss://google.com")
+        );
+    }
+
+    @Test
+    public void isValidWebsocketUrlTest() {
+        Asserts.assertTrue(
+            DefaultValidator.isValidWebsocketUrl("ws://google.com")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidWebsocketUrl("ws://google.com:9090")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidWebsocketUrl("ws://localhost:9090")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidWebsocketUrl("wss://tvd12.com?u=tvd12")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidWebsocketUrl("https://vu.tvd12.com?u=tvd12")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidWebsocketUrl("http://google.com")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidWebsocketUrl("google.com")
         );
     }
 
