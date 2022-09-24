@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.service.DefaultSettingService.DEFAULT_CACHE_PERIOD_IN_SECOND;
 
@@ -174,6 +175,21 @@ public interface SettingService {
         } catch (Exception e) {
             return Collections.emptyList();
         }
+    }
+
+    default String getWebSiteName() {
+        String siteTitle = getTextValue(
+            SETTING_NAME_WEB_SITE_TITLE
+        );
+        if (isNotBlank(siteTitle)) {
+            return siteTitle;
+        }
+        String webUrl = getWebUrl();
+        if (isNotBlank(webUrl)) {
+            return Uris.getSiteName(webUrl);
+        }
+        String adminUrl = getAdminUrl();
+        return Uris.getSiteName(adminUrl, "Website");
     }
 
     default String getAdminUrl() {

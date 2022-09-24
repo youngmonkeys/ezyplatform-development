@@ -16,6 +16,11 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import com.tvd12.ezyfox.io.EzyStrings;
+
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
 public final class Uris {
 
     private Uris() {}
@@ -44,5 +49,33 @@ public final class Uris {
             return true;
         }
         return uri.startsWith("/" + prefix);
+    }
+
+    public static String getSiteName(String siteUrl) {
+        return getSiteName(siteUrl, EMPTY_STRING);
+    }
+
+    public static String getSiteName(String siteUrl, String defaultValue) {
+        if (isBlank(siteUrl)) {
+            return defaultValue;
+        }
+        int lastDotIndex = siteUrl.lastIndexOf('.');
+        String host = siteUrl;
+        if (lastDotIndex > 0) {
+            host = host.substring(0, lastDotIndex);
+        }
+        int dotIndex = host.lastIndexOf('.');
+        if (dotIndex >= 0) {
+            host = host.substring(dotIndex + 1);
+        }
+        int slashIndex = host.lastIndexOf('/');
+        if (slashIndex >= 0) {
+            host = host.substring(slashIndex + 1);
+        }
+        int colonIndex = host.lastIndexOf(':');
+        if (colonIndex >= 0) {
+            host = host.substring(0, colonIndex);
+        }
+        return EzyStrings.toDisplayName(host);
     }
 }

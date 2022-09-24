@@ -41,4 +41,36 @@ public class UrisTest {
             "x/a/b/c/"
         );
     }
+
+    @Test
+    public void getSiteName() {
+        Asserts.assertEquals(
+            Uris.getSiteName("", "Admin"),
+            "Admin"
+        );
+        Asserts.assertEquals(
+            Uris.getSiteName("http://localhost:8080", ""),
+            "Localhost"
+        );
+        Asserts.assertEquals(
+            Uris.getSiteName("http://youngmonkeys.org:8080", ""),
+            "Youngmonkeys"
+        );
+        Asserts.assertEquals(
+            Uris.getSiteName("http://youngmonkeys.org", ""),
+            "Youngmonkeys"
+        );
+        Asserts.assertEquals(
+            Uris.getSiteName("http://admin.youngmonkeys.org", ""),
+            "Youngmonkeys"
+        );
+        Asserts.assertEquals(
+            Uris.getSiteName("youngmonkeys.org:8080", ""),
+            "Youngmonkeys"
+        );
+        Asserts.assertEquals(
+            Uris.getSiteName("admin.youngmonkeys.org:8080", ""),
+            "Youngmonkeys"
+        );
+    }
 }
