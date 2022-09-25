@@ -32,7 +32,8 @@ public enum AdminViewName {
     REGULAR("regular"),
     ROLES("roles"),
     ROLE_DETAILS("role-details"),
-    PROFILE("profile");
+    PROFILE("profile"),
+    WEBSITE("website");
 
     @Getter
     private final String name;

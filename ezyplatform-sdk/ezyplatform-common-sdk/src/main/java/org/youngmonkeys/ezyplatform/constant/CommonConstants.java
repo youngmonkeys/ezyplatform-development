@@ -63,8 +63,11 @@ public final class CommonConstants {
     public static final int MAX_LENGTH_EMAIL = 128;
     public static final int MIN_LENGTH_URL = 8;
     public static final int MAX_LENGTH_URL = 256;
-    public static final int MAX_ENUM_NAME_LENGTH = 25;
-    public static final int MAX_SEARCH_KEYWORD_LENGTH = 50;
+    public static final int MAX_LENGTH_WEBSITE_TITLE = 60;
+    public static final int MAX_LENGTH_WEBSITE_TAGLINE = 120;
+    public static final int MAX_LENGTH_PAGE_TITLE_SEPARATOR = 12;
+    public static final int MAX_LENGTH_ENUM_NAME = 25;
+    public static final int MAX_LENGTH_SEARCH_KEYWORD = 50;
     public static final int MAX_SEARCH_KEYWORD_WORDS = 6;
 
     public static final int MIN_PAGE_SIZE = 1;
@@ -101,6 +104,7 @@ public final class CommonConstants {
     public static final String SETTING_NAME_WEB_AUTO_PASS_MANAGEMENT_URIS
         = "web_auto_pass_management_uris";
     public static final String SETTING_NAME_WEB_SITE_ICON_URL = "web_site_icon_url";
+    public static final String SETTING_NAME_WEB_SITE_LOGO_URL = "web_site_logo_url";
     public static final String SETTING_NAME_ADMIN_URL = "admin_url";
     public static final String SETTING_NAME_WEB_URL = "web_url";
     public static final String SETTING_NAME_WEB_MANAGEMENT_URL = "web_management_url";
@@ -118,6 +122,7 @@ public final class CommonConstants {
     public static final boolean DEFAULT_SOCKET_ENABLE = true;
     public static final boolean DEFAULT_WEB_ENABLE = true;
     public static final String DEFAULT_WEB_SITE_ICON_URL = "/images/favicon.ico";
+    public static final String DEFAULT_WEB_SITE_LOGO_URL = "/images/logo.png";
     public static final String DEFAULT_ADMIN_URL = "http://localhost:9090";
     public static final String DEFAULT_WEB_URL = "http://localhost:8080";
     public static final String DEFAULT_WEB_MANAGEMENT_URL = "http://localhost:18080";
