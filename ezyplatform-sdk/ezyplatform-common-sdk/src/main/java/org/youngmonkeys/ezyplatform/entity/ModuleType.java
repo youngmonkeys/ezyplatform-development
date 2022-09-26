@@ -19,6 +19,8 @@ package org.youngmonkeys.ezyplatform.entity;
 import com.tvd12.ezyfox.util.EzyEnums;
 import lombok.Getter;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 public enum ModuleType {
@@ -54,6 +56,14 @@ public enum ModuleType {
         this.displayName = displayName;
         this.parentFolder = parentFolder;
         this.containerFolder = containerFolder;
+    }
+
+    public String getTargetFolder() {
+        return getTargetFolderPath().toString();
+    }
+
+    public Path getTargetFolderPath() {
+        return Paths.get(parentFolder, containerFolder);
     }
 
     public static ModuleType of(String name) {

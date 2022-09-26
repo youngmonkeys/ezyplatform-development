@@ -26,6 +26,7 @@ import java.util.Set;
 @SuppressWarnings("LineLength")
 public final class CommonConstants {
 
+    public static final String LATEST = "latest";
     public static final String PATTERN_U_INT_NUMBER = "[0-9]+";
     public static final String PATTERN_COMMON_STRING = "[a-zA-Z0-9\\s]+";
     public static final String PATTERN_COMMON_NAME = "(([A-Z][a-zA-Z0-9]+[\\s])|([A-Z][a-zA-Z0-9]+))+";
