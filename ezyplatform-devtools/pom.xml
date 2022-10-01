@@ -31,7 +31,7 @@
     <description>EzyFox development tools</description>
 
     <properties>
-        <ezy.http.version>1.0.5</ezy.http.version>
+        <ezy.http.version>1.0.6</ezy.http.version>
     </properties>
 
     <dependencies>
