@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.repo.UserMetaRepository;
+import org.youngmonkeys.ezyplatform.repo.UserMetaTransactionalRepository;
 
 import java.util.Collection;
 import java.util.List;
@@ -32,6 +33,7 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 public class DefaultUserMetaService implements UserMetaService {
 
     private final UserMetaRepository userMetaRepository;
+    private final UserMetaTransactionalRepository userMetaTransactionalRepository;
 
     @Override
     public void saveUserMeta(
@@ -63,6 +65,19 @@ public class DefaultUserMetaService implements UserMetaService {
             }
         );
         userMetaRepository.save(entities);
+    }
+
+    @Override
+    public void saveUserMetaUniqueKey(
+        long userId,
+        String metaKey,
+        String metaValue
+    ) {
+        userMetaTransactionalRepository.saveUserMetaUniqueKey(
+            userId,
+            metaKey,
+            metaValue
+        );
     }
 
     @Override

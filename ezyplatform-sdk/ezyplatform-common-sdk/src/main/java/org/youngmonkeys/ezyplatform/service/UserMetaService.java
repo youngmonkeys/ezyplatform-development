@@ -119,6 +119,24 @@ public interface UserMetaService {
             );
     }
 
+    default void saveUserMetaUniqueKey(
+        long userId,
+        String metaKey,
+        Object metaValue
+    ) {
+        saveUserMetaUniqueKey(
+            userId,
+            metaKey,
+            Strings.from(metaValue)
+        );
+    }
+
+    void saveUserMetaUniqueKey(
+        long userId,
+        String metaKey,
+        String metaValue
+    );
+
     boolean containsUserMeta(
         long userId,
         String metaKey,
