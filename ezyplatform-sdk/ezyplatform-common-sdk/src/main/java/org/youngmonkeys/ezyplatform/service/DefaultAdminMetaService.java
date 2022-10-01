@@ -21,6 +21,7 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaRepository;
+import org.youngmonkeys.ezyplatform.repo.AdminMetaTransactionalRepository;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,7 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 public class DefaultAdminMetaService implements AdminMetaService {
 
     private final AdminMetaRepository adminMetaRepository;
+    private final AdminMetaTransactionalRepository adminMetaTransactionalRepository;
 
     @Override
     public void saveAdminMeta(
@@ -64,6 +66,19 @@ public class DefaultAdminMetaService implements AdminMetaService {
             }
         );
         adminMetaRepository.save(entities);
+    }
+
+    @Override
+    public void saveAdminMetaUniqueKey(
+        long adminId,
+        String metaKey,
+        String metaValue
+    ) {
+        adminMetaTransactionalRepository.saveAdminMetaUniqueKey(
+            adminId,
+            metaKey,
+            metaValue
+        );
     }
 
     @Override

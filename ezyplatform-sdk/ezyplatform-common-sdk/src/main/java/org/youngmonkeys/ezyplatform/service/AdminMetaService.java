@@ -119,6 +119,24 @@ public interface AdminMetaService {
             );
     }
 
+    default void saveAdminMetaUniqueKey(
+        long adminId,
+        String metaKey,
+        Object metaValue
+    ) {
+        saveAdminMetaUniqueKey(
+            adminId,
+            metaKey,
+            Strings.from(metaValue)
+        );
+    }
+
+    void saveAdminMetaUniqueKey(
+        long adminId,
+        String metaKey,
+        String metaValue
+    );
+
     boolean containsAdminMeta(
         long adminId,
         String metaKey,

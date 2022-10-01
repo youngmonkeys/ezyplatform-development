@@ -82,6 +82,13 @@ public final class CommonConstants {
 
     public static final String KEY_AUTHENTICATED = "authenticated";
 
+    public static final String META_KEY_LOGIN_FAILURES = "login_failures";
+    public static final String META_KEY_LOGIN_BLOCKED_UTIL = "login_blocked_util";
+
+    public static final String SETTING_NAME_ADMIN_MAX_LOGIN_FAILURES
+        = "admin_max_login_failures";
+    public static final String SETTING_NAME_ADMIN_LOGIN_FAILURE_BLOCK_DURATIONS
+        = "admin_login_failure_block_durations";
     public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_FILE_SIZE
         = "admin_max_upload_file_size";
     public static final String SETTING_NAME_ADMIN_TOKEN_EXPIRED_IN_DAY
@@ -92,6 +99,10 @@ public final class CommonConstants {
         = "admin_auto_pass_management_uris";
     public static final String SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY
         = "user_token_expired_in_day";
+    public static final String SETTING_NAME_USER_MAX_LOGIN_FAILURES
+        = "user_max_login_failures";
+    public static final String SETTING_NAME_USER_LOGIN_FAILURE_BLOCK_DURATIONS
+        = "user_login_failure_block_durations";
     public static final String SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE
         = "web_max_upload_file_size";
     public static final String SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES
