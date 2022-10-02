@@ -23,6 +23,7 @@ import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaTransactionalRepository;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,19 @@ public class DefaultAdminMetaService implements AdminMetaService {
             adminId,
             metaKey,
             metaValue
+        );
+    }
+
+    @Override
+    public BigInteger increaseAdminMetaValue(
+        long adminId,
+        String metaKey,
+        BigInteger value
+    ) {
+        return adminMetaTransactionalRepository.increaseMetaValue(
+            adminId,
+            metaKey,
+            value
         );
     }
 

@@ -22,6 +22,7 @@ import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.math.BigInteger;
 import java.util.List;
 
 public class AdminMetaTransactionalRepository
@@ -40,10 +41,11 @@ public class AdminMetaTransactionalRepository
             try {
                 List<AdminMeta> entities = entityManager.createQuery(
                     "SELECT e FROM AdminMeta e " +
-                        "WHERE e.adminId = ?0 AND metaKey = ?1"
+                        "WHERE e.adminId = ?0 AND e.metaKey = ?1"
                 )
                     .setParameter(0, adminId)
                     .setParameter(1, metaKey)
+                    .setMaxResults(1)
                     .getResultList();
                 AdminMeta entity = EzyLists.first(entities);
                 if (entity == null) {
@@ -54,6 +56,48 @@ public class AdminMetaTransactionalRepository
                 entity.setMetaValue(metaValue);
                 entityManager.merge(entity);
                 transaction.commit();
+            } catch (Exception e) {
+                transaction.rollback();
+                throw e;
+            }
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public BigInteger increaseMetaValue(
+        long adminId,
+        String metaKey,
+        BigInteger value
+    ) {
+        EntityManager entityManager = databaseContext.createEntityManager();
+        try {
+            EntityTransaction transaction = entityManager.getTransaction();
+            transaction.begin();
+            try {
+                List<AdminMeta> entities = entityManager.createQuery(
+                        "SELECT e FROM AdminMeta e " +
+                            "WHERE e.adminId = ?0 AND e.metaKey = ?1"
+                    )
+                    .setParameter(0, adminId)
+                    .setParameter(1, metaKey)
+                    .setMaxResults(1)
+                    .getResultList();
+                AdminMeta entity = EzyLists.first(entities);
+                BigInteger currentValue = BigInteger.ZERO;
+                if (entity == null) {
+                    entity = new AdminMeta();
+                } else {
+                    currentValue = new BigInteger(entity.getMetaValue());
+                }
+                BigInteger newValue = currentValue.add(value);
+                entity.setAdminId(adminId);
+                entity.setMetaKey(metaKey);
+                entity.setMetaValue(newValue.toString());
+                entityManager.merge(entity);
+                transaction.commit();
+                return newValue;
             } catch (Exception e) {
                 transaction.rollback();
                 throw e;

@@ -22,6 +22,7 @@ import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.repo.UserMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.UserMetaTransactionalRepository;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,19 @@ public class DefaultUserMetaService implements UserMetaService {
             userId,
             metaKey,
             metaValue
+        );
+    }
+
+    @Override
+    public BigInteger increaseUserMetaValue(
+        long userId,
+        String metaKey,
+        BigInteger value
+    ) {
+        return userMetaTransactionalRepository.increaseMetaValue(
+            userId,
+            metaKey,
+            value
         );
     }
 

@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import org.youngmonkeys.ezyplatform.rx.Reactive;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -135,6 +136,12 @@ public interface AdminMetaService {
         long adminId,
         String metaKey,
         String metaValue
+    );
+
+    BigInteger increaseAdminMetaValue(
+        long adminId,
+        String metaKey,
+        BigInteger value
     );
 
     boolean containsAdminMeta(

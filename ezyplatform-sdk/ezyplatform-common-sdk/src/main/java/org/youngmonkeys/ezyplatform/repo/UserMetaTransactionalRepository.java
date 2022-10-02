@@ -22,6 +22,7 @@ import org.youngmonkeys.ezyplatform.entity.UserMeta;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
+import java.math.BigInteger;
 import java.util.List;
 
 public class UserMetaTransactionalRepository
@@ -40,10 +41,11 @@ public class UserMetaTransactionalRepository
             try {
                 List<UserMeta> entities = entityManager.createQuery(
                     "SELECT e FROM UserMeta e " +
-                        "WHERE e.userId = ?0 AND metaKey = ?1"
+                        "WHERE e.userId = ?0 AND e.metaKey = ?1"
                 )
                     .setParameter(0, userId)
                     .setParameter(1, metaKey)
+                    .setMaxResults(1)
                     .getResultList();
                 UserMeta entity = EzyLists.first(entities);
                 if (entity == null) {
@@ -54,6 +56,48 @@ public class UserMetaTransactionalRepository
                 entity.setMetaValue(metaValue);
                 entityManager.merge(entity);
                 transaction.commit();
+            } catch (Exception e) {
+                transaction.rollback();
+                throw e;
+            }
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public BigInteger increaseMetaValue(
+        long userId,
+        String metaKey,
+        BigInteger value
+    ) {
+        EntityManager entityManager = databaseContext.createEntityManager();
+        try {
+            EntityTransaction transaction = entityManager.getTransaction();
+            transaction.begin();
+            try {
+                List<UserMeta> entities = entityManager.createQuery(
+                        "SELECT e FROM UserMeta e " +
+                            "WHERE e.userId = ?0 AND e.metaKey = ?1"
+                    )
+                    .setParameter(0, userId)
+                    .setParameter(1, metaKey)
+                    .setMaxResults(1)
+                    .getResultList();
+                UserMeta entity = EzyLists.first(entities);
+                BigInteger currentValue = BigInteger.ZERO;
+                if (entity == null) {
+                    entity = new UserMeta();
+                } else {
+                    currentValue = new BigInteger(entity.getMetaValue());
+                }
+                BigInteger newValue = currentValue.add(value);
+                entity.setUserId(userId);
+                entity.setMetaKey(metaKey);
+                entity.setMetaValue(newValue.toString());
+                entityManager.merge(entity);
+                transaction.commit();
+                return newValue;
             } catch (Exception e) {
                 transaction.rollback();
                 throw e;
