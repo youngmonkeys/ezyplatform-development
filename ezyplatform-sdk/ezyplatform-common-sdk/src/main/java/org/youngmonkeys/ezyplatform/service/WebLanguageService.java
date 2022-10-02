@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 
 public interface WebLanguageService {
 
+    String getDefaultLanguageCode();
+
     WebLanguageModel[] getLanguages();
 
     default List<WebLanguageModel> getLanguageList() {

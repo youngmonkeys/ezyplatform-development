@@ -19,12 +19,20 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.model.WebLanguageModel;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DEFAULT_LANGUAGE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_LANGUAGES;
 
 @AllArgsConstructor
 public class DefaultWebLanguageService implements WebLanguageService {
 
     private final SettingService settingService;
+
+    @Override
+    public String getDefaultLanguageCode() {
+        return settingService.getCachedValue(
+            SETTING_NAME_WEB_DEFAULT_LANGUAGE
+        );
+    }
 
     @Override
     public WebLanguageModel[] getLanguages() {

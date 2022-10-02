@@ -57,6 +57,10 @@ public interface SettingService {
 
     String getDecryptionValue(String settingName);
 
+    default <T> T getCachedValue(String settingName) {
+        return getCachedValue(settingName, null);
+    }
+
     <T> T getCachedValue(String settingName, T defaultValue);
 
     Optional<String> getSettingValue(String settingName);

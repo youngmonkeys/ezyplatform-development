@@ -85,6 +85,8 @@ public final class CommonConstants {
     public static final String META_KEY_LOGIN_FAILURES = "login_failures";
     public static final String META_KEY_LOGIN_BLOCKED_UTIL = "login_blocked_util";
 
+    public static final String SETTING_NAME_ADMIN_DEFAULT_LANGUAGE
+        = "admin_default_language";
     public static final String SETTING_NAME_ADMIN_MAX_LOGIN_FAILURES
         = "admin_max_login_failures";
     public static final String SETTING_NAME_ADMIN_LOGIN_FAILURE_BLOCK_DURATIONS
@@ -103,6 +105,8 @@ public final class CommonConstants {
         = "user_max_login_failures";
     public static final String SETTING_NAME_USER_LOGIN_FAILURE_BLOCK_DURATIONS
         = "user_login_failure_block_durations";
+    public static final String SETTING_NAME_WEB_DEFAULT_LANGUAGE
+        = "web_default_language";
     public static final String SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE
         = "web_max_upload_file_size";
     public static final String SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES
