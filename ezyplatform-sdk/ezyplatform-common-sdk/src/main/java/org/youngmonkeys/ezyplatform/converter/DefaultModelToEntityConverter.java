@@ -43,9 +43,9 @@ public class DefaultModelToEntityConverter {
         LocalDateTime now = clock.nowDateTime();
         Media entity = new Media();
         if (uploadFrom == UploadFrom.ADMIN) {
-            entity.setOwnerAdminId(model.getOwner());
+            entity.setOwnerAdminId(model.getOwnerId());
         } else {
-            entity.setOwnerUserId(model.getOwner());
+            entity.setOwnerUserId(model.getOwnerId());
         }
         entity.setUploadFrom(uploadFrom);
         entity.setName(model.getFileName());

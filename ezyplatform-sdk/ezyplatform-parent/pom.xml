@@ -41,7 +41,7 @@
 	<properties>
 		<ezy.platform.version>0.0.2</ezy.platform.version>
 		<ezy.version>1.2.5</ezy.version>
-		<ezy.http.version>1.0.6</ezy.http.version>
+		<ezy.http.version>1.0.7</ezy.http.version>
 		<ezy.boot.version>1.0.7</ezy.boot.version>
 		<thymeleaf.version>3.0.15.RELEASE</thymeleaf.version>
 		<layout.dialect.version>3.1.0</layout.dialect.version>

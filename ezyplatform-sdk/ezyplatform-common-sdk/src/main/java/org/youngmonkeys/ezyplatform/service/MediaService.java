@@ -105,6 +105,11 @@ public interface MediaService {
         );
     }
 
+    long getMediaFileLength(
+        MediaType mediaType,
+        String mediaName
+    );
+
     ImageSize getMediaImageSize(
         long mediaId
     ) throws IOException;

@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.data;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -22,11 +22,8 @@ import org.youngmonkeys.ezyplatform.entity.MediaType;
 
 @Getter
 @Builder
-public class AddMediaModel {
-    private long ownerId;
-    private String url;
-    private String fileName;
-    private String originalFileName;
-    private MediaType mediaType;
-    private String mimeType;
+public class FileMetadata {
+    private final String mimeType;
+    private final String extension;
+    private final MediaType mediaType;
 }

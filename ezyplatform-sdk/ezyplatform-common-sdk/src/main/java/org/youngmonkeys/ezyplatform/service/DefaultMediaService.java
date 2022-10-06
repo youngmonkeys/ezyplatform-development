@@ -156,6 +156,21 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
+    public long getMediaFileLength(
+        MediaType mediaType,
+        String mediaName
+    ) {
+        File mediaFile = fileSystemManager.getMediaFilePath(
+            mediaType.getFolder(),
+            mediaName
+        );
+        if (!mediaFile.exists()) {
+            throw new ResourceNotFoundException("media");
+        }
+        return mediaFile.length();
+    }
+
+    @Override
     public ImageSize getMediaImageSize(
         String imageName,
         MediaType mediaType

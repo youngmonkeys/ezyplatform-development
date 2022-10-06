@@ -28,14 +28,32 @@
 
     <dependencies>
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>${javax.servlet.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.youngmonkeys</groupId>
             <artifactId>ezyplatform-common-sdk</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyhttp-server-core</artifactId>
+            <version>${ezy.http.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.thymeleaf</groupId>
             <artifactId>thymeleaf</artifactId>
             <version>${thymeleaf.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${tika.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
