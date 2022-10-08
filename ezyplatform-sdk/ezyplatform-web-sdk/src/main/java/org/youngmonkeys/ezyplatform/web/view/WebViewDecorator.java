@@ -47,11 +47,11 @@ public class WebViewDecorator implements ViewDecorator {
 
     @Override
     public void decorate(HttpServletRequest request, View view) {
-        setLocal(request, view);
+        setLanguage(request, view);
         setUserData(request, view);
     }
 
-    protected void setLocal(HttpServletRequest request, View view) {
+    protected void setLanguage(HttpServletRequest request, View view) {
         String lang = request.getParameter("lang");
         if (lang != null) {
             view.setLocale(new Locale(lang));
