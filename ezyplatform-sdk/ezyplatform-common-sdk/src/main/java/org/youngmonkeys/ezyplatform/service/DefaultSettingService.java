@@ -303,7 +303,7 @@ public abstract class DefaultSettingService
         return null;
     }
 
-    private void cacheValueIfNotNull(String settingName, Object value) {
+    public void cacheValueIfNotNull(String settingName, Object value) {
         if (value != null) {
             cachedValues.put(settingName, value);
         }
