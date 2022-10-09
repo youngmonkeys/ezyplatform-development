@@ -68,7 +68,6 @@ public abstract class DefaultSettingService
 
     public static final LocalDateTime DEFAULT_LAST_CHANGED_TIME
         = LocalDateTime.of(1970, 1, 1, 0, 0);
-    public static final int DEFAULT_CACHE_PERIOD_IN_SECOND = 5;
     public static final String DEFAULT_ENCRYPTION_KEY = "KSYzjcc8nqrBk8jXtW4QaMpr2suBU9vY";
     public static final String LAST_UPDATE_TIME_SUFFIX = "_last_updated_time";
 
@@ -142,6 +141,7 @@ public abstract class DefaultSettingService
         );
     }
 
+    @Override
     public void watchLastUpdatedTimeAndCache(
         String settingName,
         int periodInSecond
@@ -229,9 +229,16 @@ public abstract class DefaultSettingService
         try {
             EzyExceptionFunction<String, Object> converter =
                 converters.get(settingName);
-            return (T) (converter == null ? settingValue : converter.apply(settingValue));
+            return (T) (converter == null
+                ? settingValue
+                : converter.apply(settingValue));
         } catch (Exception e) {
-            logger.warn("convert setting: {} value: {} error", settingName, settingValue, e);
+            logger.warn(
+                "convert setting: {} value: {} error",
+                settingName,
+                settingValue,
+                e
+            );
             return null;
         }
     }
@@ -239,10 +246,11 @@ public abstract class DefaultSettingService
     private <T> T fetchAndCacheLastChangedTimeAndParseValue(
         String settingName
     ) {
-        LocalDateTime lastChangedTime = lastChangedTimeBySettingName.getOrDefault(
-            settingName,
-            DEFAULT_LAST_CHANGED_TIME
-        );
+        LocalDateTime lastChangedTime = lastChangedTimeBySettingName
+            .getOrDefault(
+                settingName,
+                DEFAULT_LAST_CHANGED_TIME
+            );
         Setting setting = getChangedSetting(
             settingName,
             lastChangedTime
@@ -250,7 +258,10 @@ public abstract class DefaultSettingService
         if (setting == null) {
             return null;
         }
-        lastChangedTimeBySettingName.put(settingName, setting.getUpdatedAt());
+        lastChangedTimeBySettingName.put(
+            settingName,
+            setting.getUpdatedAt()
+        );
         return convertValue(settingName, setting.getValue());
     }
 

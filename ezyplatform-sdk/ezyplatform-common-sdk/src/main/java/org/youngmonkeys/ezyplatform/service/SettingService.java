@@ -27,16 +27,42 @@ import java.util.Set;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
-import static org.youngmonkeys.ezyplatform.service.DefaultSettingService.DEFAULT_CACHE_PERIOD_IN_SECOND;
 
 @SuppressWarnings("MethodCount")
 public interface SettingService {
+
+    int DEFAULT_CACHE_PERIOD_IN_SECOND = 5;
 
     void watchLastUpdatedTime(
         String settingName,
         int periodInSecond,
         Runnable onLastUpdatedTimeChange
     );
+
+    default void watchLastUpdatedTime(
+        String settingName,
+        Runnable onLastUpdatedTimeChange
+    ) {
+        watchLastUpdatedTime(
+            settingName,
+            DEFAULT_CACHE_PERIOD_IN_SECOND,
+            onLastUpdatedTimeChange
+        );
+    }
+
+    void watchLastUpdatedTimeAndCache(
+        String settingName,
+        int periodInSecond
+    );
+
+    default void watchLastUpdatedTimeAndCache(
+        String settingName
+    ) {
+        watchLastUpdatedTimeAndCache(
+            settingName,
+            DEFAULT_CACHE_PERIOD_IN_SECOND
+        );
+    }
 
     void addValueConverter(
         String settingName,

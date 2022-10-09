@@ -52,6 +52,12 @@ public class SettingServiceTest {
         ) {}
 
         @Override
+        public void watchLastUpdatedTimeAndCache(
+            String settingName,
+            int periodInSecond
+        ) {}
+
+        @Override
         public void addValueConverter(
             String settingName,
             EzyExceptionFunction<String, Object> converter

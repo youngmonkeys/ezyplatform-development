@@ -85,6 +85,8 @@ public final class CommonConstants {
     public static final String META_KEY_LOGIN_FAILURES = "login_failures";
     public static final String META_KEY_LOGIN_BLOCKED_UTIL = "login_blocked_util";
 
+    public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY
+        = "ezyplatform_dictionary";
     public static final String SETTING_NAME_ADMIN_DEFAULT_LANGUAGE
         = "admin_default_language";
     public static final String SETTING_NAME_ADMIN_MAX_LOGIN_FAILURES
