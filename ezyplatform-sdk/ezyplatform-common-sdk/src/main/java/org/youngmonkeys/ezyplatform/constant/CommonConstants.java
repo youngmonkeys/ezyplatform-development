@@ -87,6 +87,10 @@ public final class CommonConstants {
 
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY
         = "ezyplatform_dictionary";
+    public static final String SETTING_NAME_ADMIN_DATE_FORMAT
+        = "admin_date_format";
+    public static final String SETTING_NAME_ADMIN_DATETIME_FORMAT
+        = "admin_datetime_format";
     public static final String SETTING_NAME_ADMIN_DEFAULT_LANGUAGE
         = "admin_default_language";
     public static final String SETTING_NAME_ADMIN_MAX_LOGIN_FAILURES
@@ -107,6 +111,10 @@ public final class CommonConstants {
         = "user_max_login_failures";
     public static final String SETTING_NAME_USER_LOGIN_FAILURE_BLOCK_DURATIONS
         = "user_login_failure_block_durations";
+    public static final String SETTING_NAME_WEB_DATE_FORMAT
+        = "web_date_format";
+    public static final String SETTING_NAME_WEB_DATETIME_FORMAT
+        = "web_datetime_format";
     public static final String SETTING_NAME_WEB_DEFAULT_LANGUAGE
         = "web_default_language";
     public static final String SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE
@@ -135,6 +143,8 @@ public final class CommonConstants {
     public static final String SETTING_NAME_ALLOW_SEND_STATISTICS_DATA =
         "allow_send_statistics_data";
 
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
+    public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final int DEFAULT_CACHE_SETTINGS_PERIOD = 5;
     public static final boolean DEFAULT_ADMIN_ENABLE = true;
     public static final boolean DEFAULT_SOCKET_ENABLE = true;

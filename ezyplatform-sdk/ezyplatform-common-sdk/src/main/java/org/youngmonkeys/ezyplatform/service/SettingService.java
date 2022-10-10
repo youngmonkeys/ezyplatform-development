@@ -222,6 +222,34 @@ public interface SettingService {
         return Uris.getSiteName(adminUrl, "Website");
     }
 
+    default String getAdminDateFormat() {
+        return getTextValue(
+            SETTING_NAME_ADMIN_DATE_FORMAT,
+            DEFAULT_DATE_FORMAT
+        );
+    }
+
+    default String getAdminDateTimeFormat() {
+        return getTextValue(
+            SETTING_NAME_ADMIN_DATETIME_FORMAT,
+            DEFAULT_DATETIME_FORMAT
+        );
+    }
+
+    default String getWebDateFormat() {
+        return getTextValue(
+            SETTING_NAME_WEB_DATE_FORMAT,
+            DEFAULT_DATE_FORMAT
+        );
+    }
+
+    default String getWebDateTimeFormat() {
+        return getTextValue(
+            SETTING_NAME_WEB_DATETIME_FORMAT,
+            DEFAULT_DATETIME_FORMAT
+        );
+    }
+
     default String getAdminUrl() {
         return getTextValue(
             SETTING_NAME_ADMIN_URL,

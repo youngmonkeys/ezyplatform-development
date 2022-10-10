@@ -21,6 +21,7 @@ import com.tvd12.ezyfox.io.EzyDates;
 import lombok.AllArgsConstructor;
 
 import java.time.Clock;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -37,5 +38,16 @@ public class ClockProxy {
 
     public long toTimestamp(LocalDateTime dateTime) {
         return EzyDates.toInstant(dateTime, zoneId).toEpochMilli();
+    }
+
+    public LocalDate toLocalDate(long millis) {
+        return toLocalDateTime(millis).toLocalDate();
+    }
+
+    public LocalDateTime toLocalDateTime(long millis) {
+        return EzyDates.millisToDateTime(
+            millis,
+            zoneId
+        );
     }
 }
