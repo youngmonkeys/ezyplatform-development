@@ -41,4 +41,8 @@ public class UserNameModel {
     public String getName() {
         return EzyStrings.isBlank(displayName) ? username : displayName;
     }
+
+    public String getNameAndUsername() {
+        return getName() + "<" + username + ">";
+    }
 }

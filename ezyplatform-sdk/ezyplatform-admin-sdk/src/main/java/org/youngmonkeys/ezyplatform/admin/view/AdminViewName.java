@@ -24,6 +24,7 @@ import java.util.Map;
 public enum AdminViewName {
 
     ADD("add"),
+    DETAILS("details"),
     EDIT("edit"),
     ENCRYPTION("encryption"),
     INBOX("inbox"),
