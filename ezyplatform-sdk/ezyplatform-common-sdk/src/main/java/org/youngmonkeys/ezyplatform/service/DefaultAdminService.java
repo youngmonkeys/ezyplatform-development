@@ -18,16 +18,22 @@ package org.youngmonkeys.ezyplatform.service;
 
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
 import org.youngmonkeys.ezyplatform.exception.AdminAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.AdminInvalidAccessTokenException;
 import org.youngmonkeys.ezyplatform.model.AdminModel;
+import org.youngmonkeys.ezyplatform.model.AdminNameModel;
 import org.youngmonkeys.ezyplatform.repo.AdminAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminRepository;
+import org.youngmonkeys.ezyplatform.result.AdminNameResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class DefaultAdminService implements AdminService {
@@ -36,6 +42,7 @@ public class DefaultAdminService implements AdminService {
     private final AdminRepository adminRepository;
     private final AdminAccessTokenRepository accessTokenRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+    private final DefaultResultToModelConverter resultToModelConverter;
 
     @Override
     public Optional<AdminModel> getAdminByIdOptional(long id) {
@@ -61,6 +68,27 @@ public class DefaultAdminService implements AdminService {
     public Optional<AdminModel> getAdminByUsernameOptional(String username) {
         return adminRepository.findByFieldOptional("username", username)
             .map(entityToModelConverter::toModel);
+    }
+
+    @Override
+    public AdminNameModel getAdminNameById(long id) {
+        return resultToModelConverter.toModel(
+            adminRepository.findAdminNameById(id)
+        );
+    }
+
+    @Override
+    public Map<Long, AdminNameModel> getAdminNameMapByIds(
+        Collection<Long> ids
+    ) {
+        return adminRepository.findAdminNamesByIds(ids)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    AdminNameResult::getAdminId,
+                    resultToModelConverter::toModel
+                )
+            );
     }
 
     @Override

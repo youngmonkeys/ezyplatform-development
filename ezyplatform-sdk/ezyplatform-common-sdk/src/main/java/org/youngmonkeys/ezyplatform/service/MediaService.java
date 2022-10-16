@@ -20,9 +20,7 @@ import com.tvd12.ezyfox.security.EzySHA256;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
-import org.youngmonkeys.ezyplatform.model.AddMediaModel;
-import org.youngmonkeys.ezyplatform.model.MediaModel;
-import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
+import org.youngmonkeys.ezyplatform.model.*;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -76,6 +74,22 @@ public interface MediaService {
     );
 
     MediaModel getMediaById(long mediaId);
+
+    default MediaNameModel getMediaNameModelById(
+        long mediaId
+    ) {
+        return MediaNameModel.fromMediaModel(
+            getMediaById(mediaId)
+        );
+    }
+
+    default SimpleMediaModel getSimpleMediaModelById(
+        long mediaId
+    ) {
+        return SimpleMediaModel.fromMediaModel(
+            getMediaById(mediaId)
+        );
+    }
 
     MediaModel getMediaByName(String mediaName);
 

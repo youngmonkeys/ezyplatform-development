@@ -37,7 +37,9 @@ public interface UserService {
 
     UserModel getUserByAccessToken(String accessToken);
 
-    List<UserModel> getUserListByIds(Collection<Long> userIds);
+    List<UserModel> getUserListByIds(
+        Collection<Long> userIds
+    );
 
     Long getUserIdByAccessToken(String accessToken);
 
@@ -49,7 +51,9 @@ public interface UserService {
         Collection<Long> userIds
     );
 
-    default Map<Long, UserModel> getUserMapByIds(Collection<Long> userIds) {
+    default Map<Long, UserModel> getUserMapByIds(
+        Collection<Long> userIds
+    ) {
         return newHashMap(
             getUserListByIds(userIds),
             UserModel::getId

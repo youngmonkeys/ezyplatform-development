@@ -17,7 +17,10 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.model.AdminModel;
+import org.youngmonkeys.ezyplatform.model.AdminNameModel;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 public interface AdminService {
@@ -28,8 +31,16 @@ public interface AdminService {
     
     AdminModel getAdminByUsername(String username);
     
-    Optional<AdminModel> getAdminByUsernameOptional(String username);
-    
+    Optional<AdminModel> getAdminByUsernameOptional(
+        String username
+    );
+
+    AdminNameModel getAdminNameById(long id);
+
+    Map<Long, AdminNameModel> getAdminNameMapByIds(
+        Collection<Long> ids
+    );
+
     AdminModel getAdminByAccessToken(String accessToken);
 
     Long getAdminIdByAccessToken(String accessToken);

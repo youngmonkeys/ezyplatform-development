@@ -17,7 +17,28 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.Admin;
+import org.youngmonkeys.ezyplatform.result.AdminNameResult;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface AdminRepository extends EzyDatabaseRepository<Long, Admin> {
+
+    @EzyQuery(
+        "SELECT id, username, displayName " +
+            "FROM Admin " +
+            "WHERE id = ?0"
+    )
+    AdminNameResult findAdminNameById(long id);
+
+    @EzyQuery(
+        "SELECT id, username, displayName " +
+            "FROM Admin " +
+            "WHERE id in ?0"
+    )
+    List<AdminNameResult> findAdminNamesByIds(
+        Collection<Long> ids
+    );
 }
