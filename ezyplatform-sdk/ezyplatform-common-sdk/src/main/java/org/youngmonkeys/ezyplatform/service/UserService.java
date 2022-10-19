@@ -59,4 +59,6 @@ public interface UserService {
             UserModel::getId
         );
     }
+
+    boolean containsUserById(long id);
 }

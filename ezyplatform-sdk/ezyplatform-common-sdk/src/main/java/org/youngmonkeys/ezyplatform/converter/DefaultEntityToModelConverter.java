@@ -111,6 +111,7 @@ public class DefaultEntityToModelConverter {
             .name(entity.getName())
             .displayName(entity.getDisplayName())
             .createdAt(toTimestamp(entity.getCreatedAt()))
+            .updatedAt(toTimestamp(entity.getUpdatedAt()))
             .build();
     }
 

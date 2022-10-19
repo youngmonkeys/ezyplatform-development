@@ -28,4 +28,5 @@ public class UserRoleNameModel {
     private String name;
     private String displayName;
     private long createdAt;
+    private long updatedAt;
 }

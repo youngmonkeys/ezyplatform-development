@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,6 +43,7 @@ public class UserNameModel {
         return EzyStrings.isBlank(displayName) ? username : displayName;
     }
 
+    @JsonIgnore
     public String getNameAndUsername() {
         return getName() + "<" + username + ">";
     }

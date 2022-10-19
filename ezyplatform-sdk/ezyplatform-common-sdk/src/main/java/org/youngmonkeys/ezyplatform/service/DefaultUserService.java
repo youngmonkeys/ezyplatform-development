@@ -136,4 +136,9 @@ public class DefaultUserService implements UserService {
         }
         return entity.getUserId();
     }
+
+    @Override
+    public boolean containsUserById(long id) {
+        return userRepository.containsById(id);
+    }
 }
