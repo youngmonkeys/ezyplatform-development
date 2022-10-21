@@ -20,6 +20,7 @@
 	<test name="All">
 		<packages>
 			<package name="org.youngmonkeys.ezyplatform.test.concurrent"/>
+			<package name="org.youngmonkeys.ezyplatform.test.constant"/>
 			<package name="org.youngmonkeys.ezyplatform.test.converter"/>
 			<package name="org.youngmonkeys.ezyplatform.test.data"/>
 			<package name="org.youngmonkeys.ezyplatform.test.extractor"/>

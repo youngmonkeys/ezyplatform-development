@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.constant;
 
 import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyhttp.core.constant.ContentType;
+import org.youngmonkeys.ezyplatform.entity.TargetType;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -142,6 +143,8 @@ public final class CommonConstants {
     public static final String SETTING_NAME_WEB_LANGUAGES = "web_languages";
     public static final String SETTING_NAME_ALLOW_SEND_STATISTICS_DATA =
         "allow_send_statistics_data";
+    public static final String SETTING_NAME_TARGET_ROLE_FEATURES_SUFFIX =
+        "_role_features";
 
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -204,4 +207,15 @@ public final class CommonConstants {
         = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
 
     private CommonConstants() {}
+
+    public static String settingNameTargetRoleFeatures(TargetType targetType) {
+        return settingNameTargetRoleFeatures(
+            targetType.toString()
+        );
+    }
+
+    public static String settingNameTargetRoleFeatures(String targetType) {
+        return targetType.toLowerCase() +
+            SETTING_NAME_TARGET_ROLE_FEATURES_SUFFIX;
+    }
 }

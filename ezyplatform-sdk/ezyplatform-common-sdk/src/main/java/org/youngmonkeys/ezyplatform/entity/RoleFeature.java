@@ -18,26 +18,47 @@ package org.youngmonkeys.ezyplatform.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import java.io.Serializable;
+import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @ToString
-@EqualsAndHashCode
+@Entity
+@IdClass(RoleFeatureId.class)
+@Table(name = "ezy_role_features")
 @AllArgsConstructor
 @NoArgsConstructor
-public class AdminRoleFeatureId implements Serializable {
+public class RoleFeature {
+    @Id
     @Column(name = "role_id")
     private long roleId;
 
+    @Id
     private String target;
 
+    @Id
     private String feature;
 
+    @Id
     @Column(name = "feature_uri")
     private String featureUri;
 
+    @Id
     @Column(name = "feature_method")
     private String featureMethod;
+
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @Transient
+    public RoleFeatureId identifier() {
+        return new RoleFeatureId(
+            roleId,
+            target,
+            feature,
+            featureUri,
+            featureMethod
+        );
+    }
 }
