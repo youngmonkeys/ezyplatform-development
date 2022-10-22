@@ -177,6 +177,16 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
+    public DataIndex toEntity(AddDataKeywordModel model) {
+        DataIndex entity = new DataIndex();
+        entity.setDataType(model.getDataType());
+        entity.setDataId(model.getDataId());
+        entity.setKeyword(model.getKeyword());
+        entity.setPriority(model.getPriority());
+        entity.setCreatedAt(clock.nowDateTime());
+        return entity;
+    }
+
     public List<NotificationReceiver> toEntities(
         long notificationId,
         AddNotificationModel model
