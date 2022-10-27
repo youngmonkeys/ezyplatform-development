@@ -106,4 +106,9 @@ public class AdminMetaTransactionalRepository
             entityManager.close();
         }
     }
+
+    @Override
+    protected Class<AdminMeta> getEntityType() {
+        return AdminMeta.class;
+    }
 }

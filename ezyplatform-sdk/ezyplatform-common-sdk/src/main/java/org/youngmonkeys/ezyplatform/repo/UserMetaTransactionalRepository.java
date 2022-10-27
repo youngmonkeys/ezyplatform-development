@@ -106,4 +106,9 @@ public class UserMetaTransactionalRepository
             entityManager.close();
         }
     }
+
+    @Override
+    protected Class<UserMeta> getEntityType() {
+        return UserMeta.class;
+    }
 }

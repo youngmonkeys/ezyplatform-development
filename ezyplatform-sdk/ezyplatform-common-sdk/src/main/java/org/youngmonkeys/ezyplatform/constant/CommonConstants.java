@@ -83,6 +83,7 @@ public final class CommonConstants {
 
     public static final String KEY_AUTHENTICATED = "authenticated";
 
+    public static final String META_KEY_SLUG = "slug";
     public static final String META_KEY_LOGIN_FAILURES = "login_failures";
     public static final String META_KEY_LOGIN_BLOCKED_UTIL = "login_blocked_util";
 
