@@ -167,13 +167,9 @@ public class DefaultModelToEntityConverter {
 
     public Link toEntity(SaveLinkModel model) {
         Link entity = new Link();
-        entity.setLinkUri(model.getLinkUri());
-        entity.setLinkType(model.getLinkType());
-        entity.setImageId(model.getLinkImageId());
-        entity.setDescription(model.getDescription());
+        mergeToEntity(model, entity);
         LocalDateTime now = clock.nowDateTime();
         entity.setCreatedAt(now);
-        entity.setUpdatedAt(now);
         return entity;
     }
 
