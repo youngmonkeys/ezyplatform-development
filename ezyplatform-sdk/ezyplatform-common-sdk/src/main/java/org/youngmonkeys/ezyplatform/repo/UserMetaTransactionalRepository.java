@@ -50,9 +50,9 @@ public class UserMetaTransactionalRepository
                 UserMeta entity = EzyLists.first(entities);
                 if (entity == null) {
                     entity = new UserMeta();
+                    entity.setUserId(userId);
+                    entity.setMetaKey(metaKey);
                 }
-                entity.setUserId(userId);
-                entity.setMetaKey(metaKey);
                 entity.setMetaValue(metaValue);
                 entityManager.merge(entity);
                 transaction.commit();
@@ -88,12 +88,12 @@ public class UserMetaTransactionalRepository
                 BigInteger currentValue = BigInteger.ZERO;
                 if (entity == null) {
                     entity = new UserMeta();
+                    entity.setUserId(userId);
+                    entity.setMetaKey(metaKey);
                 } else {
                     currentValue = new BigInteger(entity.getMetaValue());
                 }
                 BigInteger newValue = currentValue.add(value);
-                entity.setUserId(userId);
-                entity.setMetaKey(metaKey);
                 entity.setMetaValue(newValue.toString());
                 entityManager.merge(entity);
                 transaction.commit();

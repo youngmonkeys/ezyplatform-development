@@ -16,38 +16,28 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
-import org.youngmonkeys.ezyplatform.rx.Reactive;
-
+import java.math.BigInteger;
 import java.util.Collection;
+import java.util.Map;
 
-public interface DataIndexService {
+public interface DataActionCountService {
 
-    default void addKeywords(
+    BigInteger increaseDataActionCount(
         String dataType,
+        String actionType,
         long dataId,
-        Collection<String> keywords
-    ) {
-        Reactive.multiple()
-            .registerConsumers(keywords, keyword ->
-                addKeyword(dataType, dataId, keyword)
-            )
-            .blockingExecute();
-    }
+        BigInteger value
+    );
 
-    default void addKeyword(
+    BigInteger getDataActionCount(
         String dataType,
-        long dataId,
-        String keyword
-    ) {
-        addKeyword(
-            SaveDataKeywordModel.builder()
-                .dataType(dataType)
-                .dataId(dataId)
-                .keyword(keyword)
-                .build()
-        );
-    }
+        String actionType,
+        long dataId
+    );
 
-    void addKeyword(SaveDataKeywordModel model);
+    Map<Long, BigInteger> getDataActionCountMap(
+        String dataType,
+        String actionType,
+        Collection<Long> dataIds
+    );
 }

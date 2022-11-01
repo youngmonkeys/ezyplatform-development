@@ -50,9 +50,9 @@ public class AdminMetaTransactionalRepository
                 AdminMeta entity = EzyLists.first(entities);
                 if (entity == null) {
                     entity = new AdminMeta();
+                    entity.setAdminId(adminId);
+                    entity.setMetaKey(metaKey);
                 }
-                entity.setAdminId(adminId);
-                entity.setMetaKey(metaKey);
                 entity.setMetaValue(metaValue);
                 entityManager.merge(entity);
                 transaction.commit();
@@ -88,12 +88,12 @@ public class AdminMetaTransactionalRepository
                 BigInteger currentValue = BigInteger.ZERO;
                 if (entity == null) {
                     entity = new AdminMeta();
+                    entity.setAdminId(adminId);
+                    entity.setMetaKey(metaKey);
                 } else {
                     currentValue = new BigInteger(entity.getMetaValue());
                 }
                 BigInteger newValue = currentValue.add(value);
-                entity.setAdminId(adminId);
-                entity.setMetaKey(metaKey);
                 entity.setMetaValue(newValue.toString());
                 entityManager.merge(entity);
                 transaction.commit();

@@ -19,16 +19,17 @@ package org.youngmonkeys.ezyplatform.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_data_indices")
+@Table(name = "ezy_data_action_counts")
 @AllArgsConstructor
 @NoArgsConstructor
-public class DataIndex {
+public class DataActionCount {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -36,12 +37,14 @@ public class DataIndex {
     @Column(name = "data_type")
     private String dataType;
 
+    @Column(name = "action_type")
+    private String actionType;
+
     @Column(name = "data_id")
     private long dataId;
 
-    private String keyword;
-
-    private int priority;
+    @Column(name = "action_count")
+    private BigInteger actionCount;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

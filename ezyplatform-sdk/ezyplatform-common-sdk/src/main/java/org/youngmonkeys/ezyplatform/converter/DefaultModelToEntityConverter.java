@@ -173,12 +173,9 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
-    public DataIndex toEntity(AddDataKeywordModel model) {
+    public DataIndex toEntity(SaveDataKeywordModel model) {
         DataIndex entity = new DataIndex();
-        entity.setDataType(model.getDataType());
-        entity.setDataId(model.getDataId());
-        entity.setKeyword(model.getKeyword());
-        entity.setPriority(model.getPriority());
+        mergeToEntity(model, entity);
         entity.setCreatedAt(clock.nowDateTime());
         return entity;
     }
@@ -265,6 +262,14 @@ public class DefaultModelToEntityConverter {
         entity.setLinkType(model.getLinkType());
         entity.setImageId(model.getLinkImageId());
         entity.setDescription(model.getDescription());
+        entity.setUpdatedAt(clock.nowDateTime());
+    }
+
+    public void mergeToEntity(SaveDataKeywordModel model, DataIndex entity) {
+        entity.setDataType(model.getDataType());
+        entity.setDataId(model.getDataId());
+        entity.setKeyword(model.getKeyword());
+        entity.setPriority(model.getPriority());
         entity.setUpdatedAt(clock.nowDateTime());
     }
 

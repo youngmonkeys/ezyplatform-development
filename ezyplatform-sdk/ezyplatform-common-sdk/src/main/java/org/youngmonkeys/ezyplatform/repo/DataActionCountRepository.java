@@ -14,16 +14,26 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.repo;
 
-import lombok.Builder;
-import lombok.Getter;
+import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import org.youngmonkeys.ezyplatform.entity.DataActionCount;
 
-@Getter
-@Builder
-public class AddDataKeywordModel {
-    private String dataType;
-    private long dataId;
-    private String keyword;
-    private int priority;
+import java.util.Collection;
+import java.util.List;
+
+public interface DataActionCountRepository
+    extends EzyDatabaseRepository<Long, DataActionCount> {
+
+    DataActionCount findByDataTypeAndActionTypeAndDataId(
+        String dataType,
+        String actionType,
+        long dataId
+    );
+
+    List<DataActionCount> findByDataTypeAndActionTypeAndDataIdIn(
+        String dataType,
+        String actionType,
+        Collection<Long> dataId
+    );
 }

@@ -20,7 +20,7 @@ import com.tvd12.ezyfox.util.EzyLoggable;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.DataIndex;
-import org.youngmonkeys.ezyplatform.model.AddDataKeywordModel;
+import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
 import org.youngmonkeys.ezyplatform.repo.DataIndexRepository;
 
 @AllArgsConstructor
@@ -32,7 +32,7 @@ public class DefaultDataIndexService
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
-    public void addKeyword(AddDataKeywordModel model) {
+    public void addKeyword(SaveDataKeywordModel model) {
         DataIndex entity = dataIndexRepository.findByDataTypeAndDataIdAndKeyword(
             model.getDataType(),
             model.getDataId(),
