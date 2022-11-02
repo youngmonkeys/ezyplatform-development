@@ -18,19 +18,20 @@ package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.jpa.repository.EzyJpaRepository;
 import com.tvd12.ezyfox.io.EzyLists;
-import org.youngmonkeys.ezyplatform.entity.UserMeta;
+import org.youngmonkeys.ezyplatform.entity.DataMeta;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class UserMetaTransactionalRepository
-    extends EzyJpaRepository<Long, UserMeta> {
+public class DataMetaTransactionalRepository
+    extends EzyJpaRepository<Long, DataMeta> {
 
     @SuppressWarnings("unchecked")
-    public void saveUserMetaUniqueKey(
-        long userId,
+    public void saveDataMetaUniqueKey(
+        String dataType,
+        long dataId,
         String metaKey,
         String metaValue
     ) {
@@ -39,18 +40,21 @@ public class UserMetaTransactionalRepository
             EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             try {
-                List<UserMeta> entities = entityManager.createQuery(
-                    "SELECT e FROM UserMeta e " +
-                        "WHERE e.userId = ?0 AND e.metaKey = ?1"
+                List<DataMeta> entities = entityManager.createQuery(
+                    "SELECT e FROM DataMeta e " +
+                        "WHERE e.dataType = ?0 AND " +
+                        "e.dataId = ?1 AND e.metaKey = ?2"
                 )
-                    .setParameter(0, userId)
-                    .setParameter(1, metaKey)
+                    .setParameter(0, dataType)
+                    .setParameter(1, dataId)
+                    .setParameter(2, metaKey)
                     .setMaxResults(1)
                     .getResultList();
-                UserMeta entity = EzyLists.first(entities);
+                DataMeta entity = EzyLists.first(entities);
                 if (entity == null) {
-                    entity = new UserMeta();
-                    entity.setUserId(userId);
+                    entity = new DataMeta();
+                    entity.setDataType(dataType);
+                    entity.setDataId(dataId);
                     entity.setMetaKey(metaKey);
                 }
                 entity.setMetaValue(metaValue);
@@ -67,7 +71,8 @@ public class UserMetaTransactionalRepository
 
     @SuppressWarnings("unchecked")
     public BigDecimal increaseMetaValue(
-        long userId,
+        String dataType,
+        long dataId,
         String metaKey,
         BigDecimal value
     ) {
@@ -76,19 +81,22 @@ public class UserMetaTransactionalRepository
             EntityTransaction transaction = entityManager.getTransaction();
             transaction.begin();
             try {
-                List<UserMeta> entities = entityManager.createQuery(
-                        "SELECT e FROM UserMeta e " +
-                            "WHERE e.userId = ?0 AND e.metaKey = ?1"
+                List<DataMeta> entities = entityManager.createQuery(
+                        "SELECT e FROM DataMeta e " +
+                            "WHERE e.dataType = ?0 AND " +
+                            "e.dataId = ?1 AND e.metaKey = ?2"
                     )
-                    .setParameter(0, userId)
-                    .setParameter(1, metaKey)
+                    .setParameter(0, dataType)
+                    .setParameter(1, dataId)
+                    .setParameter(2, metaKey)
                     .setMaxResults(1)
                     .getResultList();
-                UserMeta entity = EzyLists.first(entities);
+                DataMeta entity = EzyLists.first(entities);
                 BigDecimal currentValue = BigDecimal.ZERO;
                 if (entity == null) {
-                    entity = new UserMeta();
-                    entity.setUserId(userId);
+                    entity = new DataMeta();
+                    entity.setDataType(dataType);
+                    entity.setDataId(dataId);
                     entity.setMetaKey(metaKey);
                 } else {
                     currentValue = new BigDecimal(entity.getMetaValue());
@@ -108,7 +116,7 @@ public class UserMetaTransactionalRepository
     }
 
     @Override
-    protected Class<UserMeta> getEntityType() {
-        return UserMeta.class;
+    protected Class<DataMeta> getEntityType() {
+        return DataMeta.class;
     }
 }

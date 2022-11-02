@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import org.youngmonkeys.ezyplatform.rx.Reactive;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
@@ -138,11 +139,23 @@ public interface AdminMetaService {
         String metaValue
     );
 
-    BigInteger increaseAdminMetaValue(
+    BigDecimal increaseAdminMetaValue(
+        long adminId,
+        String metaKey,
+        BigDecimal value
+    );
+
+    default BigInteger increaseAdminMetaValue(
         long adminId,
         String metaKey,
         BigInteger value
-    );
+    ) {
+        return increaseAdminMetaValue(
+            adminId,
+            metaKey,
+            new BigDecimal(value)
+        ).toBigInteger();
+    }
 
     boolean containsAdminMeta(
         long adminId,
@@ -169,6 +182,40 @@ public interface AdminMetaService {
         long adminId,
         String metaKey
     );
+
+    default String getMetaValueByAdminIdAndMetaKeyOrDefault(
+        long dataId,
+        String metaKey,
+        String defaultValue
+    ) {
+        String value = getMetaValueByAdminIdAndMetaKey(
+            dataId,
+            metaKey
+        );
+        return value != null ? value : defaultValue;
+    }
+
+    default BigDecimal getMetaDecimalValueByAdminIdAndMetaKey(
+        long dataId,
+        String metaKey
+    ) {
+        String value = getMetaValueByAdminIdAndMetaKey(
+            dataId,
+            metaKey
+        );
+        return value != null ? new BigDecimal(value) : BigDecimal.ZERO;
+    }
+
+    default BigInteger getMetaIntegerValueByAdminIdAndMetaKey(
+        long dataId,
+        String metaKey
+    ) {
+        String value = getMetaValueByAdminIdAndMetaKey(
+            dataId,
+            metaKey
+        );
+        return value != null ? new BigInteger(value) : BigInteger.ZERO;
+    }
 
     List<String> getMetaValuesByAdminIdAndMetaKey(
         long adminId,

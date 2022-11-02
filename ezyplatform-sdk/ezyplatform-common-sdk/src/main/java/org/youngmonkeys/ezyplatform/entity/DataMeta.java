@@ -16,20 +16,21 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
-import java.math.BigInteger;
-import java.time.LocalDateTime;
 
-@Getter
 @Setter
-@ToString
+@Getter
 @Entity
-@Table(name = "ezy_data_action_counts")
+@Table(name = "ezy_data_meta")
 @AllArgsConstructor
 @NoArgsConstructor
-public class DataActionCount {
+public class DataMeta {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -37,18 +38,12 @@ public class DataActionCount {
     @Column(name = "data_type")
     private String dataType;
 
-    @Column(name = "action_type")
-    private String actionType;
-
     @Column(name = "data_id")
     private long dataId;
 
-    @Column(name = "action_count")
-    private BigInteger actionCount;
+    @Column(name = "meta_key")
+    private String metaKey;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    @Column(name = "meta_value")
+    private String metaValue;
 }

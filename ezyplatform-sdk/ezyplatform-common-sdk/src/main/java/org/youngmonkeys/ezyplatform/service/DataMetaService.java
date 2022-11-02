@@ -28,39 +28,45 @@ import java.util.function.Function;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 
-public interface UserMetaService {
+public interface DataMetaService {
 
-    void saveUserMeta(
-        long userId,
+    void saveDataMeta(
+        String dataType,
+        long dataId,
         String metaKey,
         String metaValue
     );
 
-    default void saveUserMeta(
-        long userId,
+    default void saveDataMeta(
+        String dataType,
+        long dataId,
         String metaKey,
         Object metaValue
     ) {
-        saveUserMeta(
-            userId,
+        saveDataMeta(
+            dataType,
+            dataId,
             metaKey,
             Strings.from(metaValue)
         );
     }
 
-    void saveUserMeta(
-        long userId,
+    void saveDataMeta(
+        String dataType,
+        long dataId,
         String metaKey,
         List<String> metaValues
     );
 
-    default void saveUserMeta(
-        long userId,
+    default void saveDataMeta(
+        String dataType,
+        long dataId,
         String metaKey,
         Collection<Object> metaValues
     ) {
-        saveUserMeta(
-            userId,
+        saveDataMeta(
+            dataType,
+            dataId,
             metaKey,
             (List<String>) newArrayList(
                 metaValues,
@@ -69,169 +75,206 @@ public interface UserMetaService {
         );
     }
 
-    default void saveUserMetaIfAbsent(
-        long userId,
+    default void saveDataMetaIfAbsent(
+        String dataType,
+        long dataId,
         String metaKey,
         Object metaValue
     ) {
-        saveUserMetaIfAbsent(
-            userId,
+        saveDataMetaIfAbsent(
+            dataType,
+            dataId,
             metaKey,
             Strings.from(metaValue)
         );
     }
 
-    default void saveUserMetaIfAbsent(
-        long userId,
+    default void saveDataMetaIfAbsent(
+        String dataType,
+        long dataId,
         String metaKey,
         String metaValue
     ) {
-        if (!containsUserMeta(userId, metaKey, metaValue)) {
-            saveUserMeta(userId, metaKey, metaValue);
+        if (!containsDataMeta(
+            dataType,
+            dataId,
+            metaKey,
+            metaValue
+        )) {
+            saveDataMeta(
+                dataType,
+                dataId,
+                metaKey,
+                metaValue
+            );
         }
     }
 
-    default void saveUserMetaIfAbsent(
-        long userId,
+    default void saveDataMetaIfAbsent(
+        String dataType,
+        long dataId,
         String metaKey,
         List<String> metaValues
     ) {
         Reactive.single(metaValues)
             .operateItem(metaValue ->
-                saveUserMetaIfAbsent(
-                    userId,
+                saveDataMetaIfAbsent(
+                    dataType,
+                    dataId,
                     metaKey,
                     metaValue
                 )
             );
     }
 
-    default void saveUserMetaIfAbsent(
-        long userId,
+    default void saveDataMetaIfAbsent(
+        String dataType,
+        long dataId,
         String metaKey,
         Collection<Object> metaValues
     ) {
         Reactive.single(metaValues)
             .operateItem(metaValue ->
-                saveUserMetaIfAbsent(
-                    userId,
+                saveDataMetaIfAbsent(
+                    dataType,
+                    dataId,
                     metaKey,
                     metaValue
                 )
             );
     }
 
-    default void saveUserMetaUniqueKey(
-        long userId,
+    default void saveDataMetaUniqueKey(
+        String dataType,
+        long dataId,
         String metaKey,
         Object metaValue
     ) {
-        saveUserMetaUniqueKey(
-            userId,
+        saveDataMetaUniqueKey(
+            dataType,
+            dataId,
             metaKey,
             Strings.from(metaValue)
         );
     }
 
-    void saveUserMetaUniqueKey(
-        long userId,
+    void saveDataMetaUniqueKey(
+        String dataType,
+        long dataId,
         String metaKey,
         String metaValue
     );
 
-    BigDecimal increaseUserMetaValue(
-        long userId,
+    BigDecimal increaseDataMetaValue(
+        String dataType,
+        long dataId,
         String metaKey,
         BigDecimal value
     );
 
-    default BigInteger increaseUserMetaValue(
-        long userId,
+    default BigInteger increaseDataMetaValue(
+        String dataType,
+        long dataId,
         String metaKey,
         BigInteger value
     ) {
-        return increaseUserMetaValue(
-            userId,
+        return increaseDataMetaValue(
+            dataType,
+            dataId,
             metaKey,
             new BigDecimal(value)
         ).toBigInteger();
     }
 
-    boolean containsUserMeta(
-        long userId,
+    boolean containsDataMeta(
+        String dataType,
+        long dataId,
         String metaKey,
         String metaValue
     );
 
-    long getUserIdByMeta(
+    long getDataIdByMeta(
+        String dataType,
         String metaKey,
         String metaValue
     );
 
-    default long getUserIdByMeta(
+    default long getDataIdByMeta(
+        String dataType,
         String metaKey,
         Object metaValue
     ) {
-        return getUserIdByMeta(
+        return getDataIdByMeta(
+            dataType,
             metaKey,
             Strings.from(metaValue)
         );
     }
 
-    String getMetaValueByUserIdAndMetaKey(
-        long userId,
+    String getMetaValueByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
         String metaKey
     );
 
-    default String getMetaValueByUserIdAndMetaKeyOrDefault(
+    default String getMetaValueByDataIdAndMetaKeyOrDefault(
+        String dataType,
         long dataId,
         String metaKey,
         String defaultValue
     ) {
-        String value = getMetaValueByUserIdAndMetaKey(
+        String value = getMetaValueByDataIdAndMetaKey(
+            dataType,
             dataId,
             metaKey
         );
         return value != null ? value : defaultValue;
     }
 
-    default BigDecimal getMetaDecimalValueByUserIdAndMetaKey(
+    default BigDecimal getMetaDecimalValueByDataIdAndMetaKey(
+        String dataType,
         long dataId,
         String metaKey
     ) {
-        String value = getMetaValueByUserIdAndMetaKey(
+        String value = getMetaValueByDataIdAndMetaKey(
+            dataType,
             dataId,
             metaKey
         );
         return value != null ? new BigDecimal(value) : BigDecimal.ZERO;
     }
 
-    default BigInteger getMetaIntegerValueByUserIdAndMetaKey(
+    default BigInteger getMetaIntegerValueByDataIdAndMetaKey(
+        String dataType,
         long dataId,
         String metaKey
     ) {
-        String value = getMetaValueByUserIdAndMetaKey(
+        String value = getMetaValueByDataIdAndMetaKey(
+            dataType,
             dataId,
             metaKey
         );
         return value != null ? new BigInteger(value) : BigInteger.ZERO;
     }
 
-    List<String> getMetaValuesByUserIdAndMetaKey(
-        long userId,
+    List<String> getMetaValuesByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
         String metaKey,
         int limit
     );
 
-    default <T> List<T> getMetaValuesByUserIdAndMetaKey(
-        long userId,
+    default <T> List<T> getMetaValuesByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
         String metaKey,
         int limit,
         Function<String, T> valueConverter
     ) {
         return newArrayList(
-            getMetaValuesByUserIdAndMetaKey(
-                userId,
+            getMetaValuesByDataIdAndMetaKey(
+                dataType,
+                dataId,
                 metaKey,
                 limit
             ),
@@ -239,9 +282,13 @@ public interface UserMetaService {
         );
     }
 
-    Map<String, String> getUserMetaValues(long userId);
+    Map<String, String> getDataMetaValues(
+        String dataType,
+        long dataId
+    );
 
-    Map<String, Long> getUserIdMapByMetaValues(
+    Map<String, Long> getDataIdMapByMetaValues(
+        String dataType,
         String metaKey,
         Collection<String> metaValues
     );

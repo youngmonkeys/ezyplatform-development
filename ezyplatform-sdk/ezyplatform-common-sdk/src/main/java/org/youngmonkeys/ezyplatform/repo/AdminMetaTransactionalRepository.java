@@ -22,7 +22,7 @@ import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.List;
 
 public class AdminMetaTransactionalRepository
@@ -66,10 +66,10 @@ public class AdminMetaTransactionalRepository
     }
 
     @SuppressWarnings("unchecked")
-    public BigInteger increaseMetaValue(
+    public BigDecimal increaseMetaValue(
         long adminId,
         String metaKey,
-        BigInteger value
+        BigDecimal value
     ) {
         EntityManager entityManager = databaseContext.createEntityManager();
         try {
@@ -85,15 +85,15 @@ public class AdminMetaTransactionalRepository
                     .setMaxResults(1)
                     .getResultList();
                 AdminMeta entity = EzyLists.first(entities);
-                BigInteger currentValue = BigInteger.ZERO;
+                BigDecimal currentValue = BigDecimal.ZERO;
                 if (entity == null) {
                     entity = new AdminMeta();
                     entity.setAdminId(adminId);
                     entity.setMetaKey(metaKey);
                 } else {
-                    currentValue = new BigInteger(entity.getMetaValue());
+                    currentValue = new BigDecimal(entity.getMetaValue());
                 }
-                BigInteger newValue = currentValue.add(value);
+                BigDecimal newValue = currentValue.add(value);
                 entity.setMetaValue(newValue.toString());
                 entityManager.merge(entity);
                 transaction.commit();

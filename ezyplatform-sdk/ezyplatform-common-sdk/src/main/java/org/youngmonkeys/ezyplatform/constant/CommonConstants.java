@@ -29,8 +29,6 @@ public final class CommonConstants {
 
     public static final String LATEST = "latest";
 
-    public static final String ACTION_VIEW = "view";
-
     public static final String PATTERN_U_INT_NUMBER = "[0-9]+";
     public static final String PATTERN_COMMON_STRING = "[a-zA-Z0-9\\s]+";
     public static final String PATTERN_COMMON_NAME = "(([A-Z][a-zA-Z0-9]+[\\s])|([A-Z][a-zA-Z0-9]+))+";
@@ -89,6 +87,9 @@ public final class CommonConstants {
     public static final String META_KEY_SLUG = "slug";
     public static final String META_KEY_LOGIN_FAILURES = "login_failures";
     public static final String META_KEY_LOGIN_BLOCKED_UTIL = "login_blocked_util";
+    public static final String META_KEY_VIEWS = "views";
+    public static final String META_KEY_STARS = "stars";
+    public static final String META_KEY_STAR_POINT = "starPoints";
 
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY
         = "ezyplatform_dictionary";
