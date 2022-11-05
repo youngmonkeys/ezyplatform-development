@@ -184,34 +184,34 @@ public interface UserMetaService {
     );
 
     default String getMetaValueByUserIdAndMetaKeyOrDefault(
-        long dataId,
+        long userId,
         String metaKey,
         String defaultValue
     ) {
         String value = getMetaValueByUserIdAndMetaKey(
-            dataId,
+            userId,
             metaKey
         );
         return value != null ? value : defaultValue;
     }
 
     default BigDecimal getMetaDecimalValueByUserIdAndMetaKey(
-        long dataId,
+        long userId,
         String metaKey
     ) {
         String value = getMetaValueByUserIdAndMetaKey(
-            dataId,
+            userId,
             metaKey
         );
         return value != null ? new BigDecimal(value) : BigDecimal.ZERO;
     }
 
     default BigInteger getMetaIntegerValueByUserIdAndMetaKey(
-        long dataId,
+        long userId,
         String metaKey
     ) {
         String value = getMetaValueByUserIdAndMetaKey(
-            dataId,
+            userId,
             metaKey
         );
         return value != null ? new BigInteger(value) : BigInteger.ZERO;

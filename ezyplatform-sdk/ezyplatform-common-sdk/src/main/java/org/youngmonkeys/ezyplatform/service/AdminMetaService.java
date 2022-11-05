@@ -184,34 +184,34 @@ public interface AdminMetaService {
     );
 
     default String getMetaValueByAdminIdAndMetaKeyOrDefault(
-        long dataId,
+        long adminId,
         String metaKey,
         String defaultValue
     ) {
         String value = getMetaValueByAdminIdAndMetaKey(
-            dataId,
+            adminId,
             metaKey
         );
         return value != null ? value : defaultValue;
     }
 
     default BigDecimal getMetaDecimalValueByAdminIdAndMetaKey(
-        long dataId,
+        long adminId,
         String metaKey
     ) {
         String value = getMetaValueByAdminIdAndMetaKey(
-            dataId,
+            adminId,
             metaKey
         );
         return value != null ? new BigDecimal(value) : BigDecimal.ZERO;
     }
 
     default BigInteger getMetaIntegerValueByAdminIdAndMetaKey(
-        long dataId,
+        long adminId,
         String metaKey
     ) {
         String value = getMetaValueByAdminIdAndMetaKey(
-            dataId,
+            adminId,
             metaKey
         );
         return value != null ? new BigInteger(value) : BigInteger.ZERO;
