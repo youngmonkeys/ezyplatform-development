@@ -110,6 +110,15 @@ public interface MediaService {
         );
     }
 
+    default Map<Long, MediaNameModel> getMediaNameModelMapByIds(
+        Collection<Long> mediaIds
+    ) {
+        return newHashMapNewValues(
+            getMediaMapByIds(mediaIds),
+            MediaNameModel::fromMediaModel
+        );
+    }
+
     default Map<Long, String> getMediaNameMapByIds(
         Collection<Long> mediaIds
     ) {

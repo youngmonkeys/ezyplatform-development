@@ -17,8 +17,8 @@
 package org.youngmonkeys.ezyplatform.test.util;
 
 import org.testng.annotations.Test;
-import org.youngmonkeys.ezyplatform.util.Strings;
 
+import static org.youngmonkeys.ezyplatform.util.Strings.containInvalidSpaces;
 import static org.youngmonkeys.ezyplatform.util.Strings.startsWithIgnoreSpaces;
 
 public class StringsTest {
@@ -36,5 +36,20 @@ public class StringsTest {
         assert !startsWithIgnoreSpaces(" \t", "a");
         assert !startsWithIgnoreSpaces(" \n", "a");
         assert !startsWithIgnoreSpaces(" hello", "hellow");
+    }
+
+    @Test
+    public void containInvalidSpacesTest() {
+        // given
+        // when
+        // then
+        assert containInvalidSpaces("a\tb");
+        assert containInvalidSpaces("a\nb");
+        assert containInvalidSpaces("a  b");
+        assert containInvalidSpaces("a b  ");
+        assert containInvalidSpaces("  a b");
+        assert !containInvalidSpaces("a b");
+        assert !containInvalidSpaces("a b ");
+        assert !containInvalidSpaces(" a b");
     }
 }

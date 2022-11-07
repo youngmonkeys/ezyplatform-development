@@ -168,15 +168,14 @@ public class DefaultModelToEntityConverter {
     public Link toEntity(SaveLinkModel model) {
         Link entity = new Link();
         mergeToEntity(model, entity);
-        LocalDateTime now = clock.nowDateTime();
-        entity.setCreatedAt(now);
+        entity.setCreatedAt(entity.getUpdatedAt());
         return entity;
     }
 
     public DataIndex toEntity(SaveDataKeywordModel model) {
         DataIndex entity = new DataIndex();
         mergeToEntity(model, entity);
-        entity.setCreatedAt(clock.nowDateTime());
+        entity.setCreatedAt(entity.getUpdatedAt());
         return entity;
     }
 

@@ -243,7 +243,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         RequestArguments arguments,
         DeserializeBodyException e
     ) {
-        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage(), e);
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {

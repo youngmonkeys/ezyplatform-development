@@ -52,4 +52,20 @@ public final class Strings {
         }
         return k >= prefix.length();
     }
+
+    public static boolean containInvalidSpaces(String str) {
+        for (int i = 0; i < str.length(); ++i) {
+            char ch = str.charAt(i);
+            if (ch == '\n' || ch == '\t') {
+                return true;
+            }
+            if (ch == ' '
+                && i < str.length() - 1
+                && str.charAt(i + 1) == ' '
+            ) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
