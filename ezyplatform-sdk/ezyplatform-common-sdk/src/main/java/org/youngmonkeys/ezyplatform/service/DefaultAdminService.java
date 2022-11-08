@@ -39,6 +39,7 @@ import java.util.stream.Collectors;
 public class DefaultAdminService implements AdminService {
 
     private final ClockProxy clock;
+    private final AdminAccessTokenService accessTokenService;
     private final AdminRepository adminRepository;
     private final AdminAccessTokenRepository accessTokenRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
@@ -116,6 +117,10 @@ public class DefaultAdminService implements AdminService {
         }
         AdminAccessToken entity = accessTokenRepository.findById(accessToken);
         if (entity == null) {
+            throw new AdminInvalidAccessTokenException(accessToken);
+        }
+        long adminId = accessTokenService.extractAdminId(accessToken);
+        if (adminId != entity.getAdminId()) {
             throw new AdminInvalidAccessTokenException(accessToken);
         }
         LocalDateTime now = clock.nowDateTime();

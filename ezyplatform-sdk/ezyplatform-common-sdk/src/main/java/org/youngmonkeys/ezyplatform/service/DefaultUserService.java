@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
+import org.youngmonkeys.ezyplatform.exception.UserInvalidAccessTokenException;
 import org.youngmonkeys.ezyplatform.exception.UserAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.UserInvalidAccessTokenException;
 import org.youngmonkeys.ezyplatform.model.UserModel;
@@ -41,6 +42,7 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 public class DefaultUserService implements UserService {
 
     private final ClockProxy clock;
+    private final UserAccessTokenService accessTokenService;
     private final UserRepository userRepository;
     private final UserAccessTokenRepository accessTokenRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
@@ -128,6 +130,10 @@ public class DefaultUserService implements UserService {
         }
         UserAccessToken entity = accessTokenRepository.findById(accessToken);
         if (entity == null) {
+            throw new UserInvalidAccessTokenException(accessToken);
+        }
+        long userId = accessTokenService.extractUserId(accessToken);
+        if (userId != entity.getUserId()) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
         LocalDateTime now = clock.nowDateTime();

@@ -111,12 +111,16 @@ public final class CommonConstants {
         = "admin_accepted_media_mime_types";
     public static final String SETTING_NAME_ADMIN_AUTO_PASS_MANAGEMENT_URIS
         = "admin_auto_pass_management_uris";
+    public static final String SETTING_NAME_ADMIN_ACCESS_TOKEN_ENCRYPTION_KEY
+        = "admin_access_token_encryption_key";
     public static final String SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY
         = "user_token_expired_in_day";
     public static final String SETTING_NAME_USER_MAX_LOGIN_FAILURES
         = "user_max_login_failures";
     public static final String SETTING_NAME_USER_LOGIN_FAILURE_BLOCK_DURATIONS
         = "user_login_failure_block_durations";
+    public static final String SETTING_NAME_USER_ACCESS_TOKEN_ENCRYPTION_KEY
+        = "user_access_token_encryption_key";
     public static final String SETTING_NAME_WEB_DATE_FORMAT
         = "web_date_format";
     public static final String SETTING_NAME_WEB_DATETIME_FORMAT
