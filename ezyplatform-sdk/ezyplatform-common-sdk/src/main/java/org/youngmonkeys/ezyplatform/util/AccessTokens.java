@@ -45,7 +45,8 @@ public final class AccessTokens {
         } catch (Exception e) {
             throw new IllegalStateException(
                 "can not generate access token for " + source +
-                    " id: " + source
+                    " id: " + sourceId,
+                e
             );
         }
         String header = EzyBase64.encode2utf(encryptedSourceIdBytes);
