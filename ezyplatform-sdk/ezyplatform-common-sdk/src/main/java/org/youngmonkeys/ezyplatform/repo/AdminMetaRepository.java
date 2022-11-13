@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 
@@ -43,6 +44,16 @@ public interface AdminMetaRepository
         long adminId,
         String metaKey,
         Next next
+    );
+
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.adminId = ?0 AND e.metaKey = ?1 " +
+            "ORDER BY e.id DESC"
+    )
+    Optional<AdminMeta> findByAdminIdAndMetaKeyOrderByIdDesc(
+        long adminId,
+        String metaKey
     );
 
     Optional<AdminMeta> findByAdminIdAndMetaKeyAndMetaValue(

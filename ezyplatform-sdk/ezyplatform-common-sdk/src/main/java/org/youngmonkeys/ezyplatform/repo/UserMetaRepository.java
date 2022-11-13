@@ -17,7 +17,9 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
+import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.entity.UserMeta;
 
 import java.util.Collection;
@@ -43,6 +45,16 @@ public interface UserMetaRepository
         long userId,
         String metaKey,
         Next next
+    );
+
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.userId = ?0 AND e.metaKey = ?1 " +
+            "ORDER BY e.id DESC"
+    )
+    Optional<UserMeta> findByUserIdAndMetaKeyOrderByIdDesc(
+        long userId,
+        String metaKey
     );
 
     Optional<UserMeta> findByUserIdAndMetaKeyAndMetaValue(

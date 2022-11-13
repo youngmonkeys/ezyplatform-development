@@ -134,6 +134,19 @@ public class DefaultUserMetaService implements UserMetaService {
     }
 
     @Override
+    public String getLatestMetaValueByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    ) {
+        return userMetaRepository.findByUserIdAndMetaKeyOrderByIdDesc(
+                userId,
+                metaKey
+            )
+            .map(UserMeta::getMetaValue)
+            .orElse(null);
+    }
+
+    @Override
     public List<String> getMetaValuesByUserIdAndMetaKey(
         long userId,
         String metaKey,

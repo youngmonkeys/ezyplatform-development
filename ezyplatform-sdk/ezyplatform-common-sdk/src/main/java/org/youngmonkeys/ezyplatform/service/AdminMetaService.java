@@ -183,6 +183,11 @@ public interface AdminMetaService {
         String metaKey
     );
 
+    String getLatestMetaValueByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    );
+
     default String getMetaValueByAdminIdAndMetaKeyOrDefault(
         long adminId,
         String metaKey,

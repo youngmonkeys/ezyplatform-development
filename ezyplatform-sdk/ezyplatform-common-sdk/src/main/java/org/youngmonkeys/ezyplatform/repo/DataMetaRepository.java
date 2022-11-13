@@ -17,7 +17,9 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
+import org.youngmonkeys.ezyplatform.entity.DataMeta;
 import org.youngmonkeys.ezyplatform.entity.DataMeta;
 
 import java.util.Collection;
@@ -49,6 +51,17 @@ public interface DataMetaRepository
         long dataId,
         String metaKey,
         Next next
+    );
+
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 AND e.dataId = ?1 AND e.metaKey = ?2 " +
+            "ORDER BY e.id DESC"
+    )
+    Optional<DataMeta> findByDataTypeDataIdAndMetaKeyOrderByIdDesc(
+        String dataType,
+        long dataId,
+        String metaKey
     );
 
     Optional<DataMeta> findByDataTypeAndDataIdAndMetaKeyAndMetaValue(

@@ -134,6 +134,19 @@ public class DefaultAdminMetaService implements AdminMetaService {
     }
 
     @Override
+    public String getLatestMetaValueByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    ) {
+        return adminMetaRepository.findByAdminIdAndMetaKeyOrderByIdDesc(
+            adminId,
+            metaKey
+        )
+            .map(AdminMeta::getMetaValue)
+            .orElse(null);
+    }
+
+    @Override
     public List<String> getMetaValuesByAdminIdAndMetaKey(
         long adminId,
         String metaKey,

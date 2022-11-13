@@ -183,6 +183,11 @@ public interface UserMetaService {
         String metaKey
     );
 
+    String getLatestMetaValueByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    );
+
     default String getMetaValueByUserIdAndMetaKeyOrDefault(
         long userId,
         String metaKey,

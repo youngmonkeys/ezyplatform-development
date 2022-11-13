@@ -217,6 +217,12 @@ public interface DataMetaService {
         String metaKey
     );
 
+    String getLatestMetaValueByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    );
+
     default String getMetaValueByDataIdAndMetaKeyOrDefault(
         String dataType,
         long dataId,

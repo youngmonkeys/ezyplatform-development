@@ -148,6 +148,21 @@ public class DefaultDataMetaService implements DataMetaService {
     }
 
     @Override
+    public String getLatestMetaValueByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    ) {
+        return dataMetaRepository.findByDataTypeDataIdAndMetaKeyOrderByIdDesc(
+            dataType,
+            dataId,
+            metaKey
+        )
+            .map(DataMeta::getMetaValue)
+            .orElse(null);
+    }
+
+    @Override
     public List<String> getMetaValuesByDataIdAndMetaKey(
         String dataType,
         long dataId,
