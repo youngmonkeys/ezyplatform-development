@@ -245,4 +245,9 @@ public interface AdminMetaService {
         String metaKey,
         Collection<String> metaValues
     );
+
+    Map<Long, String> getAdminMetaValueMapByAdminIds(
+        Collection<Long> adminIds,
+        String metaKey
+    );
 }

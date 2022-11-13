@@ -245,4 +245,9 @@ public interface UserMetaService {
         String metaKey,
         Collection<String> metaValues
     );
+
+    Map<Long, String> getUserMetaValueMapByUserIds(
+        Collection<Long> userIds,
+        String metaKey
+    );
 }

@@ -292,4 +292,10 @@ public interface DataMetaService {
         String metaKey,
         Collection<String> metaValues
     );
+
+    Map<Long, String> getDataMetaValueMapByDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey
+    );
 }

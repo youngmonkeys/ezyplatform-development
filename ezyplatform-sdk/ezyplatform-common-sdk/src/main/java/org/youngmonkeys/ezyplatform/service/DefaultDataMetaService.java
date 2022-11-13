@@ -202,4 +202,24 @@ public class DefaultDataMetaService implements DataMetaService {
                 )
             );
     }
+
+    @Override
+    public Map<Long, String> getDataMetaValueMapByDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey
+    ) {
+        return dataMetaRepository.findByDataTypeAndDataIdInAndMetaKey(
+                dataType,
+                dataIds,
+                metaKey
+            )
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    DataMeta::getDataId,
+                    DataMeta::getMetaValue
+                )
+            );
+    }
 }

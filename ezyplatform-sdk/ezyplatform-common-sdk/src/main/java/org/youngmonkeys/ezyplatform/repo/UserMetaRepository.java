@@ -55,4 +55,9 @@ public interface UserMetaRepository
         String metaKey,
         Collection<String> metaValues
     );
+
+    List<UserMeta> findByUserIdInAndMetaKey(
+        Collection<Long> userIds,
+        String metaKey
+    );
 }
