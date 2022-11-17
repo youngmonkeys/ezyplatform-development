@@ -221,8 +221,10 @@ public final class Reactive {
         }
 
         public Multiple registerRx(Object name, RxOperation operation) {
-            taskKeys.add(name);
-            tasks.put(name, operation);
+            if (operation != null) {
+                taskKeys.add(name);
+                tasks.put(name, operation);
+            }
             return this;
         }
 
