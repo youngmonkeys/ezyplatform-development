@@ -18,12 +18,20 @@ package org.youngmonkeys.ezyplatform.util;
 
 import java.util.Map;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
 public final class Strings {
 
     private Strings() {}
 
     public static String from(Object value) {
         return value != null ? value.toString() : null;
+    }
+
+    public static String toLowerDashCase(String str) {
+        return isBlank(str)
+            ? str
+            : str.replace(' ', '-').toLowerCase();
     }
 
     public static String entryToString(Map.Entry<?, ?> entry) {
