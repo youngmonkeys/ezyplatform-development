@@ -93,6 +93,13 @@ public class WebViewDecorator implements ViewDecorator {
                 avatarImageName = mediaService.getMediaName(user.getAvatarImageId());
                 view.setVariable("avatarImageName", avatarImageName);
             }
+            decorateWithUserData(request, view, user);
         }
     }
+
+    protected void decorateWithUserData(
+        HttpServletRequest request,
+        View view,
+        UserModel user
+    ) {}
 }
