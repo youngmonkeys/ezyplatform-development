@@ -166,9 +166,19 @@ public class MediaControllerService extends EzyLoggable {
         RequestArguments requestArguments,
         String name
     ) throws Exception {
+        getMedia(requestArguments, name, true);
+    }
+
+    public void getMedia(
+        RequestArguments requestArguments,
+        String name,
+        boolean exposePrivateMedia
+    ) throws Exception {
         mediaValidator.validateMediaName(name);
         MediaModel media = mediaService.getMediaByName(name);
-        if (media == null) {
+        if (media == null
+            || (!media.isPublicMedia() && !exposePrivateMedia)
+        ) {
             throw new MediaNotFoundException(name);
         }
         MediaType mediaType = media.getType();
