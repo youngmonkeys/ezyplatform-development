@@ -14,17 +14,21 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.result;
+package org.youngmonkeys.ezyplatform.util;
 
-import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
-import lombok.Getter;
-import lombok.Setter;
+import com.tvd12.ezyfox.security.EzySHA256;
 
-@Getter
-@Setter
-@EzyQueryResult
-public class AdminNameResult {
-    private long adminId;
-    private String username;
-    private String displayName;
+import java.util.UUID;
+
+public final class Sha256Uuids {
+
+    private Sha256Uuids() {}
+
+    public static String generateUuid(String uniqueString) {
+        return EzySHA256.cryptUtfToLowercase(
+            uniqueString +
+                System.currentTimeMillis() +
+                UUID.randomUUID()
+        );
+    }
 }

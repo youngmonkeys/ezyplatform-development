@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.entity.AdminStatus;
 @Builder
 public class AdminModel {
     private long id;
+    private String uuid;
     private String username;
     private String password;
     private String email;

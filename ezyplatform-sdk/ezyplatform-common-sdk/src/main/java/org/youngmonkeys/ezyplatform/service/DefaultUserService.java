@@ -20,14 +20,16 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
-import org.youngmonkeys.ezyplatform.exception.UserInvalidAccessTokenException;
 import org.youngmonkeys.ezyplatform.exception.UserAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.UserInvalidAccessTokenException;
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
+import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import org.youngmonkeys.ezyplatform.repo.UserAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRepository;
-import org.youngmonkeys.ezyplatform.result.UserNameResult;
+import org.youngmonkeys.ezyplatform.result.IdNameResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
@@ -92,7 +94,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     public UserNameModel getUsernameById(long userId) {
-        return resultToModelConverter.toModel(
+        return resultToModelConverter.toUserNameModel(
             userRepository.findUserIdAndNameById(userId)
         );
     }
@@ -100,15 +102,42 @@ public class DefaultUserService implements UserService {
     public Map<Long, UserNameModel> getUsernameMapByIds(
         Collection<Long> userIds
     ) {
-        List<UserNameResult> results = userRepository
+        List<IdNameResult> results = userRepository
             .findUserIdAndNameByIds(userIds);
         return results.stream()
             .collect(
                 Collectors.toMap(
-                    UserNameResult::getUserId,
+                    IdNameResult::getId,
+                    resultToModelConverter::toUserNameModel
+                )
+            );
+    }
+
+    @Override
+    public UuidNameModel getUserUuidNameById(long userId) {
+        return resultToModelConverter.toModel(
+            userRepository.findUserUuidNameById(userId)
+        );
+    }
+
+    @Override
+    public Map<Long, UuidNameModel> getUserUuidNameMapByIds(
+        Collection<Long> userIds
+    ) {
+        return userRepository.findUserUuidNamesByIds(userIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    IdUuidNameResult::getId,
                     resultToModelConverter::toModel
                 )
             );
+    }
+
+    @Override
+    public Long getUserIdByUuid(String uuid) {
+        IdResult result = userRepository.findUserIdByUuid(uuid);
+        return result != null ? result.getId() : null;
     }
 
     @Override

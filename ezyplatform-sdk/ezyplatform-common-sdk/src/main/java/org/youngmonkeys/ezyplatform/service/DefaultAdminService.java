@@ -24,9 +24,12 @@ import org.youngmonkeys.ezyplatform.exception.AdminAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.AdminInvalidAccessTokenException;
 import org.youngmonkeys.ezyplatform.model.AdminModel;
 import org.youngmonkeys.ezyplatform.model.AdminNameModel;
+import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import org.youngmonkeys.ezyplatform.repo.AdminAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminRepository;
-import org.youngmonkeys.ezyplatform.result.AdminNameResult;
+import org.youngmonkeys.ezyplatform.result.IdNameResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
@@ -46,16 +49,16 @@ public class DefaultAdminService implements AdminService {
     private final DefaultResultToModelConverter resultToModelConverter;
 
     @Override
-    public Optional<AdminModel> getAdminByIdOptional(long id) {
-        return adminRepository.findByIdOptional(id)
-            .map(entityToModelConverter::toModel);
-    }
-
-    @Override
     public AdminModel getAdminById(long adminId) {
         return entityToModelConverter.toModel(
             adminRepository.findById(adminId)
         );
+    }
+
+    @Override
+    public Optional<AdminModel> getAdminByIdOptional(long adminId) {
+        return adminRepository.findByIdOptional(adminId)
+            .map(entityToModelConverter::toModel);
     }
 
     @Override
@@ -72,24 +75,51 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public AdminNameModel getAdminNameById(long id) {
-        return resultToModelConverter.toModel(
-            adminRepository.findAdminNameById(id)
+    public AdminNameModel getAdminNameById(long adminId) {
+        return resultToModelConverter.toAdminNameModel(
+            adminRepository.findAdminNameById(adminId)
         );
     }
 
     @Override
     public Map<Long, AdminNameModel> getAdminNameMapByIds(
-        Collection<Long> ids
+        Collection<Long> adminIds
     ) {
-        return adminRepository.findAdminNamesByIds(ids)
+        return adminRepository.findAdminNamesByIds(adminIds)
             .stream()
             .collect(
                 Collectors.toMap(
-                    AdminNameResult::getAdminId,
+                    IdNameResult::getId,
+                    resultToModelConverter::toAdminNameModel
+                )
+            );
+    }
+
+    @Override
+    public UuidNameModel getAdminUuidNameById(long adminId) {
+        return resultToModelConverter.toModel(
+            adminRepository.findAdminUuidNameById(adminId)
+        );
+    }
+
+    @Override
+    public Map<Long, UuidNameModel> getAdminUuidNameMapByIds(
+        Collection<Long> adminIds
+    ) {
+        return adminRepository.findAdminUuidNamesByIds(adminIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    IdUuidNameResult::getId,
                     resultToModelConverter::toModel
                 )
             );
+    }
+
+    @Override
+    public Long getAdminIdByUuid(String uuid) {
+        IdResult result = adminRepository.findAdminIdByUuid(uuid);
+        return result != null ? result.getId() : null;
     }
 
     @Override

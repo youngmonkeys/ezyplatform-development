@@ -19,7 +19,9 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.User;
-import org.youngmonkeys.ezyplatform.result.UserNameResult;
+import org.youngmonkeys.ezyplatform.result.IdNameResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,14 +29,36 @@ import java.util.List;
 public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
+        "SELECT e.id FROM User e " +
+            "WHERE e.uuid = ?0"
+    )
+    IdResult findUserIdByUuid(String uuid);
+
+    @EzyQuery(
         "SELECT e.id, e.username, e.displayName " +
             "FROM User e WHERE e.id = ?0"
     )
-    UserNameResult findUserIdAndNameById(long id);
+    IdNameResult findUserIdAndNameById(long id);
 
     @EzyQuery(
         "SELECT e.id, e.username, e.displayName " +
             "FROM User e WHERE e.id in ?0"
     )
-    List<UserNameResult> findUserIdAndNameByIds(Collection<Long> ids);
+    List<IdNameResult> findUserIdAndNameByIds(Collection<Long> ids);
+
+    @EzyQuery(
+        "SELECT e.id, e.uuid, e.displayName " +
+            "FROM User e " +
+            "WHERE e.id = ?0"
+    )
+    IdUuidNameResult findUserUuidNameById(long id);
+
+    @EzyQuery(
+        "SELECT e.id, e.uuid, e.displayName " +
+            "FROM User e " +
+            "WHERE e.id in ?0"
+    )
+    List<IdUuidNameResult> findUserUuidNamesByIds(
+        Collection<Long> ids
+    );
 }

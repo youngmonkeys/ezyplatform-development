@@ -19,7 +19,9 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.Admin;
-import org.youngmonkeys.ezyplatform.result.AdminNameResult;
+import org.youngmonkeys.ezyplatform.result.IdNameResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,18 +29,40 @@ import java.util.List;
 public interface AdminRepository extends EzyDatabaseRepository<Long, Admin> {
 
     @EzyQuery(
-        "SELECT id, username, displayName " +
-            "FROM Admin " +
-            "WHERE id = ?0"
+        "SELECT e.id FROM Admin e " +
+            "WHERE e.uuid = ?0"
     )
-    AdminNameResult findAdminNameById(long id);
+    IdResult findAdminIdByUuid(String uuid);
 
     @EzyQuery(
-        "SELECT id, username, displayName " +
-            "FROM Admin " +
-            "WHERE id in ?0"
+        "SELECT e.id, e.username, e.displayName " +
+            "FROM Admin e " +
+            "WHERE e.id = ?0"
     )
-    List<AdminNameResult> findAdminNamesByIds(
+    IdNameResult findAdminNameById(long id);
+
+    @EzyQuery(
+        "SELECT e.id, e.username, e.displayName " +
+            "FROM Admin e " +
+            "WHERE e.id in ?0"
+    )
+    List<IdNameResult> findAdminNamesByIds(
+        Collection<Long> ids
+    );
+
+    @EzyQuery(
+        "SELECT e.id, e.uuid, e.displayName " +
+            "FROM Admin e " +
+            "WHERE e.id = ?0"
+    )
+    IdUuidNameResult findAdminUuidNameById(long id);
+
+    @EzyQuery(
+        "SELECT e.id, e.uuid, e.displayName " +
+            "FROM Admin e " +
+            "WHERE e.id in ?0"
+    )
+    List<IdUuidNameResult> findAdminUuidNamesByIds(
         Collection<Long> ids
     );
 }

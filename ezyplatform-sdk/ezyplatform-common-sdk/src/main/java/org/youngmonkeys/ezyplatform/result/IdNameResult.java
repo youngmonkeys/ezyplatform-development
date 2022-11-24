@@ -23,8 +23,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @EzyQueryResult
-public class UserNameResult {
-    private long userId;
+public class IdNameResult {
+    private long id;
     private String username;
     private String displayName;
 }

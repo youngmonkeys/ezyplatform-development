@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
+import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +42,8 @@ public interface UserService {
         Collection<Long> userIds
     );
 
+    Long getUserIdByUuid(String uuid);
+
     Long getUserIdByAccessToken(String accessToken);
 
     long validateAccessToken(String accessToken);
@@ -48,6 +51,12 @@ public interface UserService {
     UserNameModel getUsernameById(long userId);
 
     Map<Long, UserNameModel> getUsernameMapByIds(
+        Collection<Long> userIds
+    );
+
+    UuidNameModel getUserUuidNameById(long userId);
+
+    Map<Long, UuidNameModel> getUserUuidNameMapByIds(
         Collection<Long> userIds
     );
 

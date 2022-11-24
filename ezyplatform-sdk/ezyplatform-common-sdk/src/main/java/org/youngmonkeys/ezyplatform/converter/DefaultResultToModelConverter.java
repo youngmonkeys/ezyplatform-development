@@ -19,8 +19,9 @@ package org.youngmonkeys.ezyplatform.converter;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.model.AdminNameModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
-import org.youngmonkeys.ezyplatform.result.AdminNameResult;
-import org.youngmonkeys.ezyplatform.result.UserNameResult;
+import org.youngmonkeys.ezyplatform.model.UuidNameModel;
+import org.youngmonkeys.ezyplatform.result.IdNameResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.util.LocalDateTimes;
 
 import java.time.LocalDateTime;
@@ -31,23 +32,33 @@ public class DefaultResultToModelConverter {
 
     protected final ZoneId zoneId;
 
-    public AdminNameModel toModel(AdminNameResult result) {
+    public UuidNameModel toModel(IdUuidNameResult result) {
+        if (result == null) {
+            return null;
+        }
+        return UuidNameModel.builder()
+            .uuid(result.getUuid())
+            .displayName(result.getDisplayName())
+            .build();
+    }
+
+    public AdminNameModel toAdminNameModel(IdNameResult result) {
         if (result == null) {
             return null;
         }
         return AdminNameModel.builder()
-            .adminId(result.getAdminId())
+            .adminId(result.getId())
             .username(result.getUsername())
             .displayName(result.getDisplayName())
             .build();
     }
 
-    public UserNameModel toModel(UserNameResult result) {
+    public UserNameModel toUserNameModel(IdNameResult result) {
         if (result == null) {
             return null;
         }
         return UserNameModel.builder()
-            .userId(result.getUserId())
+            .userId(result.getId())
             .username(result.getUsername())
             .displayName(result.getDisplayName())
             .build();

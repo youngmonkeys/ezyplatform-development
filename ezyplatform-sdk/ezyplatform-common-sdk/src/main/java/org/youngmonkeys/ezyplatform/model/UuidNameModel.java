@@ -22,23 +22,11 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class UserModel {
-    private long id;
+public class UuidNameModel {
     private String uuid;
-    private String username;
     private String displayName;
-    private String password;
-    private String email;
-    private String phone;
-    private String url;
-    private long avatarImageId;
-    private long coverImageId;
-    private String status;
-    private String activationKey;
-    private long createdAt;
-    private long updatedAt;
 
     public String getName() {
-        return EzyStrings.isBlank(displayName) ? username : displayName;
+        return EzyStrings.isBlank(displayName) ? uuid : displayName;
     }
 }

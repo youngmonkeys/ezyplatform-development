@@ -37,6 +37,7 @@ public class DefaultEntityToModelConverter {
         }
         return AdminModel.builder()
             .id(entity.getId())
+            .uuid(entity.getUuid())
             .username(entity.getUsername())
             .password(entity.getPassword())
             .email(entity.getEmail())
@@ -87,6 +88,7 @@ public class DefaultEntityToModelConverter {
         }
         return UserModel.builder()
             .id(entity.getId())
+            .uuid(entity.getUuid())
             .username(entity.getUsername())
             .email(entity.getEmail())
             .password(includePassword ? entity.getPassword() : EMPTY_STRING)

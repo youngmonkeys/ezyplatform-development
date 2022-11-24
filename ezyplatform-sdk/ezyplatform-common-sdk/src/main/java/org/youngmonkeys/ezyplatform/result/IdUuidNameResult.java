@@ -14,31 +14,17 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.result;
 
-import com.tvd12.ezyfox.io.EzyStrings;
-import lombok.Builder;
+import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-@Builder
-public class UserModel {
+@Setter
+@EzyQueryResult
+public class IdUuidNameResult {
     private long id;
     private String uuid;
-    private String username;
     private String displayName;
-    private String password;
-    private String email;
-    private String phone;
-    private String url;
-    private long avatarImageId;
-    private long coverImageId;
-    private String status;
-    private String activationKey;
-    private long createdAt;
-    private long updatedAt;
-
-    public String getName() {
-        return EzyStrings.isBlank(displayName) ? username : displayName;
-    }
 }

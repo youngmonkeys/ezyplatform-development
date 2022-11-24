@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.model.AdminModel;
 import org.youngmonkeys.ezyplatform.model.AdminNameModel;
+import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 
 import java.util.Collection;
 import java.util.Map;
@@ -27,19 +28,27 @@ public interface AdminService {
 
     AdminModel getAdminById(long adminId);
 
-    Optional<AdminModel> getAdminByIdOptional(long id);
-    
+    Optional<AdminModel> getAdminByIdOptional(long adminId);
+
     AdminModel getAdminByUsername(String username);
     
     Optional<AdminModel> getAdminByUsernameOptional(
         String username
     );
 
-    AdminNameModel getAdminNameById(long id);
+    AdminNameModel getAdminNameById(long adminId);
 
     Map<Long, AdminNameModel> getAdminNameMapByIds(
-        Collection<Long> ids
+        Collection<Long> adminIds
     );
+
+    UuidNameModel getAdminUuidNameById(long adminId);
+
+    Map<Long, UuidNameModel> getAdminUuidNameMapByIds(
+        Collection<Long> adminIds
+    );
+
+    Long getAdminIdByUuid(String uuid);
 
     AdminModel getAdminByAccessToken(String accessToken);
 

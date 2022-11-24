@@ -35,6 +35,8 @@ public class Admin {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    private String uuid;
+
     private String username;
 
     private String password;
