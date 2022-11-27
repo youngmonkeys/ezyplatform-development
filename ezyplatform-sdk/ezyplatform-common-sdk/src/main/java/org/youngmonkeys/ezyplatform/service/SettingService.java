@@ -192,6 +192,18 @@ public interface SettingService {
         }
     }
 
+    default List<String> getListStringValue(String settingName) {
+        return getListValue(settingName, String.class);
+    }
+
+    default List<String> getListStringValue(
+        String settingName,
+        List<String> defaultValue
+    ) {
+        List<String> value = getListValue(settingName, String.class);
+        return value.isEmpty() ? defaultValue : value;
+    }
+
     @SuppressWarnings("unchecked")
     default <T> List<T> getListValue(String settingName, Class<T> valueType) {
         String textValue = getTextValue(settingName);
