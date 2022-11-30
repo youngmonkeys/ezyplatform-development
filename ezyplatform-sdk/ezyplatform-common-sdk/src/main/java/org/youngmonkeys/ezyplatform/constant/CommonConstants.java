@@ -192,6 +192,7 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_PAGE_TITLE = "pageTitle";
     public static final String VIEW_VARIABLE_PAGE_SEPARATOR = "pageTitleSeparator";
     public static final String VIEW_VARIABLE_SITE_ICON_URL = "siteIconUrl";
+    public static final String VIEW_VARIABLE_SITE_LOGO_URL = "siteLogoUrl";
     public static final String VIEW_VARIABLE_PAGE_CHARSET = "pageCharset";
     public static final String VIEW_VARIABLE_PAGE_CONTENT_TYPE = "pageContentType";
     public static final String VIEW_VARIABLE_PAGE_DESCRIPTION = "pageDescription";
