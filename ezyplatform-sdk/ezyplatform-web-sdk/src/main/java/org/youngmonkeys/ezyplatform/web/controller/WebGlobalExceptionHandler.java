@@ -140,6 +140,17 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         );
     }
 
+    @TryCatch(BadRequestException.class)
+    public Object handle(RequestArguments arguments, BadRequestException e) {
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        HttpMethod method = arguments.getMethod();
+        String uriTemplate = arguments.getUriTemplate();
+        if (requestUriManager.isApiURI(method, uriTemplate)) {
+            return ResponseEntity.badRequest(e.getErrors());
+        }
+        return Redirect.to("/bad-request");
+    }
+
     @TryCatch(ResourceNotFoundException.class)
     public Object handle(
         RequestArguments arguments,
