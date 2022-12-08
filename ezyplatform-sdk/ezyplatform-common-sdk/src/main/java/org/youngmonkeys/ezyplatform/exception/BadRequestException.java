@@ -31,4 +31,9 @@ public class BadRequestException extends RuntimeException {
         super(message);
         this.errors = errors;
     }
+
+    public BadRequestException(Object errors, String message, Throwable cause) {
+        super(message, cause);
+        this.errors = errors;
+    }
 }
