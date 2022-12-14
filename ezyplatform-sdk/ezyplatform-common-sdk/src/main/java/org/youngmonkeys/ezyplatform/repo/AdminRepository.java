@@ -65,4 +65,11 @@ public interface AdminRepository extends EzyDatabaseRepository<Long, Admin> {
     List<IdUuidNameResult> findAdminUuidNamesByIds(
         Collection<Long> ids
     );
+
+    @EzyQuery(
+        "SELECT e.id, e.uuid, e.displayName " +
+            "FROM Admin e " +
+            "WHERE e.uuid = ?0"
+    )
+    IdUuidNameResult findAdminUuidNameByUuid(String uuid);
 }

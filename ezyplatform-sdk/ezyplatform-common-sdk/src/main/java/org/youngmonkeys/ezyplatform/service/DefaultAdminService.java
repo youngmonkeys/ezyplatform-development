@@ -117,6 +117,13 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
+    public UuidNameModel getAdminUuidNameByUuid(String uuid) {
+        return resultToModelConverter.toModel(
+            adminRepository.findAdminUuidNameByUuid(uuid)
+        );
+    }
+
+    @Override
     public Long getAdminIdByUuid(String uuid) {
         IdResult result = adminRepository.findAdminIdByUuid(uuid);
         return result != null ? result.getId() : null;

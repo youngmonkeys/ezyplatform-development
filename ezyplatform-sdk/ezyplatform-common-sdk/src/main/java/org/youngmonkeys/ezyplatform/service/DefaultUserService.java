@@ -135,6 +135,13 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public UuidNameModel getUserUuidNameByUuid(String uuid) {
+        return resultToModelConverter.toModel(
+            userRepository.findUserUuidNameByUuid(uuid)
+        );
+    }
+
+    @Override
     public Long getUserIdByUuid(String uuid) {
         IdResult result = userRepository.findUserIdByUuid(uuid);
         return result != null ? result.getId() : null;

@@ -60,6 +60,8 @@ public interface UserService {
         Collection<Long> userIds
     );
 
+    UuidNameModel getUserUuidNameByUuid(String uuid);
+
     default Map<Long, UserModel> getUserMapByIds(
         Collection<Long> userIds
     ) {

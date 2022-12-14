@@ -48,6 +48,8 @@ public interface AdminService {
         Collection<Long> adminIds
     );
 
+    UuidNameModel getAdminUuidNameByUuid(String uuid);
+
     Long getAdminIdByUuid(String uuid);
 
     AdminModel getAdminByAccessToken(String accessToken);

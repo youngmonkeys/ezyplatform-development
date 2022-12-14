@@ -61,4 +61,11 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
     List<IdUuidNameResult> findUserUuidNamesByIds(
         Collection<Long> ids
     );
+
+    @EzyQuery(
+        "SELECT e.id, e.uuid, e.displayName " +
+            "FROM User e " +
+            "WHERE e.uuid = ?0"
+    )
+    IdUuidNameResult findUserUuidNameByUuid(String uuid);
 }
