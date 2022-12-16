@@ -32,6 +32,10 @@ public class ClockProxy {
     private final Clock clock;
     private final ZoneId zoneId;
 
+    public LocalDate newDate() {
+        return nowDateTime().toLocalDate();
+    }
+
     public LocalDateTime nowDateTime() {
         return EzyDates.millisToDateTime(clock.millis(), zoneId);
     }
