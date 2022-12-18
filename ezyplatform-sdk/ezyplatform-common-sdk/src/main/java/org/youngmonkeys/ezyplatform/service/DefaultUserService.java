@@ -58,6 +58,13 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public UserModel getUserByUuid(String uuid) {
+        return userRepository.findByFieldOptional("uuid", uuid)
+            .map(entityToModelConverter::toModel)
+            .orElse(null);
+    }
+
+    @Override
     public UserModel getUserByUsername(String username) {
         return userRepository.findByFieldOptional("username", username)
             .map(entityToModelConverter::toModel)

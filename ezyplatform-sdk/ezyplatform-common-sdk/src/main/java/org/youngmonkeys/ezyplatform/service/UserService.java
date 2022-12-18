@@ -30,6 +30,8 @@ public interface UserService {
 
     UserModel getUserById(long userId);
 
+    UserModel getUserByUuid(String uuid);
+
     UserModel getUserByUsername(String username);
 
     UserModel getUserByEmail(String mail);

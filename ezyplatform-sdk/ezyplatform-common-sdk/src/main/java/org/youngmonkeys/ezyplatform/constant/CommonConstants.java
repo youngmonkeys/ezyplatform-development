@@ -59,6 +59,7 @@ public final class CommonConstants {
     public static final String PREFIX_HTTP_URL = "http://";
     public static final String PREFIX_HTTPS_URL = "https://";
 
+    public static final int MAX_LENGTH_UUID = 128;
     public static final int MIN_LENGTH_PASSWORD = 6;
     public static final int MAX_LENGTH_PASSWORD = 128;
     public static final int MIN_LENGTH_PHONE = 6;

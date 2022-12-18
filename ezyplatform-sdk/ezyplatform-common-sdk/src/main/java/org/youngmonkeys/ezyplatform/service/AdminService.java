@@ -30,6 +30,12 @@ public interface AdminService {
 
     Optional<AdminModel> getAdminByIdOptional(long adminId);
 
+    AdminModel getAdminByUuid(String uuid);
+
+    Optional<AdminModel> getAdminByUuidOptional(
+        String uuid
+    );
+
     AdminModel getAdminByUsername(String username);
     
     Optional<AdminModel> getAdminByUsernameOptional(

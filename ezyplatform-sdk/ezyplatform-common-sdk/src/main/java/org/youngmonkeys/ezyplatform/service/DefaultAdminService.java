@@ -62,6 +62,19 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
+    public AdminModel getAdminByUuid(String uuid) {
+        return entityToModelConverter.toModel(
+            adminRepository.findByField("uuid", uuid)
+        );
+    }
+
+    @Override
+    public Optional<AdminModel> getAdminByUuidOptional(String uuid) {
+        return adminRepository.findByFieldOptional("uuid", uuid)
+            .map(entityToModelConverter::toModel);
+    }
+
+    @Override
     public AdminModel getAdminByUsername(String username) {
         return entityToModelConverter.toModel(
             adminRepository.findByField("username", username)

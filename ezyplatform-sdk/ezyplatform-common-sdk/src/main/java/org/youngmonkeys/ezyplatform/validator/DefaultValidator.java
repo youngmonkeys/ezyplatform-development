@@ -33,6 +33,11 @@ public final class DefaultValidator {
             && value.matches(PATTERN_U_INT_NUMBER);
     }
 
+    public static boolean isValidUuid(String uuid) {
+        return uuid != null
+            && uuid.length() <= MAX_LENGTH_UUID;
+    }
+
     public static boolean isValidEmail(String email) {
         return email != null
             && email.length() <= MAX_LENGTH_EMAIL
