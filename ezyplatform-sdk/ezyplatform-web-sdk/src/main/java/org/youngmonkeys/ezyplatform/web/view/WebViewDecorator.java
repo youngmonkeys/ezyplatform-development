@@ -86,6 +86,7 @@ public class WebViewDecorator implements ViewDecorator {
         }
         if (user != null) {
             view.setVariable("user", user);
+            view.setVariable("userUuid", user.getUuid());
             view.setVariable("loggedIn", true);
             
             String avatarImageName = view.getVariable("avatarImageName");
