@@ -59,7 +59,7 @@ public class DefaultUserRoleService implements UserRoleService {
     @Override
     public boolean containsUserRole(long userId, long roleId) {
         return userRoleRepository.containsById(
-            new UserRoleId(userId, roleId)
+            new UserRoleId(roleId, userId)
         );
     }
 
