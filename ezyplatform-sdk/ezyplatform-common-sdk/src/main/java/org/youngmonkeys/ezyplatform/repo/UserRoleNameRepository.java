@@ -14,17 +14,10 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.service;
+package org.youngmonkeys.ezyplatform.repo;
 
-import java.util.Set;
+import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import org.youngmonkeys.ezyplatform.entity.UserRoleName;
 
-public interface UserRoleService {
-
-    long getRoleIdByName(String roleName);
-
-    Set<Long> getRoleIdsByUserId(long userId);
-
-    boolean containsUserRole(long userId, long roleId);
-
-    boolean containsUserRole(long userId, String roleName);
-}
+public interface UserRoleNameRepository
+    extends EzyDatabaseRepository<Long, UserRoleName> {}

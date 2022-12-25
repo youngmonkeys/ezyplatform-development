@@ -18,6 +18,9 @@ package org.youngmonkeys.ezyplatform.service;
 
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
+import org.youngmonkeys.ezyplatform.entity.UserRoleId;
+import org.youngmonkeys.ezyplatform.entity.UserRoleName;
+import org.youngmonkeys.ezyplatform.repo.UserRoleNameRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRoleRepository;
 
 import java.util.Set;
@@ -28,15 +31,46 @@ import static com.tvd12.ezyfox.io.EzySets.newHashSet;
 public class DefaultUserRoleService implements UserRoleService {
 
     private final UserRoleRepository userRoleRepository;
+    private final UserRoleNameRepository userRoleNameRepository;
 
     @Override
-    public Set<Long> getRoleIdsByUserId(long adminId) {
+    public long getRoleIdByName(String roleName) {
+        UserRoleName userRoleName = userRoleNameRepository
+            .findByField(
+                "name",
+                roleName
+            );
+        return userRoleName == null
+            ? 0L
+            : userRoleName.getId();
+    }
+
+    @Override
+    public Set<Long> getRoleIdsByUserId(long userId) {
         return newHashSet(
             userRoleRepository.findListByField(
                 "userId",
-                adminId
+                userId
             ),
             UserRole::getRoleId
         );
+    }
+
+    @Override
+    public boolean containsUserRole(long userId, long roleId) {
+        return userRoleRepository.containsById(
+            new UserRoleId(userId, roleId)
+        );
+    }
+
+    @Override
+    public boolean containsUserRole(long userId, String roleName) {
+        UserRoleName userRoleName = userRoleNameRepository
+            .findByField(
+                "name",
+                roleName
+            );
+        return userRoleName != null
+            && containsUserRole(userId, userRoleName.getId());
     }
 }
