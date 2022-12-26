@@ -76,4 +76,22 @@ public final class Strings {
         }
         return false;
     }
+
+    public static String hideSensitiveInformation(
+        String str,
+        int startHidden,
+        int hiddenLength
+    ) {
+        if (startHidden >= str.length()) {
+            return str;
+        }
+        StringBuilder builder = new StringBuilder()
+            .append(str, 0, startHidden)
+            .append("***");
+        int end = startHidden + hiddenLength;
+        if (end < str.length() - 1) {
+            builder.append(str.substring(end));
+        }
+        return builder.toString();
+    }
 }

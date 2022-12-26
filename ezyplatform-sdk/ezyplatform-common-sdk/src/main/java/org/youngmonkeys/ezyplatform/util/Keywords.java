@@ -57,7 +57,7 @@ public final class Keywords {
 
     public static String keywordFromEmail(String email) {
         int atIndex = email.indexOf("@");
-        return  atIndex < 1
+        return atIndex < 1
             ? EMPTY_STRING
             : email.substring(0, atIndex).toLowerCase();
     }

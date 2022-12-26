@@ -16,10 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.test.util;
 
+import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
-import static org.youngmonkeys.ezyplatform.util.Strings.containInvalidSpaces;
-import static org.youngmonkeys.ezyplatform.util.Strings.startsWithIgnoreSpaces;
+import static org.youngmonkeys.ezyplatform.util.Strings.*;
 
 public class StringsTest {
 
@@ -51,5 +51,62 @@ public class StringsTest {
         assert !containInvalidSpaces("a b");
         assert !containInvalidSpaces("a b ");
         assert !containInvalidSpaces(" a b");
+    }
+
+    @Test
+    public void hideSensitiveInformationTest() {
+        // given
+        String str = "youngmonkeys";
+
+        // when
+        String actual = hideSensitiveInformation(
+            str,
+            3,
+            3
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            "you***onkeys"
+        );
+    }
+
+    @Test
+    public void hideSensitiveInformationWithLargeStartLengthTest() {
+        // given
+        String str = "young";
+
+        // when
+        String actual = hideSensitiveInformation(
+            str,
+            5,
+            3
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            "young"
+        );
+    }
+
+    @Test
+    public void hideSensitiveInformationWithLargeLengthTest() {
+        // given
+        String str = "youngmonkeys";
+
+        // when
+        String actual = hideSensitiveInformation(
+            str,
+            3,
+            100
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            "you***"
+        );
     }
 }
