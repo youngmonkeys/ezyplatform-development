@@ -52,6 +52,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static java.util.Collections.singletonMap;
 
@@ -76,7 +77,8 @@ public class MediaControllerService extends EzyLoggable {
         HttpServletResponse response,
         UploadFrom uploadFrom,
         long ownerId,
-        boolean avatar
+        boolean avatar,
+        boolean notPublic
     ) throws Exception {
         FileUploader fileUploader = singletonFactory.getSingletonCast(
             FileUploader.class
@@ -110,7 +112,8 @@ public class MediaControllerService extends EzyLoggable {
                     ownerId,
                     submittedFileName,
                     newFileName,
-                    fileMetadata
+                    fileMetadata,
+                    notPublic
                 );
                 byte[] responseBytes = mediaAddResponse(model).getBytes();
                 response.getOutputStream().write(responseBytes);
@@ -174,10 +177,28 @@ public class MediaControllerService extends EzyLoggable {
         String name,
         boolean exposePrivateMedia
     ) throws Exception {
+        getMedia(
+            requestArguments,
+            name,
+            exposePrivateMedia,
+            media -> true
+        );
+    }
+
+    public void getMedia(
+        RequestArguments requestArguments,
+        String name,
+        boolean exposePrivateMedia,
+        Predicate<MediaModel> validMediaCondition
+    ) throws Exception {
         mediaValidator.validateMediaName(name);
         MediaModel media = mediaService.getMediaByName(name);
         if (media == null
-            || (!media.isPublicMedia() && !exposePrivateMedia)
+            || (
+                !media.isPublicMedia()
+                    && !exposePrivateMedia
+                    && !validMediaCondition.test(media)
+            )
         ) {
             throw new MediaNotFoundException(name);
         }
@@ -302,7 +323,8 @@ public class MediaControllerService extends EzyLoggable {
         long ownerId,
         String submittedFileName,
         String fileName,
-        FileMetadata fileMetadata
+        FileMetadata fileMetadata,
+        boolean notPublic
     ) {
         return mediaService.addMedia(
             AddMediaModel.builder()
@@ -311,6 +333,7 @@ public class MediaControllerService extends EzyLoggable {
                 .originalFileName(submittedFileName)
                 .mediaType(fileMetadata.getMediaType())
                 .mimeType(fileMetadata.getMimeType())
+                .notPublic(notPublic)
                 .build(),
             uploadFrom
         );

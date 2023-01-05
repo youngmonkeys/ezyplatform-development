@@ -28,4 +28,5 @@ public class UpdateMediaModel {
     private String title;
     private String caption;
     private String description;
+    private boolean notPublic;
 }

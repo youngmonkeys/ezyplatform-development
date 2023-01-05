@@ -56,7 +56,7 @@ public class DefaultModelToEntityConverter {
         entity.setAlternativeText(EMPTY_STRING);
         entity.setCaption(EMPTY_STRING);
         entity.setDescription(EMPTY_STRING);
-        entity.setPublicMedia(true);
+        entity.setPublicMedia(!model.isNotPublic());
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
         return entity;
@@ -253,6 +253,7 @@ public class DefaultModelToEntityConverter {
         entity.setTitle(model.getTitle());
         entity.setCaption(model.getCaption());
         entity.setDescription(model.getDescription());
+        entity.setPublicMedia(!model.isNotPublic());
         entity.setUpdatedAt(clock.nowDateTime());
     }
 

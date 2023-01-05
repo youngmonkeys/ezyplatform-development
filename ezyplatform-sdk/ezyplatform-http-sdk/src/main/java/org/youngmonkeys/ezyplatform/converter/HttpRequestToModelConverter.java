@@ -47,6 +47,7 @@ public class HttpRequestToModelConverter {
             .title(request.getTitle())
             .caption(request.getCaption())
             .description(request.getDescription())
+            .notPublic(request.isNotPublic())
             .build();
     }
 }

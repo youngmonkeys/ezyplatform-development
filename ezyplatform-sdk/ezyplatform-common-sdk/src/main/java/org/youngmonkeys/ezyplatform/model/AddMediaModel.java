@@ -29,4 +29,5 @@ public class AddMediaModel {
     private String originalFileName;
     private MediaType mediaType;
     private String mimeType;
+    private boolean notPublic;
 }
