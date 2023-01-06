@@ -16,18 +16,19 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.Link;
 import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
+import org.youngmonkeys.ezyplatform.repo.LinkRepository;
 
 @AllArgsConstructor
-public class DefaultLinkService {
+public class DefaultLinkService implements LinkService {
 
-    private final EzyDatabaseRepository<Long, Link> linkRepository;
+    private final LinkRepository linkRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
+    @Override
     public void saveLink(SaveLinkModel model) {
         Link entity = linkRepository
             .findByField("linkUri", model.getLinkUri());
@@ -39,7 +40,13 @@ public class DefaultLinkService {
         linkRepository.save(entity);
     }
 
+    @Override
     public void removeLink(long linkId) {
         linkRepository.delete(linkId);
+    }
+
+    @Override
+    public void removeLinkByUri(String uri) {
+        linkRepository.deleteByLinkUri(uri);
     }
 }
