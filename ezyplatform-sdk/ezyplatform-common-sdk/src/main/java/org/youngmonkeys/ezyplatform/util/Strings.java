@@ -94,4 +94,10 @@ public final class Strings {
         }
         return builder.toString();
     }
+
+    public static String escapeScriptTag(String content) {
+        return content
+            .replace("<script>", "&lt;script&gt;")
+            .replace("</script>", "&lt;/script&gt;");
+    }
 }
