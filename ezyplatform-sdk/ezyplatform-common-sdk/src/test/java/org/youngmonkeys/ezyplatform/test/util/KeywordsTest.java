@@ -21,6 +21,7 @@ import org.testng.annotations.Test;
 import org.testng.collections.Sets;
 import org.youngmonkeys.ezyplatform.util.Keywords;
 
+import java.util.Collections;
 import java.util.Set;
 
 public class KeywordsTest {
@@ -47,5 +48,88 @@ public class KeywordsTest {
             "Lucky Wheel Game"
         );
         Asserts.assertEquals(actual, expectation);
+    }
+
+    @Test
+    public void toKeywordsWithMaxLengthTest() {
+        // given
+        String str = "Lucky Wheel Game";
+
+        // when
+        Set<String> actual = Keywords.toKeywords(str, true, 1);
+
+        // then
+        Set<String> expectation = Sets.newHashSet(
+            "l",
+            "L",
+            "w",
+            "W",
+            "g",
+            "G"
+        );
+        Asserts.assertEquals(actual, expectation);
+    }
+
+    @Test
+    public void toKeywordsWithMaxWordTest() {
+        // given
+        String str = "Lucky Wheel Game";
+
+        // when
+        Set<String> actual = Keywords.toKeywords(str, true, 12);
+
+        // then
+        Set<String> expectation = Sets.newHashSet(
+            "lucky",
+            "Lucky",
+            "wheel",
+            "Wheel",
+            "game",
+            "Game",
+            "lucky wheel",
+            "Lucky Wheel",
+            "wheel game",
+            "Wheel Game"
+        );
+        Asserts.assertEquals(actual, expectation);
+    }
+
+    @Test
+    public void toKeywordsWithMaxLengthIsZeroTest() {
+        // given
+        String str = "Lucky Wheel Game";
+
+        // when
+        Set<String> actual = Keywords.toKeywords(str, true, 0);
+
+        // then
+        Set<String> expectation = Sets.newHashSet(
+            ""
+        );
+        Asserts.assertEquals(actual, expectation);
+    }
+
+    @Test
+    public void toKeywordsWithNullIfEmptyTrueTest() {
+        // given
+        String str = "";
+
+        // when
+        Set<String> actual = Keywords.toKeywords(str, true);
+
+        // then
+        Asserts.assertNull(actual);
+    }
+
+    @Test
+    public void toKeywordsWithNullIfEmptyFalseTest() {
+        // given
+        String str = "";
+
+        // when
+        Set<String> actual = Keywords.toKeywords(str, false);
+
+        // then
+        Asserts.assertEquals(actual, Collections.emptySet());
     }
 }

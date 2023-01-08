@@ -22,35 +22,60 @@ import static com.tvd12.ezyfox.io.EzyStrings.*;
 
 public final class Keywords {
 
+    public static final int DEFAULT_MAX_KEYWORD_LENGTH = 300;
+
     private Keywords() {}
 
     public static Set<String> toKeywords(String str) {
         return toKeywords(str, false);
     }
 
-    public static Set<String> toKeywords(String str, boolean nullIfBlank) {
+    public static Set<String> toKeywords(
+        String str,
+        boolean nullIfBlank
+    ) {
+        return toKeywords(
+            str,
+            nullIfBlank,
+            DEFAULT_MAX_KEYWORD_LENGTH
+        );
+    }
+
+    public static Set<String> toKeywords(
+        String str,
+        boolean nullIfBlank,
+        int maxKeywordLength
+    ) {
         if (isBlank(str)) {
             return nullIfBlank ? null : Collections.emptySet();
         }
         Set<String> answer = new HashSet<>();
         List<String> words = splitString(str);
-        StringBuilder keyword = null;
+        int longKeywordLength = 0;
+        Queue<String> longKeyword = null;
         for (String word : words) {
-            if (isBlank(word)) {
-                continue;
-            }
             String wordTrim = word.trim();
-            if (keyword == null) {
-                keyword = new StringBuilder(wordTrim);
-            } else {
-                keyword.append(' ').append(wordTrim);
+            if (wordTrim.length() > maxKeywordLength) {
+                wordTrim = wordTrim.substring(0, maxKeywordLength);
+            }
+            if (longKeyword == null) {
+                longKeyword = new LinkedList<>();
+            }
+            longKeyword.add(wordTrim);
+            longKeywordLength += wordTrim.length();
+            if (longKeyword.size() > 1) {
+                longKeywordLength += 1;
+            }
+            while (longKeywordLength > maxKeywordLength) {
+                String firstWord = longKeyword.poll();
+                longKeywordLength -= Objects.requireNonNull(firstWord).length();
+                longKeywordLength -= 1;
             }
             answer.add(wordTrim);
             answer.add(wordTrim.toLowerCase());
-            String keywordString = keyword.toString();
-            answer.add(keywordString);
-            answer.add(keywordString.toLowerCase());
-
+            String longKeywordString = String.join(" ", longKeyword);
+            answer.add(longKeywordString);
+            answer.add(longKeywordString.toLowerCase());
         }
         return answer;
     }

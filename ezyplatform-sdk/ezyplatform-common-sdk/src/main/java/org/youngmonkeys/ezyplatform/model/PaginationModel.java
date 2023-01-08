@@ -20,6 +20,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
 
@@ -36,6 +37,19 @@ public class PaginationModel<T> {
     private int count;
     private long total;
     private long timestamp;
+
+    @SuppressWarnings("rawtypes")
+    public static final PaginationModel EMPTY_PAGINATION =
+        PaginationModel.builder()
+            .pageToken(PageToken.builder().build())
+            .continuation(Continuation.builder().build())
+            .items(Collections.emptyList())
+            .build();
+
+    @SuppressWarnings("unchecked")
+    public static <T> PaginationModel<T> emptyPagination() {
+        return EMPTY_PAGINATION;
+    }
 
     public <R> PaginationModel<R> map(
         Function<T, R> mapper
