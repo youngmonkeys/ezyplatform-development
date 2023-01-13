@@ -172,9 +172,12 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
-    public DataIndex toEntity(SaveDataKeywordModel model) {
+    public DataIndex toEntity(
+        String dataType,
+        SaveDataKeywordModel model
+    ) {
         DataIndex entity = new DataIndex();
-        mergeToEntity(model, entity);
+        mergeToEntity(dataType, model, entity);
         entity.setCreatedAt(entity.getUpdatedAt());
         return entity;
     }
@@ -265,8 +268,12 @@ public class DefaultModelToEntityConverter {
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
-    public void mergeToEntity(SaveDataKeywordModel model, DataIndex entity) {
-        entity.setDataType(model.getDataType());
+    public void mergeToEntity(
+        String dataType,
+        SaveDataKeywordModel model,
+        DataIndex entity
+    ) {
+        entity.setDataType(dataType);
         entity.setDataId(model.getDataId());
         entity.setKeyword(model.getKeyword());
         entity.setPriority(model.getPriority());

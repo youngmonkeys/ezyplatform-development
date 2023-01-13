@@ -22,7 +22,6 @@ import lombok.Getter;
 @Getter
 @Builder
 public class SaveDataKeywordModel {
-    private String dataType;
     private long dataId;
     private String keyword;
     private int priority;

@@ -23,31 +23,31 @@ import java.util.Collection;
 
 public interface DataIndexService {
 
-    default void addKeywords(
+    default void saveKeywords(
         String dataType,
         long dataId,
         Collection<String> keywords
     ) {
         Reactive.multiple()
             .registerConsumers(keywords, keyword ->
-                addKeyword(dataType, dataId, keyword)
+                saveKeyword(dataType, dataId, keyword)
             )
             .blockingExecute();
     }
 
-    default void addKeyword(
+    default void saveKeyword(
         String dataType,
         long dataId,
         String keyword
     ) {
-        addKeyword(
+        saveKeyword(
+            dataType,
             SaveDataKeywordModel.builder()
-                .dataType(dataType)
                 .dataId(dataId)
                 .keyword(keyword)
                 .build()
         );
     }
 
-    void addKeyword(SaveDataKeywordModel model);
+    void saveKeyword(String dataType, SaveDataKeywordModel model);
 }

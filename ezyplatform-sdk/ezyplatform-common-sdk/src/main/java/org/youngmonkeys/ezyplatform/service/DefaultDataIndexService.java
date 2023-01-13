@@ -32,19 +32,21 @@ public class DefaultDataIndexService
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
-    public void addKeyword(SaveDataKeywordModel model) {
+    public void saveKeyword(String dataType, SaveDataKeywordModel model) {
         DataIndex entity = dataIndexRepository.findByDataTypeAndDataIdAndKeyword(
-            model.getDataType(),
+            dataType,
             model.getDataId(),
             model.getKeyword()
         );
         if (entity == null) {
-            entity = modelToEntityConverter.toEntity(model);
-            try {
-                dataIndexRepository.save(entity);
-            } catch (Exception e) {
-                logger.info("add data keyword: {} failed: {}", entity, e.getMessage());
-            }
+            entity = modelToEntityConverter.toEntity(dataType, model);
+        } else {
+            modelToEntityConverter.mergeToEntity(dataType, model, entity);
+        }
+        try {
+            dataIndexRepository.save(entity);
+        } catch (Exception e) {
+            logger.info("add data keyword: {} failed: {}", entity, e.getMessage());
         }
     }
 }
