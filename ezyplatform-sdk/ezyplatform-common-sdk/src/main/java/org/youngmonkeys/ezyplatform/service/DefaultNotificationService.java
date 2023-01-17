@@ -54,6 +54,6 @@ public class DefaultNotificationService implements NotificationService {
     public long addNotificationReceiver(AddNotificationReceiverModel model) {
         NotificationReceiver entity = modelToEntityConverter.toEntity(model);
         notificationReceiverRepository.save(entity);
-        return entity.getNotificationId();
+        return entity.getId();
     }
 }

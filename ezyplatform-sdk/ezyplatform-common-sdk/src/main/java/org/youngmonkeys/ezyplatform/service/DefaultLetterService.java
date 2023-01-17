@@ -54,6 +54,6 @@ public class DefaultLetterService implements LetterService {
     public long addLetterReceiver(AddLetterReceiverModel model) {
         LetterReceiver entity = modelToEntityConverter.toEntity(model);
         letterReceiverRepository.save(entity);
-        return entity.getLetterId();
+        return entity.getId();
     }
 }
