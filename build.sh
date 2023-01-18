@@ -23,4 +23,3 @@ cd ..
 cd ezyplatform-sdk
 mvn clean install
 cd ..
-
