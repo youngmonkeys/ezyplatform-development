@@ -46,6 +46,9 @@ public class Letter {
     @Column(name = "from_user_id")
     private long fromUserId;
 
+    @Column(name = "parent_id")
+    private long parentId;
+
     private String status;
 
     @Column(name = "created_at")

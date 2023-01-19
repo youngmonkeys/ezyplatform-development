@@ -69,6 +69,7 @@ public class DefaultModelToEntityConverter {
         letter.setType(model.getType());
         letter.setFromAdminId(model.getFromAdminId());
         letter.setFromUserId(model.getFromUserId());
+        letter.setParentId(model.getParentId());
         letter.setStatus(model.getLetterStatus());
         letter.setCreatedAt(clock.nowDateTime());
         return letter;

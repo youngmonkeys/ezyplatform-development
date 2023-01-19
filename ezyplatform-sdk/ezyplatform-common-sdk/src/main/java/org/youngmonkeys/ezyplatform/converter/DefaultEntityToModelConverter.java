@@ -156,6 +156,7 @@ public class DefaultEntityToModelConverter {
             .fromUserId(letter.getFromUserId())
             .toAdminId(entity.getToAdminId())
             .toUserId(entity.getToUserId())
+            .parentId(letter.getParentId())
             .notificationReceiverId(entity.getNotificationReceiverId())
             .confidenceLevel(entity.getConfidenceLevel())
             .importantLevel(entity.getImportantLevel())

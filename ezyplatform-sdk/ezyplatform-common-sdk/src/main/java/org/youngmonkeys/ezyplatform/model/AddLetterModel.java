@@ -30,6 +30,7 @@ public class AddLetterModel {
     private final String content;
     private final long fromAdminId;
     private final long fromUserId;
+    private final long parentId;
     private final String letterStatus;
     private final Set<Long> toAdminIds;
     private final Set<Long> toUserIds;
@@ -44,6 +45,7 @@ public class AddLetterModel {
         this.content = builder.content;
         this.fromAdminId = builder.fromAdminId;
         this.fromUserId = builder.fromUserId;
+        this.parentId = builder.parentId;
         this.letterStatus = builder.letterStatus;
         this.toAdminIds = builder.toAdminIds;
         this.toUserIds = builder.toUserIds;
@@ -63,6 +65,7 @@ public class AddLetterModel {
         protected String content;
         protected long fromAdminId;
         protected long fromUserId;
+        protected long parentId;
         protected String letterStatus;
         protected String confidenceLevel;
         protected String importantLevel;
@@ -119,6 +122,11 @@ public class AddLetterModel {
 
         public Builder toUserIds(Collection<Long> toUserIds) {
             this.toUserIds.addAll(toUserIds);
+            return this;
+        }
+
+        public Builder parentId(long parentId) {
+            this.parentId = parentId;
             return this;
         }
 
