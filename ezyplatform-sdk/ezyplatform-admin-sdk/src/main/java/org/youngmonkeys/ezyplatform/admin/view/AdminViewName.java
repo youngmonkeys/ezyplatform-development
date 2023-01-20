@@ -32,7 +32,7 @@ public enum AdminViewName {
     LIST("list"),
     REGULAR("regular"),
     ROLES("roles"),
-    ROLE_DETAILS("role-details"),
+    ROLE_DETAILS("role_details"),
     PROFILE("profile"),
     WEBSITE("website");
 
