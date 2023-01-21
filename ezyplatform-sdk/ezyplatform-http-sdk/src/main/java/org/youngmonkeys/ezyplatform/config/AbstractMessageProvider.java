@@ -26,10 +26,7 @@ import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 @AllArgsConstructor
 public abstract class AbstractMessageProvider implements MessageProvider {
@@ -55,7 +52,10 @@ public abstract class AbstractMessageProvider implements MessageProvider {
             moduleTypes
         );
         for (ModuleType moduleType : moduleTypes) {
-            List<String> modules = modulesMap.get(moduleType);
+            List<String> modules = modulesMap.getOrDefault(
+                moduleType,
+                Collections.emptyList()
+            );
             for (String module : modules) {
                 readAndAppendMessages(
                     answer,
