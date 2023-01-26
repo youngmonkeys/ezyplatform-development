@@ -21,9 +21,7 @@ import org.youngmonkeys.ezyplatform.model.WebLanguageModel;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public interface WebLanguageService {
-
-    String getDefaultLanguageCode();
+public interface WebLanguageService extends LanguageService {
 
     WebLanguageModel[] getLanguages();
 
