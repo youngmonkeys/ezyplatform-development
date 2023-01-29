@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.model.UserAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
@@ -48,7 +49,11 @@ public interface UserService {
 
     Long getUserIdByAccessToken(String accessToken);
 
-    long validateAccessToken(String accessToken);
+    long validateUserAccessToken(String accessToken);
+
+    UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
+        String accessToken
+    );
 
     UserNameModel getUsernameById(long userId);
 

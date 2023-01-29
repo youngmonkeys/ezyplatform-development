@@ -53,6 +53,22 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
+    public AdminAccessTokenModel toModel(AdminAccessToken entity) {
+        if (entity == null) {
+            return null;
+        }
+        return AdminAccessTokenModel.builder()
+            .adminId(entity.getAdminId())
+            .accessToken(entity.getId())
+            .renewalCount(entity.getRenewalCount())
+            .status(entity.getStatus())
+            .createdAt(entity.getCreatedAt())
+            .expiredAt(entity.getExpiredAt())
+            .createdAtTimestamp(toTimestamp(entity.getCreatedAt()))
+            .expiredAtTimestamp(toTimestamp(entity.getExpiredAt()))
+            .build();
+    }
+
     public MediaModel toModel(Media entity) {
         return MediaModel.builder()
             .id(entity.getId())
@@ -101,6 +117,22 @@ public class DefaultEntityToModelConverter {
             .status(entity.getStatus())
             .createdAt(toTimestamp(entity.getCreatedAt()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .build();
+    }
+
+    public UserAccessTokenModel toModel(UserAccessToken entity) {
+        if (entity == null) {
+            return null;
+        }
+        return UserAccessTokenModel.builder()
+            .userId(entity.getUserId())
+            .accessToken(entity.getId())
+            .renewalCount(entity.getRenewalCount())
+            .status(entity.getStatus())
+            .createdAt(entity.getCreatedAt())
+            .expiredAt(entity.getExpiredAt())
+            .createdAtTimestamp(toTimestamp(entity.getCreatedAt()))
+            .expiredAtTimestamp(toTimestamp(entity.getExpiredAt()))
             .build();
     }
 

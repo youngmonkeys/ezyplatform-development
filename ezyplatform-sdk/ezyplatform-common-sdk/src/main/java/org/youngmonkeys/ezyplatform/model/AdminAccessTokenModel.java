@@ -14,28 +14,23 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.entity;
+package org.youngmonkeys.ezyplatform.model;
 
-public enum AccessTokenStatus {
-    ACTIVATED,
-    ACTIVATED_2FA,
-    INACTIVATED,
-    BLOCKED,
-    DELETED,
-    WAITING_2FA;
+import lombok.Builder;
+import lombok.Getter;
+import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
 
-    public static AccessTokenStatus of(String value) {
-        return of(value, INACTIVATED);
-    }
+import java.time.LocalDateTime;
 
-    public static AccessTokenStatus of(
-        String value,
-        AccessTokenStatus defaultStatus
-    ) {
-        try {
-            return AccessTokenStatus.valueOf(value);
-        } catch (Exception e) {
-            return defaultStatus;
-        }
-    }
+@Getter
+@Builder
+public class AdminAccessTokenModel {
+    private long adminId;
+    private String accessToken;
+    private long renewalCount;
+    private AccessTokenStatus status;
+    private LocalDateTime createdAt;
+    private LocalDateTime expiredAt;
+    private long createdAtTimestamp;
+    private long expiredAtTimestamp;
 }

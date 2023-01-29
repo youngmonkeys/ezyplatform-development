@@ -22,10 +22,7 @@ import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
-import com.tvd12.ezyhttp.core.exception.DeserializeBodyException;
-import com.tvd12.ezyhttp.core.exception.HttpForbiddenException;
-import com.tvd12.ezyhttp.core.exception.HttpNotFoundException;
-import com.tvd12.ezyhttp.core.exception.HttpUnauthorizedException;
+import com.tvd12.ezyhttp.core.exception.*;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.TryCatch;
 import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
@@ -270,6 +267,25 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
             }
             return ResponseEntity.badRequest(
                 errors
+            );
+        }
+        return Redirect.to("/bad-request");
+    }
+
+    @TryCatch(DeserializeValueException.class)
+    public Object handle(
+        RequestArguments arguments,
+        DeserializeValueException e
+    ) {
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage(), e);
+        HttpMethod method = arguments.getMethod();
+        String uriTemplate = arguments.getUriTemplate();
+        if (requestUriManager.isApiURI(method, uriTemplate)) {
+            return ResponseEntity.badRequest(
+                singletonMap(
+                    e.getValueName(),
+                    "invalid"
+                )
             );
         }
         return Redirect.to("/bad-request");

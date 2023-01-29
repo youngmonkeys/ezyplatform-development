@@ -19,9 +19,12 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
+import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 import org.youngmonkeys.ezyplatform.exception.UserAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.UserInvalidAccessTokenException;
+import org.youngmonkeys.ezyplatform.exception.UserWaiting2FaAccessTokenException;
+import org.youngmonkeys.ezyplatform.model.UserAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
@@ -87,7 +90,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     public UserModel getUserByAccessToken(String accessToken) {
-        long userId = validateAccessToken(accessToken);
+        long userId = validateUserAccessToken(accessToken);
         return getUserById(userId);
     }
 
@@ -167,12 +170,48 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public long validateAccessToken(String accessToken) {
+    public long validateUserAccessToken(String accessToken) {
+        return getAccessTokenEntityOrThrowByAccessToken(
+            accessToken,
+            Boolean.TRUE
+        ).getUserId();
+    }
+
+    @Override
+    public UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
+        String accessToken
+    ) {
+        return entityToModelConverter.toModel(
+            getAccessTokenEntityOrThrowByAccessToken(
+                accessToken,
+                Boolean.FALSE
+            )
+        );
+    }
+
+    protected UserAccessToken getAccessTokenEntityOrThrowByAccessToken(
+        String accessToken,
+        boolean verifyStatus
+    ) {
         if (accessToken == null) {
             throw new UserInvalidAccessTokenException(null);
         }
-        UserAccessToken entity = accessTokenRepository.findById(accessToken);
+        UserAccessToken entity = accessTokenRepository.findById(
+            accessToken
+        );
         if (entity == null) {
+            throw new UserInvalidAccessTokenException(accessToken);
+        }
+        AccessTokenStatus status = entity.getStatus();
+        if (verifyStatus
+            && status != AccessTokenStatus.ACTIVATED
+            && status != AccessTokenStatus.ACTIVATED_2FA
+        ) {
+            if (status == AccessTokenStatus.WAITING_2FA) {
+                throw new UserWaiting2FaAccessTokenException(
+                    accessToken
+                );
+            }
             throw new UserInvalidAccessTokenException(accessToken);
         }
         long userId = accessTokenService.extractUserId(accessToken);
@@ -183,7 +222,7 @@ public class DefaultUserService implements UserService {
         if (now.isAfter(entity.getExpiredAt())) {
             throw new UserAccessTokenExpiredException(accessToken);
         }
-        return entity.getUserId();
+        return entity;
     }
 
     @Override

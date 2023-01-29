@@ -33,6 +33,7 @@ public class Scheduler extends EzyLoggable {
     private final Map<Runnable, Task> tasks;
     private final ExecutorService executorService;
     private final ScheduledExecutorService inspector;
+    private final Map<Object, ScheduledExecutorService> executorServiceByName;
 
     private static final int DEFAULT_PERIOD_IN_MILLIS = 5;
 
@@ -59,6 +60,7 @@ public class Scheduler extends EzyLoggable {
         this.stoppable = stoppable;
         this.tasks = new ConcurrentHashMap<>();
         this.runningTasks = ConcurrentHashMap.newKeySet();
+        this.executorServiceByName = new ConcurrentHashMap<>();
         this.inspector = EzyExecutors.newSingleThreadScheduledExecutor(
             DefaultThreadFactory.create("scheduler")
         );
@@ -172,6 +174,28 @@ public class Scheduler extends EzyLoggable {
             logger.warn("scheduler run task error", e);
         } finally {
             runningTasks.remove(task);
+        }
+    }
+
+    public ScheduledExecutorService getOrCreateSingleThreadScheduledExecutor(
+        String name
+    ) {
+        return executorServiceByName.computeIfAbsent(
+            name,
+            k -> EzyExecutors.newSingleThreadScheduledExecutor(
+                DefaultThreadFactory.create(name)
+            )
+        );
+    }
+
+    public void removeAndShutdownScheduledExecutorService(
+        String name
+    ) {
+        ScheduledExecutorService service = executorServiceByName.remove(
+            name
+        );
+        if (service != null) {
+            service.shutdown();
         }
     }
 

@@ -18,10 +18,7 @@ package org.youngmonkeys.ezyplatform.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -41,7 +38,8 @@ public class UserAccessToken {
     @Column(name = "renewal_count")
     private long renewalCount;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private AccessTokenStatus status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

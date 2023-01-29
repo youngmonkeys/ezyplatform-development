@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.model.AdminAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.AdminModel;
 import org.youngmonkeys.ezyplatform.model.AdminNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
@@ -62,5 +63,9 @@ public interface AdminService {
 
     Long getAdminIdByAccessToken(String accessToken);
 
-    long validateAccessToken(String accessToken);
+    long validateAdminAccessToken(String accessToken);
+
+    AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
+        String accessToken
+    );
 }

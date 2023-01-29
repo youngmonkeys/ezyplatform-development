@@ -14,28 +14,11 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.entity;
+package org.youngmonkeys.ezyplatform.exception;
 
-public enum AccessTokenStatus {
-    ACTIVATED,
-    ACTIVATED_2FA,
-    INACTIVATED,
-    BLOCKED,
-    DELETED,
-    WAITING_2FA;
+public class UserWaiting2FaAccessTokenException extends RuntimeException {
 
-    public static AccessTokenStatus of(String value) {
-        return of(value, INACTIVATED);
-    }
-
-    public static AccessTokenStatus of(
-        String value,
-        AccessTokenStatus defaultStatus
-    ) {
-        try {
-            return AccessTokenStatus.valueOf(value);
-        } catch (Exception e) {
-            return defaultStatus;
-        }
+    public UserWaiting2FaAccessTokenException(String accessToken) {
+        super("waiting 2FA for access token: " + accessToken);
     }
 }

@@ -19,9 +19,12 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
+import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
 import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
 import org.youngmonkeys.ezyplatform.exception.AdminAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.AdminInvalidAccessTokenException;
+import org.youngmonkeys.ezyplatform.exception.AdminWaiting2FaAccessTokenException;
+import org.youngmonkeys.ezyplatform.model.AdminAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.AdminModel;
 import org.youngmonkeys.ezyplatform.model.AdminNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
@@ -144,7 +147,7 @@ public class DefaultAdminService implements AdminService {
 
     @Override
     public AdminModel getAdminByAccessToken(String accessToken) {
-        long adminId = validateAccessToken(accessToken);
+        long adminId = validateAdminAccessToken(accessToken);
         return getAdminById(adminId);
     }
 
@@ -161,12 +164,48 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public long validateAccessToken(String accessToken) {
+    public long validateAdminAccessToken(String accessToken) {
+        return getAccessTokenEntityOrThrowByAccessToken(
+            accessToken,
+            Boolean.TRUE
+        ).getAdminId();
+    }
+
+    @Override
+    public AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
+        String accessToken
+    ) {
+        return entityToModelConverter.toModel(
+            getAccessTokenEntityOrThrowByAccessToken(
+                accessToken,
+                Boolean.FALSE
+            )
+        );
+    }
+
+    protected AdminAccessToken getAccessTokenEntityOrThrowByAccessToken(
+        String accessToken,
+        boolean verifyStatus
+    ) {
         if (accessToken == null) {
             throw new AdminInvalidAccessTokenException("null");
         }
-        AdminAccessToken entity = accessTokenRepository.findById(accessToken);
+        AdminAccessToken entity = accessTokenRepository.findById(
+            accessToken
+        );
         if (entity == null) {
+            throw new AdminInvalidAccessTokenException(accessToken);
+        }
+        AccessTokenStatus status = entity.getStatus();
+        if (verifyStatus
+            && status != AccessTokenStatus.ACTIVATED
+            && status != AccessTokenStatus.ACTIVATED_2FA
+        ) {
+            if (status == AccessTokenStatus.WAITING_2FA) {
+                throw new AdminWaiting2FaAccessTokenException(
+                    accessToken
+                );
+            }
             throw new AdminInvalidAccessTokenException(accessToken);
         }
         long adminId = accessTokenService.extractAdminId(accessToken);
@@ -177,6 +216,6 @@ public class DefaultAdminService implements AdminService {
         if (now.isAfter(entity.getExpiredAt())) {
             throw new AdminAccessTokenExpiredException(accessToken);
         }
-        return entity.getAdminId();
+        return entity;
     }
 }
