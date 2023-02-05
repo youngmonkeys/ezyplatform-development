@@ -214,6 +214,7 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_PAGE_IMAGE_URL = "pageImageUrl";
     public static final String VIEW_VARIABLE_MENU_BADGES = "menuBadges";
     public static final String VIEW_VARIABLE_MENUITEM_BADGES = "menuItemBadges";
+    public static final String VIEW_VARIABLE_WEBSOCKET_URL = "websocketUrl";
 
     public static final String PROPERTY_NAME_EZYPLATFORM_HOME = "ezyplatform.home";
 
