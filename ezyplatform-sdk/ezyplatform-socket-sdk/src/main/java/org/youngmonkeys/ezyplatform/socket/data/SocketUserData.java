@@ -18,20 +18,47 @@ package org.youngmonkeys.ezyplatform.socket.data;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.youngmonkeys.ezyplatform.socket.constant.ISocketUserType;
+import org.youngmonkeys.ezyplatform.socket.constant.SocketUserType;
+
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 
 @Getter
 @Builder
 public class SocketUserData {
     private long userId;
     private long adminId;
+    private String userUuid;
+    private String adminUuid;
     private String userAccessToken;
     private String adminAccessToken;
-
-    public boolean isUser() {
-        return userId > 0;
-    }
+    private ISocketUserType socketUserType;
 
     public boolean isAdmin() {
-        return adminId > 0;
+        return socketUserType == SocketUserType.ADMIN;
+    }
+
+    public boolean isAnonymous() {
+        return socketUserType == SocketUserType.ANONYMOUS;
+    }
+
+    public boolean isUser() {
+        return socketUserType == SocketUserType.USER;
+    }
+
+    public long getSocketUserId() {
+        return adminId > 0 ? adminId : userId;
+    }
+
+    public String getSocketUserUuid() {
+        return isNotBlank(adminUuid) ? adminUuid : userUuid;
+    }
+
+    public String getSocketUserUuidIncludeType() {
+        return socketUserType + "#" + getSocketUserUuid();
+    }
+
+    public SocketUserType getSocketUserTypeCast() {
+        return (SocketUserType) socketUserType;
     }
 }
