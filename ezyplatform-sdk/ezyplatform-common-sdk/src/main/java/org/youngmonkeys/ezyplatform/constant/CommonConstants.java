@@ -215,6 +215,8 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_MENU_BADGES = "menuBadges";
     public static final String VIEW_VARIABLE_MENUITEM_BADGES = "menuItemBadges";
     public static final String VIEW_VARIABLE_WEBSOCKET_URL = "websocketUrl";
+    public static final String VIEW_VARIABLE_ADDITIONAL_MESSAGE_MAP = "additionalMessageMap";
+    public static final String VIEW_VARIABLE_ADDITIONAL_VALUE_MAP = "additionalValueMap";
 
     public static final String PROPERTY_NAME_EZYPLATFORM_HOME = "ezyplatform.home";
 

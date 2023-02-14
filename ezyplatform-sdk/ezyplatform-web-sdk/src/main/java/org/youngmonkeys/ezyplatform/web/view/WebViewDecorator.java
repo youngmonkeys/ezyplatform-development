@@ -19,22 +19,19 @@ package org.youngmonkeys.ezyplatform.web.view;
 import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyhttp.server.core.util.HttpServletRequests;
 import com.tvd12.ezyhttp.server.core.view.View;
-import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
 import lombok.Setter;
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.service.MediaService;
 import org.youngmonkeys.ezyplatform.service.UserService;
-import org.youngmonkeys.ezyplatform.service.WebLanguageService;
 import org.youngmonkeys.ezyplatform.web.annotation.UserId;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Locale;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ACCESS_TOKEN;
 
 @Setter
-public class WebViewDecorator implements ViewDecorator {
+public class WebViewDecorator extends WebViewLanguageDecorator {
 
     @EzyAutoBind
     private UserService userService;
@@ -42,27 +39,10 @@ public class WebViewDecorator implements ViewDecorator {
     @EzyAutoBind
     private MediaService mediaService;
 
-    @EzyAutoBind
-    private WebLanguageService webLanguageService;
-
     @Override
     public void decorate(HttpServletRequest request, View view) {
-        setLanguage(request, view);
+        super.decorate(request, view);
         setUserData(request, view);
-    }
-
-    protected void setLanguage(HttpServletRequest request, View view) {
-        String lang = request.getParameter("lang");
-        if (lang != null) {
-            view.setLocale(new Locale(lang));
-            view.setVariable("ezyLang", lang);
-        } else {
-            lang = webLanguageService.getDefaultLanguageCode();
-            if (isNotBlank(lang)) {
-                view.setLocale(new Locale(lang));
-                view.setVariable("ezyDefaultLang", lang);
-            }
-        }
     }
 
     protected void setUserData(HttpServletRequest request, View view) {
