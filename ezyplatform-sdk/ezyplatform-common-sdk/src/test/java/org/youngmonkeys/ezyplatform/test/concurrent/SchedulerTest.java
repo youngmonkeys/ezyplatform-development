@@ -41,7 +41,7 @@ public class SchedulerTest {
 
         // when
         scheduler.scheduleOneTime(command, 3, TimeUnit.MILLISECONDS);
-        EzyThreads.sleep(100);
+        EzyThreads.sleep(500);
 
         // then
         Map<Runnable, Object> tasks = FieldUtil.getFieldValue(
