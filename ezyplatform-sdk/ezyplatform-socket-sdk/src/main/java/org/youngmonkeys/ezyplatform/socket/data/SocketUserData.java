@@ -18,8 +18,8 @@ package org.youngmonkeys.ezyplatform.socket.data;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.socket.constant.ISocketUserType;
-import org.youngmonkeys.ezyplatform.socket.constant.SocketUserType;
+import org.youngmonkeys.ezyplatform.constant.ISocketUserType;
+import org.youngmonkeys.ezyplatform.constant.SocketUserType;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 

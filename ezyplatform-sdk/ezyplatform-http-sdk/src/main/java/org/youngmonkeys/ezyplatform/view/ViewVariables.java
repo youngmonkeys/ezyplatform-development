@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2023 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,21 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.socket.constant;
+package org.youngmonkeys.ezyplatform.view;
 
-@SuppressWarnings("AbbreviationAsWordInName")
-public interface ISocketUserType {}
+import com.tvd12.ezyhttp.server.core.view.View;
+
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
+public final class ViewVariables {
+
+    private ViewVariables() {}
+
+    public static String getEzyLanguage(View view) {
+        String lang = view.getVariable("ezyLang");
+        if (isBlank(lang)) {
+            lang = view.getVariable("ezyDefaultLang");
+        }
+        return lang;
+    }
+}

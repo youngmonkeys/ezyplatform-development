@@ -14,10 +14,7 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.socket.constant;
+package org.youngmonkeys.ezyplatform.constant;
 
-public enum SocketUserType implements ISocketUserType {
-    ADMIN,
-    ANONYMOUS,
-    USER
-}
+@SuppressWarnings("AbbreviationAsWordInName")
+public interface ISocketUserType {}
