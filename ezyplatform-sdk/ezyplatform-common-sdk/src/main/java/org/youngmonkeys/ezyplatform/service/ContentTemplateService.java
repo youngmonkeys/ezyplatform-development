@@ -26,4 +26,9 @@ public interface ContentTemplateService {
         String templateType,
         String templateName
     );
+
+    boolean containsTemplateByTypeAndName(
+        String templateType,
+        String templateName
+    );
 }

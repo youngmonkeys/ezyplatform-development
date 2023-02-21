@@ -26,4 +26,9 @@ public interface ContentTemplateRepository
         String templateType,
         String templateName
     );
+
+    int countByTemplateTypeAndTemplateName(
+        String templateType,
+        String templateName
+    );
 }

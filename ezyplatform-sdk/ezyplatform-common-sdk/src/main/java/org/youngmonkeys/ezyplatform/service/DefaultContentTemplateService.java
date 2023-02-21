@@ -47,4 +47,15 @@ public class DefaultContentTemplateService
             )
         );
     }
+
+    @Override
+    public boolean containsTemplateByTypeAndName(
+        String templateType,
+        String templateName
+    ) {
+        return contentTemplateRepository.countByTemplateTypeAndTemplateName(
+            templateType,
+            templateName
+        ) > 0;
+    }
 }
