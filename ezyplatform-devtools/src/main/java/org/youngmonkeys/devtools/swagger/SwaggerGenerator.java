@@ -27,6 +27,7 @@ import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
+import com.tvd12.ezyhttp.server.core.view.View;
 import lombok.AllArgsConstructor;
 
 import java.io.File;
@@ -184,7 +185,7 @@ public class SwaggerGenerator {
                 .put(
                     "description",
                     apiParameter.defaultValue != null
-                        ? "default value " + apiParameter.defaultValue
+                        ? "default value is " + apiParameter.defaultValue
                         : "parameter"
                 )
                 .toMap(),
@@ -273,17 +274,22 @@ public class SwaggerGenerator {
             );
         }
         String code = "200";
+        String description = "success";
         if (apiMethod.response.type == Redirect.class) {
             code = "302";
+            description = "redirect";
         } else if (apiMethod.response.type == ResponseEntity.class) {
             code = "204";
+            description = "no content";
+        } else if (apiMethod.response.type == View.class) {
+            description = "return a view";
         }
         return swaggerTemplate.createContent(
             "response",
             EzyMapBuilder
                 .mapBuilder()
                 .put("code", code)
-                .put("description", "success")
+                .put("description", description)
                 .put("content", responseContent)
                 .toMap(),
             4
@@ -585,6 +591,7 @@ public class SwaggerGenerator {
         if (responseBodyType != void.class
             && responseBodyType != Redirect.class
             && responseBodyType != ResponseEntity.class
+            && responseBodyType != View.class
         ) {
             fields = extractApiDataFields(
                 responseBodyType,
