@@ -1,0 +1,59 @@
+# file
+openapi: ${open_api_version}
+info:
+  title: ${title}
+  version: ${version}
+servers:
+  ${servers}
+paths:
+  ${apis}
+
+# server
+- url: '${url}'
+  description: ${description}
+
+# api
+'${uri}':
+  ${method}:
+    summary: >
+      ${summary}
+    description: >
+      ${description}
+    ${request_body}
+    ${parameters}
+    responses:
+      ${responses}
+# request body
+requestBody:
+  required: ${required}
+  content:
+    ${content_type}:
+      schema:
+        type: ${type}
+        ${properties}
+
+# parameter
+- name: ${name}
+  in: ${in}
+  description: ${description}
+  required: ${required}
+  schema:
+    type: ${type}
+
+# response
+'${code}':
+  description: >
+    ${description}
+  ${content}
+
+# response content
+content:
+${content_type}:
+  schema:
+    type: ${type}
+    ${response_data}
+
+# response array data
+items:
+  type: ${type}
+  ${properties}
