@@ -57,5 +57,17 @@ public class WebViewLanguageDecorator implements ViewDecorator {
             view.setLocale(new Locale(lang));
             view.setVariable("ezyLang", lang);
         }
+        if (!view.containsVariable("webLanguages")
+            && includeWebLanguages()
+        ) {
+            view.setVariable(
+                "webLanguages",
+                webLanguageService.getLanguages()
+            );
+        }
+    }
+
+    protected boolean includeWebLanguages() {
+        return false;
     }
 }

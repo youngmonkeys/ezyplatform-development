@@ -19,6 +19,8 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.model.WebLanguageModel;
 
+import java.util.Arrays;
+
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DEFAULT_LANGUAGE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_LANGUAGES;
 
@@ -40,6 +42,10 @@ public class DefaultWebLanguageService implements WebLanguageService {
             SETTING_NAME_WEB_LANGUAGES,
             WebLanguageModel.Mutable[].class
         );
-        return answer != null ? answer : new WebLanguageModel[0];
+        if (answer == null) {
+            answer = new WebLanguageModel[0];
+        }
+        Arrays.sort(answer);
+        return answer;
     }
 }
