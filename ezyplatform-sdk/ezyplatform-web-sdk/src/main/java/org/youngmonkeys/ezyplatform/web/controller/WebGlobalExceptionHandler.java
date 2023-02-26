@@ -31,14 +31,18 @@ import com.tvd12.ezyhttp.server.core.view.Redirect;
 import lombok.Setter;
 import org.youngmonkeys.ezyplatform.exception.*;
 import org.youngmonkeys.ezyplatform.service.SettingService;
+import org.youngmonkeys.ezyplatform.web.view.WebViews;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import static java.util.Collections.singletonMap;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ACCESS_TOKEN;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT;
+import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 
 @Setter
 public class WebGlobalExceptionHandler extends EzyLoggable {
@@ -51,6 +55,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
 
     @TryCatch(AdminInvalidAccessTokenException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         AdminInvalidAccessTokenException e
     ) {
@@ -63,14 +68,12 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(Collections.singletonMap("token", "invalid"))
                 .build();
         }
-        return Redirect.builder()
-            .uri(settingService.getAdminUrl() + "/login")
-            .addCookie(COOKIE_NAME_ACCESS_TOKEN, "")
-            .build();
+        return redirectToAdminLogin(request);
     }
 
     @TryCatch(AdminAccessTokenExpiredException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         AdminAccessTokenExpiredException e
     ) {
@@ -83,14 +86,12 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(Collections.singletonMap("adminToken", "expired"))
                 .build();
         }
-        return Redirect.builder()
-            .uri(settingService.getAdminUrl() + "/login")
-            .addCookie(COOKIE_NAME_ADMIN_ACCESS_TOKEN, "")
-            .build();
+        return redirectToAdminLogin(request);
     }
 
     @TryCatch(UserInvalidAccessTokenException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         UserInvalidAccessTokenException e
     ) {
@@ -103,14 +104,12 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(Collections.singletonMap("token", "invalid"))
                 .build();
         }
-        return Redirect.builder()
-            .uri("/login")
-            .addCookie(COOKIE_NAME_ACCESS_TOKEN, "")
-            .build();
+        return WebViews.redirectToLogin(request);
     }
 
     @TryCatch(UserAccessTokenExpiredException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         UserAccessTokenExpiredException e
     ) {
@@ -123,10 +122,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(Collections.singletonMap("token", "expired"))
                 .build();
         }
-        return Redirect.builder()
-            .uri("/login")
-            .addCookie(COOKIE_NAME_ACCESS_TOKEN, "")
-            .build();
+        return WebViews.redirectToLogin(request);
     }
 
     @TryCatch(IncorrectPasswordException.class)
@@ -138,18 +134,23 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
     }
 
     @TryCatch(BadRequestException.class)
-    public Object handle(RequestArguments arguments, BadRequestException e) {
+    public Object handle(
+        HttpServletRequest request,
+        RequestArguments arguments,
+        BadRequestException e
+    ) {
         logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
             return ResponseEntity.badRequest(e.getErrors());
         }
-        return Redirect.to("/bad-request");
+        return Redirect.to(addLanguageToUri(request, "/bad-request"));
     }
 
     @TryCatch(ResourceNotFoundException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         ResourceNotFoundException e
     ) {
@@ -161,11 +162,15 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 e.getResponseData()
             );
         }
-        return Redirect.to("/not-found");
+        return Redirect.to(addLanguageToUri(request, "/not-found"));
     }
 
     @TryCatch(HttpUnauthorizedException.class)
-    public Object handle(RequestArguments arguments, HttpUnauthorizedException e) {
+    public Object handle(
+        HttpServletRequest request,
+        RequestArguments arguments,
+        HttpUnauthorizedException e
+    ) {
         logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
@@ -176,24 +181,29 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .build();
         }
         return Redirect.builder()
-            .uri("/login")
+            .uri(addLanguageToUri(request, "/login"))
             .addCookie(COOKIE_NAME_ADMIN_ACCESS_TOKEN, "")
             .build();
     }
 
     @TryCatch(HttpNotFoundException.class)
-    public Object handle(RequestArguments arguments, HttpNotFoundException e) {
+    public Object handle(
+        HttpServletRequest request,
+        RequestArguments arguments,
+        HttpNotFoundException e
+    ) {
         logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
             return ResponseEntity.notFound(e.getData());
         }
-        return Redirect.to("/not-found");
+        return Redirect.to(addLanguageToUri(request, "/not-found"));
     }
 
     @TryCatch(ForbiddenActionException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         ForbiddenActionException e
     ) {
@@ -207,11 +217,12 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(e.getResponseData())
                 .build();
         }
-        return Redirect.to("/not-found");
+        return Redirect.to(addLanguageToUri(request, "/not-found"));
     }
 
     @TryCatch(PermissionDeniedException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         PermissionDeniedException e
     ) {
@@ -225,11 +236,12 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(singletonMap("permission", "denied"))
                 .build();
         }
-        return Redirect.to("/permission-denied");
+        return Redirect.to(addLanguageToUri(request, "/permission-denied"));
     }
 
     @TryCatch(HttpForbiddenException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         HttpForbiddenException e
     ) {
@@ -243,11 +255,12 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(e.getData())
                 .build();
         }
-        return Redirect.to("/permission-denied");
+        return Redirect.to(addLanguageToUri(request, "/permission-denied"));
     }
 
     @TryCatch(DeserializeBodyException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         DeserializeBodyException e
     ) {
@@ -269,11 +282,12 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 errors
             );
         }
-        return Redirect.to("/bad-request");
+        return Redirect.to(addLanguageToUri(request, "/bad-request"));
     }
 
     @TryCatch(DeserializeValueException.class)
     public Object handle(
+        HttpServletRequest request,
         RequestArguments arguments,
         DeserializeValueException e
     ) {
@@ -288,6 +302,29 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 )
             );
         }
-        return Redirect.to("/bad-request");
+        return Redirect.to(addLanguageToUri(request, "/bad-request"));
+    }
+
+    protected Redirect redirectToAdminLogin(
+        HttpServletRequest request
+    ) {
+        Cookie tokenCookie = new Cookie(
+            COOKIE_NAME_ADMIN_ACCESS_TOKEN,
+            ""
+        );
+        tokenCookie.setPath("/");
+        tokenCookie.setMaxAge(0);
+        Cookie tokenCookieExpiredAt = new Cookie(
+            COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT,
+            "0"
+        );
+        tokenCookieExpiredAt.setMaxAge(0);
+        tokenCookieExpiredAt.setPath("/");
+        String adminLoginUri = settingService.getAdminUrl() + "/login";
+        return Redirect.builder()
+            .uri(addLanguageToUri(request, adminLoginUri))
+            .addCookie(tokenCookie)
+            .addCookie(tokenCookieExpiredAt)
+            .build();
     }
 }

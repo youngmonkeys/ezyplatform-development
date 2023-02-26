@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletResponse;
 import static com.tvd12.ezyfox.io.EzyStrings.exceptionToSimpleString;
 import static com.tvd12.ezyhttp.server.core.constant.CoreConstants.ATTRIBUTE_MATCHED_URI;
 import static java.util.Collections.singletonMap;
+import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 
 /**
  * Handle all errors happen in when handle client's requests.
@@ -80,7 +81,11 @@ public class WebGlobalErrorHandler implements UnhandledErrorHandler {
         );
     }
 
-    protected Object processError(int errorStatusCode, Exception exception) {
+    protected Object processError(
+        HttpServletRequest request,
+        int errorStatusCode,
+        Exception exception
+    ) {
         if (environmentManager.isDebugMode()) {
             return toResponseEntity(errorStatusCode, exception);
         }
@@ -90,16 +95,16 @@ public class WebGlobalErrorHandler implements UnhandledErrorHandler {
                 .build();
         } else if (errorStatusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
             return Redirect.builder()
-                .uri("/server-error")
+                .uri(addLanguageToUri(request, "/server-error"))
                 .addAttribute(
                     "exceptionMessage",
                     exceptionToSimpleString(exception)
                 )
                 .build();
         } else if (errorStatusCode == StatusCodes.BAD_REQUEST) {
-            return Redirect.to("/bad-request");
+            return Redirect.to(addLanguageToUri(request, "/bad-request"));
         }
-        return Redirect.to("/not-found");
+        return Redirect.to(addLanguageToUri(request, "/not-found"));
     }
 
     protected Object postProcessError(
@@ -109,7 +114,7 @@ public class WebGlobalErrorHandler implements UnhandledErrorHandler {
         int errorStatusCode,
         Exception exception
     ) {
-        return processError(errorStatusCode, exception);
+        return processError(request, errorStatusCode, exception);
     }
 
     private ResponseEntity toResponseEntity(

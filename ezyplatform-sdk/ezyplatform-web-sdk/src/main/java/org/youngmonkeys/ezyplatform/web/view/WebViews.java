@@ -14,32 +14,31 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.admin.view;
+package org.youngmonkeys.ezyplatform.web.view;
 
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 
-public final class AdminViews {
+public final class WebViews {
 
-    private AdminViews() {}
+    private WebViews() {}
 
     public static Redirect redirectToLogin(
         HttpServletRequest request
     ) {
         Cookie tokenCookie = new Cookie(
-            COOKIE_NAME_ADMIN_ACCESS_TOKEN,
+            COOKIE_NAME_ACCESS_TOKEN,
             ""
         );
-        tokenCookie.setPath("/");
         tokenCookie.setMaxAge(0);
+        tokenCookie.setPath("/");
         Cookie tokenCookieExpiredAt = new Cookie(
-            COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT,
+            COOKIE_NAME_ACCESS_TOKEN_EXPIRED_AT,
             "0"
         );
         tokenCookieExpiredAt.setMaxAge(0);

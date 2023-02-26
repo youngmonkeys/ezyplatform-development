@@ -50,6 +50,11 @@
             <version>${ezy.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>game-box</artifactId>
+            <version>${game.box.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.youngmonkeys</groupId>
             <artifactId>ezyplatform-common-sdk</artifactId>
             <version>${project.version}</version>
