@@ -37,6 +37,7 @@ public class WebViewLanguageDecorator implements ViewDecorator {
     @Override
     public void decorate(HttpServletRequest request, View view) {
         setLanguage(request, view);
+        setLanguages(request, view);
     }
 
     protected void setLanguage(HttpServletRequest request, View view) {
@@ -57,12 +58,15 @@ public class WebViewLanguageDecorator implements ViewDecorator {
             view.setLocale(new Locale(lang));
             view.setVariable("ezyLang", lang);
         }
+    }
+
+    protected void setLanguages(HttpServletRequest request, View view) {
         if (!view.containsVariable("webLanguages")
             && includeWebLanguages()
         ) {
             view.setVariable(
                 "webLanguages",
-                webLanguageService.getLanguages()
+                webLanguageService.getActiveLanguages()
             );
         }
     }
