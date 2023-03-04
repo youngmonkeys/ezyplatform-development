@@ -239,6 +239,9 @@ public class DefaultEntityToModelConverter {
     }
 
     public LinkModel toModel(Link entity, String imageName) {
+        if (entity == null) {
+            return null;
+        }
         return LinkModel.builder()
             .id(entity.getId())
             .linkType(entity.getLinkType())

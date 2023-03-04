@@ -163,6 +163,18 @@ public final class CommonConstants {
         "allow_send_statistics_data";
     public static final String SETTING_NAME_TARGET_ROLE_FEATURES_SUFFIX =
         "_role_features";
+    public static final String SETTING_NAME_WEB_ADDITIONAL_HEAD =
+        "web_additional_head";
+    public static final String SETTING_NAME_WEB_ADDITIONAL_STYLE_FILES =
+        "web_additional_style_files";
+    public static final String SETTING_NAME_WEB_ADDITIONAL_STYLE =
+        "web_additional_style";
+    public static final String SETTING_NAME_WEB_ADDITIONAL_SCRIPT_FILES =
+        "web_additional_script_files";
+    public static final String SETTING_NAME_WEB_ADDITIONAL_SCRIPT =
+        "web_additional_script";
+    public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
+        "web_additional_foot";
 
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -217,6 +229,12 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_WEBSOCKET_URL = "websocketUrl";
     public static final String VIEW_VARIABLE_ADDITIONAL_MESSAGE_MAP = "additionalMessageMap";
     public static final String VIEW_VARIABLE_ADDITIONAL_VALUE_MAP = "additionalValueMap";
+    public static final String VIEW_VARIABLE_ADDITIONAL_HEADS = "additionalHeads";
+    public static final String VIEW_VARIABLE_ADDITIONAL_STYLE_FILES = "additionalStyleFiles";
+    public static final String VIEW_VARIABLE_ADDITIONAL_STYLES = "additionalStyles";
+    public static final String VIEW_VARIABLE_ADDITIONAL_SCRIPT_FILES = "additionalScriptFiles";
+    public static final String VIEW_VARIABLE_ADDITIONAL_SCRIPTS = "additionalScripts";
+    public static final String VIEW_VARIABLE_ADDITIONAL_FOOTS = "additionalFoots";
 
     public static final String PROPERTY_NAME_EZYPLATFORM_HOME = "ezyplatform.home";
 

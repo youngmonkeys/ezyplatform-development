@@ -16,13 +16,24 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.model.LinkModel;
 import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
 
 public interface LinkService {
 
     void saveLink(SaveLinkModel model);
 
-    void removeLink(long linkId);
+    void removeLinkById(long linkId);
 
     void removeLinkByUri(String uri);
+
+    boolean containsLinkByUri(String uri);
+
+    LinkModel getLinkById(long linkId);
+
+    LinkModel getLinkByIdIncludeImage(long linkId);
+
+    LinkModel getLinkByUri(String uri);
+
+    LinkModel getLinkByUriIncludeImage(String uri);
 }
