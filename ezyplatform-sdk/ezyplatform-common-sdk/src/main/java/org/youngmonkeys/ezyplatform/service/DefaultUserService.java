@@ -179,12 +179,13 @@ public class DefaultUserService implements UserService {
 
     @Override
     public UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
-        String accessToken
+        String accessToken,
+        boolean verifyStatus
     ) {
         return entityToModelConverter.toModel(
             getAccessTokenEntityOrThrowByAccessToken(
                 accessToken,
-                Boolean.FALSE
+                verifyStatus
             )
         );
     }

@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT;
@@ -320,9 +321,15 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         );
         tokenCookieExpiredAt.setMaxAge(0);
         tokenCookieExpiredAt.setPath("/");
-        String adminLoginUri = settingService.getAdminUrl() + "/login";
+        String adminLoginUri = settingService.getAdminUrl() +
+            "/sso-web" +
+            "?callbackUrl=" + request.getRequestURI();
+        String queryString = request.getQueryString();
+        if (isNotBlank(queryString)) {
+            adminLoginUri += "?" + queryString;
+        }
         return Redirect.builder()
-            .uri(addLanguageToUri(request, adminLoginUri))
+            .uri(adminLoginUri)
             .addCookie(tokenCookie)
             .addCookie(tokenCookieExpiredAt)
             .build();

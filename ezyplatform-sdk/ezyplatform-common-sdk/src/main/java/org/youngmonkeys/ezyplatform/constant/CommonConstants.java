@@ -86,6 +86,9 @@ public final class CommonConstants {
     public static final String COOKIE_NAME_ACCESS_TOKEN_EXPIRED_AT = "accessTokenExpiredAt";
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN = "adminAccessToken";
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT = "adminAccessTokenExpiredAt";
+    public static final String COOKIE_NAME_ADMIN_SSO_CALL_BACK_URL = "adminSSOCallbackUrl";
+
+    public static final int COOKIE_ADMIN_SSO_CALL_BACK_URL_MAX_AGE = 5 * 60;
 
     public static final String KEY_AUTHENTICATED = "authenticated";
 
@@ -122,6 +125,8 @@ public final class CommonConstants {
         = "admin_auto_pass_management_uris";
     public static final String SETTING_NAME_ADMIN_ACCESS_TOKEN_ENCRYPTION_KEY
         = "admin_access_token_encryption_key";
+    public static final String SETTING_NAME_ADMIN_SSO_ALLOWED_ORIGINS =
+        "admin_sso_allowed_origins";
     public static final String SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY
         = "user_token_expired_in_day";
     public static final String SETTING_NAME_USER_MAX_LOGIN_FAILURES

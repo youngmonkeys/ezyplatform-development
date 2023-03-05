@@ -66,6 +66,16 @@ public interface AdminService {
     long validateAdminAccessToken(String accessToken);
 
     AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
-        String accessToken
+        String accessToken,
+        boolean verifyStatus
     );
+
+    default AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
+        String accessToken
+    ) {
+        return getAdminAccessTokenOrThrowByAccessToken(
+            accessToken,
+            Boolean.FALSE
+        );
+    }
 }

@@ -52,8 +52,18 @@ public interface UserService {
     long validateUserAccessToken(String accessToken);
 
     UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
-        String accessToken
+        String accessToken,
+        boolean verifyStatus
     );
+
+    default UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
+        String accessToken
+    ) {
+        return getUserAccessTokenOrThrowByAccessToken(
+            accessToken,
+            Boolean.FALSE
+        );
+    }
 
     UserNameModel getUsernameById(long userId);
 

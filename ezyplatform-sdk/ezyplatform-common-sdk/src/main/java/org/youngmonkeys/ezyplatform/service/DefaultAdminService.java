@@ -173,12 +173,13 @@ public class DefaultAdminService implements AdminService {
 
     @Override
     public AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
-        String accessToken
+        String accessToken,
+        boolean verifyStatus
     ) {
         return entityToModelConverter.toModel(
             getAccessTokenEntityOrThrowByAccessToken(
                 accessToken,
-                Boolean.FALSE
+                verifyStatus
             )
         );
     }
