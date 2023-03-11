@@ -89,6 +89,12 @@ public class MediaControllerService extends EzyLoggable {
             );
         }
         Part filePart = request.getPart("file");
+        if (filePart == null) {
+            Collection<Part> parts = request.getParts();
+            if (parts.size() > 0) {
+                filePart = parts.iterator().next();
+            }
+        }
         FileMetadata fileMetadata = mediaValidator.validateFilePart(
             filePart,
             avatar
