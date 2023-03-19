@@ -232,6 +232,7 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_MENU_BADGES = "menuBadges";
     public static final String VIEW_VARIABLE_MENUITEM_BADGES = "menuItemBadges";
     public static final String VIEW_VARIABLE_WEBSOCKET_URL = "websocketUrl";
+    public static final String VIEW_VARIABLE_ADDITIONAL_MESSAGE_KEYS = "additionalMessageKeys";
     public static final String VIEW_VARIABLE_ADDITIONAL_MESSAGE_MAP = "additionalMessageMap";
     public static final String VIEW_VARIABLE_ADDITIONAL_VALUE_MAP = "additionalValueMap";
     public static final String VIEW_VARIABLE_ADDITIONAL_HEADS = "additionalHeads";
@@ -240,6 +241,8 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_ADDITIONAL_SCRIPT_FILES = "additionalScriptFiles";
     public static final String VIEW_VARIABLE_ADDITIONAL_SCRIPTS = "additionalScripts";
     public static final String VIEW_VARIABLE_ADDITIONAL_FOOTS = "additionalFoots";
+    public static final String VIEW_VARIABLE_MODULE_SCRIPT_FILES = "moduleScriptFiles";
+    public static final String VIEW_VARIABLE_FINAL_SCRIPT_FILES = "finalScriptFiles";
 
     public static final String PROPERTY_NAME_EZYPLATFORM_HOME = "ezyplatform.home";
 

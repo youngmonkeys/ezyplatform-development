@@ -36,4 +36,9 @@ public interface LinkService {
     LinkModel getLinkByUri(String uri);
 
     LinkModel getLinkByUriIncludeImage(String uri);
+
+    default String getLinkUriById(long linkId) {
+        LinkModel model = getLinkById(linkId);
+        return  model != null ? model.getLinkUri() : null;
+    }
 }

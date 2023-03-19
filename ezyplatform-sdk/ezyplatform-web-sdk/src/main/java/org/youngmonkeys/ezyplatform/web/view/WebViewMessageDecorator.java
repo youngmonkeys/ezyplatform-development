@@ -25,6 +25,7 @@ import lombok.Setter;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.VIEW_VARIABLE_ADDITIONAL_MESSAGE_MAP;
 
@@ -35,6 +36,8 @@ public abstract class WebViewMessageDecorator
     @EzyAutoBind
     private EzySingletonFactory singletonFactory;
     private final Collection<String> messageKeys;
+    private final AtomicReference<ViewContext> viewContextRef =
+        new AtomicReference<>();
 
     public WebViewMessageDecorator() {
         this.messageKeys = messageKeys();
@@ -44,9 +47,7 @@ public abstract class WebViewMessageDecorator
     @Override
     public void decorate(HttpServletRequest request, View view) {
         super.decorate(request, view);
-        ViewContext viewContext = this.singletonFactory.getSingletonCast(
-            ViewContext.class
-        );
+        ViewContext viewContext = getViewContext();
         view.putKeyValuesToVariable(
             VIEW_VARIABLE_ADDITIONAL_MESSAGE_MAP,
             (Map) viewContext.resolveMessages(
@@ -54,6 +55,22 @@ public abstract class WebViewMessageDecorator
                 messageKeys
             )
         );
+    }
+
+    protected ViewContext getViewContext() {
+        ViewContext viewContext = viewContextRef.get();
+        if (viewContext == null) {
+            synchronized (viewContextRef) {
+                viewContext = viewContextRef.get();
+                if (viewContext == null) {
+                    viewContext = this.singletonFactory.getSingletonCast(
+                        ViewContext.class
+                    );
+                    viewContextRef.set(viewContext);
+                }
+            }
+        }
+        return viewContext;
     }
 
     protected abstract Collection<String> messageKeys();
