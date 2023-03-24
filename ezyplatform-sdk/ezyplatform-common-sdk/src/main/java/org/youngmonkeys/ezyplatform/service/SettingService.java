@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
@@ -99,6 +100,32 @@ public interface SettingService {
 
     <T> T getObjectValue(String settingName, Class<T> objectType);
 
+    default <T> T getObjectValue(
+        String settingName,
+        Class<T> objectType,
+        T defaultValue
+    ) {
+        T answer = getObjectValue(
+            settingName,
+            objectType
+        );
+        return answer != null ? answer : defaultValue;
+    }
+
+    default <T> T getObjectValueOrDefault(
+        String settingName,
+        Class<T> objectType,
+        Supplier<T> defaultValueSupplier
+    ) {
+        T answer = getObjectValue(
+            settingName,
+            objectType
+        );
+        return answer != null
+            ? answer
+            : defaultValueSupplier.get();
+    }
+
     default String getPasswordValue(String settingName) {
         return getDecryptionValue(settingName);
     }
@@ -107,7 +134,10 @@ public interface SettingService {
         return getBooleanValue(settingName, false);
     }
 
-    default boolean getBooleanValue(String settingName, boolean defaultValue) {
+    default boolean getBooleanValue(
+        String settingName,
+        boolean defaultValue
+    ) {
         return getSettingValue(settingName)
             .map(it -> {
                 try {

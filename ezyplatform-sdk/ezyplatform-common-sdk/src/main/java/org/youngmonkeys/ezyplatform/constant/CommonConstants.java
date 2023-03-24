@@ -181,6 +181,7 @@ public final class CommonConstants {
     public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
         "web_additional_foot";
 
+    public static final int DEFAULT_TIMEOUT_SECONDS = 15;
     public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
     public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
     public static final int DEFAULT_CACHE_SETTINGS_PERIOD = 5;
