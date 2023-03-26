@@ -33,7 +33,7 @@ import java.time.LocalDateTime;
 public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
 
     @Column(name = "link_type")
     private String linkType;
@@ -42,7 +42,7 @@ public class Link {
     private String linkUri;
 
     @Column(name = "image_id")
-    private Long imageId;
+    private long imageId;
 
     private String description;
 

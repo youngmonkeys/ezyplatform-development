@@ -22,7 +22,7 @@ import lombok.Data;
 @Data
 @Builder
 public class LinkModel {
-    private Long id;
+    private long id;
     private String linkType;
     private String linkUri;
     private long imageId;
