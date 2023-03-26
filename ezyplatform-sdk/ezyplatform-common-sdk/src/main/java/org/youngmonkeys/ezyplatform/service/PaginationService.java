@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyfox.io.EzyLists;
 import com.tvd12.ezyfox.security.EzyBase64;
+import org.youngmonkeys.ezyplatform.data.PaginationParameter;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.rx.Reactive;
 import org.youngmonkeys.ezyplatform.rx.RxOperation;
@@ -121,7 +122,9 @@ public abstract class PaginationService<T, F, P> {
         List<T> listPlusOne = map.get("listPlusOne");
         List<T> list = EzyLists.take(listPlusOne, limit);
         boolean hasNext = listPlusOne.size() > limit;
-        boolean hasPrev = paginationParameter != null && list.size() > 0;
+        boolean hasPrev = !isEmptyPaginationParameter(
+            paginationParameter
+        ) && list.size() > 0;
         T nextPageTokenItem = hasNext ? EzyLists.last(list) : null;
         T lastPageTokenItem =  hasPrev ? EzyLists.first(list) : null;
         return PaginationModel.<T>builder()
@@ -245,4 +248,17 @@ public abstract class PaginationService<T, F, P> {
     }
 
     protected abstract P deserializePageToken(String pageToken);
+
+    protected boolean isEmptyPaginationParameter(
+        Object paginationParameter
+    ) {
+        if (paginationParameter == null) {
+            return true;
+        }
+        if (paginationParameter instanceof PaginationParameter) {
+            return ((PaginationParameter) paginationParameter)
+                .isEmpty();
+        }
+        return false;
+    }
 }

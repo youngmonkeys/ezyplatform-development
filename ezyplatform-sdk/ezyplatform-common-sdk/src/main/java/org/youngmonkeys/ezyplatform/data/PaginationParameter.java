@@ -16,5 +16,14 @@
 
 package org.youngmonkeys.ezyplatform.data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import static org.youngmonkeys.ezyplatform.util.ReflectionObjects.isEmptyObject;
+
 public interface PaginationParameter extends ParameterMapFetcher {
+
+    @JsonIgnore
+    default boolean isEmpty() {
+        return isEmptyObject(this);
+    }
 }

@@ -16,5 +16,4 @@
 
 package org.youngmonkeys.ezyplatform.data;
 
-public interface StorageFilter extends ParameterMapFetcher {
-}
+public interface StorageFilter extends ParameterMapFetcher {}
