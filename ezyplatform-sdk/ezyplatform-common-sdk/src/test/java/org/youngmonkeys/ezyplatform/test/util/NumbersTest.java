@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.test.util;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
+import static org.youngmonkeys.ezyplatform.util.Numbers.formatToUnitString;
 import static org.youngmonkeys.ezyplatform.util.Numbers.roundUpOrDownToInt;
 
 public class NumbersTest {
@@ -48,6 +49,41 @@ public class NumbersTest {
         Asserts.assertEquals(
             roundUpOrDownToInt(d),
             5
+        );
+    }
+
+    @Test
+    public void formatToUnitStringTest() {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            formatToUnitString(1, 1),
+            "1"
+        );
+        Asserts.assertEquals(
+            formatToUnitString(1000, 1),
+            "1K"
+        );
+        Asserts.assertEquals(
+            formatToUnitString(1100, 1),
+            "1.1K"
+        );
+        Asserts.assertEquals(
+            formatToUnitString(1_000_000, 1),
+            "1M"
+        );
+        Asserts.assertEquals(
+            formatToUnitString(1_100_000, 1),
+            "1.1M"
+        );
+        Asserts.assertEquals(
+            formatToUnitString(1_000_000_000, 1),
+            "1B"
+        );
+        Asserts.assertEquals(
+            formatToUnitString(1_100_000_000, 1),
+            "1.1B"
         );
     }
 }

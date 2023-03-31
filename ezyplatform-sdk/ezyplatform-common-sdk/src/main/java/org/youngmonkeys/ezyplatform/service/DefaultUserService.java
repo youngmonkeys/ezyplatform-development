@@ -230,4 +230,9 @@ public class DefaultUserService implements UserService {
     public boolean containsUserById(long id) {
         return userRepository.containsById(id);
     }
+
+    @Override
+    public long countUsersByStatus(String status) {
+        return userRepository.countByStatus(status);
+    }
 }

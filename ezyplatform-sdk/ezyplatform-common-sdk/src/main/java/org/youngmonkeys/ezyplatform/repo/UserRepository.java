@@ -68,4 +68,6 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
             "WHERE e.uuid = ?0"
     )
     IdUuidNameResult findUserUuidNameByUuid(String uuid);
+
+    long countByStatus(String status);
 }

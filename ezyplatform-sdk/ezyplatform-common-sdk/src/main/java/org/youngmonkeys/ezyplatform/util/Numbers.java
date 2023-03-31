@@ -26,4 +26,31 @@ public final class Numbers {
             ? starsInt
             : starsInt + 1;
     }
+
+    public static String formatToUnitString(
+        Number number,
+        int decimals
+    ) {
+        long num = number.longValue();
+        String format = "%." + decimals + "f";
+        if (num >= 1_000_000_000L) {
+            if (num % 1_000_000_000L == 0) {
+                return num / 1_000_000_000L + "B";
+            }
+            return String.format(format, num / 1_000_000_000D) + 'B';
+        }
+        if (num >= 1_000_000L) {
+            if (num % 1_000_000L == 0) {
+                return num / 1_000_000L + "M";
+            }
+            return String.format(format, num / 1_000_000D) + 'M';
+        }
+        if (num >= 1_000L) {
+            if (num % 1_000L == 0) {
+                return num / 1_000L + "K";
+            }
+            return String.format(format, num / 1_000D) + 'K';
+        }
+        return String.valueOf(num);
+    }
 }

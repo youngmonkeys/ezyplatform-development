@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.entity.UserStatus;
 import org.youngmonkeys.ezyplatform.model.UserAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
@@ -89,4 +90,12 @@ public interface UserService {
     }
 
     boolean containsUserById(long id);
+
+    long countUsersByStatus(String status);
+
+    default long countActivatedUsers() {
+        return countUsersByStatus(
+            UserStatus.ACTIVATED.toString()
+        );
+    }
 }
