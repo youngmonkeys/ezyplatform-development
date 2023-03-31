@@ -19,12 +19,15 @@ package org.youngmonkeys.ezyplatform.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
 @Getter
 @Builder
 public class MediaNameModel {
     private long id;
     private String name;
     private String originalName;
+    private String url;
 
     public static MediaNameModel fromMediaModel(
         MediaModel model
@@ -36,6 +39,13 @@ public class MediaNameModel {
             .id(model.getId())
             .name(model.getName())
             .originalName(model.getOriginalName())
+            .url(model.getUrl())
             .build();
+    }
+
+    public String getUrlOrDefault(String defaultUrl) {
+        return isBlank(url)
+            ? isBlank(name) ? defaultUrl : "/api/v1/media/" + name
+            : url;
     }
 }
