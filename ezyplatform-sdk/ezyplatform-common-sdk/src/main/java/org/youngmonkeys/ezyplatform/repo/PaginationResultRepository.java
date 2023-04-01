@@ -185,7 +185,10 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
                 queryString.append(" AND ");
             }
             if (paginationConditionNotBlank) {
-                queryString.append(paginationCondition);
+                queryString
+                    .append("(")
+                    .append(paginationCondition)
+                    .append(")");
             }
         }
         String groupBy = makeGroupBy(filter, paginationParameter);
