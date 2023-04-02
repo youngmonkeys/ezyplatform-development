@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.util;
 
 import java.util.Map;
 
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
 public final class Strings {
@@ -99,5 +100,9 @@ public final class Strings {
         return content
             .replace("<script>", "&lt;script&gt;")
             .replace("</script>", "&lt;/script&gt;");
+    }
+
+    public static String emptyIfNull(String str) {
+        return str != null ? str : EMPTY_STRING;
     }
 }

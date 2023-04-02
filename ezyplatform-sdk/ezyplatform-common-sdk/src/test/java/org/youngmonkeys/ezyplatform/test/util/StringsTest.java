@@ -109,4 +109,19 @@ public class StringsTest {
             "you***"
         );
     }
+
+    @Test
+    public void emptyIfNullTest() {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            emptyIfNull("hello"),
+            "hello"
+        );
+        Asserts.assertEquals(
+            emptyIfNull(null),
+            ""
+        );
+    }
 }
