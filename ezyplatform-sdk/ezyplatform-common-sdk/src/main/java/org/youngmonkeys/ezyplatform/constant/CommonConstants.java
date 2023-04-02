@@ -99,7 +99,7 @@ public final class CommonConstants {
     public static final String META_KEY_STARS = "stars";
     public static final String META_KEY_VOTES = "votes";
     public static final String META_KEY_HEARTS = "hearts";
-    public static final String META_KEY_BEST_ANSWER = "bestAnswer";
+    public static final String META_KEY_THE_BEST_ANSWER = "thBestAnswer";
     public static final String META_KEY_STAR_POINT = "starPoints";
     public static final String META_KEY_ENABLE_2FA = "enable2FA";
     public static final String META_KEY_REGISTER_FROM = "registerFrom";
