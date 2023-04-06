@@ -243,8 +243,12 @@ public abstract class PaginationService<T, F, P> {
 
     private P doDeserializePageToken(String pageToken) {
         return pageToken == null
-            ? null
+            ? defaultPaginationParameter()
             : deserializePageToken(EzyBase64.decodeUtf(pageToken));
+    }
+
+    protected P defaultPaginationParameter() {
+        return null;
     }
 
     protected abstract P deserializePageToken(String pageToken);
