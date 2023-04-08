@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 
 public interface UserMetaService {
 
@@ -255,4 +256,15 @@ public interface UserMetaService {
         Collection<Long> userIds,
         String metaKey
     );
+
+    default <V> Map<Long, V> getUserMetaValueMapByUserIds(
+        Collection<Long> userIds,
+        String metaKey,
+        Function<String, V> valueConverter
+    ) {
+        return newHashMapNewValues(
+            getUserMetaValueMapByUserIds(userIds, metaKey),
+            valueConverter
+        );
+    }
 }

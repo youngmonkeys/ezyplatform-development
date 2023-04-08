@@ -204,6 +204,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
                 metaKey
             )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     AdminMeta::getAdminId,

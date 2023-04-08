@@ -204,6 +204,7 @@ public class DefaultUserMetaService implements UserMetaService {
                 metaKey
             )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     UserMeta::getUserId,

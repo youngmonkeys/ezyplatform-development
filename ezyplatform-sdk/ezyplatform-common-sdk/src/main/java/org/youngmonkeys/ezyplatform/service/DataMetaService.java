@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 
 public interface DataMetaService {
 
@@ -304,4 +305,20 @@ public interface DataMetaService {
         Collection<Long> dataIds,
         String metaKey
     );
+
+    default <V> Map<Long, V> getDataMetaValueMapByDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        Function<String, V> valueConverter
+    ) {
+        return newHashMapNewValues(
+            getDataMetaValueMapByDataIds(
+                dataType,
+                dataIds,
+                metaKey
+            ),
+            valueConverter
+        );
+    }
 }

@@ -22,6 +22,7 @@ import org.youngmonkeys.ezyplatform.entity.User;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -33,6 +34,12 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
             "WHERE e.uuid = ?0"
     )
     IdResult findUserIdByUuid(String uuid);
+
+    @EzyQuery(
+        "SELECT e.id, e.uuid FROM User e " +
+            "WHERE e.uuid in ?0"
+    )
+    List<IdUuidResult> findUserIdsByUuids(Collection<String> uuids);
 
     @EzyQuery(
         "SELECT e.id, e.username, e.displayName " +

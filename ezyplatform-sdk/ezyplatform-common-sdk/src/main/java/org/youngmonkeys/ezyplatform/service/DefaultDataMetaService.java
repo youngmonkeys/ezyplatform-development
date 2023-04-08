@@ -230,6 +230,7 @@ public class DefaultDataMetaService implements DataMetaService {
                 metaKey
             )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     DataMeta::getDataId,

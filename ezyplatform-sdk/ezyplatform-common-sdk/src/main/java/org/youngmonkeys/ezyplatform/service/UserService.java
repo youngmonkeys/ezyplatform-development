@@ -48,6 +48,10 @@ public interface UserService {
 
     Long getUserIdByUuid(String uuid);
 
+    Map<String, Long> getUserIdMapByUuids(
+        Collection<String> uuids
+    );
+
     Long getUserIdByAccessToken(String accessToken);
 
     long validateUserAccessToken(String accessToken);

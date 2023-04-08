@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 
 public interface AdminMetaService {
 
@@ -255,4 +256,18 @@ public interface AdminMetaService {
         Collection<Long> adminIds,
         String metaKey
     );
+
+    default <V> Map<Long, V> getAdminMetaValueMapByAdminIds(
+        Collection<Long> adminIds,
+        String metaKey,
+        Function<String, V> valueConverter
+    ) {
+        return newHashMapNewValues(
+            getAdminMetaValueMapByAdminIds(
+                adminIds,
+                metaKey
+            ),
+            valueConverter
+        );
+    }
 }

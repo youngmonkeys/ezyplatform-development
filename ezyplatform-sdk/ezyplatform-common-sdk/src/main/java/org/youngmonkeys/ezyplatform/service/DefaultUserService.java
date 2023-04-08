@@ -33,6 +33,7 @@ import org.youngmonkeys.ezyplatform.repo.UserRepository;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
@@ -155,6 +156,20 @@ public class DefaultUserService implements UserService {
     public Long getUserIdByUuid(String uuid) {
         IdResult result = userRepository.findUserIdByUuid(uuid);
         return result != null ? result.getId() : null;
+    }
+
+    @Override
+    public Map<String, Long> getUserIdMapByUuids(
+        Collection<String> uuids
+    ) {
+        return userRepository.findUserIdsByUuids(uuids)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    IdUuidResult::getUuid,
+                    IdUuidResult::getId
+                )
+            );
     }
 
     @Override
