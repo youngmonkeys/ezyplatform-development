@@ -40,6 +40,23 @@ public class DefaultUserFilter implements UserFilter {
     }
 
     @Override
+    public void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {
+        if (keywords != null) {
+            queryString.append(" INNER JOIN UserKeyword k ON e.id = k.userId");
+        }
+        if (roleIds != null) {
+            queryString.append(" INNER JOIN UserRole l ON e.id = l.userId");
+        }
+        if (roleNames != null) {
+            queryString
+                .append(" INNER JOIN UserRole l ON e.id = l.userId")
+                .append(" INNER JOIN UserRoleName m ON m.id = m.roleId");
+        }
+    }
+
+    @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
         if (status != null) {
@@ -58,23 +75,6 @@ public class DefaultUserFilter implements UserFilter {
             answer.and("m.roleName IN :roleNames");
         }
         return answer.build();
-    }
-
-    @Override
-    public void decorateQueryStringBeforeWhere(
-        StringBuilder queryString
-    ) {
-        if (keywords != null) {
-            queryString.append(" INNER JOIN UserKeyword k ON e.id = k.userId");
-        }
-        if (roleIds != null) {
-            queryString.append(" INNER JOIN UserRole l ON e.id = l.userId");
-        }
-        if (roleNames != null) {
-            queryString
-                .append(" INNER JOIN UserRole l ON e.id = l.userId")
-                .append(" INNER JOIN UserRoleName m ON m.id = m.roleId");
-        }
     }
 
     @SuppressWarnings("unchecked")

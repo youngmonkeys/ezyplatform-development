@@ -20,9 +20,9 @@ import org.youngmonkeys.ezyplatform.data.StorageFilter;
 
 public interface UserFilter extends StorageFilter {
 
-    String matchingCondition();
-
     void decorateQueryStringBeforeWhere(
         StringBuilder queryString
     );
+
+    String matchingCondition();
 }
