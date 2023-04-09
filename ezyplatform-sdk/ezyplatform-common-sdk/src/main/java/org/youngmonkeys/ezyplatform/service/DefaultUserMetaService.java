@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @AllArgsConstructor
 public class DefaultUserMetaService implements UserMetaService {
@@ -46,6 +47,7 @@ public class DefaultUserMetaService implements UserMetaService {
         entity.setUserId(userId);
         entity.setMetaKey(metaKey);
         entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
         userMetaRepository.save(entity);
     }
 
@@ -62,6 +64,7 @@ public class DefaultUserMetaService implements UserMetaService {
                 entity.setUserId(userId);
                 entity.setMetaKey(metaKey);
                 entity.setMetaValue(metaValue);
+                entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
                 return entity;
             }
         );
@@ -75,6 +78,19 @@ public class DefaultUserMetaService implements UserMetaService {
         String metaValue
     ) {
         userMetaTransactionalRepository.saveUserMetaUniqueKey(
+            userId,
+            metaKey,
+            metaValue
+        );
+    }
+
+    @Override
+    public void saveUserMetaIfAbsent(
+        long userId,
+        String metaKey,
+        String metaValue
+    ) {
+        userMetaTransactionalRepository.saveUserMetaUniqueKeyValue(
             userId,
             metaKey,
             metaValue

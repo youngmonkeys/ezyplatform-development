@@ -25,6 +25,8 @@ import javax.persistence.EntityTransaction;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
+
 public class UserMetaTransactionalRepository
     extends EzyJpaRepository<Long, UserMeta> {
 
@@ -41,7 +43,8 @@ public class UserMetaTransactionalRepository
             try {
                 List<UserMeta> entities = entityManager.createQuery(
                     "SELECT e FROM UserMeta e " +
-                        "WHERE e.userId = ?0 AND e.metaKey = ?1"
+                        "WHERE e.userId = ?0 " +
+                        "AND e.metaKey = ?1"
                 )
                     .setParameter(0, userId)
                     .setParameter(1, metaKey)
@@ -54,7 +57,49 @@ public class UserMetaTransactionalRepository
                     entity.setMetaKey(metaKey);
                 }
                 entity.setMetaValue(metaValue);
+                entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
                 entityManager.merge(entity);
+                transaction.commit();
+            } catch (Exception e) {
+                transaction.rollback();
+                throw e;
+            }
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void saveUserMetaUniqueKeyValue(
+        long userId,
+        String metaKey,
+        String metaValue
+    ) {
+        EntityManager entityManager = databaseContext.createEntityManager();
+        try {
+            EntityTransaction transaction = entityManager.getTransaction();
+            transaction.begin();
+            try {
+                List<UserMeta> entities = entityManager.createQuery(
+                        "SELECT e FROM UserMeta e " +
+                            "WHERE e.userId = ?0 " +
+                            "AND e.metaKey = ?1 " +
+                            "AND e.metaValue = ?2"
+                    )
+                    .setParameter(0, userId)
+                    .setParameter(1, metaKey)
+                    .setParameter(2, metaValue)
+                    .setMaxResults(1)
+                    .getResultList();
+                UserMeta entity = EzyLists.first(entities);
+                if (entity == null) {
+                    entity = new UserMeta();
+                    entity.setUserId(userId);
+                    entity.setMetaKey(metaKey);
+                    entity.setMetaValue(metaValue);
+                    entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+                    entityManager.merge(entity);
+                }
                 transaction.commit();
             } catch (Exception e) {
                 transaction.rollback();
@@ -78,7 +123,8 @@ public class UserMetaTransactionalRepository
             try {
                 List<UserMeta> entities = entityManager.createQuery(
                         "SELECT e FROM UserMeta e " +
-                            "WHERE e.userId = ?0 AND e.metaKey = ?1"
+                            "WHERE e.userId = ?0 " +
+                            "AND e.metaKey = ?1"
                     )
                     .setParameter(0, userId)
                     .setParameter(1, metaKey)
@@ -95,6 +141,7 @@ public class UserMetaTransactionalRepository
                 }
                 BigDecimal newValue = currentValue.add(value);
                 entity.setMetaValue(newValue.toString());
+                entity.setMetaNumberValue(newValue.toBigInteger());
                 entityManager.merge(entity);
                 transaction.commit();
                 return newValue;

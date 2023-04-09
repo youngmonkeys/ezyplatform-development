@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 
 @Setter
 @Getter
@@ -43,4 +44,7 @@ public class AdminMeta {
 
     @Column(name = "meta_value")
     private String metaValue;
+
+    @Column(name = "meta_number_value")
+    private BigInteger metaNumberValue;
 }

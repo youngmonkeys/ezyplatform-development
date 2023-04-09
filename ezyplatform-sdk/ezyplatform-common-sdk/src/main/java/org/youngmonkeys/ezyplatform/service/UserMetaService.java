@@ -82,15 +82,11 @@ public interface UserMetaService {
         );
     }
 
-    default void saveUserMetaIfAbsent(
+    void saveUserMetaIfAbsent(
         long userId,
         String metaKey,
         String metaValue
-    ) {
-        if (!containsUserMeta(userId, metaKey, metaValue)) {
-            saveUserMeta(userId, metaKey, metaValue);
-        }
-    }
+    );
 
     default void saveUserMetaIfAbsent(
         long userId,

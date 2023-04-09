@@ -25,6 +25,8 @@ import javax.persistence.EntityTransaction;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
+
 public class DataMetaTransactionalRepository
     extends EzyJpaRepository<Long, DataMeta> {
 
@@ -42,8 +44,9 @@ public class DataMetaTransactionalRepository
             try {
                 List<DataMeta> entities = entityManager.createQuery(
                     "SELECT e FROM DataMeta e " +
-                        "WHERE e.dataType = ?0 AND " +
-                        "e.dataId = ?1 AND e.metaKey = ?2"
+                        "WHERE e.dataType = ?0 " +
+                        "AND e.dataId = ?1 " +
+                        "AND e.metaKey = ?2"
                 )
                     .setParameter(0, dataType)
                     .setParameter(1, dataId)
@@ -58,7 +61,53 @@ public class DataMetaTransactionalRepository
                     entity.setMetaKey(metaKey);
                 }
                 entity.setMetaValue(metaValue);
+                entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
                 entityManager.merge(entity);
+                transaction.commit();
+            } catch (Exception e) {
+                transaction.rollback();
+                throw e;
+            }
+        } finally {
+            entityManager.close();
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void saveDataMetaUniqueKeyValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue
+    ) {
+        EntityManager entityManager = databaseContext.createEntityManager();
+        try {
+            EntityTransaction transaction = entityManager.getTransaction();
+            transaction.begin();
+            try {
+                List<DataMeta> entities = entityManager.createQuery(
+                        "SELECT e FROM DataMeta e " +
+                            "WHERE e.dataType = ?0 " +
+                            "AND e.dataId = ?1 " +
+                            "AND e.metaKey = ?2 " +
+                            "AND e.metaValue = ?3"
+                    )
+                    .setParameter(0, dataType)
+                    .setParameter(1, dataId)
+                    .setParameter(2, metaKey)
+                    .setParameter(3, metaValue)
+                    .setMaxResults(1)
+                    .getResultList();
+                DataMeta entity = EzyLists.first(entities);
+                if (entity == null) {
+                    entity = new DataMeta();
+                    entity.setDataType(dataType);
+                    entity.setDataId(dataId);
+                    entity.setMetaKey(metaKey);
+                    entity.setMetaValue(metaValue);
+                    entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+                    entityManager.merge(entity);
+                }
                 transaction.commit();
             } catch (Exception e) {
                 transaction.rollback();
@@ -83,8 +132,9 @@ public class DataMetaTransactionalRepository
             try {
                 List<DataMeta> entities = entityManager.createQuery(
                         "SELECT e FROM DataMeta e " +
-                            "WHERE e.dataType = ?0 AND " +
-                            "e.dataId = ?1 AND e.metaKey = ?2"
+                            "WHERE e.dataType = ?0 " +
+                            "AND e.dataId = ?1 " +
+                            "AND e.metaKey = ?2"
                     )
                     .setParameter(0, dataType)
                     .setParameter(1, dataId)
@@ -103,6 +153,7 @@ public class DataMetaTransactionalRepository
                 }
                 BigDecimal newValue = currentValue.add(value);
                 entity.setMetaValue(newValue.toString());
+                entity.setMetaNumberValue(newValue.toBigInteger());
                 entityManager.merge(entity);
                 transaction.commit();
                 return newValue;

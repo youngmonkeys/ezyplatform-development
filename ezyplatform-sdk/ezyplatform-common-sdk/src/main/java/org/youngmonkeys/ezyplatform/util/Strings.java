@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
@@ -104,5 +105,13 @@ public final class Strings {
 
     public static String emptyIfNull(String str) {
         return str != null ? str : EMPTY_STRING;
+    }
+
+    public static BigInteger toBigIntegerOrZero(String str) {
+        try {
+            return new BigInteger(str);
+        } catch (Exception e) {
+            return BigInteger.ZERO;
+        }
     }
 }

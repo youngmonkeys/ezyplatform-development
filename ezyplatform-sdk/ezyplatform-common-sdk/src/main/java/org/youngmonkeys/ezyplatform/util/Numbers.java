@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import java.math.BigInteger;
+
 public final class Numbers {
 
     private Numbers() {}
@@ -52,5 +54,54 @@ public final class Numbers {
             return String.format(format, num / 1_000D) + 'K';
         }
         return String.valueOf(num);
+    }
+
+    public static int toIntValue(BigInteger value) {
+        return value != null ? value.intValue() : 0;
+    }
+
+    public static String toPaddedValueLong(
+        BigInteger value
+    ) {
+        return toPaddedValueLong(value, BigInteger.ZERO);
+    }
+
+    public static String toPaddedValueLong(
+        BigInteger value,
+        BigInteger defaultValue
+    ) {
+        return toPaddedValue(
+            value,
+            25,
+            defaultValue
+        );
+    }
+
+    public static String toPaddedValueUint256(
+        BigInteger value
+    ) {
+        return toPaddedValueUint256(value, BigInteger.ZERO);
+    }
+
+    public static String toPaddedValueUint256(
+        BigInteger value,
+        BigInteger defaultValue
+    ) {
+        return toPaddedValue(
+            value,
+            76,
+            defaultValue
+        );
+    }
+
+    public static String toPaddedValue(
+        BigInteger value,
+        int leadingZeros,
+        BigInteger defaultValue
+    ) {
+        String format = "%0" + leadingZeros + "d";
+        return value == null
+            ? (defaultValue == null ? null : String.format(format, defaultValue))
+            : String.format(format, value);
     }
 }

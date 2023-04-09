@@ -82,15 +82,11 @@ public interface AdminMetaService {
         );
     }
 
-    default void saveAdminMetaIfAbsent(
+    void saveAdminMetaIfAbsent(
         long adminId,
         String metaKey,
         String metaValue
-    ) {
-        if (!containsAdminMeta(adminId, metaKey, metaValue)) {
-            saveAdminMeta(adminId, metaKey, metaValue);
-        }
-    }
+    );
 
     default void saveAdminMetaIfAbsent(
         long adminId,

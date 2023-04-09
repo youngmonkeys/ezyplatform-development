@@ -17,11 +17,15 @@
 package org.youngmonkeys.ezyplatform.test.util;
 
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.base.BaseTest;
+import com.tvd12.test.performance.Performance;
 import org.testng.annotations.Test;
+
+import java.math.BigInteger;
 
 import static org.youngmonkeys.ezyplatform.util.Strings.*;
 
-public class StringsTest {
+public class StringsTest extends BaseTest {
 
     @Test
     public void test() {
@@ -123,5 +127,29 @@ public class StringsTest {
             emptyIfNull(null),
             ""
         );
+    }
+
+    @Test
+    public void toBigIntegerOrZeroTest() {
+        Asserts.assertEquals(
+            toBigIntegerOrZero("1"),
+            BigInteger.ONE
+        );
+        Asserts.assertEquals(
+            toBigIntegerOrZero("1.1"),
+            BigInteger.ZERO
+        );
+        Asserts.assertEquals(
+            toBigIntegerOrZero("true"),
+            BigInteger.ZERO
+        );
+
+        //noinspection ResultOfMethodCallIgnored
+        long time = Performance
+            .create()
+            .loop(10000)
+            .test(() -> toBigIntegerOrZero("hello world"))
+            .getTime();
+        System.out.println("toBigIntegerOrZero elapsed time: " + time);
     }
 }

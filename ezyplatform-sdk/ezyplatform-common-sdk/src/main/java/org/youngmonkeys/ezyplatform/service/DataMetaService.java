@@ -90,26 +90,12 @@ public interface DataMetaService {
         );
     }
 
-    default void saveDataMetaIfAbsent(
+    void saveDataMetaIfAbsent(
         String dataType,
         long dataId,
         String metaKey,
         String metaValue
-    ) {
-        if (!containsDataMeta(
-            dataType,
-            dataId,
-            metaKey,
-            metaValue
-        )) {
-            saveDataMeta(
-                dataType,
-                dataId,
-                metaKey,
-                metaValue
-            );
-        }
-    }
+    );
 
     default void saveDataMetaIfAbsent(
         String dataType,

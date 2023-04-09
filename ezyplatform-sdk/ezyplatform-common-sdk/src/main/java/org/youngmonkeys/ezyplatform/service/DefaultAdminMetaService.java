@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @AllArgsConstructor
 public class DefaultAdminMetaService implements AdminMetaService {
@@ -46,6 +47,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
         entity.setAdminId(adminId);
         entity.setMetaKey(metaKey);
         entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
         adminMetaRepository.save(entity);
     }
 
@@ -62,6 +64,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
                 entity.setAdminId(adminId);
                 entity.setMetaKey(metaKey);
                 entity.setMetaValue(metaValue);
+                entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
                 return entity;
             }
         );
@@ -75,6 +78,19 @@ public class DefaultAdminMetaService implements AdminMetaService {
         String metaValue
     ) {
         adminMetaTransactionalRepository.saveAdminMetaUniqueKey(
+            adminId,
+            metaKey,
+            metaValue
+        );
+    }
+
+    @Override
+    public void saveAdminMetaIfAbsent(
+        long adminId,
+        String metaKey,
+        String metaValue
+    ) {
+        adminMetaTransactionalRepository.saveAdminMetaUniqueKeyValue(
             adminId,
             metaKey,
             metaValue

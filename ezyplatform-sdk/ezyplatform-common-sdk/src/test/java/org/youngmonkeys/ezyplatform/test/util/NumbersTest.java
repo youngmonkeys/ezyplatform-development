@@ -19,8 +19,9 @@ package org.youngmonkeys.ezyplatform.test.util;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
-import static org.youngmonkeys.ezyplatform.util.Numbers.formatToUnitString;
-import static org.youngmonkeys.ezyplatform.util.Numbers.roundUpOrDownToInt;
+import java.math.BigInteger;
+
+import static org.youngmonkeys.ezyplatform.util.Numbers.*;
 
 public class NumbersTest {
 
@@ -84,6 +85,38 @@ public class NumbersTest {
         Asserts.assertEquals(
             formatToUnitString(1_100_000_000, 1),
             "1.1B"
+        );
+    }
+
+    @Test
+    public void toIntValueTest() {
+        Asserts.assertEquals(
+            toIntValue(BigInteger.TEN),
+            10
+        );
+        Asserts.assertEquals(
+            toIntValue(null),
+            0
+        );
+    }
+
+    @Test
+    public void toPaddedValueTest() {
+        Asserts.assertEquals(
+            toPaddedValueLong(BigInteger.TEN),
+            "0000000000000000000000010"
+        );
+        Asserts.assertEquals(
+            toPaddedValueLong(null, BigInteger.ONE),
+            "0000000000000000000000001"
+        );
+        Asserts.assertEquals(
+            toPaddedValueUint256(BigInteger.TEN),
+            "0000000000000000000000000000000000000000000000000000000000000000000000000010"
+        );
+        Asserts.assertEquals(
+            toPaddedValueUint256(null, BigInteger.ONE),
+            "0000000000000000000000000000000000000000000000000000000000000000000000000001"
         );
     }
 }
