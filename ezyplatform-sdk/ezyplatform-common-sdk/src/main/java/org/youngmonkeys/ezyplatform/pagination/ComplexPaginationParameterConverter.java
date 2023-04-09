@@ -23,7 +23,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 public abstract class ComplexPaginationParameterConverter<S, M> {
@@ -33,7 +34,7 @@ public abstract class ComplexPaginationParameterConverter<S, M> {
     private final Map<Object, Class<?>> paginationParameterTypeBySortOrder;
     private final Map<S, Function<M, Object>> paginationParameterExtractorBySortOrder;
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    @SuppressWarnings("unchecked")
     public ComplexPaginationParameterConverter(
         PaginationParameterConverter converter
     ) {
@@ -41,34 +42,51 @@ public abstract class ComplexPaginationParameterConverter<S, M> {
         this.defaultPageTokenBySortOrder = new HashMap<>();
         this.paginationParameterTypeBySortOrder = new HashMap<>();
         mapPaginationParametersToTypes(
-            (Map) paginationParameterTypeBySortOrder
+            (Map<S, Class<?>>) paginationParameterTypeBySortOrder
         );
-        List<S> sortOrders = new ArrayList<>(
-            (Set) paginationParameterTypeBySortOrder.keySet()
+        new HashMap<>((Map<S, Class<?>>) paginationParameterTypeBySortOrder)
+            .forEach(this::registerPaginationParameter);
+        this.paginationParameterExtractorBySortOrder = new HashMap<>();
+        addPaginationParameterExtractors(paginationParameterExtractorBySortOrder);
+    }
+
+    private void registerPaginationParameter(
+        S sortOrder,
+        Class<?> paginationParameterType
+    ) {
+        paginationParameterTypeBySortOrder.put(
+            sortOrder,
+            paginationParameterType
         );
-        for (S sortOrder : sortOrders) {
-            Class<?> paginationParameterType =
-                paginationParameterTypeBySortOrder.get(sortOrder);
-            paginationParameterTypeBySortOrder.put(
-                sortOrder.toString(),
-                paginationParameterType
-            );
-            defaultPageTokenBySortOrder.put(
-                sortOrder,
-                EzyBase64.encodeUtf(
-                    converter.serialize(
-                        new PaginationParameterWrapper<>(
-                            sortOrder,
-                            converter.serializeToMap(
-                                EzyClasses.newInstance(paginationParameterType)
-                            )
+        paginationParameterTypeBySortOrder.put(
+            sortOrder.toString(),
+            paginationParameterType
+        );
+        defaultPageTokenBySortOrder.put(
+            sortOrder,
+            EzyBase64.encodeUtf(
+                converter.serialize(
+                    new PaginationParameterWrapper<>(
+                        sortOrder,
+                        converter.serializeToMap(
+                            EzyClasses.newInstance(paginationParameterType)
                         )
                     )
                 )
-            );
-        }
-        this.paginationParameterExtractorBySortOrder = new HashMap<>();
-        addPaginationParameterExtractors(paginationParameterExtractorBySortOrder);
+            )
+        );
+    }
+
+    public void registerPaginationParameter(
+        S sortOrder,
+        Class<?> paginationParameterType,
+        Function<M, Object> paginationParameterExtractor
+    ) {
+        registerPaginationParameter(sortOrder, paginationParameterType);
+        paginationParameterExtractorBySortOrder.put(
+            sortOrder,
+            paginationParameterExtractor
+        );
     }
 
     public String serialize(
