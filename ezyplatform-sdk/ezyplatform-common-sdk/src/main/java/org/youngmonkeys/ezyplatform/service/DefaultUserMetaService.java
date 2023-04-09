@@ -24,6 +24,7 @@ import org.youngmonkeys.ezyplatform.repo.UserMetaTransactionalRepository;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -197,6 +198,9 @@ public class DefaultUserMetaService implements UserMetaService {
         String metaKey,
         Collection<String> metaValues
     ) {
+        if (metaValues.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return userMetaRepository.findByMetaKeyAndMetaValueIn(
             metaKey,
             metaValues
@@ -215,6 +219,9 @@ public class DefaultUserMetaService implements UserMetaService {
         Collection<Long> userIds,
         String metaKey
     ) {
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return userMetaRepository.findByUserIdInAndMetaKey(
                 userIds,
                 metaKey

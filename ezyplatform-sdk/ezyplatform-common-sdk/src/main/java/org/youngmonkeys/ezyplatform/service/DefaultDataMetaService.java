@@ -24,6 +24,7 @@ import org.youngmonkeys.ezyplatform.repo.DataMetaTransactionalRepository;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -222,6 +223,9 @@ public class DefaultDataMetaService implements DataMetaService {
         String metaKey,
         Collection<String> metaValues
     ) {
+        if (metaValues.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return dataMetaRepository.findByDataTypeAndMetaKeyAndMetaValueIn(
             dataType,
             metaKey,
@@ -242,6 +246,9 @@ public class DefaultDataMetaService implements DataMetaService {
         Collection<Long> dataIds,
         String metaKey
     ) {
+        if (dataIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return dataMetaRepository.findByDataTypeAndDataIdInAndMetaKey(
                 dataType,
                 dataIds,

@@ -24,6 +24,7 @@ import org.youngmonkeys.ezyplatform.repo.AdminMetaTransactionalRepository;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -197,6 +198,9 @@ public class DefaultAdminMetaService implements AdminMetaService {
         String metaKey,
         Collection<String> metaValues
     ) {
+        if (metaValues.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return adminMetaRepository.findByMetaKeyAndMetaValueIn(
                 metaKey,
                 metaValues
@@ -215,6 +219,9 @@ public class DefaultAdminMetaService implements AdminMetaService {
         Collection<Long> adminIds,
         String metaKey
     ) {
+        if (adminIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return adminMetaRepository.findByAdminIdInAndMetaKey(
                 adminIds,
                 metaKey
