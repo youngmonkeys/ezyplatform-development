@@ -104,11 +104,11 @@ public class NumbersTest {
     public void toPaddedValueTest() {
         Asserts.assertEquals(
             toPaddedValueLong(BigInteger.TEN),
-            "0000000000000000000000010"
+            "00000000000000000000000010"
         );
         Asserts.assertEquals(
             toPaddedValueLong(null, BigInteger.ONE),
-            "0000000000000000000000001"
+            "00000000000000000000000001"
         );
         Asserts.assertEquals(
             toPaddedValueUint256(BigInteger.TEN),
