@@ -52,8 +52,12 @@ public final class PaginationModelFetchers {
         boolean lastPage,
         int limit
     ) {
-        if (lastPage) {
-            return paginationService.getLastPage(filter, limit);
+        if (isBlank(nextPageToken) && isBlank(prevPageToken)) {
+            if (lastPage) {
+                return paginationService.getLastPage(filter, limit);
+            } else {
+                return paginationService.getFirstPage(filter, limit);
+            }
         }
         if (isBlank(prevPageToken)) {
             return paginationService.getNextPage(filter, nextPageToken, limit);

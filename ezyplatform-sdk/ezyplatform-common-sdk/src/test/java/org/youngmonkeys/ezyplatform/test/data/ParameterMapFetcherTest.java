@@ -60,7 +60,7 @@ public class ParameterMapFetcherTest {
         private String world = "a";
         public String foo = "x";
         private String bar = "y";
-        public final String v = "v";
+        public transient String v = "v";
         public static String z = "z";
         public transient String t = "t";
     }

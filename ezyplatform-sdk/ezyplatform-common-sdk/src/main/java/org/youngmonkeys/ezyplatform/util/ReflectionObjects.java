@@ -43,31 +43,34 @@ public final class ReflectionObjects {
         boolean onlyTakeFirstValue
     ) {
         Map<String, Object> properties = new HashMap<>();
-        Field[] fields = obj.getClass().getDeclaredFields();
-        for (Field field : fields) {
-            if (Modifier.isStatic(field.getModifiers())
-                || Modifier.isFinal(field.getModifiers())
-                || Modifier.isTransient(field.getModifiers())
-            ) {
-                continue;
-            }
-            Object value;
-            try {
-                if (Modifier.isPublic(field.getModifiers())) {
-                    value = field.get(obj);
-                } else {
-                    field.setAccessible(true);
-                    value = field.get(obj);
+        Class<?> clazz = obj.getClass();
+        while (clazz != Object.class) {
+            Field[] fields = clazz.getDeclaredFields();
+            for (Field field : fields) {
+                if (Modifier.isStatic(field.getModifiers())
+                    || Modifier.isTransient(field.getModifiers())
+                ) {
+                    continue;
                 }
-            } catch (Exception e) {
-                throw new IllegalStateException(e);
-            }
-            if (value != null) {
-                properties.put(field.getName(), value);
-                if (onlyTakeFirstValue) {
-                    break;
+                Object value;
+                try {
+                    if (Modifier.isPublic(field.getModifiers())) {
+                        value = field.get(obj);
+                    } else {
+                        field.setAccessible(true);
+                        value = field.get(obj);
+                    }
+                } catch (Exception e) {
+                    throw new IllegalStateException(e);
+                }
+                if (value != null) {
+                    properties.put(field.getName(), value);
+                    if (onlyTakeFirstValue) {
+                        return properties;
+                    }
                 }
             }
+            clazz = clazz.getSuperclass();
         }
         return properties;
     }
