@@ -24,7 +24,6 @@ import java.util.Collection;
 
 @Getter
 public class DefaultUserFilter implements UserFilter {
-
     public final String status;
     public final Collection<String> statuses;
     public final Collection<String> keywords;
