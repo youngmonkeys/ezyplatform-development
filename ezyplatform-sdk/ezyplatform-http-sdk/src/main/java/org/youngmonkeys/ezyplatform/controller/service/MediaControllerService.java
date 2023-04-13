@@ -38,7 +38,7 @@ import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.service.MediaService;
-import org.youngmonkeys.ezyplatform.service.PaginationService;
+import org.youngmonkeys.ezyplatform.service.PaginationMediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 import org.youngmonkeys.ezyplatform.validator.CommonValidator;
 import org.youngmonkeys.ezyplatform.validator.MediaValidator;
@@ -61,8 +61,7 @@ public class MediaControllerService extends EzyLoggable {
 
     private final MediaService mediaService;
     private final SettingService settingService;
-    @SuppressWarnings("rawtypes")
-    private final PaginationService paginationMediaService;
+    private final PaginationMediaService paginationMediaService;
     private final ObjectMapper objectMapper;
     private final EzyInputStreamLoader inputStreamLoader;
     private final EzySingletonFactory singletonFactory;
@@ -99,6 +98,7 @@ public class MediaControllerService extends EzyLoggable {
             filePart,
             avatar
         );
+        //noinspection ConstantConditions
         String submittedFileName = filePart.getSubmittedFileName();
         String fileExtension = fileMetadata.getExtension();
         String containerFolder = fileMetadata.getMediaType().getFolder();

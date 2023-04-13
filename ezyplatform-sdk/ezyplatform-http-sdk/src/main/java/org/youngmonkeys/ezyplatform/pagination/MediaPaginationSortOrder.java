@@ -16,4 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
-public interface UserPaginationParameter extends CommonPaginationParameter {}
+public enum MediaPaginationSortOrder {
+    ID_DESC
+}

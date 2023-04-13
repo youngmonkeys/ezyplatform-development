@@ -16,4 +16,4 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
-public interface UserPaginationParameter extends CommonPaginationParameter {}
+public interface MediaPaginationParameter extends CommonPaginationParameter {}

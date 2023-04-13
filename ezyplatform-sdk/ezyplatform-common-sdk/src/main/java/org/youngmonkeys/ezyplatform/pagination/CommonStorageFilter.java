@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 youngmonkeys.org
+ * Copyright 2022 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,17 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
-public interface UserPaginationParameter extends CommonPaginationParameter {}
+import org.youngmonkeys.ezyplatform.data.StorageFilter;
+
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+
+public interface CommonStorageFilter extends StorageFilter {
+
+    default void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {}
+
+    default String matchingCondition() {
+        return EMPTY_STRING;
+    }
+}

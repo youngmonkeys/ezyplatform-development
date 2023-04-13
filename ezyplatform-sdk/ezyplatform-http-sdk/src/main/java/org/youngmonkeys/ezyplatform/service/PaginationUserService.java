@@ -25,7 +25,7 @@ import org.youngmonkeys.ezyplatform.pagination.UserPaginationParameter;
 import org.youngmonkeys.ezyplatform.pagination.UserPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.repo.PaginationUserRepository;
 
-public class PaginationUserService extends DefaultPaginationService<
+public class PaginationUserService extends CommonPaginationService<
     UserModel,
     UserFilter,
     UserPaginationParameter,
@@ -33,16 +33,14 @@ public class PaginationUserService extends DefaultPaginationService<
     User> {
 
     private final DefaultEntityToModelConverter entityToModelConverter;
-    private final UserPaginationParameterConverter userPaginationParameterConverter;
 
     public PaginationUserService(
         PaginationUserRepository repository,
         DefaultEntityToModelConverter entityToModelConverter,
         UserPaginationParameterConverter userPaginationParameterConverter
     ) {
-        super(repository);
+        super(repository, userPaginationParameterConverter);
         this.entityToModelConverter = entityToModelConverter;
-        this.userPaginationParameterConverter = userPaginationParameterConverter;
     }
 
     @Override
@@ -51,25 +49,7 @@ public class PaginationUserService extends DefaultPaginationService<
     }
 
     @Override
-    protected String serializeToPageToken(
-        UserPaginationParameter paginationParameter,
-        UserModel model
-    ) {
-        return userPaginationParameterConverter.serialize(
-            paginationParameter.sortOrder(),
-            model
-        );
-    }
-
-    @Override
-    protected UserPaginationParameter deserializePageToken(String value) {
-        return userPaginationParameterConverter.deserialize(
-            value
-        );
-    }
-
-    @Override
     protected UserPaginationParameter defaultPaginationParameter() {
-        return new IdDescUserPaginationParameter(0L);
+        return new IdDescUserPaginationParameter();
     }
 }

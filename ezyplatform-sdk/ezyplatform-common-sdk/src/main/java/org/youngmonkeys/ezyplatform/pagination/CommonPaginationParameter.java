@@ -16,4 +16,13 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
-public interface UserPaginationParameter extends CommonPaginationParameter {}
+import org.youngmonkeys.ezyplatform.data.PaginationParameter;
+
+public interface CommonPaginationParameter extends PaginationParameter {
+
+    String paginationCondition(boolean nextPage);
+
+    String orderBy(boolean nextPage);
+
+    String sortOrder();
+}

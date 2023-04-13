@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 youngmonkeys.org
+ * Copyright 2022 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,6 +14,22 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.pagination;
+package org.youngmonkeys.ezyplatform.repo;
 
-public interface UserPaginationParameter extends CommonPaginationParameter {}
+import com.tvd12.ezyfox.database.annotation.EzyRepository;
+import org.youngmonkeys.ezyplatform.entity.Media;
+import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
+import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameter;
+
+@EzyRepository
+public class PaginationMediaRepository extends CommonPaginationRepository<
+    MediaFilter,
+    MediaPaginationParameter,
+    Long,
+    Media> {
+
+    @Override
+    protected Class<Media> getEntityType() {
+        return Media.class;
+    }
+}

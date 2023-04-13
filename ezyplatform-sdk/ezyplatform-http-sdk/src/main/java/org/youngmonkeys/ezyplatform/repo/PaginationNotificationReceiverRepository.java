@@ -16,18 +16,20 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
-import org.youngmonkeys.ezyplatform.entity.User;
-import org.youngmonkeys.ezyplatform.pagination.UserFilter;
-import org.youngmonkeys.ezyplatform.pagination.UserPaginationParameter;
+import com.tvd12.ezyfox.database.annotation.EzyRepository;
+import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
+import org.youngmonkeys.ezyplatform.pagination.NotificationFilter;
+import org.youngmonkeys.ezyplatform.pagination.NotificationPaginationParameter;
 
-public class PaginationUserRepository extends CommonPaginationRepository<
-    UserFilter,
-    UserPaginationParameter,
+@EzyRepository
+public class PaginationNotificationReceiverRepository extends CommonPaginationRepository<
+    NotificationFilter,
+    NotificationPaginationParameter,
     Long,
-    User> {
+    NotificationReceiver> {
 
     @Override
-    protected Class<User> getEntityType() {
-        return User.class;
+    protected Class<NotificationReceiver> getEntityType() {
+        return NotificationReceiver.class;
     }
 }
