@@ -18,11 +18,12 @@ package org.youngmonkeys.ezyplatform.manager;
 
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyfox.security.BCrypt;
+import com.tvd12.ezyfox.util.EzyLoggable;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PASSWORD_SALT;
 
 @EzySingleton
-public class PasswordManager {
+public class PasswordManager extends EzyLoggable {
 
     public String hashPassword(String password) {
         return BCrypt.hashpw(password, PASSWORD_SALT);
@@ -32,6 +33,15 @@ public class PasswordManager {
         String password,
         String hashedPassword
     ) {
-        return BCrypt.checkpw(password, hashedPassword);
+        try {
+            return BCrypt.checkpw(password, hashedPassword);
+        } catch (Exception e) {
+            logger.info(
+                "password is not matching cause by: {} ({})",
+                e.getClass(),
+                e.getMessage()
+            );
+            return false;
+        }
     }
 }

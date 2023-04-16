@@ -28,7 +28,6 @@ public abstract class AbstractEventHandler<D, R>
         try {
             return doHandleEventData(data);
         } catch (Exception e) {
-            logger.info("handle event error", e);
             return handleException(e);
         }
     }
@@ -39,6 +38,10 @@ public abstract class AbstractEventHandler<D, R>
     }
 
     protected void processEventData(D data) {}
+
+    protected R handleException(D data, Exception e) {
+        return handleException(e);
+    }
 
     protected R handleException(Exception e) {
         return null;
