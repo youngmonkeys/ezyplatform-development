@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyhttp.server.core.util.HttpServletRequests;
 import com.tvd12.ezyhttp.server.core.view.View;
 import lombok.Setter;
+import org.youngmonkeys.ezyplatform.model.MediaNameModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.service.MediaService;
 import org.youngmonkeys.ezyplatform.service.UserService;
@@ -71,8 +72,20 @@ public class WebViewDecorator extends WebViewLanguageDecorator {
             
             String avatarImageName = view.getVariable("avatarImageName");
             if (avatarImageName == null) {
-                avatarImageName = mediaService.getMediaName(user.getAvatarImageId());
+                MediaNameModel avatarImageModel = view.getVariable(
+                    "avatarImageModel"
+                );
+                if (avatarImageModel == null) {
+                    avatarImageModel = mediaService.getMediaNameModelById(
+                        user.getAvatarImageId()
+                    );
+                }
+                if (avatarImageModel == null) {
+                    avatarImageModel = MediaNameModel.builder().build();
+                }
+                avatarImageName = avatarImageModel.getName();
                 view.setVariable("avatarImageName", avatarImageName);
+                view.setVariable("avatarImageModel", avatarImageModel);
             }
             decorateWithUserData(request, view, user);
         }
