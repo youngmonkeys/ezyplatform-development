@@ -79,6 +79,32 @@ public final class Strings {
         return false;
     }
 
+    public static String substringLast(
+        String str,
+        int lastIndex,
+        int length
+    ) {
+        int from = lastIndex > length ? lastIndex - length : 0;
+        return str.substring(from, lastIndex);
+    }
+
+    public static boolean endsWith(
+        String str,
+        int endIndex,
+        String endStr
+    ) {
+        int fromIndex = endIndex - endStr.length();
+        if (fromIndex < 0) {
+            return false;
+        }
+        for (int i = fromIndex, k = 0; i < endIndex; ++i, ++k) {
+            if (str.charAt(i) != endStr.charAt(k)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static String hideSensitiveInformation(
         String str,
         int startHidden,
@@ -95,12 +121,6 @@ public final class Strings {
             builder.append(str.substring(end));
         }
         return builder.toString();
-    }
-
-    public static String escapeScriptTag(String content) {
-        return content
-            .replace("<script>", "&lt;script&gt;")
-            .replace("</script>", "&lt;/script&gt;");
     }
 
     public static String emptyIfNull(String str) {

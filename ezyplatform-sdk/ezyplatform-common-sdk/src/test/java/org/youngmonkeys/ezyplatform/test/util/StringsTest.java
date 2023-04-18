@@ -58,6 +58,35 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void substringLastTest() {
+        Asserts.assertEquals(
+            substringLast("hello", 3, 2),
+            "el"
+        );
+
+        Asserts.assertEquals(
+            substringLast("hello", 3, 5),
+            "hel"
+        );
+    }
+
+    @Test
+    public void endsWithTest() {
+        Asserts.assertTrue(
+            endsWith("hello", 3, "hel")
+        );
+        Asserts.assertFalse(
+            endsWith("hello", 3, "hol")
+        );
+        Asserts.assertFalse(
+            endsWith("hello", 3, "hell")
+        );
+        Asserts.assertFalse(
+            endsWith("hello", 1, "he")
+        );
+    }
+
+    @Test
     public void hideSensitiveInformationTest() {
         // given
         String str = "youngmonkeys";
