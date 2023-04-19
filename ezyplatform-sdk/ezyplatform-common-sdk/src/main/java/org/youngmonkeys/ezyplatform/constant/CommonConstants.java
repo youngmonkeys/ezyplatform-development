@@ -230,7 +230,7 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_PAGE_CONTENT_TYPE = "pageContentType";
     public static final String VIEW_VARIABLE_PAGE_DESCRIPTION = "pageDescription";
     public static final String VIEW_VARIABLE_PAGE_VIEW_PORT = "pageViewPort";
-    public static final String VIEW_VARIABLE_SITE_LOCAL = "siteLocal";
+    public static final String VIEW_VARIABLE_SITE_LOCAL = "siteLocale";
     public static final String VIEW_VARIABLE_PAGE_URL = "pageUrl";
     public static final String VIEW_VARIABLE_SITE_NAME = "siteName";
     public static final String VIEW_VARIABLE_SITE_PUBLISHER = "sitePublisher";
