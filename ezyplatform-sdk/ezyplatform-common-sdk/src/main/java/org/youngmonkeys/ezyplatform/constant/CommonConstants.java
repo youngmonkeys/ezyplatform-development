@@ -208,7 +208,8 @@ public final class CommonConstants {
             Sets.newHashSet(
                 ContentType.IMAGE_PNG.getValue(),
                 ContentType.IMAGE_JPG.getValue(),
-                ContentType.IMAGE_JPEG.getValue()
+                ContentType.IMAGE_JPEG.getValue(),
+                ContentType.ICON.getValue()
             )
         );
     public static final Set<String> DEFAULT_AUTO_PASS_URIS =
