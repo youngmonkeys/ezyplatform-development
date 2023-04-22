@@ -33,7 +33,6 @@ import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -174,7 +173,7 @@ public class DefaultMediaService implements MediaService {
     public ImageSize getMediaImageSize(
         String imageName,
         MediaType mediaType
-    ) throws IOException {
+    ) {
         File mediaFile = fileSystemManager.getMediaFilePath(
             mediaType.getFolder(),
             imageName
@@ -188,7 +187,7 @@ public class DefaultMediaService implements MediaService {
     @Override
     public ImageSize getMediaImageSize(
         long mediaId
-    ) throws IOException {
+    ) {
         if (mediaId <= 0) {
             throw new ResourceNotFoundException("media");
         }

@@ -37,7 +37,7 @@ public final class ImageProxy {
 
     public static ImageSize getImageSize(
         Path imageFilePath
-    ) throws IOException {
+    ) {
         return getImageSize(imageFilePath.toFile());
     }
 
@@ -49,7 +49,7 @@ public final class ImageProxy {
 
     public static ImageSize getImageSize(
         File imageFile
-    ) throws IOException {
+    ) {
         try (ImageInputStream inputStream =
                 ImageIO.createImageInputStream(imageFile)
         ) {
