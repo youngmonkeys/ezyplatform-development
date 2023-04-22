@@ -78,6 +78,9 @@ public final class CommonConstants {
     public static final int MAX_LENGTH_SEARCH_KEYWORD = 50;
     public static final int MAX_SEARCH_KEYWORD_WORDS = 6;
 
+    public static final int LIMIT_1500_RECORDS = 1500;
+    public static final int LIMIT_3000_RECORDS = 3000;
+
     public static final int MIN_PAGE_SIZE = 1;
     public static final int MAX_PAGE_SIZE = 300;
     public static final int WEB_MAX_PAGE_SIZE = 100;
