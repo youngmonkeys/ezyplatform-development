@@ -16,9 +16,57 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import com.tvd12.ezyfox.collect.Sets;
+import org.youngmonkeys.ezyplatform.exception.InvalidHtmlContentException;
+
+import java.util.ArrayDeque;
+import java.util.Collections;
+import java.util.Deque;
+import java.util.Set;
+
+import static org.youngmonkeys.ezyplatform.util.Strings.endsWith;
+import static org.youngmonkeys.ezyplatform.util.Strings.substringLast;
+
 public final class Htmls {
 
     public static final String TAG_NAME_SCRIPT = "script";
+    public static final String HTML_COMMENT_TAG_OPEN = "!--";
+    public static final String HTML_COMMENT_TAG_CLOSE = "--";
+    public static final Set<String> HTML_TAGS = Collections
+        .unmodifiableSet(
+            Sets.newHashSet(
+                "!DOCTYPE", "abbreviation", "acronym",
+                "address", "anchor", "applet", "area", "article",
+                "aside", "audio", "base", "basefont", "bdi", "bdo",
+                "bgsound", "big", "blockquote", "b", "body", "bold", "break",
+                "button", "caption", "canvas", "center", "cite", "code",
+                "colgroup", "column", "comment", "data", "datalist",
+                "dd", "define", "delete", "details", "dialog",
+                "dir", "div", "dl", "dt", "em", "embed", "fieldset",
+                "figcaption", "figure", "font", "footer", "form",
+                "frame", "frameset", "head", "header", "heading",
+                "hgroup", "hr", "html", "h1", "h2", "h3", "h4", "h5",
+                "h6", "Iframes", "i", "image", "input",
+                "ins", "isindex", "italic", "kbd", "keygen", "label",
+                "legend", "li", "list", "main", "mark", "marquee", "map",
+                "menuitem", "meta", "meter", "nav", "nobreak", "noembed",
+                "noscript", "object", "ol", "optgroup", "option", "output",
+                "p", "paragraphs", "param", "phrase", "pre", "progress",
+                "q", "rp", "rt", "ruby", "s", "samp", "script", "section",
+                "small", "source", "spacer", "span", "strike", "strong",
+                "style", "sub", "sup", "summary", "svg", "table", "tbody",
+                "td", "template", "tfoot", "th", "thead", "time", "title",
+                "tr", "track", "tt", "ul", "underline", "var", "video",
+                "wbr", "xmp"
+            )
+        );
+    public static final Set<String> NO_CLOSED_TAGS = Collections
+        .unmodifiableSet(
+            Sets.newHashSet(
+                "area", "base", "br", "col", "command", "!DOCTYPE", "embed", "hr",
+                "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"
+            )
+        );
 
     private Htmls() {}
 
@@ -52,6 +100,12 @@ public final class Htmls {
             }
         }
         return false;
+    }
+
+    public static String escapeHtmlTag(String content) {
+        return content
+            .replace("<", "&lt")
+            .replace(">", "&gt");
     }
 
     @SuppressWarnings("MethodLength")
@@ -120,5 +174,272 @@ public final class Htmls {
             }
         }
         return answer.toString();
+    }
+
+    @SuppressWarnings("MethodLength")
+    public static void validateHtmlContent(String content) {
+        Deque<String> openTags = new ArrayDeque<>();
+        int contentLength = content.length();
+        for (int i = 0; i < contentLength; ++i) {
+            char ch = content.charAt(i);
+            if (ch != '<') {
+                continue;
+            }
+
+            // for case <<<script
+            for (++i; i < contentLength; ++i) {
+                ch = content.charAt(i);
+                if (ch != '<') {
+                    break;
+                }
+            }
+
+            // for case <   script
+            boolean isOpenTag = true;
+            for (; i < contentLength; ++i) {
+                ch = content.charAt(i);
+                if (ch == '/') {
+                    isOpenTag = false;
+                }
+                if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '/') {
+                    break;
+                }
+            }
+            StringBuilder tagNameBuilder = new StringBuilder();
+            for (; i < contentLength; ++i) {
+                ch = content.charAt(i);
+                if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '>') {
+                    char nextCh = i < contentLength - 1
+                        ? content.charAt(i + 1)
+                        : 0;
+                    if (ch != '/' || nextCh != '>') {
+                        tagNameBuilder.append(ch);
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            String tagName = tagNameBuilder.toString();
+
+            // check script tag
+            if (tagName.equals(TAG_NAME_SCRIPT)) {
+                boolean startQuote = false;
+                boolean startDoubleQuotes = false;
+                for (++i; i < contentLength; ++i) {
+                    ch = content.charAt(i);
+                    char beforeCh = content.charAt(i - 1);
+                    if (ch == '\'' && beforeCh != '\\') {
+                        if (startQuote) {
+                            startQuote = false;
+                        } else if (!startDoubleQuotes) {
+                            startQuote = true;
+                        }
+                    } else if (ch == '"' && beforeCh != '\\') {
+                        if (startDoubleQuotes) {
+                            startDoubleQuotes = false;
+                        } else if (!startQuote) {
+                            startDoubleQuotes = true;
+                        }
+                    } else if (ch == '>'
+                        && !startQuote
+                        && !startDoubleQuotes
+                        && endsWith(content, i, TAG_NAME_SCRIPT)
+                    ) {
+                        ++i;
+                        break;
+                    }
+                }
+                continue;
+            }
+
+            // check comment
+            if (tagName.startsWith(HTML_COMMENT_TAG_OPEN)) {
+                for (++i; i < contentLength; ++i) {
+                    ch = content.charAt(i);
+                    if (ch == '>'
+                        && endsWith(content, i, HTML_COMMENT_TAG_CLOSE)
+                    ) {
+                        ++i;
+                        break;
+                    }
+                }
+                continue;
+            }
+
+            // check tag content
+            boolean startAttribute = false;
+            boolean startAttributeDoubleQuotes = false;
+            for (; i < contentLength; ++i) {
+                ch = content.charAt(i);
+                char beforeCh = content.charAt(i - 1);
+                char nextCh = i < contentLength - 1
+                    ? content.charAt(i + 1)
+                    : 0;
+                if ((ch == '/' && nextCh == '>') || ch == '>') {
+                    if (startAttribute) {
+                        throw new InvalidHtmlContentException(
+                            tagName,
+                            "incomplete_tag_attribute",
+                            i,
+                            subNearbyErrorContent(content, i)
+                        );
+                    }
+                    break;
+                } else if (ch == '=') {
+                    if (startAttribute && !startAttributeDoubleQuotes) {
+                        throw new InvalidHtmlContentException(
+                            tagName,
+                            "invalid_tag_attribute",
+                            i,
+                            subNearbyErrorContent(content, i)
+                        );
+                    }
+                    startAttribute = true;
+                } else if (ch == '"') {
+                    if (!startAttribute) {
+                        throw new InvalidHtmlContentException(
+                            tagName,
+                            "invalid_tag_attribute",
+                            i,
+                            subNearbyErrorContent(content, i)
+                        );
+                    }
+                    if (beforeCh == '\\' && !startAttributeDoubleQuotes) {
+                        throw new InvalidHtmlContentException(
+                            tagName,
+                            "invalid_tag_attribute",
+                            i,
+                            subNearbyErrorContent(content, i)
+                        );
+                    } else if (beforeCh != '\\') {
+                        startAttributeDoubleQuotes = !startAttributeDoubleQuotes;
+                        if (!startAttributeDoubleQuotes) {
+                            startAttribute = false;
+                        }
+                    }
+                } else if (startAttribute
+                    && !startAttributeDoubleQuotes
+                    && ch != ' '
+                    && ch != '\t'
+                    && ch != '\n'
+                ) {
+                    throw new InvalidHtmlContentException(
+                        tagName,
+                        "tag_attribute_must_start_with_double_quotes",
+                        i,
+                        subNearbyErrorContent(content, i)
+                    );
+                }
+            }
+
+            // check close tag
+            boolean hasGtSign = false;
+            boolean selfCloseTag = false;
+            for (; i < contentLength; ++i) {
+                ch = content.charAt(i);
+                if (ch == '/') {
+                    selfCloseTag = true;
+                } else if (ch == '>') {
+                    hasGtSign = true;
+                    break;
+                } else if (selfCloseTag) {
+                    throw new InvalidHtmlContentException(
+                        tagName,
+                        "invalid_tag_content",
+                        i,
+                        subNearbyErrorContent(content, i)
+                    );
+                } else if (ch == '"') {
+                    char beforeCh;
+                    boolean hasDoubleQuotationMarks = false;
+                    for (++i; i < contentLength; ++i) {
+                        beforeCh = content.charAt(i - 1);
+                        ch = content.charAt(i);
+                        if (ch == '"' && beforeCh != '\\') {
+                            hasDoubleQuotationMarks = true;
+                            break;
+                        }
+                    }
+                    if (!hasDoubleQuotationMarks) {
+                        throw new InvalidHtmlContentException(
+                            tagName,
+                            "missing_close_double_quotation_marks",
+                            i,
+                            subNearbyErrorContent(content, i)
+                        );
+                    }
+                }
+            }
+            if ((selfCloseTag && hasGtSign) || !HTML_TAGS.contains(tagName)) {
+                continue;
+            }
+            if (hasGtSign) {
+                String openTag = openTags.peek();
+                if (isOpenTag) {
+                    openTags.push(tagName);
+                } else {
+                    if (openTag == null) {
+                        throw new InvalidHtmlContentException(
+                            tagName,
+                            "missing_open_tag",
+                            i,
+                            subNearbyErrorContent(content, i)
+                        );
+                    }
+                    while (NO_CLOSED_TAGS.contains(openTag)) {
+                        openTags.pop();
+                        openTag = openTags.peek();
+                    }
+                    if (openTag != null) {
+                        if (openTag.equals(tagName)) {
+                            openTags.pop();
+                        } else {
+                            throw new InvalidHtmlContentException(
+                                openTag,
+                                "missing_close_tag",
+                                i,
+                                subNearbyErrorContent(content, i)
+                            );
+                        }
+                    }
+                }
+            } else {
+                throw new InvalidHtmlContentException(
+                    tagName,
+                    "missing_the_greater_than_sign_to_close_tag",
+                    i,
+                    subNearbyErrorContent(content, i)
+                );
+            }
+        }
+        while (openTags.size() > 0) {
+            String openTag = openTags.peek();
+            if (NO_CLOSED_TAGS.contains(openTag)) {
+                openTags.pop();
+            } else {
+                break;
+            }
+        }
+        String openTag = openTags.peek();
+        if (openTag != null) {
+            throw new InvalidHtmlContentException(
+                openTag,
+                "missing_close_tag",
+                contentLength,
+                ""
+            );
+        }
+    }
+
+    private static String subNearbyErrorContent(
+        String content,
+        int position
+    ) {
+        return substringLast(
+            content,
+            position,
+            120
+        );
     }
 }

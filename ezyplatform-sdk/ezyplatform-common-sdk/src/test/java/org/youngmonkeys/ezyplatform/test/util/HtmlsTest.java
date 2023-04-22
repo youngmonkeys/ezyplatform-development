@@ -19,8 +19,7 @@ package org.youngmonkeys.ezyplatform.test.util;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
-import static org.youngmonkeys.ezyplatform.util.Htmls.containsScriptTag;
-import static org.youngmonkeys.ezyplatform.util.Htmls.escapeScriptTag;
+import static org.youngmonkeys.ezyplatform.util.Htmls.*;
 
 public class HtmlsTest {
 
@@ -128,5 +127,49 @@ public class HtmlsTest {
         Asserts.assertEquals(escapeScriptTag("< scrip hello"), "< scrip hello");
         Asserts.assertEquals(escapeScriptTag("<"), "<");
         Asserts.assertEquals(escapeScriptTag("<script />"), "&ltscript /&gt");
+    }
+
+    @Test
+    public void validateHtmlContentTest() throws Exception {
+        validateHtmlContent("<p>hello world</p>");
+        validateHtmlContent(
+            "<a value = \"hello world\"></a>"
+        );
+        validateHtmlContent(
+            "<a value =\"\\\"\\\"hello''world\"></a>"
+        );
+        validateHtmlContent(
+            "1 < 2 and 2 > 1"
+        );
+        validateHtmlContent(
+            "<link><a></a></link>"
+        );
+        validateHtmlContent(
+            "<link>hello</link>"
+        );
+        validateHtmlContent(
+            "<br/>"
+        );
+        validateHtmlContent(
+            "<!--hello-->"
+        );
+        validateHtmlContent(
+            "<!-- hello -->"
+        );
+        validateHtmlContent(
+            "<p>hello</p>"
+        );
+        validateHtmlContent(
+            "<p class=\"text-primary\">hello</p>"
+        );
+        validateHtmlContent(
+            "<p><span class=\"text-primary\">hello</span></p>"
+        );
+        validateHtmlContent(
+            "<img src=\"img.png\"><a>hello</a>"
+        );
+        validateHtmlContent(
+            "<img src=\"img.png\"><br><br></br><a>hello</a><p />"
+        );
     }
 }

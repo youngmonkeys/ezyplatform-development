@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.util;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public final class CollectionFunctions {
 
@@ -28,5 +29,13 @@ public final class CollectionFunctions {
         return collection == null || collection.size() > 0
             ? collection
             : null;
+    }
+
+    public static <E> Collection<E> toEmptyIfNull(
+        Collection<E> collection
+    ) {
+        return collection == null
+            ? Collections.emptyList()
+            : collection;
     }
 }
