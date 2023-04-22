@@ -35,6 +35,7 @@ import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.io.FolderProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.*;
+import org.youngmonkeys.ezyplatform.pagination.DefaultMediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.service.MediaService;
@@ -316,7 +317,10 @@ public class MediaControllerService extends EzyLoggable {
         commonValidator.validatePageSize(limit);
         return PaginationModelFetchers.getPaginationModel(
             paginationMediaService,
-            ownerId,
+            DefaultMediaFilter
+                .builder()
+                .ownerUserId(ownerId)
+                .build(),
             nextPageToken,
             prevPageToken,
             lastPage,

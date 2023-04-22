@@ -37,6 +37,10 @@ public class DefaultMediaFilter implements MediaFilter {
         return answer.build();
     }
 
+    public static Builder<?> builder() {
+        return new Builder<>();
+    }
+
     @SuppressWarnings("unchecked")
     public static class Builder<T extends Builder<T>>
         implements EzyBuilder<DefaultMediaFilter> {
