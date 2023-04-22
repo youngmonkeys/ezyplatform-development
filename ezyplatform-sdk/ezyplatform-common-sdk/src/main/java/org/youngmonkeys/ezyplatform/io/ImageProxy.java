@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.io;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 
 import javax.imageio.ImageIO;
@@ -27,6 +29,9 @@ import java.nio.file.Path;
 import java.util.Iterator;
 
 public final class ImageProxy {
+
+    private static final Logger LOGGER = LoggerFactory
+        .getLogger(ImageProxy.class);
 
     private ImageProxy() {}
 
@@ -63,7 +68,18 @@ public final class ImageProxy {
                     reader.dispose();
                 }
             }
+        } catch (Throwable e) {
+            LOGGER.info(
+                "can not read size of image: {}, error: {} ({})",
+                imageFile,
+                e.getClass(),
+                e.getMessage()
+            );
         }
-        throw new IOException("there is no reader for image file: " + imageFile);
+        return new ImageSize(
+            0,
+            0,
+            imageFile.length()
+        );
     }
 }
