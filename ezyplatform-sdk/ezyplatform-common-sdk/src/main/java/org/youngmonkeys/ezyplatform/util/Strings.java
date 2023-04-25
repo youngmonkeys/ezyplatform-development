@@ -79,6 +79,13 @@ public final class Strings {
         return false;
     }
 
+    public static String substring(String str, int from, int to) {
+        return str.substring(
+            Math.max(from, 0),
+            Math.min(to, str.length())
+        );
+    }
+
     public static String substringLast(
         String str,
         int lastIndex,

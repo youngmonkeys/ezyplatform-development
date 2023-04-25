@@ -58,6 +58,18 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void substringTest() {
+        Asserts.assertEquals(
+            substring("hello", -1, 6),
+            "hello"
+        );
+        Asserts.assertEquals(
+            substring("hello", 1, 3),
+            "el"
+        );
+    }
+
+    @Test
     public void substringLastTest() {
         Asserts.assertEquals(
             substringLast("hello", 3, 2),
