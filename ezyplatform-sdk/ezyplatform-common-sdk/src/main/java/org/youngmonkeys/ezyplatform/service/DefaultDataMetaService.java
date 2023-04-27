@@ -212,7 +212,8 @@ public class DefaultDataMetaService implements DataMetaService {
             .collect(
                 Collectors.toMap(
                     DataMeta::getMetaKey,
-                    DataMeta::getMetaValue
+                    DataMeta::getMetaValue,
+                    (o, n) -> n
                 )
             );
     }
@@ -235,7 +236,8 @@ public class DefaultDataMetaService implements DataMetaService {
             .collect(
                 Collectors.toMap(
                     DataMeta::getMetaValue,
-                    DataMeta::getDataId
+                    DataMeta::getDataId,
+                    (o, n) -> n
                 )
             );
     }
@@ -259,7 +261,8 @@ public class DefaultDataMetaService implements DataMetaService {
             .collect(
                 Collectors.toMap(
                     DataMeta::getDataId,
-                    DataMeta::getMetaValue
+                    DataMeta::getMetaValue,
+                    (o, n) -> n
                 )
             );
     }

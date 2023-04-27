@@ -35,7 +35,7 @@ public final class Htmls {
     public static final Set<String> HTML_TAGS = Collections
         .unmodifiableSet(
             Sets.newHashSet(
-                "!DOCTYPE", "abbreviation", "acronym",
+                "!DOCTYPE", "a", "abbreviation", "acronym",
                 "address", "anchor", "applet", "area", "article",
                 "aside", "audio", "base", "basefont", "bdi", "bdo",
                 "bgsound", "big", "blockquote", "b", "body", "bold", "break",
@@ -46,7 +46,7 @@ public final class Htmls {
                 "figcaption", "figure", "font", "footer", "form",
                 "frame", "frameset", "head", "header", "heading",
                 "hgroup", "hr", "html", "h1", "h2", "h3", "h4", "h5",
-                "h6", "Iframes", "i", "image", "input",
+                "h6", "iframe", "i", "image", "input",
                 "ins", "isindex", "italic", "kbd", "keygen", "label",
                 "legend", "li", "list", "main", "mark", "marquee", "map",
                 "menuitem", "meta", "meter", "nav", "nobreak", "noembed",
@@ -250,6 +250,15 @@ public final class Htmls {
                         break;
                     }
                 }
+                continue;
+            }
+
+            if (tagName.isEmpty()) {
+                continue;
+            }
+
+            char firstCh = tagName.charAt(0);
+            if ((firstCh < 'a' || firstCh > 'z') && (firstCh < 'A' || firstCh > 'Z')) {
                 continue;
             }
 

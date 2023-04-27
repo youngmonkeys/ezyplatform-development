@@ -171,6 +171,18 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void toDashLowerCaseWithoutSpecialCharactersTest() {
+        // given
+        String str = "hello !\"#$%&'()*+,-./:;<=>?@[\\\\]^_`{|}~ world \t I'm\nhere";
+
+        // when
+        String actual = toLowerDashCaseWithoutSpecialCharacters(str);
+
+        // then
+        Asserts.assertEquals(actual,"hello---world---im-here");
+    }
+
+    @Test
     public void toBigIntegerOrZeroTest() {
         Asserts.assertEquals(
             toBigIntegerOrZero("1"),

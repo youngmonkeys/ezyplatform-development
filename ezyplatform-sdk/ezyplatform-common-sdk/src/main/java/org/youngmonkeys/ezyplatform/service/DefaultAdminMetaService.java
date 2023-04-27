@@ -188,7 +188,8 @@ public class DefaultAdminMetaService implements AdminMetaService {
             .collect(
                 Collectors.toMap(
                     AdminMeta::getMetaKey,
-                    AdminMeta::getMetaValue
+                    AdminMeta::getMetaValue,
+                    (o, n) -> n
                 )
             );
     }
@@ -209,7 +210,8 @@ public class DefaultAdminMetaService implements AdminMetaService {
             .collect(
                 Collectors.toMap(
                     AdminMeta::getMetaValue,
-                    AdminMeta::getAdminId
+                    AdminMeta::getAdminId,
+                    (o, n) -> n
                 )
             );
     }
@@ -231,7 +233,8 @@ public class DefaultAdminMetaService implements AdminMetaService {
             .collect(
                 Collectors.toMap(
                     AdminMeta::getAdminId,
-                    AdminMeta::getMetaValue
+                    AdminMeta::getMetaValue,
+                    (o, n) -> n
                 )
             );
     }

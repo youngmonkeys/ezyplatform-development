@@ -188,7 +188,8 @@ public class DefaultUserMetaService implements UserMetaService {
             .collect(
                 Collectors.toMap(
                     UserMeta::getMetaKey,
-                    UserMeta::getMetaValue
+                    UserMeta::getMetaValue,
+                    (o, n) -> n
                 )
             );
     }
@@ -209,7 +210,8 @@ public class DefaultUserMetaService implements UserMetaService {
             .collect(
                 Collectors.toMap(
                     UserMeta::getMetaValue,
-                    UserMeta::getUserId
+                    UserMeta::getUserId,
+                    (o, n) -> n
                 )
             );
     }
@@ -231,7 +233,8 @@ public class DefaultUserMetaService implements UserMetaService {
             .collect(
                 Collectors.toMap(
                     UserMeta::getUserId,
-                    UserMeta::getMetaValue
+                    UserMeta::getMetaValue,
+                    (o, n) -> n
                 )
             );
     }

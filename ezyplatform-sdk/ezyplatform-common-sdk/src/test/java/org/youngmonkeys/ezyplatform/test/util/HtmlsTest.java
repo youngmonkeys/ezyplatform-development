@@ -171,5 +171,18 @@ public class HtmlsTest {
         validateHtmlContent(
             "<img src=\"img.png\"><br><br></br><a>hello</a><p />"
         );
+        validateHtmlContent(
+            "<img src=\"img.png\"><br><br></br><a>hello</a><p />"
+        );
+        validateHtmlContent(
+            "for b in bytes_:\n" +
+                "        for i in range(8):\n" +
+                "            bit = ((b >> (7 - i) & 1) == 1)\n" +
+                "            c15 = ((crc >> 15 & 1) == 1)\n" +
+                "            crc <<= 1\n" +
+                "            if c15 ^ bit:\n" +
+                "                crc ^= polynomial\n" +
+                "    return format(crc & 0xFFFF, \"x\")"
+        );
     }
 }

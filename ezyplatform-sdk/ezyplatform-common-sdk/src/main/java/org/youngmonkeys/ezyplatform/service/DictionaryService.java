@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import static org.youngmonkeys.ezyplatform.util.Strings.toLowerDashCaseWithoutSpecialCharacters;
+
 public interface DictionaryService {
 
     String translate(String input);
@@ -30,9 +32,8 @@ public interface DictionaryService {
     default String translateToStringInDashCase(
         String input
     ) {
-        return translateToAsciiString(input)
-            .toLowerCase()
-            .replace('\t', '-')
-            .replace(' ', '-');
+        return toLowerDashCaseWithoutSpecialCharacters(
+            translateToAsciiString(input)
+        );
     }
 }

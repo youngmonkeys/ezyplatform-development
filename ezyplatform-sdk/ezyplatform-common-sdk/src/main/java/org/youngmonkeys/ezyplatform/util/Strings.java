@@ -24,6 +24,9 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
 public final class Strings {
 
+    public static final String SPECIAL_CHARACTERS =
+        "!\"#$%&'()*+,-./:;<=>?@[\\\\]^_`{|}~";
+
     private Strings() {}
 
     public static String from(Object value) {
@@ -132,6 +135,21 @@ public final class Strings {
 
     public static String emptyIfNull(String str) {
         return str != null ? str : EMPTY_STRING;
+    }
+
+    public static String toLowerDashCaseWithoutSpecialCharacters(
+        String str
+    ) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < str.length(); ++i) {
+            char ch = str.charAt(i);
+            if (ch == '-' || ch == ' ' || ch == '\t' || ch == '\n') {
+                builder.append('-');
+            } else if (SPECIAL_CHARACTERS.indexOf(ch) < 0) {
+                builder.append(Character.toLowerCase(ch));
+            }
+        }
+        return builder.toString();
     }
 
     public static BigInteger toBigIntegerOrZero(String str) {
