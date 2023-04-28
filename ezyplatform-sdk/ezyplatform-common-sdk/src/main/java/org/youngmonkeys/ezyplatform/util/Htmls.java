@@ -29,6 +29,7 @@ import static org.youngmonkeys.ezyplatform.util.Strings.substringLast;
 
 public final class Htmls {
 
+    public static final String TAG_NAME_PRE = "pre";
     public static final String TAG_NAME_SCRIPT = "script";
     public static final String HTML_COMMENT_TAG_OPEN = "!--";
     public static final String HTML_COMMENT_TAG_CLOSE = "--";
@@ -208,13 +209,13 @@ public final class Htmls {
             StringBuilder tagNameBuilder = new StringBuilder();
             for (; i < contentLength; ++i) {
                 ch = content.charAt(i);
-                if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '>') {
-                    char nextCh = i < contentLength - 1
-                        ? content.charAt(i + 1)
-                        : 0;
-                    if (ch != '/' || nextCh != '>') {
-                        tagNameBuilder.append(ch);
-                    }
+                if (ch != ' '
+                    && ch != '\t'
+                    && ch != '\n'
+                    && ch != '/'
+                    && ch != '>'
+                ) {
+                    tagNameBuilder.append(ch);
                 } else {
                     break;
                 }
