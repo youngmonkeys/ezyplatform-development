@@ -17,9 +17,14 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.Link;
+
+import java.util.List;
 
 public interface LinkRepository extends EzyDatabaseRepository<Long, Link> {
     
     void deleteByLinkUri(String linkUri);
+
+    List<Link> findByIdGt(long idExclusive, Next next);
 }
