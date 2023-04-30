@@ -23,7 +23,10 @@ import com.tvd12.ezyfox.reflect.EzyGenerics;
 import org.youngmonkeys.ezyplatform.data.PaginationParameter;
 import org.youngmonkeys.ezyplatform.data.StorageFilter;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyCollections.isEmpty;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
@@ -38,6 +41,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
  * @param <E> the entity type
  * @param <R> the query result type
  */
+@SuppressWarnings("MethodCount")
 public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<I, E> {
 
     protected final Class<R> resultType = getResultType();
@@ -152,7 +156,10 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
             if (distinct) {
                 queryString.append(" DISTINCT");
             }
-            List<String> selectionFields = getSelectionFields();
+            List<String> selectionFields = getSelectionFields(
+                filter,
+                paginationParameter
+            );
             if (isEmpty(selectionFields)) {
                 queryString.append(" e");
             } else {
@@ -213,6 +220,17 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
 
     protected String getCountField() {
         return "e";
+    }
+
+    protected List<String> getSelectionFields(
+        F filter,
+        P paginationParameter
+    ) {
+        return getSelectionFields(filter);
+    }
+
+    protected List<String> getSelectionFields(F filter) {
+        return getSelectionFields();
     }
 
     protected List<String> getSelectionFields() {

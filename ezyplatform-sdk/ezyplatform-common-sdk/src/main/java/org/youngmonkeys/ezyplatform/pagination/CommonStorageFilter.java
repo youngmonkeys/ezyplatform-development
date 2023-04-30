@@ -18,9 +18,16 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import org.youngmonkeys.ezyplatform.data.StorageFilter;
 
+import java.util.Collections;
+import java.util.List;
+
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 public interface CommonStorageFilter extends StorageFilter {
+
+    default List<String> selectionFields() {
+        return Collections.emptyList();
+    }
 
     default void decorateQueryStringBeforeWhere(
         StringBuilder queryString

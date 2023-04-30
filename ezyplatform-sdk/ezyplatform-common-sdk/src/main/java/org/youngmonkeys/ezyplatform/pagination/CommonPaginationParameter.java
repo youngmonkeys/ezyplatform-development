@@ -18,7 +18,18 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import org.youngmonkeys.ezyplatform.data.PaginationParameter;
 
+import java.util.Collections;
+import java.util.List;
+
 public interface CommonPaginationParameter extends PaginationParameter {
+
+    default List<String> selectionFields() {
+        return Collections.emptyList();
+    }
+
+    default void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {}
 
     String paginationCondition(boolean nextPage);
 

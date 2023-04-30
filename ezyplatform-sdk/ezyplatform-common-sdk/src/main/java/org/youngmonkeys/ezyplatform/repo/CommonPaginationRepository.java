@@ -16,8 +16,11 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
+import com.tvd12.ezyfox.io.EzyLists;
 import org.youngmonkeys.ezyplatform.pagination.CommonPaginationParameter;
 import org.youngmonkeys.ezyplatform.pagination.CommonStorageFilter;
+
+import java.util.List;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
@@ -40,6 +43,18 @@ public class CommonPaginationRepository<
         return true;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    protected List<String> getSelectionFields(
+        F filter,
+        P paginationParameter
+    ) {
+        return EzyLists.combine(
+            filter.selectionFields(),
+            paginationParameter.selectionFields()
+        );
+    }
+
     @Override
     protected String makeMatchingCondition(F filter) {
         return filter != null
@@ -50,10 +65,14 @@ public class CommonPaginationRepository<
     @Override
     protected void decorateQueryStringBeforeWhere(
         StringBuilder queryString,
-        F filter
+        F filter,
+        P paginationParameter
     ) {
         if (filter != null) {
             filter.decorateQueryStringBeforeWhere(queryString);
+        }
+        if (paginationParameter != null) {
+            paginationParameter.decorateQueryStringBeforeWhere(queryString);
         }
     }
 
