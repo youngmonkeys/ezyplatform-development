@@ -16,7 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.data.TitleContent;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
+
+import java.util.Map;
 
 public interface ContentTemplateService {
 
@@ -30,5 +33,11 @@ public interface ContentTemplateService {
     boolean containsTemplateByTypeAndName(
         String templateType,
         String templateName
+    );
+
+    TitleContent makeTitleContent(
+        String templateType,
+        String templateName,
+        Map<String, Object> parameters
     );
 }

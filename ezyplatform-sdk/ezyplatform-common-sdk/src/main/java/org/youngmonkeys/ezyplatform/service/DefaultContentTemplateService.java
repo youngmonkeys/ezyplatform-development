@@ -18,8 +18,11 @@ package org.youngmonkeys.ezyplatform.service;
 
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.data.TitleContent;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
 import org.youngmonkeys.ezyplatform.repo.ContentTemplateRepository;
+
+import java.util.Map;
 
 @AllArgsConstructor
 public class DefaultContentTemplateService
@@ -57,5 +60,22 @@ public class DefaultContentTemplateService
             templateType,
             templateName
         ) > 0;
+    }
+
+    @Override
+    public TitleContent makeTitleContent(
+        String templateType,
+        String templateName,
+        Map<String, Object> parameters
+    ) {
+        ContentTemplateModel template = getTemplateByTypeAndName(
+            templateType,
+            templateName
+        );
+        return TitleContent.fromTemplates(
+            template.getTitleTemplate(),
+            template.getContentTemplate(),
+            parameters
+        );
     }
 }
