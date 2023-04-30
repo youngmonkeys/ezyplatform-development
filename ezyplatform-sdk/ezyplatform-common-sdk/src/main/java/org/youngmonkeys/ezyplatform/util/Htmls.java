@@ -177,12 +177,38 @@ public final class Htmls {
         return answer.toString();
     }
 
-    @SuppressWarnings("MethodLength")
     public static void validateHtmlContent(String content) {
+        validateHtmlContent(content, true);
+    }
+
+    @SuppressWarnings("MethodLength")
+    public static void validateHtmlContent(
+        String content,
+        boolean acceptMarkdown
+    ) {
         Deque<String> openTags = new ArrayDeque<>();
         int contentLength = content.length();
         for (int i = 0; i < contentLength; ++i) {
             char ch = content.charAt(i);
+            if (ch == '`' && acceptMarkdown) {
+                StringBuilder marks = new StringBuilder();
+                for (; i < contentLength; ++i) {
+                    ch = content.charAt(i);
+                    if (ch == '`') {
+                        marks.append(ch);
+                    } else {
+                        break;
+                    }
+                }
+                i = validateCodeContainerTag(
+                    content,
+                    contentLength,
+                    i,
+                    marks.toString(),
+                    false
+                );
+                continue;
+            }
             if (ch != '<') {
                 continue;
             }
@@ -225,32 +251,13 @@ public final class Htmls {
 
             // check script tag
             if (tagName.equals(TAG_NAME_SCRIPT)) {
-                boolean startQuote = false;
-                boolean startDoubleQuotes = false;
-                for (++i; i < contentLength; ++i) {
-                    ch = content.charAt(i);
-                    char beforeCh = content.charAt(i - 1);
-                    if (ch == '\'' && beforeCh != '\\') {
-                        if (startQuote) {
-                            startQuote = false;
-                        } else if (!startDoubleQuotes) {
-                            startQuote = true;
-                        }
-                    } else if (ch == '"' && beforeCh != '\\') {
-                        if (startDoubleQuotes) {
-                            startDoubleQuotes = false;
-                        } else if (!startQuote) {
-                            startDoubleQuotes = true;
-                        }
-                    } else if (ch == '>'
-                        && !startQuote
-                        && !startDoubleQuotes
-                        && endsWith(content, i, TAG_NAME_SCRIPT)
-                    ) {
-                        ++i;
-                        break;
-                    }
-                }
+                i = validateCodeContainerTag(
+                    content,
+                    contentLength,
+                    i,
+                    TAG_NAME_SCRIPT,
+                    true
+                );
                 continue;
             }
 
@@ -451,5 +458,41 @@ public final class Htmls {
             position,
             120
         );
+    }
+
+    private static int validateCodeContainerTag(
+        String content,
+        int contentLength,
+        int i,
+        String tagName,
+        boolean isScriptTag
+    ) {
+        boolean startQuote = false;
+        boolean startDoubleQuotes = false;
+        for (++i; i < contentLength; ++i) {
+            char ch = content.charAt(i);
+            char beforeCh = content.charAt(i - 1);
+            if (ch == '\'' && beforeCh != '\\') {
+                if (startQuote) {
+                    startQuote = false;
+                } else if (!startDoubleQuotes) {
+                    startQuote = true;
+                }
+            } else if (ch == '"' && beforeCh != '\\') {
+                if (startDoubleQuotes) {
+                    startDoubleQuotes = false;
+                } else if (!startQuote) {
+                    startDoubleQuotes = true;
+                }
+            } else if ((!isScriptTag || ch == '>')
+                && !startQuote
+                && !startDoubleQuotes
+                && endsWith(content, i, tagName)
+            ) {
+                ++i;
+                break;
+            }
+        }
+        return i;
     }
 }

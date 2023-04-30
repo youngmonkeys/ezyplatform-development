@@ -16,8 +16,12 @@
 
 package org.youngmonkeys.ezyplatform.test.util;
 
+import com.tvd12.ezyfox.stream.EzyAnywayInputStreamLoader;
+import com.tvd12.ezyfox.stream.EzyInputStreams;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
+
+import java.io.InputStream;
 
 import static org.youngmonkeys.ezyplatform.util.Htmls.*;
 
@@ -131,6 +135,7 @@ public class HtmlsTest {
 
     @Test
     public void validateHtmlContentTest() throws Exception {
+        validateHtmlContent("`if (frame.getStartTime() < minStartTime) { a = b`");
         validateHtmlContent("<p>hello world</p>");
         validateHtmlContent(
             "<a value = \"hello world\"></a>"
@@ -184,5 +189,10 @@ public class HtmlsTest {
                 "                crc ^= polynomial\n" +
                 "    return format(crc & 0xFFFF, \"x\")"
         );
+        try(InputStream inputStream = new EzyAnywayInputStreamLoader()
+            .load("to-validate.html")
+        ) {
+            validateHtmlContent(EzyInputStreams.toStringUtf8(inputStream));
+        };
     }
 }
