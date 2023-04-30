@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.youngmonkeys.ezyplatform.model.PaginationModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -120,7 +121,8 @@ public abstract class ComplexPaginationParameterConverter<S, M> {
             .get(wrapper.sortOrder);
         if (paginationParameterType == null) {
             throw new IllegalArgumentException(
-                "there is no pagination parameter type map to sort order: " + wrapper.sortOrder
+                "there is no pagination parameter type map to sort order: " +
+                    wrapper.sortOrder
             );
         }
         return (T) converter.deserializeFromMap(
@@ -133,6 +135,27 @@ public abstract class ComplexPaginationParameterConverter<S, M> {
         S sortOrder
     ) {
         return defaultPageTokenBySortOrder.get(sortOrder);
+    }
+
+    public PaginationModel.PageToken getDefaultPageTokenIfNull(
+        S sortOrder,
+        String nextPageToken,
+        String prevPageToken,
+        boolean lastPage
+    ) {
+        String actualNextPageToken = nextPageToken;
+        String actualPrevPageToken = prevPageToken;
+        if (nextPageToken == null && prevPageToken == null) {
+            if (lastPage) {
+                actualPrevPageToken = getDefaultPageToken(sortOrder);
+            } else {
+                actualNextPageToken = getDefaultPageToken(sortOrder);
+            }
+        }
+        return PaginationModel.PageToken.builder()
+            .next(actualNextPageToken)
+            .prev(actualPrevPageToken)
+            .build();
     }
 
     protected abstract void mapPaginationParametersToTypes(
