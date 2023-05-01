@@ -154,7 +154,9 @@ public abstract class PaginationService<T, F, P> {
     ) {
         List<T> listPlusOne = map.get("listPlusOne");
         List<T> list = EzyLists.take(listPlusOne, limit);
-        boolean hasNext = paginationParameter != null && list.size() > 0;
+        boolean hasNext = !isEmptyPaginationParameter(
+            paginationParameter
+        ) && list.size() > 0;
         boolean hasPrev = listPlusOne.size() > limit;
         T nextPageTokenItem = hasNext ? EzyLists.first(list) : null;
         T lastPageTokenItem =  hasPrev ? EzyLists.last(list) : null;
