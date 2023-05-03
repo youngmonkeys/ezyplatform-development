@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.Link;
 
@@ -27,4 +28,12 @@ public interface LinkRepository extends EzyDatabaseRepository<Long, Link> {
     void deleteByLinkUri(String linkUri);
 
     List<Link> findByIdGt(long idExclusive, Next next);
+
+    @EzyQuery(
+        "SELECT e FROM Link e WHERE e.linkType = ?0 ORDER BY e.id DESC"
+    )
+    List<Link> findByLinkTypeOrderByIdDesc(
+        String linkType,
+        Next next
+    );
 }
