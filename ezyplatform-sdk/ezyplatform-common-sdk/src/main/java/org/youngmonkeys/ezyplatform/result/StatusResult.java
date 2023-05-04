@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2023 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,15 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.repo;
+package org.youngmonkeys.ezyplatform.result;
 
-import com.tvd12.ezydata.database.EzyDatabaseRepository;
-import org.youngmonkeys.ezyplatform.entity.UserKeyword;
+import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.Collection;
-
-public interface UserKeywordRepository
-    extends EzyDatabaseRepository<Long, UserKeyword> {
-
-    void deleteByUserId(long userId);
-
-    void deleteByUserIdIn(Collection<Long> userIds);
-
-    UserKeyword findByUserIdAndKeyword(
-        long userId,
-        String keyword
-    );
+@Getter
+@Setter
+@EzyQueryResult
+public class StatusResult {
+    private String status;
 }

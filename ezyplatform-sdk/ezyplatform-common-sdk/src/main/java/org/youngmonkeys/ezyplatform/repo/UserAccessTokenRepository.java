@@ -19,6 +19,12 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 
+import java.util.Collection;
+
 public interface UserAccessTokenRepository
     extends EzyDatabaseRepository<String, UserAccessToken> {
+
+    void deleteByUserId(long userId);
+
+    void deleteByUserIdIn(Collection<Long> userIds);
 }

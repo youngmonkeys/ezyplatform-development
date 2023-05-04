@@ -30,10 +30,7 @@ import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import org.youngmonkeys.ezyplatform.repo.UserAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRepository;
-import org.youngmonkeys.ezyplatform.result.IdNameResult;
-import org.youngmonkeys.ezyplatform.result.IdResult;
-import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
-import org.youngmonkeys.ezyplatform.result.IdUuidResult;
+import org.youngmonkeys.ezyplatform.result.*;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
@@ -53,6 +50,13 @@ public class DefaultUserService implements UserService {
     private final UserAccessTokenRepository accessTokenRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultResultToModelConverter resultToModelConverter;
+
+    public List<String> getAllUserStatuses() {
+        return newArrayList(
+            userRepository.findAllUserStatuses(),
+            StatusResult::getStatus
+        );
+    }
 
     @Override
     public UserModel getUserById(long id) {

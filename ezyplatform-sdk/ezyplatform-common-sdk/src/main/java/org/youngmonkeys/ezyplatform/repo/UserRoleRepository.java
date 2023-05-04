@@ -20,8 +20,12 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
 import org.youngmonkeys.ezyplatform.entity.UserRoleId;
 
+import java.util.Collection;
+
 public interface UserRoleRepository
     extends EzyDatabaseRepository<UserRoleId, UserRole> {
 
     void deleteByUserId(long userId);
+
+    void deleteByUserIdIn(Collection<Long> userIds);
 }
