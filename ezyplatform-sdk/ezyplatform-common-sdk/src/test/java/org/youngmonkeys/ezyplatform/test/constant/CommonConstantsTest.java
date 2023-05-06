@@ -21,6 +21,8 @@ import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.constant.CommonConstants;
 import org.youngmonkeys.ezyplatform.entity.TargetType;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_USERNAME;
+
 public class CommonConstantsTest {
 
     @Test
@@ -32,5 +34,13 @@ public class CommonConstantsTest {
 
         // then
         Asserts.assertEquals(actual, "web_role_features");
+    }
+
+    @Test
+    public void usernamePatternTest() {
+        Asserts.assertTrue("hello.world".matches(PATTERN_USERNAME));
+        Asserts.assertTrue("hello_world".matches(PATTERN_USERNAME));
+        Asserts.assertFalse("hello-world".matches(PATTERN_USERNAME));
+        Asserts.assertFalse("hello\\world".matches(PATTERN_USERNAME));
     }
 }
