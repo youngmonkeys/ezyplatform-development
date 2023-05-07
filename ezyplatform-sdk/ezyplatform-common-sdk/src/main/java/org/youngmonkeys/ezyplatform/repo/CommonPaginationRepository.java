@@ -16,12 +16,13 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
-import com.tvd12.ezyfox.io.EzyLists;
 import org.youngmonkeys.ezyplatform.pagination.CommonPaginationParameter;
 import org.youngmonkeys.ezyplatform.pagination.CommonStorageFilter;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static com.tvd12.ezyfox.io.EzyCollections.isEmpty;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 /**
@@ -43,16 +44,26 @@ public class CommonPaginationRepository<
         return true;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected List<String> getSelectionFields(
         F filter,
         P paginationParameter
     ) {
-        return EzyLists.combine(
-            filter.selectionFields(),
-            paginationParameter.selectionFields()
-        );
+        List<String> fields = new ArrayList<>();
+        if (filter != null) {
+            List<String> filterFields = filter.selectionFields();
+            if (!isEmpty(filterFields)) {
+                fields.addAll(filterFields);
+            }
+        }
+        if (paginationParameter != null) {
+            List<String> paramFields =
+                paginationParameter.selectionFields();
+            if (!isEmpty(paramFields)) {
+                fields.addAll(paramFields);
+            }
+        }
+        return fields;
     }
 
     @Override
