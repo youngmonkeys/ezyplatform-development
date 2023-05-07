@@ -40,7 +40,8 @@ public class CommonConstantsTest {
     public void usernamePatternTest() {
         Asserts.assertTrue("hello.world".matches(PATTERN_USERNAME));
         Asserts.assertTrue("hello_world".matches(PATTERN_USERNAME));
-        Asserts.assertFalse("hello-world".matches(PATTERN_USERNAME));
+        Asserts.assertTrue("hello-world".matches(PATTERN_USERNAME));
+        Asserts.assertFalse("hello+world".matches(PATTERN_USERNAME));
         Asserts.assertFalse("hello\\world".matches(PATTERN_USERNAME));
     }
 }
