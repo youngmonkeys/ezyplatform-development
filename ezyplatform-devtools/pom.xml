@@ -31,10 +31,17 @@
     <description>EzyFox development tools</description>
 
     <properties>
+        <ezy.version>1.2.7</ezy.version>
         <ezy.http.version>1.1.5</ezy.http.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>com.tvd12</groupId>
+            <artifactId>ezyfox-tools</artifactId>
+            <version>${ezy.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>com.tvd12</groupId>
             <artifactId>ezyhttp-server-thymeleaf</artifactId>

@@ -52,11 +52,11 @@ public class UnitTestClassGenerator {
     public String generateContent() {
         imports.addAll(
             Arrays.asList(
-                "com.tvd12.ezyfox.tool.EzyObjectInstanceRandom;",
                 "org.testng.annotations.*;",
                 "static org.mockito.Mockito.*;"
             )
         );
+        imports.add(InstanceRandom.class.getName() + ";");
         Class<?>[] componentClasses = constructor == null
             ? new Class[0]
             : constructor.getParameterTypes();
@@ -81,14 +81,12 @@ public class UnitTestClassGenerator {
                 getVariableName(componentClass) + ";"
             );
         }
-        content.add(tabs(1) + "private " + classSimpleName + " instance;\n");
+        content.add(tabs(1) + "private " + classSimpleName + " instance;");
         content.add("");
         content.add(
-            tabs(1) + "private final EzyObjectInstanceRandom instanceRandom ="
+            tabs(1) + "private final InstanceRandom instanceRandom ="
         );
-        content.add(
-            tabs(2) + "new EzyObjectInstanceRandom();"
-        );
+        content.add(tabs(2) + "new InstanceRandom();");
         content.add("");
         content.add(tabs(1) + "@BeforeMethod");
         content.add(tabs(1) + "public void setup() {");
