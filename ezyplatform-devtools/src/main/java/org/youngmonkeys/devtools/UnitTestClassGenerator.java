@@ -105,7 +105,10 @@ public class UnitTestClassGenerator {
                     classSimpleName + "();"
             );
         } else {
-            content.add(tabs(2) + "instance = new PostService(");
+            content.add(
+                tabs(2) + "instance = new " +
+                    classSimpleName + "("
+            );
             List<String> params = new ArrayList<>();
             for (Class<?> componentClass : componentClasses) {
                 params.add(
