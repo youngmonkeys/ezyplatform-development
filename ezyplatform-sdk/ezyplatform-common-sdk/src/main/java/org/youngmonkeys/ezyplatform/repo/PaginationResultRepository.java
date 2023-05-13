@@ -1,32 +1,35 @@
 /*
  * Copyright 2022 youngmonkeys.org
- * 
+ *
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://youngmonkeys.org/licenses/ezyplatform-1.0.0.txt
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.query.EzyQueryData;
 import com.tvd12.ezydata.database.query.EzyQueryMethodType;
 import com.tvd12.ezydata.jpa.repository.EzyJpaRepository;
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyGenerics;
 import org.youngmonkeys.ezyplatform.data.PaginationParameter;
 import org.youngmonkeys.ezyplatform.data.StorageFilter;
+import org.youngmonkeys.ezyplatform.pagination.CommonPaginationParameter;
+import org.youngmonkeys.ezyplatform.pagination.CommonStorageFilter;
+import org.youngmonkeys.ezyplatform.pagination.OffsetPaginationParameter;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.tvd12.ezyfox.io.EzyCollections.isEmpty;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
@@ -45,7 +48,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<I, E> {
 
     protected final Class<R> resultType = getResultType();
-    
+
     public List<R> findFirstElements(
         F filter,
         int limit
@@ -120,19 +123,27 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
             paginationParameter,
             nextPage
         );
+        int actualOffset = 0;
+        int actualLimit = limit;
+        if (paginationParameter instanceof OffsetPaginationParameter) {
+            int offset = ((OffsetPaginationParameter) paginationParameter)
+                .getOffset();
+            actualLimit = (offset >= 0) ? limit : limit + offset;
+            actualOffset = Math.max(offset, 0);
+        }
         return resultType != entityType
             ? fetchListByQueryString(
                 query.getQuery(),
                 query.getParameterMap(),
                 resultType,
-                0,
-                limit
+                actualOffset,
+                actualLimit
             )
             : (List<R>) findListByQueryString(
                 query.getQuery(),
                 query.getParameterMap(),
-                0,
-                limit
+                actualOffset,
+                actualLimit
             );
     }
 
@@ -151,7 +162,9 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
             if (distinct) {
                 queryString.append(" DISTINCT ");
             }
-            queryString.append(getCountField()).append(")");
+            queryString
+                .append(getCountField(filter))
+                .append(")");
         } else {
             if (distinct) {
                 queryString.append(" DISTINCT");
@@ -218,6 +231,13 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         return entityType.getSimpleName();
     }
 
+    protected String getCountField(F filter) {
+        if (filter instanceof CommonStorageFilter) {
+            return ((CommonStorageFilter) filter).countField();
+        }
+        return getCountField();
+    }
+
     protected String getCountField() {
         return "e";
     }
@@ -226,14 +246,32 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         F filter,
         P paginationParameter
     ) {
-        return getSelectionFields(filter);
+        return Stream.of(
+            getSelectionFields(filter),
+            getPaginationSelectionFields(paginationParameter),
+            getSelectionFields()
+        )
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
     }
 
     protected List<String> getSelectionFields(F filter) {
-        return getSelectionFields();
+        if (filter instanceof CommonStorageFilter) {
+            return ((CommonStorageFilter) filter)
+                .selectionFields();
+        }
+        return Collections.emptyList();
     }
 
     protected List<String> getSelectionFields() {
+        return Collections.emptyList();
+    }
+
+    protected List<String> getPaginationSelectionFields(P paginationParameter) {
+        if (paginationParameter instanceof CommonPaginationParameter) {
+            return ((CommonPaginationParameter) paginationParameter)
+                .selectionFields();
+        }
         return Collections.emptyList();
     }
 
@@ -246,51 +284,110 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         F filter,
         P paginationParameter
     ) {
-        decorateQueryStringBeforeWhere(queryString, filter);
+        decorateQueryStringBeforeWhere(
+            queryString,
+            filter
+        );
+        decoratePaginationQueryStringBeforeWhere(
+            queryString,
+            paginationParameter
+        );
+        decorateQueryStringBeforeWhere(queryString);
     }
 
     protected void decorateQueryStringBeforeWhere(
         StringBuilder queryString,
         F filter
     ) {
-        decorateQueryStringBeforeWhere(queryString);
+        if (filter instanceof CommonStorageFilter) {
+            ((CommonStorageFilter) filter)
+                .decorateQueryStringBeforeWhere(queryString);
+        }
     }
 
-    protected void decorateQueryStringBeforeWhere(StringBuilder queryString) {}
+    protected void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {}
+
+    protected void decoratePaginationQueryStringBeforeWhere(
+        StringBuilder queryString,
+        P paginationParameter
+    ) {
+        if (paginationParameter instanceof CommonPaginationParameter) {
+            ((CommonPaginationParameter) paginationParameter)
+                .decorateQueryStringBeforeWhere(queryString);
+        }
+    }
+
+    protected String makeMatchingCondition(F filter) {
+        if (filter instanceof CommonStorageFilter) {
+            return ((CommonStorageFilter) filter)
+                .matchingCondition();
+        }
+        return makeMatchingCondition();
+    }
 
     protected String makeMatchingCondition() {
         return EMPTY_STRING;
     }
 
-    protected String makeMatchingCondition(F filter) {
-        return makeMatchingCondition();
+    protected String makePaginationCondition(
+        P paginationParameter,
+        boolean nextPage
+    ) {
+        if (paginationParameter instanceof CommonPaginationParameter) {
+            return ((CommonPaginationParameter) paginationParameter)
+                .paginationCondition(nextPage);
+        }
+        return makePaginationCondition(nextPage);
     }
 
     protected String makePaginationCondition(boolean nextPage) {
         return EMPTY_STRING;
     }
 
-    protected String makePaginationCondition(P paginationParameter, boolean nextPage) {
-        return makePaginationCondition(nextPage);
-    }
-
     protected String makeGroupBy(F filter, P paginationParameter) {
-        return makeGroupBy(filter);
+        return Stream.of(
+            makeGroupBy(filter),
+            makePaginationGroupBy(paginationParameter),
+            makeGroupBy()
+        )
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.joining());
     }
 
     protected String makeGroupBy(F filter) {
-        return makeGroupBy();
+        if (filter instanceof CommonStorageFilter) {
+            return ((CommonStorageFilter) filter).groupBy();
+        }
+        return EMPTY_STRING;
     }
 
     protected String makeGroupBy() {
         return EMPTY_STRING;
     }
 
-    protected String makeOrderBy(F filter, P paginationParameter, boolean nextPage) {
+    protected String makePaginationGroupBy(P paginationParameter) {
+        if (paginationParameter instanceof CommonPaginationParameter) {
+            return ((CommonPaginationParameter) paginationParameter)
+                .groupBy();
+        }
+        return EMPTY_STRING;
+    }
+
+    protected String makeOrderBy(
+        F filter,
+        P paginationParameter,
+        boolean nextPage
+    ) {
         return makeOrderBy(paginationParameter, nextPage);
     }
 
     protected String makeOrderBy(P paginationParameter, boolean nextPage) {
+        if (paginationParameter instanceof CommonPaginationParameter) {
+            return ((CommonPaginationParameter) paginationParameter)
+                .orderBy(nextPage);
+        }
         return makeOrderBy(nextPage);
     }
 
@@ -303,7 +400,9 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         F filter,
         P paginationParameter
     ) {
-        Map<String, Object> parameters = new HashMap<>(getFilterQueryParameters(filter));
+        Map<String, Object> parameters = new HashMap<>(
+            getFilterQueryParameters(filter)
+        );
         if (methodType != EzyQueryMethodType.COUNT) {
             parameters.putAll(getPaginationQueryParameters(paginationParameter));
         }
@@ -319,7 +418,9 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
             : Collections.singletonMap("filter", filter);
     }
 
-    protected Map<String, Object> getPaginationQueryParameters(P paginationParameter) {
+    protected Map<String, Object> getPaginationQueryParameters(
+        P paginationParameter
+    ) {
         if (paginationParameter instanceof PaginationParameter) {
             return ((PaginationParameter) paginationParameter).getParameters();
         }

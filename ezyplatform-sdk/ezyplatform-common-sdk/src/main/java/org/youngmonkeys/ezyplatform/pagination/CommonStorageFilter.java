@@ -29,11 +29,19 @@ public interface CommonStorageFilter extends StorageFilter {
         return Collections.emptyList();
     }
 
+    default String countField() {
+        return "e";
+    }
+
     default void decorateQueryStringBeforeWhere(
         StringBuilder queryString
     ) {}
 
     default String matchingCondition() {
+        return EMPTY_STRING;
+    }
+
+    default String groupBy() {
         return EMPTY_STRING;
     }
 }
