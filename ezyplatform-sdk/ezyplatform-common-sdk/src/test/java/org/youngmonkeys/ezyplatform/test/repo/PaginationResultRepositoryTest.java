@@ -305,7 +305,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, idResults);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT e FROM User e"
+            "SELECT e FROM User e ORDER BY e.id DESC"
         );
         verify(query, times(1)).setFirstResult(0);
         verify(query, times(1)).setMaxResults(limit - 1);
@@ -358,7 +358,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, idResults);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT e FROM User e"
+            "SELECT e FROM User e ORDER BY e.id DESC"
         );
         verify(query, times(1)).setFirstResult(1);
         verify(query, times(1)).setMaxResults(limit);

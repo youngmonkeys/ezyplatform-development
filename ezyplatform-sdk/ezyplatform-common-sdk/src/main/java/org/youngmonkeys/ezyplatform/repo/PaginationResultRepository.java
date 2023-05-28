@@ -387,6 +387,9 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         if (paginationParameter instanceof CommonPaginationParameter) {
             return ((CommonPaginationParameter) paginationParameter)
                 .orderBy(nextPage);
+        } else if (paginationParameter instanceof OffsetPaginationParameter) {
+            return ((OffsetPaginationParameter) paginationParameter)
+                .getOrderBy();
         }
         return makeOrderBy(nextPage);
     }
