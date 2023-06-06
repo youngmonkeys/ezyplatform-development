@@ -21,6 +21,8 @@ import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
 @Getter
 @Builder
 public class MediaModel {
@@ -40,4 +42,33 @@ public class MediaModel {
     private boolean publicMedia;
     private long createdAt;
     private long updatedAt;
+
+    public static String getMediaUrlOrNull(
+        MediaModel media
+    ) {
+        return getMediaUrlOrDefault(media, null);
+    }
+
+    public static String getMediaUrlOrDefault(
+        MediaModel media,
+        String defaultUrl
+    ) {
+        return media == null
+            ? defaultUrl
+            : media.getUrlOrDefault(defaultUrl);
+    }
+
+    public static String toMediaUrlOrDefault(
+        String mediaName,
+        String mediaUrl,
+        String defaultUrl
+    ) {
+        return isBlank(mediaUrl)
+            ? isBlank(mediaName) ? defaultUrl : "/api/v1/media/" + mediaName
+            : mediaUrl;
+    }
+
+    public String getUrlOrDefault(String defaultUrl) {
+        return toMediaUrlOrDefault(name, url, defaultUrl);
+    }
 }
