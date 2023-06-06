@@ -16,7 +16,6 @@
 
 package org.youngmonkeys.devtools;
 
-import com.tvd12.ezyfox.reflect.EzyField;
 import com.tvd12.ezyfox.tool.EzyObjectInstanceRandom;
 
 public class InstanceRandom extends EzyObjectInstanceRandom {
@@ -29,20 +28,13 @@ public class InstanceRandom extends EzyObjectInstanceRandom {
         return randomInstanceValues(instance, true);
     }
 
-    @SuppressWarnings("unchecked")
     public <T> T randomInstanceValues(
         T instance,
         boolean includeAllFields
     ) {
-        return (T) randomObject(
-            instance.getClass(),
-            includeAllFields,
-            params -> instance,
-            params -> randomObjectValue((Class<?>) params[0]),
-            params -> {
-                EzyField field = (EzyField) params[1];
-                field.getField().setAccessible(true);
-                field.set(params[0], params[2]);
-            });
+        return (T) randomObjectValues(
+            instance,
+            includeAllFields
+        );
     }
 }
