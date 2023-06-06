@@ -135,16 +135,6 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public String getMediaName(long mediaId) {
-        if (mediaId <= 0) {
-            return null;
-        }
-        return mediaRepository.findByIdOptional(mediaId)
-            .map(Media::getName)
-            .orElse(null);
-    }
-
-    @Override
     public List<MediaModel> getMediaListByIds(
         Collection<Long> mediaIds
     ) {

@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
 import org.youngmonkeys.ezyplatform.repo.LinkRepository;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static org.youngmonkeys.ezyplatform.model.MediaNameModel.getMediaUrlOrNull;
 
 @AllArgsConstructor
 public class DefaultLinkService implements LinkService {
@@ -101,7 +102,9 @@ public class DefaultLinkService implements LinkService {
             link,
             imageId <= 0
                 ? EMPTY_STRING
-                : mediaService.getMediaName(link.getImageId())
+                : getMediaUrlOrNull(
+                    mediaService.getMediaNameById(link.getImageId())
+                )
         );
     }
 }

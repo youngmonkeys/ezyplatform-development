@@ -70,22 +70,15 @@ public class WebViewDecorator extends WebViewLanguageDecorator {
             view.setVariable("userUuid", user.getUuid());
             view.setVariable("loggedIn", true);
             
-            String avatarImageName = view.getVariable("avatarImageName");
-            if (avatarImageName == null) {
-                MediaNameModel avatarImageModel = view.getVariable(
-                    "avatarImageModel"
+            MediaNameModel avatarImage = view.getVariable("avatarImage");
+            if (avatarImage == null) {
+                avatarImage = mediaService.getMediaNameById(
+                    user.getAvatarImageId()
                 );
-                if (avatarImageModel == null) {
-                    avatarImageModel = mediaService.getMediaNameModelById(
-                        user.getAvatarImageId()
-                    );
+                if (avatarImage == null) {
+                    avatarImage = MediaNameModel.builder().build();
                 }
-                if (avatarImageModel == null) {
-                    avatarImageModel = MediaNameModel.builder().build();
-                }
-                avatarImageName = avatarImageModel.getName();
-                view.setVariable("avatarImageName", avatarImageName);
-                view.setVariable("avatarImageModel", avatarImageModel);
+                view.setVariable("avatarImage", avatarImage);
             }
             decorateWithUserData(request, view, user);
         }

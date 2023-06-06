@@ -75,7 +75,7 @@ public interface MediaService {
 
     MediaModel getMediaById(long mediaId);
 
-    default MediaNameModel getMediaNameModelById(
+    default MediaNameModel getMediaNameById(
         long mediaId
     ) {
         return MediaNameModel.fromMediaModel(
@@ -93,8 +93,6 @@ public interface MediaService {
 
     MediaModel getMediaByName(String mediaName);
 
-    String getMediaName(long mediaId);
-
     boolean containsMedia(long mediaId);
 
     List<MediaModel> getMediaListByIds(
@@ -110,21 +108,12 @@ public interface MediaService {
         );
     }
 
-    default Map<Long, MediaNameModel> getMediaNameModelMapByIds(
+    default Map<Long, MediaNameModel> getMediaNameMapByIds(
         Collection<Long> mediaIds
     ) {
         return newHashMapNewValues(
             getMediaMapByIds(mediaIds),
             MediaNameModel::fromMediaModel
-        );
-    }
-
-    default Map<Long, String> getMediaNameMapByIds(
-        Collection<Long> mediaIds
-    ) {
-        return newHashMapNewValues(
-            getMediaMapByIds(mediaIds),
-            MediaModel::getName
         );
     }
 

@@ -26,7 +26,7 @@ public class LinkModel {
     private String linkType;
     private String linkUri;
     private long imageId;
-    private String imageName;
+    private String imageUrl;
     private String description;
     private long createdAt;
     private long updatedAt;

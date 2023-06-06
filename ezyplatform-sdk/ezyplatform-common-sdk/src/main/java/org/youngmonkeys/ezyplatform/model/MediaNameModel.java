@@ -43,6 +43,36 @@ public class MediaNameModel {
             .build();
     }
 
+    public static String getMediaNameOrNull(
+        MediaNameModel media
+    ) {
+        return getMediaNameOrDefault(media, null);
+    }
+
+    public static String getMediaNameOrDefault(
+        MediaNameModel media,
+        String defaultName
+    ) {
+        return media == null
+            ? defaultName
+            : media.getName();
+    }
+
+    public static String getMediaUrlOrNull(
+        MediaNameModel media
+    ) {
+        return getMediaUrlOrDefault(media, null);
+    }
+
+    public static String getMediaUrlOrDefault(
+        MediaNameModel media,
+        String defaultUrl
+    ) {
+        return media == null
+            ? defaultUrl
+            : media.getUrlOrDefault(defaultUrl);
+    }
+
     public String getUrlOrDefault(String defaultUrl) {
         return isBlank(url)
             ? isBlank(name) ? defaultUrl : "/api/v1/media/" + name
