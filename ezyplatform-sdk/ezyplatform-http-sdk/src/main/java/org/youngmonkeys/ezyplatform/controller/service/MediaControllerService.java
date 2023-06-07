@@ -279,10 +279,6 @@ public class MediaControllerService extends EzyLoggable {
             .build();
     }
 
-    public String getMediaName(long mediaId) {
-        return mediaService.getMediaName(mediaId);
-    }
-
     public MediaModel getMediaById(long mediaId) {
         return mediaService.getMediaById(mediaId);
     }
