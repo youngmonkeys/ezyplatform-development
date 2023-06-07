@@ -159,6 +159,8 @@ public final class CommonConstants {
         = "web_site_title";
     public static final String SETTING_NAME_WEB_SITE_TAGLINE
         = "web_site_tagline";
+    public static final String SETTING_NAME_WEB_SITE_IMAGE_URL
+        = "web_site_image_url";
     public static final String SETTING_NAME_WEB_PAGE_TITLE_SEPARATOR
         = "web_page_title_separator";
     public static final String SETTING_NAME_WEB_AUTO_PASS_MANAGEMENT_URIS
