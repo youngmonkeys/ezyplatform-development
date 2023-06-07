@@ -219,7 +219,7 @@ public class SchedulerTest {
         // when
         scheduler.scheduleAtFixRate(command1, 0, 3, TimeUnit.MILLISECONDS);
         scheduler.scheduleAtFixRate(command2, 0, 3, TimeUnit.MILLISECONDS);
-        EzyThreads.sleep(10);
+        EzyThreads.sleep(100);
 
         // then
         Map<Runnable, Object> tasks = FieldUtil.getFieldValue(
