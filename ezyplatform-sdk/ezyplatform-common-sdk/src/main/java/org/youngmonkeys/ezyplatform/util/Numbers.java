@@ -60,6 +60,22 @@ public final class Numbers {
         return value != null ? value.intValue() : 0;
     }
 
+    public static int toIntOrZero(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
+    public static long toLongOrZero(String value) {
+        try {
+            return Long.parseLong(value);
+        } catch (Exception e) {
+            return 0L;
+        }
+    }
+
     public static String toPaddedValueLong(
         BigInteger value
     ) {

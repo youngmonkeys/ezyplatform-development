@@ -17,12 +17,15 @@
 package org.youngmonkeys.ezyplatform.test.util;
 
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.util.Durations;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.youngmonkeys.ezyplatform.util.Durations.calculateDurationInMinute;
 
 public class DurationsTest {
 
@@ -66,5 +69,44 @@ public class DurationsTest {
             -1L
         );
         Asserts.assertEquals(actual, expectation, false);
+    }
+
+    @Test
+    public void calculateDurationInMinuteNormalTest() {
+        // given
+        long from = RandomUtil.randomLong();
+        long to = from + 60 * 1000;
+
+        // when
+        int actual = calculateDurationInMinute(from, to);
+
+        // then
+        Asserts.assertEquals(actual, 1);
+    }
+
+    @Test
+    public void calculateDurationInMinuteGreaterOneTest() {
+        // given
+        long from = RandomUtil.randomLong();
+        long to = from + 60 * 1000 + 1000;
+
+        // when
+        int actual = calculateDurationInMinute(from, to);
+
+        // then
+        Asserts.assertEquals(actual, 2);
+    }
+
+    @Test
+    public void calculateDurationInMinuteZeroTest() {
+        // given
+        long from = RandomUtil.randomLong();
+        long to = from - 60 * 1000;
+
+        // when
+        int actual = calculateDurationInMinute(from, to);
+
+        // then
+        Asserts.assertZero(actual);
     }
 }

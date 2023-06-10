@@ -76,4 +76,17 @@ public final class Durations {
         }
         return answer;
     }
+
+    public static int calculateDurationInMinute(
+        long from,
+        long to
+    ) {
+        if (to <= from) {
+            return 0;
+        }
+        long durationSeconds = (to - from) / 1000;
+        return (int) (durationSeconds % 60 == 0
+            ? durationSeconds / 60
+            : (durationSeconds / 60) + 1);
+    }
 }

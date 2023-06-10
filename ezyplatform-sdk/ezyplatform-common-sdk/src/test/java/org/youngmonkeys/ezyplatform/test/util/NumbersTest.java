@@ -26,6 +26,18 @@ import static org.youngmonkeys.ezyplatform.util.Numbers.*;
 public class NumbersTest {
 
     @Test
+    public void toIntOrZeroTest() {
+        Asserts.assertEquals(toIntOrZero("10"), 10);
+        Asserts.assertEquals(toIntOrZero("10a"), 0);
+    }
+
+    @Test
+    public void toLongOrZeroTest() {
+        Asserts.assertEquals(toLongOrZero("10"), 10L);
+        Asserts.assertEquals(toLongOrZero("10a"), 0L);
+    }
+
+    @Test
     public void roundUpOrDownToIntTest() {
         // given
         double a = 1.1;
