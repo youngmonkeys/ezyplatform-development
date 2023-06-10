@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.exception;
 
 import static java.util.Collections.singletonMap;
+import static org.youngmonkeys.ezyplatform.util.Strings.hideSensitiveInformation;
 
 public class IncorrectPasswordException extends BadRequestException {
 
@@ -42,7 +43,8 @@ public class IncorrectPasswordException extends BadRequestException {
     public static IncorrectPasswordException ofUserName(String username) {
         return new IncorrectPasswordException(
             "password",
-            "Incorrect password of user: " + username
+            "Incorrect password of user: " +
+                hideSensitiveInformation(username, 2, 6)
         );
     }
 

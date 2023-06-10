@@ -19,8 +19,7 @@ package org.youngmonkeys.ezyplatform.util;
 import java.math.BigInteger;
 import java.util.Map;
 
-import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.*;
 
 public final class Strings {
 
@@ -158,5 +157,14 @@ public final class Strings {
         } catch (Exception e) {
             return BigInteger.ZERO;
         }
+    }
+
+    public static String firstNotBlankValue(String... strs) {
+        for (String str : strs) {
+            if (isNotBlank(str)) {
+                return str;
+            }
+        }
+        return null;
     }
 }

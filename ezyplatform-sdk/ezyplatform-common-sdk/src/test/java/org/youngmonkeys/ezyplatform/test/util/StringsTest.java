@@ -43,6 +43,18 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void toLowerDashCaseTest() {
+        // given
+        String value = "Hello World";
+
+        // when
+        String actual = toLowerDashCase(value);
+
+        // then
+        Asserts.assertEquals(actual, "hello-world");
+    }
+
+    @Test
     public void containInvalidSpacesTest() {
         // given
         // when
@@ -204,5 +216,14 @@ public class StringsTest extends BaseTest {
             .test(() -> toBigIntegerOrZero("hello world"))
             .getTime();
         System.out.println("toBigIntegerOrZero elapsed time: " + time);
+    }
+
+    @Test
+    public void firstNotBlankValueTest() {
+        Asserts.assertEquals(
+            firstNotBlankValue("", "a"),
+            "a"
+        );
+        Asserts.assertNull(firstNotBlankValue("", ""));
     }
 }
