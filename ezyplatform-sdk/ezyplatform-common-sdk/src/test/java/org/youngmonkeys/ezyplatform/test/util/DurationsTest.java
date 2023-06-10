@@ -21,11 +21,13 @@ import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.util.Durations;
 
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.youngmonkeys.ezyplatform.util.Durations.calculateDurationInMinute;
+import static org.youngmonkeys.ezyplatform.util.Durations.calculateDurationToNextTime;
 
 public class DurationsTest {
 
@@ -108,5 +110,59 @@ public class DurationsTest {
 
         // then
         Asserts.assertZero(actual);
+    }
+
+    @Test
+    public void calculateDurationToNextTimeByNextLtTest() {
+        // given
+        LocalDateTime start = LocalDateTime.of(
+            2023,
+            6,
+            10,
+            23,
+            1,
+            1
+        );
+
+        // when
+        long actual = calculateDurationToNextTime(
+            start,
+            0,
+            0,
+            0
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            (58 * 60 + 59) * 1000L
+        );
+    }
+
+    @Test
+    public void calculateDurationToNextTimeByNextGtTest() {
+        // given
+        LocalDateTime start = LocalDateTime.of(
+            2023,
+            6,
+            10,
+            22,
+            1,
+            1
+        );
+
+        // when
+        long actual = calculateDurationToNextTime(
+            start,
+            23,
+            0,
+            0
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            (58 * 60 + 59) * 1000L
+        );
     }
 }

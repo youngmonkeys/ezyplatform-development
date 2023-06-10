@@ -18,6 +18,8 @@ package org.youngmonkeys.ezyplatform.util;
 
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
@@ -88,5 +90,25 @@ public final class Durations {
         return (int) (durationSeconds % 60 == 0
             ? durationSeconds / 60
             : (durationSeconds / 60) + 1);
+    }
+
+    public static long calculateDurationToNextTime(
+        LocalDateTime start,
+        int nextHour,
+        int nextMinute,
+        int nextSecond
+    ) {
+        LocalDateTime next = LocalDateTime.of(
+            start.getYear(),
+            start.getMonth(),
+            start.getDayOfMonth(),
+            nextHour,
+            nextMinute,
+            nextSecond
+        );
+        if (next.isBefore(start)) {
+            next = next.plusDays(1L);
+        }
+        return Duration.between(start, next).toMillis();
     }
 }
