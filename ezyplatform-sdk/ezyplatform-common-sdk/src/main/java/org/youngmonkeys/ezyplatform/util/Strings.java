@@ -136,6 +136,10 @@ public final class Strings {
         return str != null ? str : EMPTY_STRING;
     }
 
+    public static String emptyIfBlank(String str) {
+        return isBlank(str) ? EMPTY_STRING : str;
+    }
+
     public static String toLowerDashCaseWithoutSpecialCharacters(
         String str
     ) {

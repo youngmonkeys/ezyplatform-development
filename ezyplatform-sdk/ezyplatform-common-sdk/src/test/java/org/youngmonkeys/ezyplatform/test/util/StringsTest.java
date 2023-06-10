@@ -183,6 +183,34 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void emptyIfBlankTest() {
+        Asserts.assertEquals(
+            emptyIfBlank("hello"),
+            "hello"
+        );
+        Asserts.assertEquals(
+            emptyIfBlank(null),
+            ""
+        );
+        Asserts.assertEquals(
+            emptyIfBlank(""),
+            ""
+        );
+        Asserts.assertEquals(
+            emptyIfBlank(" "),
+            ""
+        );
+        Asserts.assertEquals(
+            emptyIfBlank("\t"),
+            ""
+        );
+        Asserts.assertEquals(
+            emptyIfBlank("\n"),
+            ""
+        );
+    }
+
+    @Test
     public void toDashLowerCaseWithoutSpecialCharactersTest() {
         // given
         String str = "hello !\"#$%&'()*+,-./:;<=>?@[\\\\]^_`{|}~ world \t I'm\nhere";
