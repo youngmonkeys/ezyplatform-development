@@ -75,10 +75,14 @@ public class MediaValidator {
             if (filePart.getSize() > settingService.getMaxUploadFileSize()) {
                 errors.put("uploadSize", "over");
             }
-            mediaType = tika.getDetector().detect(
-                TikaInputStream.get(filePart.getInputStream()),
-                new Metadata()
-            );
+            try (TikaInputStream tikaInputStream =
+                     TikaInputStream.get(filePart.getInputStream())
+            ) {
+                mediaType = tika.getDetector().detect(
+                    tikaInputStream,
+                    new Metadata()
+                );
+            }
             Set<String> acceptedMediaMimeTypes = settingService
                 .getAcceptedMediaMimeTypes();
             if (!acceptedMediaMimeTypes.contains(mediaType.toString())
