@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.controller.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.bean.EzySingletonFactory;
+import com.tvd12.ezyfox.concurrent.EzyLazyInitializer;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
@@ -25,12 +26,14 @@ import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
-import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
+import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
+import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
+import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.io.FolderProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
@@ -57,20 +60,52 @@ import java.util.function.Predicate;
 
 import static java.util.Collections.singletonMap;
 
-@AllArgsConstructor
 public class MediaControllerService extends EzyLoggable {
 
-    private final MediaService mediaService;
-    private final SettingService settingService;
-    private final PaginationMediaService paginationMediaService;
-    private final ObjectMapper objectMapper;
-    private final EzyInputStreamLoader inputStreamLoader;
-    private final EzySingletonFactory singletonFactory;
-    private final CommonValidator commonValidator;
-    private final MediaValidator mediaValidator;
+    private final EventHandlerManager eventHandlerManager;
     private final FileSystemManager fileSystemManager;
     private final ResourceDownloadManager resourceDownloadManager;
+    private final MediaService mediaService;
+    private final PaginationMediaService paginationMediaService;
+    private final SettingService settingService;
+    private final CommonValidator commonValidator;
+    private final MediaValidator mediaValidator;
     private final HttpRequestToModelConverter requestToModelConverter;
+    private final EzyLazyInitializer<FileUploader> fileUploaderWrapper;
+    private final EzyInputStreamLoader inputStreamLoader;
+    private final ObjectMapper objectMapper;
+
+    public MediaControllerService(
+        EventHandlerManager eventHandlerManager,
+        FileSystemManager fileSystemManager,
+        ResourceDownloadManager resourceDownloadManager,
+        MediaService mediaService,
+        PaginationMediaService paginationMediaService,
+        SettingService settingService,
+        CommonValidator commonValidator,
+        MediaValidator mediaValidator,
+        HttpRequestToModelConverter requestToModelConverter,
+        EzySingletonFactory singletonFactory,
+        EzyInputStreamLoader inputStreamLoader,
+        ObjectMapper objectMapper
+    ) {
+        this.mediaService = mediaService;
+        this.paginationMediaService = paginationMediaService;
+        this.settingService = settingService;
+        this.objectMapper = objectMapper;
+        this.inputStreamLoader = inputStreamLoader;
+        this.commonValidator = commonValidator;
+        this.mediaValidator = mediaValidator;
+        this.eventHandlerManager = eventHandlerManager;
+        this.fileSystemManager = fileSystemManager;
+        this.resourceDownloadManager = resourceDownloadManager;
+        this.requestToModelConverter = requestToModelConverter;
+        this.fileUploaderWrapper = new EzyLazyInitializer<>(
+            () -> singletonFactory.getSingletonCast(
+                FileUploader.class
+            )
+        );
+    }
 
     public void addMedia(
         HttpServletRequest request,
@@ -80,9 +115,7 @@ public class MediaControllerService extends EzyLoggable {
         boolean avatar,
         boolean notPublic
     ) throws Exception {
-        FileUploader fileUploader = singletonFactory.getSingletonCast(
-            FileUploader.class
-        );
+        FileUploader fileUploader = fileUploaderWrapper.get();
         if (fileUploader == null) {
             throw new HttpNotAcceptableException(
                 singletonMap("fileUpload", "disabled")
@@ -108,10 +141,14 @@ public class MediaControllerService extends EzyLoggable {
             fileExtension
         );
         AsyncContext asyncContext = request.getAsyncContext();
+        File mediaFilePath = fileSystemManager.getMediaFilePath(
+            containerFolder,
+            newFileName
+        );
         fileUploader.accept(
             asyncContext,
             filePart,
-            fileSystemManager.getMediaFilePath(containerFolder, newFileName),
+            mediaFilePath,
             settingService.getMaxUploadFileSize(),
             () -> {
                 MediaModel model = saveMediaInformation(
@@ -121,6 +158,12 @@ public class MediaControllerService extends EzyLoggable {
                     newFileName,
                     fileMetadata,
                     notPublic
+                );
+                notifyMediaEvent(
+                    new MediaUploadedEvent(
+                        model,
+                        mediaFilePath
+                    )
                 );
                 byte[] responseBytes = mediaAddResponse(model).getBytes();
                 response.getOutputStream().write(responseBytes);
@@ -169,6 +212,7 @@ public class MediaControllerService extends EzyLoggable {
                 media.getName()
             );
             FolderProxy.deleteFile(filePath);
+            notifyMediaEvent(new MediaRemovedEvent(media));
         }
     }
 
@@ -355,5 +399,17 @@ public class MediaControllerService extends EzyLoggable {
 
     private String mediaAddResponse(MediaModel model) throws IOException {
         return objectMapper.writeValueAsString(model);
+    }
+
+    private void notifyMediaEvent(Object event) {
+        try {
+            eventHandlerManager.handleEvent(event);
+        } catch (Throwable e) {
+            logger.warn(
+                "notify media event: {} failed",
+                event.getClass().getSimpleName(),
+                e
+            );
+        }
     }
 }
