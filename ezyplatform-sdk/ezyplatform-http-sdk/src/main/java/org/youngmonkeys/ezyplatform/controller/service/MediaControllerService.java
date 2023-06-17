@@ -31,9 +31,7 @@ import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
-import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
-import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
-import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
+import org.youngmonkeys.ezyplatform.event.*;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.io.FolderProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
@@ -178,6 +176,7 @@ public class MediaControllerService extends EzyLoggable {
         UpdateMediaModel model = requestToModelConverter
             .toModel(mediaId, request);
         mediaService.updateMedia(model);
+        notifyMediaEvent(new MediaUpdatedEvent(model.getMediaId()));
     }
 
     public void updateMedia(
@@ -188,15 +187,17 @@ public class MediaControllerService extends EzyLoggable {
         UpdateMediaModel model = requestToModelConverter
             .toModel(mediaName, request);
         mediaService.updateMedia(ownerId, model);
+        notifyMediaEvent(new MediaUpdatedEvent(model.getMediaId()));
     }
 
     public void removeMedia(long mediaId) {
-        MediaModel mediaModel = mediaService.removeMedia(mediaId);
+        MediaModel media = mediaService.removeMedia(mediaId);
         File file = fileSystemManager.getMediaFilePath(
-            mediaModel.getType().getFolder(),
-            mediaModel.getName()
+            media.getType().getFolder(),
+            media.getName()
         );
         FolderProxy.deleteFile(file);
+        notifyMediaEvent(new MediaRemovedEvent(media));
     }
 
     public void removeMedia(
@@ -253,6 +254,7 @@ public class MediaControllerService extends EzyLoggable {
         ) {
             throw new MediaNotFoundException(name);
         }
+        notifyMediaEvent(new MediaDownloadEvent(media));
         MediaType mediaType = media.getType();
         File resourcePath = fileSystemManager.getMediaFilePath(
             mediaType.getFolder(),
