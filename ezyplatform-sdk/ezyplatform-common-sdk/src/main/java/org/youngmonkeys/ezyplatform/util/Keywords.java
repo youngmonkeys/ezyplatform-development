@@ -71,10 +71,8 @@ public final class Keywords {
                 longKeywordLength -= Objects.requireNonNull(firstWord).length();
                 longKeywordLength -= 1;
             }
-            answer.add(wordTrim);
             answer.add(wordTrim.toLowerCase());
             String longKeywordString = String.join(" ", longKeyword);
-            answer.add(longKeywordString);
             answer.add(longKeywordString.toLowerCase());
         }
         return answer;

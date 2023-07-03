@@ -37,15 +37,10 @@ public class KeywordsTest {
         // then
         Set<String> expectation = Sets.newHashSet(
             "lucky",
-            "Lucky",
             "wheel",
-            "Wheel",
             "game",
-            "Game",
             "lucky wheel",
-            "Lucky Wheel",
-            "lucky wheel game",
-            "Lucky Wheel Game"
+            "lucky wheel game"
         );
         Asserts.assertEquals(actual, expectation);
     }
@@ -61,11 +56,8 @@ public class KeywordsTest {
         // then
         Set<String> expectation = Sets.newHashSet(
             "l",
-            "L",
             "w",
-            "W",
-            "g",
-            "G"
+            "g"
         );
         Asserts.assertEquals(actual, expectation);
     }
@@ -81,15 +73,10 @@ public class KeywordsTest {
         // then
         Set<String> expectation = Sets.newHashSet(
             "lucky",
-            "Lucky",
             "wheel",
-            "Wheel",
             "game",
-            "Game",
             "lucky wheel",
-            "Lucky Wheel",
-            "wheel game",
-            "Wheel Game"
+            "wheel game"
         );
         Asserts.assertEquals(actual, expectation);
     }
