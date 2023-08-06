@@ -32,7 +32,7 @@
 
     <properties>
         <ezy.version>1.2.8</ezy.version>
-        <ezy.http.version>1.2.1</ezy.http.version>
+        <ezy.http.version>1.2.2</ezy.http.version>
     </properties>
 
     <dependencies>
