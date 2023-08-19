@@ -32,6 +32,7 @@ public class LetterModel {
     private long toAdminId;
     private long toUserId;
     private long parentId;
+    private long letterReceiverId;
     private long notificationReceiverId;
     private String confidenceLevel;
     private String importantLevel;

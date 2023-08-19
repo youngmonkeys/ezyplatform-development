@@ -50,7 +50,7 @@ public class NotificationPaginationParameterConverter
         map.put(
             NotificationPaginationSortOrder.ID_DESC.toString(),
             model -> new IdDescNotificationPaginationParameter(
-                model.getId()
+                model.getNotificationReceiverId()
             )
         );
     }

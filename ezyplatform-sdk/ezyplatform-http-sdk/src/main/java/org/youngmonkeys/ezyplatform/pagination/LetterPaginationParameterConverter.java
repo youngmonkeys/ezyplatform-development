@@ -50,7 +50,7 @@ public class LetterPaginationParameterConverter
         map.put(
             LetterPaginationSortOrder.ID_DESC.toString(),
             model -> new IdDescLetterPaginationParameter(
-                model.getId()
+                model.getLetterReceiverId()
             )
         );
     }
