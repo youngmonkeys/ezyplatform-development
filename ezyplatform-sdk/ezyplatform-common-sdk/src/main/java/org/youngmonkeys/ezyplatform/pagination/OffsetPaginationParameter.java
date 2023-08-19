@@ -43,7 +43,7 @@ public class OffsetPaginationParameter implements PaginationParameter {
 
     @Override
     public boolean isEmpty() {
-        return true;
+        return offset == 0;
     }
 
     @Override

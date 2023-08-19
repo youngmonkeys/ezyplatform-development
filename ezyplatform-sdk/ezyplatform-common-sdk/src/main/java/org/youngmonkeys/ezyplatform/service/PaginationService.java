@@ -16,9 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import java.util.Collections;
-import java.util.List;
-
+import com.tvd12.ezyfox.io.EzyLists;
+import com.tvd12.ezyfox.security.EzyBase64;
 import org.youngmonkeys.ezyplatform.data.PaginationParameter;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.pagination.OffsetPaginationParameter;
@@ -26,8 +25,8 @@ import org.youngmonkeys.ezyplatform.rx.Reactive;
 import org.youngmonkeys.ezyplatform.rx.RxOperation;
 import org.youngmonkeys.ezyplatform.rx.RxValueMap;
 
-import com.tvd12.ezyfox.io.EzyLists;
-import com.tvd12.ezyfox.security.EzyBase64;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * For pagination business.
@@ -104,12 +103,18 @@ public abstract class PaginationService<T, F, P> {
         String pageToken,
         int limit
     ) {
+        long tmpTotalItems = -1L;
         P paginationParameter = doDeserializePageToken(pageToken);
         if (paginationParameter == null) {
-            paginationParameter = defaultLastPaginationParameter(filter, limit);
+            tmpTotalItems = getTotalItems(filter);
+            paginationParameter = defaultLastPaginationParameter(
+                tmpTotalItems,
+                limit
+            );
         }
         P paginationParameterFinal = paginationParameter;
         int limitPlusOne = limit + 1;
+        final long totalItems = tmpTotalItems;
         return Reactive.multiple()
             .registerRx(
                 "listPlusOne",
@@ -117,7 +122,7 @@ public abstract class PaginationService<T, F, P> {
             )
             .register(
                 "total",
-                () -> getTotalItems(filter)
+                () -> totalItems >= 0 ? totalItems : getTotalItems(filter)
             )
             .blockingGet(map ->
                 toPreviousPageModel(map, paginationParameterFinal, limit)
@@ -152,7 +157,7 @@ public abstract class PaginationService<T, F, P> {
                 .prev(
                     doSerializeToOffsetPageToken(
                         offsetPaginationParameter.previousOffset(limit),
-                        nextPageTokenItem
+                        lastPageTokenItem
                     )
                 )
                 .build();
@@ -189,12 +194,19 @@ public abstract class PaginationService<T, F, P> {
             paginationParameter
         ) && list.size() > 0;
         boolean hasPrev = listPlusOne.size() > limit;
+        OffsetPaginationParameter offsetPaginationParameter = null;
+        if (paginationParameter instanceof OffsetPaginationParameter) {
+            offsetPaginationParameter =
+                (OffsetPaginationParameter) paginationParameter;
+        }
+        if (offsetPaginationParameter != null) {
+            hasNext = listPlusOne.size() > limit;
+            hasPrev = offsetPaginationParameter.getOffset() > 0;
+        }
         T nextPageTokenItem = hasNext ? EzyLists.first(list) : null;
         T lastPageTokenItem =  hasPrev ? EzyLists.last(list) : null;
         PaginationModel.PageToken pageToken;
-        if (paginationParameter instanceof OffsetPaginationParameter) {
-            OffsetPaginationParameter offsetPaginationParameter =
-                (OffsetPaginationParameter) paginationParameter;
+        if (offsetPaginationParameter != null) {
             pageToken = PaginationModel.PageToken
                 .builder()
                 .next(
@@ -206,7 +218,7 @@ public abstract class PaginationService<T, F, P> {
                 .prev(
                     doSerializeToOffsetPageToken(
                         offsetPaginationParameter.previousOffset(limit),
-                        nextPageTokenItem
+                        lastPageTokenItem
                     )
                 )
                 .build();
@@ -318,7 +330,10 @@ public abstract class PaginationService<T, F, P> {
         return null;
     }
 
-    protected P defaultLastPaginationParameter(F filter, int limit) {
+    protected P defaultLastPaginationParameter(
+        long totalItems,
+        int limit
+    ) {
         return null;
     }
 

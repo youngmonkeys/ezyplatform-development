@@ -70,9 +70,12 @@ public class OffsetPaginationService<
     }
 
     @Override
-    protected P defaultLastPaginationParameter(F filter, int limit) {
+    protected P defaultLastPaginationParameter(
+        long totalItems,
+        int limit
+    ) {
         return paginationParameterCreator.apply(
-            getTotalItems(filter) - limit
+            totalItems - limit
         );
     }
 }
