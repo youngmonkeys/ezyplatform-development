@@ -183,25 +183,34 @@ public abstract class PaginationService<T, F, P> {
             .build();
     }
 
+    @SuppressWarnings("MethodLength")
     private PaginationModel<T> toPreviousPageModel(
         RxValueMap map,
         P paginationParameter,
         int limit
     ) {
-        List<T> listPlusOne = map.get("listPlusOne");
-        List<T> list = EzyLists.take(listPlusOne, limit);
-        boolean hasNext = !isEmptyPaginationParameter(
-            paginationParameter
-        ) && list.size() > 0;
-        boolean hasPrev = listPlusOne.size() > limit;
+        List<T> list;
+        boolean hasNext;
+        boolean hasPrev;
         OffsetPaginationParameter offsetPaginationParameter = null;
         if (paginationParameter instanceof OffsetPaginationParameter) {
             offsetPaginationParameter =
                 (OffsetPaginationParameter) paginationParameter;
         }
+        long totalItems = map.get("total");
+        List<T> listPlusOne = map.get("listPlusOne");
         if (offsetPaginationParameter != null) {
-            hasNext = listPlusOne.size() > limit;
-            hasPrev = offsetPaginationParameter.getOffset() > 0;
+            int offset = offsetPaginationParameter.getOffset();
+            int count = offset >= 0 ? limit : Math.max(offset + limit, 0);
+            list = EzyLists.take(listPlusOne, count);
+            hasNext = (offset + count) < totalItems;
+            hasPrev = offset > 0;
+        } else {
+            list = EzyLists.take(listPlusOne, limit);
+            hasNext = !isEmptyPaginationParameter(
+                paginationParameter
+            ) && list.size() > 0;
+            hasPrev = listPlusOne.size() > limit;
         }
         T nextPageTokenItem = hasNext ? EzyLists.first(list) : null;
         T lastPageTokenItem =  hasPrev ? EzyLists.last(list) : null;
@@ -233,7 +242,7 @@ public abstract class PaginationService<T, F, P> {
         return PaginationModel.<T>builder()
             .items(list)
             .count(list.size())
-            .total(map.get("total"))
+            .total(totalItems)
             .timestamp(getTimestamp())
             .pageToken(pageToken)
             .continuation(

@@ -129,6 +129,7 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
             int offset = ((OffsetPaginationParameter) paginationParameter)
                 .getOffset();
             actualLimit = (offset >= 0) ? limit : limit + offset;
+            actualLimit = Math.max(actualLimit, 0);
             actualOffset = Math.max(offset, 0);
         }
         return resultType != entityType
