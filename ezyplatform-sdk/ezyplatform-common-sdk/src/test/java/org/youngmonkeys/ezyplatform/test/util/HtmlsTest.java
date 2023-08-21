@@ -135,6 +135,15 @@ public class HtmlsTest {
 
     @Test
     public void validateHtmlContentTest() throws Exception {
+        validateHtmlContent(
+            "<" + TAG_NAME_PRE + ">\n```java\nHello World\n```\n</pre>"
+        );
+        validateHtmlContent(
+            "<li>One backtick symbol (\\`): \n\n \\ \\\\ \n</li>"
+        );
+        validateHtmlContent(
+            "<li>One backtick symbol (\\`): For inline code. Example: \\`console.log(\"Hello\")\\`.</li>"
+        );
         validateHtmlContent("`if (frame.getStartTime() < minStartTime) { a = b`");
         validateHtmlContent("<p>hello world</p>");
         validateHtmlContent(
@@ -193,6 +202,14 @@ public class HtmlsTest {
             .load("to-validate.html")
         ) {
             validateHtmlContent(EzyInputStreams.toStringUtf8(inputStream));
-        };
+        }
+    }
+
+    @Test
+    public void escapeHtmlTagTest() {
+        Asserts.assertEquals(
+            escapeHtmlTag("<>"),
+            "&lt&gt"
+        );
     }
 }

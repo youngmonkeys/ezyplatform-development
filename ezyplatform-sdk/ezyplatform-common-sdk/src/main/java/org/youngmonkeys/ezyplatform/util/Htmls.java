@@ -186,11 +186,24 @@ public final class Htmls {
         String content,
         boolean acceptMarkdown
     ) {
+        char ch = 0;
+        int backslashCount;
         Deque<String> openTags = new ArrayDeque<>();
         int contentLength = content.length();
         for (int i = 0; i < contentLength; ++i) {
-            char ch = content.charAt(i);
-            if (ch == '`' && acceptMarkdown) {
+            backslashCount = 0;
+            for (; i < contentLength; ++i) {
+                ch = content.charAt(i);
+                if (ch == '\\') {
+                    ++backslashCount;
+                } else {
+                    break;
+                }
+            }
+            if (ch == '`'
+                && backslashCount % 2 == 0
+                && acceptMarkdown
+            ) {
                 StringBuilder marks = new StringBuilder();
                 for (; i < contentLength; ++i) {
                     ch = content.charAt(i);
@@ -489,7 +502,6 @@ public final class Htmls {
                 && !startDoubleQuotes
                 && endsWith(content, i, tagName)
             ) {
-                ++i;
                 break;
             }
         }
