@@ -17,10 +17,12 @@
 package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
 @Builder
+@EqualsAndHashCode
 public class SaveDataKeywordModel {
     private long dataId;
     private String keyword;
