@@ -37,6 +37,7 @@ import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -101,6 +102,9 @@ public class DefaultAdminService implements AdminService {
     public Map<Long, AdminNameModel> getAdminNameMapByIds(
         Collection<Long> adminIds
     ) {
+        if (adminIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return adminRepository.findAdminNamesByIds(adminIds)
             .stream()
             .collect(
@@ -122,6 +126,9 @@ public class DefaultAdminService implements AdminService {
     public Map<Long, UuidNameModel> getAdminUuidNameMapByIds(
         Collection<Long> adminIds
     ) {
+        if (adminIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return adminRepository.findAdminUuidNamesByIds(adminIds)
             .stream()
             .collect(

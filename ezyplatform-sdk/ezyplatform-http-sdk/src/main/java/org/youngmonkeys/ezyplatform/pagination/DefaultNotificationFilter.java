@@ -21,7 +21,7 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 
 @Getter
-public class DefaultNotificationFilter implements MediaFilter {
+public class DefaultNotificationFilter implements NotificationFilter {
     public final Long toUserId;
     public final Long toAdminId;
 

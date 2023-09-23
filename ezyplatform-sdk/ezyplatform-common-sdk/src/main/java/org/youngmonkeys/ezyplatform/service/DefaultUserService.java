@@ -35,6 +35,7 @@ import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -101,6 +102,9 @@ public class DefaultUserService implements UserService {
 
     @Override
     public List<UserModel> getUserListByIds(Collection<Long> userIds) {
+        if (userIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return newArrayList(
             userRepository.findListByIds(userIds),
             entityToModelConverter::toModel
@@ -117,6 +121,9 @@ public class DefaultUserService implements UserService {
     public Map<Long, UserNameModel> getUsernameMapByIds(
         Collection<Long> userIds
     ) {
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         List<IdNameResult> results = userRepository
             .findUserIdAndNameByIds(userIds);
         return results.stream()
@@ -139,6 +146,9 @@ public class DefaultUserService implements UserService {
     public Map<Long, UuidNameModel> getUserUuidNameMapByIds(
         Collection<Long> userIds
     ) {
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return userRepository.findUserUuidNamesByIds(userIds)
             .stream()
             .collect(
@@ -166,6 +176,9 @@ public class DefaultUserService implements UserService {
     public Map<String, Long> getUserIdMapByUuids(
         Collection<String> uuids
     ) {
+        if (uuids.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return userRepository.findUserIdsByUuids(uuids)
             .stream()
             .collect(

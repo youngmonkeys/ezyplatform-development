@@ -34,6 +34,7 @@ import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -138,6 +139,9 @@ public class DefaultMediaService implements MediaService {
     public List<MediaModel> getMediaListByIds(
         Collection<Long> mediaIds
     ) {
+        if (mediaIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return newArrayList(
             mediaRepository.findListByIds(mediaIds),
             entityToModelConverter::toModel
