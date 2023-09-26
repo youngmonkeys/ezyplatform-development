@@ -58,11 +58,7 @@ public class PaginationLetterService extends CommonPaginationService<
             Letter letter = letterRepository.findById(
                 it.getLetterId()
             );
-            return entityToModelConverter.toModel(
-                letter,
-                it,
-                false
-            );
+            return entityToModelConverter.toModel(letter, it);
         });
     }
 

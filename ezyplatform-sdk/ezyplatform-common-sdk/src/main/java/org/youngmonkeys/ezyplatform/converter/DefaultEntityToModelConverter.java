@@ -178,15 +178,14 @@ public class DefaultEntityToModelConverter {
 
     public LetterModel toModel(
         Letter letter,
-        LetterReceiver entity,
-        boolean includeFromAdmin
+        LetterReceiver entity
     ) {
         return LetterModel.builder()
             .id(letter.getId())
             .title(letter.getTitle())
             .content(letter.getContent())
             .status(letter.getStatus())
-            .fromAdminId(includeFromAdmin ? letter.getFromAdminId() : 0L)
+            .fromAdminId(letter.getFromAdminId())
             .fromUserId(letter.getFromUserId())
             .toAdminId(entity.getToAdminId())
             .toUserId(entity.getToUserId())
