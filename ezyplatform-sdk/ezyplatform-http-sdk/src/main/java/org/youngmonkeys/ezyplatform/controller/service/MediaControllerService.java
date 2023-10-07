@@ -26,6 +26,7 @@ import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
+import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
@@ -37,8 +38,8 @@ import org.youngmonkeys.ezyplatform.io.FolderProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.pagination.DefaultMediaFilter;
-import org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
+import org.youngmonkeys.ezyplatform.response.MediaResponse;
 import org.youngmonkeys.ezyplatform.service.MediaService;
 import org.youngmonkeys.ezyplatform.service.PaginationMediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
@@ -57,6 +58,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static java.util.Collections.singletonMap;
+import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModel;
 
 public class MediaControllerService extends EzyLoggable {
 
@@ -69,6 +71,7 @@ public class MediaControllerService extends EzyLoggable {
     private final CommonValidator commonValidator;
     private final MediaValidator mediaValidator;
     private final HttpRequestToModelConverter requestToModelConverter;
+    private final HttpModelToResponseConverter modelToResponseConverter;
     private final EzyLazyInitializer<FileUploader> fileUploaderWrapper;
     private final EzyInputStreamLoader inputStreamLoader;
     private final ObjectMapper objectMapper;
@@ -83,6 +86,7 @@ public class MediaControllerService extends EzyLoggable {
         CommonValidator commonValidator,
         MediaValidator mediaValidator,
         HttpRequestToModelConverter requestToModelConverter,
+        HttpModelToResponseConverter modelToResponseConverter,
         EzySingletonFactory singletonFactory,
         EzyInputStreamLoader inputStreamLoader,
         ObjectMapper objectMapper
@@ -98,6 +102,7 @@ public class MediaControllerService extends EzyLoggable {
         this.fileSystemManager = fileSystemManager;
         this.resourceDownloadManager = resourceDownloadManager;
         this.requestToModelConverter = requestToModelConverter;
+        this.modelToResponseConverter = modelToResponseConverter;
         this.fileUploaderWrapper = new EzyLazyInitializer<>(
             () -> singletonFactory.getSingletonCast(
                 FileUploader.class
@@ -333,23 +338,24 @@ public class MediaControllerService extends EzyLoggable {
         return mediaService.getMediaByName(name);
     }
 
-    public PaginationModel<MediaModel> getMediaList(
+    public PaginationModel<MediaResponse> getMediaList(
         String nextPageToken,
         String prevPageToken,
         boolean lastPage,
         int limit
     ) {
         commonValidator.validatePageSize(limit);
-        return PaginationModelFetchers.getPaginationModel(
+        PaginationModel<MediaModel> pagination = getPaginationModel(
             paginationMediaService,
             nextPageToken,
             prevPageToken,
             lastPage,
             limit
         );
+        return pagination.map(modelToResponseConverter::toResponse);
     }
 
-    public PaginationModel<MediaModel> getMediaList(
+    public PaginationModel<MediaResponse> getMediaList(
         long ownerId,
         String nextPageToken,
         String prevPageToken,
@@ -357,7 +363,7 @@ public class MediaControllerService extends EzyLoggable {
         int limit
     ) {
         commonValidator.validatePageSize(limit);
-        return PaginationModelFetchers.getPaginationModel(
+        PaginationModel<MediaModel> pagination = getPaginationModel(
             paginationMediaService,
             DefaultMediaFilter
                 .builder()
@@ -368,6 +374,7 @@ public class MediaControllerService extends EzyLoggable {
             lastPage,
             limit
         );
+        return pagination.map(modelToResponseConverter::toResponse);
     }
 
     private MediaModel saveMediaInformation(
