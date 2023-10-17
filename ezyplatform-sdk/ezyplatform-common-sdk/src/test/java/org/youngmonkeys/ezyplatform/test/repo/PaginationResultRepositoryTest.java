@@ -272,7 +272,7 @@ public class PaginationResultRepositoryTest {
         int limit = RandomUtil.randomSmallInt();
         Query query = mock(Query.class);
         when(query.setFirstResult(0)).thenReturn(query);
-        when(query.setMaxResults(limit)).thenReturn(query);
+        when(query.setMaxResults(limit - 1)).thenReturn(query);
         List<Long> ids = RandomUtil.randomShortList(Long.class);
         when(query.getResultList()).thenReturn(ids);
         when(
