@@ -17,21 +17,28 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.util.EzyLoggable;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.AdminActivityHistory;
 import org.youngmonkeys.ezyplatform.model.AddAdminActivityHistoryModel;
 
 @AllArgsConstructor
-public class DefaultAdminActivityHistoryService implements AdminActivityHistoryService {
+public class DefaultAdminActivityHistoryService
+    extends EzyLoggable
+    implements AdminActivityHistoryService {
 
     private final EzyDatabaseRepository<Long, AdminActivityHistory> adminActivityHistoryRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
     public void addHistory(AddAdminActivityHistoryModel model) {
-        adminActivityHistoryRepository.save(
-            modelToEntityConverter.toEntity(model)
-        );
+        try {
+            adminActivityHistoryRepository.save(
+                modelToEntityConverter.toEntity(model)
+            );
+        } catch (Exception e) {
+            logger.warn("save admin activity history error", e);
+        }
     }
 }

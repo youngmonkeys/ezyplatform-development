@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH;
 
 @AllArgsConstructor
 public class DefaultModelToEntityConverter {
@@ -155,13 +156,22 @@ public class DefaultModelToEntityConverter {
     }
 
     public AdminActivityHistory toEntity(AddAdminActivityHistoryModel model) {
+        String parameters = valueToJsonOrNull(model.getParameters());
+        if (parameters != null
+            && parameters.length() > MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH
+        ) {
+            parameters = parameters.substring(
+                0,
+                MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH
+            );
+        }
         AdminActivityHistory entity = new AdminActivityHistory();
         entity.setAdminId(model.getAdminId());
         entity.setFeature(model.getFeature());
         entity.setMethod(model.getMethod());
         entity.setUri(model.getUri());
         entity.setUriType(model.getUriType());
-        entity.setParameters(valueToJsonOrNull(model.getParameters()));
+        entity.setParameters(parameters);
         entity.setCreatedAt(clock.nowDateTime());
         return entity;
     }

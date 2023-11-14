@@ -77,6 +77,8 @@ public final class CommonConstants {
     public static final int MAX_LENGTH_ENUM_NAME = 25;
     public static final int MAX_LENGTH_SEARCH_KEYWORD = 50;
     public static final int MAX_SEARCH_KEYWORD_WORDS = 6;
+    public static final int MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH =
+        600;
 
     public static final int LIMIT_1500_RECORDS = 1500;
     public static final int LIMIT_3000_RECORDS = 3000;
