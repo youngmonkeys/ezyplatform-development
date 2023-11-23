@@ -46,7 +46,7 @@ public final class CommonConstants {
         "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.?[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
     public static final String PATTERN_WEBSOCKET_URL =
         "wss?:\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.?[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
-    public static final String PATTERN_MEDIA_NAME = "[a-zA-Z0-9]+\\.[a-zA-Z0-9]+";
+    public static final String PATTERN_MEDIA_NAME = "^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$";
     public static final String PATTERN_VERSION = "[0-9]+[\\.][0-9]+[\\.][0-9]+";
     public static final String PATTERN_PROPERTY_NAME = "[\\d\\w_\\-\\.\\+\\$]+";
     public static final String PATTERN_SHA256_STRING = "[a-fA-F0-9\\s]{64}";

@@ -131,4 +131,32 @@ public class DefaultValidatorTest {
             DefaultValidator.containsVariable("deea9efe778fd3ed248427997afb7d2c06fda7be2457f5188ace85d6dcd1594z")
         );
     }
+
+    @Test
+    public void isValidMediaNameTest() {
+        Asserts.assertTrue(
+            DefaultValidator.isValidMediaName("example.txt")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidMediaName("file-name.txt")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidMediaName("file_name.doc")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidMediaName("_file.txt")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidMediaName("folder/file.doc")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidMediaName(".hidden-file")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidMediaName("invalid..file")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidMediaName("5fcbfdc3c0b00331df26b45e3745df99a18ca94ce8dd736cc6f6bc6d89ae8ff0")
+        );
+    }
 }
