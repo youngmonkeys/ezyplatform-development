@@ -16,7 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import org.youngmonkeys.ezyplatform.rx.Reactive;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -103,8 +102,9 @@ public interface DataMetaService {
         String metaKey,
         List<String> metaValues
     ) {
-        Reactive.single(metaValues)
-            .operateItem(metaValue ->
+        metaValues
+            .parallelStream()
+            .forEach(metaValue ->
                 saveDataMetaIfAbsent(
                     dataType,
                     dataId,
@@ -120,8 +120,9 @@ public interface DataMetaService {
         String metaKey,
         Collection<Object> metaValues
     ) {
-        Reactive.single(metaValues)
-            .operateItem(metaValue ->
+        metaValues
+            .parallelStream()
+            .forEach(metaValue ->
                 saveDataMetaIfAbsent(
                     dataType,
                     dataId,
@@ -151,6 +152,24 @@ public interface DataMetaService {
         String metaKey,
         String metaValue
     );
+
+    default void saveDataMetaUniqueKeys(
+        String dataType,
+        long dataId,
+        Map<String, Object> valueMap
+    ) {
+        valueMap
+            .entrySet()
+            .parallelStream()
+            .forEach(e ->
+                saveDataMetaUniqueKey(
+                    dataType,
+                    dataId,
+                    e.getKey(),
+                    e.getValue()
+                )
+            );
+    }
 
     BigDecimal increaseDataMetaValue(
         String dataType,

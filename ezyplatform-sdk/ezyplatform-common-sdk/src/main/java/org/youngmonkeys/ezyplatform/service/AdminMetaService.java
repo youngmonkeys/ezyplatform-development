@@ -16,7 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import org.youngmonkeys.ezyplatform.rx.Reactive;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -93,8 +92,9 @@ public interface AdminMetaService {
         String metaKey,
         List<String> metaValues
     ) {
-        Reactive.single(metaValues)
-            .operateItem(metaValue ->
+        metaValues
+            .parallelStream()
+            .forEach(metaValue ->
                 saveAdminMetaIfAbsent(
                     adminId,
                     metaKey,
@@ -108,8 +108,9 @@ public interface AdminMetaService {
         String metaKey,
         Collection<Object> metaValues
     ) {
-        Reactive.single(metaValues)
-            .operateItem(metaValue ->
+        metaValues
+            .parallelStream()
+            .forEach(metaValue ->
                 saveAdminMetaIfAbsent(
                     adminId,
                     metaKey,
@@ -135,6 +136,22 @@ public interface AdminMetaService {
         String metaKey,
         String metaValue
     );
+
+    default void saveAdminMetaUniqueKeys(
+        long adminId,
+        Map<String, Object> valueMap
+    ) {
+        valueMap
+            .entrySet()
+            .parallelStream()
+            .forEach(e ->
+                saveAdminMetaUniqueKey(
+                    adminId,
+                    e.getKey(),
+                    e.getValue()
+                )
+            );
+    }
 
     BigDecimal increaseAdminMetaValue(
         long adminId,
