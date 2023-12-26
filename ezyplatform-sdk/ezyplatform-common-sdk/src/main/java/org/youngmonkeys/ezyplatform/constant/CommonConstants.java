@@ -92,6 +92,8 @@ public final class CommonConstants {
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN = "adminAccessToken";
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT = "adminAccessTokenExpiredAt";
     public static final String COOKIE_NAME_ADMIN_SSO_CALL_BACK_URL = "adminSSOCallbackUrl";
+    public static final String COOKIE_NAME_MARKET_ACCESS_TOKEN = "marketAccessToken";
+    public static final String COOKIE_NAME_MARKET_ACCESS_TOKEN_EXPIRED_AT = "marketAccessTokenExpiredAt";
 
     public static final int COOKIE_ADMIN_SSO_CALL_BACK_URL_MAX_AGE = 5 * 60;
 

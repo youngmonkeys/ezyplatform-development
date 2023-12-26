@@ -210,6 +210,17 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public UserAccessTokenModel getUserAccessTokenByAccessToken(
+        String accessToken
+    ) {
+        return entityToModelConverter.toModel(
+            accessTokenRepository.findById(
+                accessToken
+            )
+        );
+    }
+
+    @Override
     public UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
         String accessToken,
         boolean verifyStatus

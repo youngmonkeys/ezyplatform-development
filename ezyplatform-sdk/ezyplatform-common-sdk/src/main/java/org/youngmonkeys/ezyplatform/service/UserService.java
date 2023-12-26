@@ -56,6 +56,10 @@ public interface UserService {
 
     long validateUserAccessToken(String accessToken);
 
+    UserAccessTokenModel getUserAccessTokenByAccessToken(
+        String accessToken
+    );
+
     UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
         String accessToken,
         boolean verifyStatus
