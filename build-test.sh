@@ -15,11 +15,11 @@
 #
 
 cd ezyplatform-devtools
-mvn clean install -Dmaven.test.skip=true
+mvn clean install
 cd ..
 cd ezyplatform-parent
-mvn clean install -Dmaven.test.skip=true
+mvn clean install
 cd ..
 cd ezyplatform-sdk
-mvn clean install -Dmaven.test.skip=true
+mvn clean install
 cd ..
