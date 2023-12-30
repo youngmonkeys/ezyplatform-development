@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.test.util;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import static org.youngmonkeys.ezyplatform.util.Numbers.*;
@@ -129,6 +130,32 @@ public class NumbersTest {
         Asserts.assertEquals(
             toPaddedValueUint256(null, BigInteger.ONE),
             "0000000000000000000000000000000000000000000000000000000000000000000000000001"
+        );
+    }
+
+    @Test
+    public void toNoTrailingZerosStringTest() {
+        Asserts.assertEquals(
+            toNoTrailingZerosString(BigDecimal.ZERO),
+            "0"
+        );
+        Asserts.assertEquals(
+            toNoTrailingZerosString(
+                new BigDecimal(String.valueOf(Long.MAX_VALUE))
+            ),
+            String.valueOf(Long.MAX_VALUE)
+        );
+        Asserts.assertEquals(
+            toNoTrailingZerosString(new BigDecimal("25.00000")),
+            "25"
+        );
+        Asserts.assertEquals(
+            toNoTrailingZerosString(new BigDecimal("0.02500")),
+            "0.025"
+        );
+        Asserts.assertEquals(
+            toNoTrailingZerosString(new BigDecimal("-25.00000")),
+            "-25"
         );
     }
 }

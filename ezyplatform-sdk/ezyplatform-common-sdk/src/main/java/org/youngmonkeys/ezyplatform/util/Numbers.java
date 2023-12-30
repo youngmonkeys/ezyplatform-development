@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public final class Numbers {
@@ -119,5 +120,21 @@ public final class Numbers {
         return value == null
             ? (defaultValue == null ? null : String.format(format, defaultValue))
             : String.format(format, value);
+    }
+
+    public static BigDecimal stripTrailingZeros(
+        BigDecimal value
+    ) {
+        return value == null
+            ? null
+            : value.stripTrailingZeros();
+    }
+
+    public static String toNoTrailingZerosString(
+        BigDecimal value
+    ) {
+        return value == null
+            ? null
+            : stripTrailingZeros(value).toPlainString();
     }
 }
