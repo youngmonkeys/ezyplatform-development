@@ -197,13 +197,12 @@ public abstract class PaginationService<T, F, P> {
             offsetPaginationParameter =
                 (OffsetPaginationParameter) paginationParameter;
         }
-        long totalItems = map.get("total");
         List<T> listPlusOne = map.get("listPlusOne");
         if (offsetPaginationParameter != null) {
             int offset = offsetPaginationParameter.getOffset();
             int count = offset >= 0 ? limit : Math.max(offset + limit, 0);
             list = EzyLists.take(listPlusOne, count);
-            hasNext = (offset + count) < totalItems;
+            hasNext = listPlusOne.size() > count;
             hasPrev = offset > 0;
         } else {
             list = EzyLists.take(listPlusOne, limit);
@@ -239,6 +238,7 @@ public abstract class PaginationService<T, F, P> {
                 .prev(doSerializeToPageToken(paginationParameter, lastPageTokenItem))
                 .build();
         }
+        long totalItems = map.get("total");
         return PaginationModel.<T>builder()
             .items(list)
             .count(list.size())
