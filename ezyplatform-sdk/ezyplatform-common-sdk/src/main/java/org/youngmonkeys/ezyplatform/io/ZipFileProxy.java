@@ -17,9 +17,9 @@
 package org.youngmonkeys.ezyplatform.io;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -28,25 +28,39 @@ public final class ZipFileProxy {
 
     private ZipFileProxy() {}
 
-    public static void unzipFile(
+    public static File unzipFile(
         File rootFolder,
         File zipFile
     ) throws IOException {
+        return unzipFile(rootFolder, zipFile, false);
+    }
+
+    public static File unzipFile(
+        File rootFolder,
+        File zipFile,
+        boolean excludeParentFolder
+    ) throws IOException {
         ZipInputStream zipInputStream = new ZipInputStream(
-            new FileInputStream(zipFile)
+            Files.newInputStream(zipFile.toPath())
         );
         try {
-            unzipStream(rootFolder, zipInputStream);
+            return unzipStream(
+                rootFolder,
+                zipInputStream,
+                excludeParentFolder
+            );
         } finally {
             zipInputStream.closeEntry();
             zipInputStream.close();
         }
     }
 
-    public static void unzipStream(
+    public static File unzipStream(
         File rootFolder,
-        ZipInputStream zipInputStream
+        ZipInputStream zipInputStream,
+        boolean excludeParentFolder
     ) throws IOException {
+        File answer = null;
         ZipEntry zipEntry;
         byte[] buffer = new byte[1024];
         while ((zipEntry = zipInputStream.getNextEntry()) != null) {
@@ -54,8 +68,17 @@ public final class ZipFileProxy {
             if (entryName.contains("..")) {
                 continue;
             }
+            if (excludeParentFolder) {
+                int index = entryName.indexOf('/', 1);
+                if (index > 0) {
+                    entryName = entryName.substring(index + 1);
+                }
+            }
             File newFile = Paths.get(rootFolder.toString(), entryName).toFile();
-            if (entryName.endsWith("/")) {
+            if (answer == null) {
+                answer = newFile;
+            }
+            if (zipEntry.isDirectory()) {
                 FolderProxy.mkdirs(newFile);
                 continue;
             }
@@ -67,5 +90,6 @@ public final class ZipFileProxy {
                 }
             }
         }
+        return answer;
     }
 }

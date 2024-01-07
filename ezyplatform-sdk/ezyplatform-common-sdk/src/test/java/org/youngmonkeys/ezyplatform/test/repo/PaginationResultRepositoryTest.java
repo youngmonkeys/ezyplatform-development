@@ -269,7 +269,7 @@ public class PaginationResultRepositoryTest {
         TestOffsetPaginationResultRepository instance = new TestOffsetPaginationResultRepository();
         instance.setDatabaseContext(databaseContext);
         TestFilter filter = new TestFilter();
-        int limit = RandomUtil.randomSmallInt();
+        int limit = RandomUtil.randomSmallInt() + 1;
         Query query = mock(Query.class);
         when(query.setFirstResult(0)).thenReturn(query);
         when(query.setMaxResults(limit - 1)).thenReturn(query);

@@ -41,7 +41,7 @@
     <properties>
         <ezy.platform.version>0.0.2</ezy.platform.version>
         <ezy.version>1.2.8</ezy.version>
-        <ezy.http.version>1.2.5</ezy.http.version>
+        <ezy.http.version>1.2.6</ezy.http.version>
         <ezy.server.version>1.2.8.1</ezy.server.version>
         <ezy.boot.version>1.1.0</ezy.boot.version>
         <game.box.version>1.2.2</game.box.version>
