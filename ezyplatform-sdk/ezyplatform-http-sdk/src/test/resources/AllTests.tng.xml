@@ -19,7 +19,7 @@
 <suite name="AllTests">
 	<test name="All">
 		<packages>
-			<package name="org.youngmonkeys.ezyplatform.test"/>
+			<package name="org.youngmonkeys.ezyplatform.test.util"/>
 		</packages>
 	</test>
 </suite>

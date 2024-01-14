@@ -38,6 +38,12 @@ public final class HttpRequests {
         String uri
     ) {
         String lang = getLanguage(request);
-        return uri + (isBlank(lang) ? "" : "?lang=" + lang);
+        if (isBlank(lang)) {
+            return uri;
+        }
+        char concatSymbol = uri.indexOf('?') < 0
+            ? '?'
+            : '&';
+        return uri + concatSymbol + "lang=" + lang;
     }
 }
