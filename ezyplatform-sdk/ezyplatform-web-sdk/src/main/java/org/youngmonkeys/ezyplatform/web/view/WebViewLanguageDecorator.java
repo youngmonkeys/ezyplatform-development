@@ -21,6 +21,7 @@ import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
 import lombok.Setter;
 import org.youngmonkeys.ezyplatform.service.WebLanguageService;
+import org.youngmonkeys.ezyplatform.util.HttpRequests;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
@@ -41,7 +42,7 @@ public class WebViewLanguageDecorator implements ViewDecorator {
     }
 
     protected void setLanguage(HttpServletRequest request, View view) {
-        String lang = request.getParameter("lang");
+        String lang = HttpRequests.getLanguage(request);
         if (isBlank(lang)) {
             if (view.containsVariable("ezyDefaultLang")) {
                 return;
