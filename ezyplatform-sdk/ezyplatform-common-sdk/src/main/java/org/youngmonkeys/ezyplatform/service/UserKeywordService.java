@@ -17,7 +17,6 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.model.AddUserKeywordModel;
-import org.youngmonkeys.ezyplatform.rx.Reactive;
 
 import java.util.Collection;
 
@@ -27,11 +26,11 @@ public interface UserKeywordService {
         long userId,
         Collection<String> keywords
     ) {
-        Reactive.multiple()
-            .registerConsumers(keywords, keyword ->
+        keywords
+            .parallelStream()
+            .forEach(keyword ->
                 addUserKeyword(userId, keyword)
-            )
-            .blockingExecute();
+            );
     }
 
     default void addUserKeyword(long userId, String keyword) {

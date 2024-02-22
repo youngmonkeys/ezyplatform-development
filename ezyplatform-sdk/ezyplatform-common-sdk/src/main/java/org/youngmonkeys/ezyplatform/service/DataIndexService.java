@@ -17,7 +17,6 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
-import org.youngmonkeys.ezyplatform.rx.Reactive;
 
 import java.util.Collection;
 
@@ -28,11 +27,11 @@ public interface DataIndexService {
         long dataId,
         Collection<String> keywords
     ) {
-        Reactive.multiple()
-            .registerConsumers(keywords, keyword ->
+        keywords
+            .parallelStream()
+            .forEach(keyword ->
                 saveKeyword(dataType, dataId, keyword)
-            )
-            .blockingExecute();
+            );
     }
 
     default void saveKeyword(

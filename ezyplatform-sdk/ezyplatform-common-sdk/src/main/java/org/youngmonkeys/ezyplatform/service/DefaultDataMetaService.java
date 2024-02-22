@@ -209,6 +209,7 @@ public class DefaultDataMetaService implements DataMetaService {
             dataId
         )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     DataMeta::getMetaKey,
@@ -233,6 +234,7 @@ public class DefaultDataMetaService implements DataMetaService {
             metaValues
         )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     DataMeta::getMetaValue,
