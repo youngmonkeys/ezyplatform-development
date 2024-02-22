@@ -21,11 +21,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_ADMIN_ACTIVITY_HISTORY;
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_admin_activity_histories")
+@Table(name = TABLE_NAME_ADMIN_ACTIVITY_HISTORY)
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminActivityHistory {

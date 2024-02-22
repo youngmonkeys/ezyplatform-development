@@ -21,11 +21,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_NOTIFICATION;
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_notifications")
+@Table(name = TABLE_NAME_NOTIFICATION)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Notification {

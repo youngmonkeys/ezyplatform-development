@@ -24,14 +24,15 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.math.BigInteger;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_USER_META;
+
 @Setter
 @Getter
 @Entity
-@Table(name = "ezy_user_meta")
+@Table(name = TABLE_NAME_USER_META)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserMeta {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

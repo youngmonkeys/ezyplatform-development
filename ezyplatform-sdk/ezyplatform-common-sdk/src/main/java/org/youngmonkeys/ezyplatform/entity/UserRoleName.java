@@ -21,11 +21,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_USER_ROLE_NAME;
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_user_role_names")
+@Table(name = TABLE_NAME_USER_ROLE_NAME)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRoleName {

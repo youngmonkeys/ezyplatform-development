@@ -24,12 +24,14 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_LINK;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "ezy_links")
+@Table(name = TABLE_NAME_LINK)
 public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

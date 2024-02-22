@@ -21,11 +21,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_USER_KEYWORD;
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_user_keywords")
+@Table(name = TABLE_NAME_USER_KEYWORD)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserKeyword {

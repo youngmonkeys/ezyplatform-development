@@ -21,11 +21,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_USER_ACCESS_TOKEN;
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_user_access_tokens")
+@Table(name = TABLE_NAME_USER_ACCESS_TOKEN)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserAccessToken {

@@ -21,12 +21,14 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_ADMIN_ROLE;
+
 @Getter
 @Setter
 @ToString
 @Entity
 @IdClass(AdminRoleId.class)
-@Table(name = "ezy_admin_roles")
+@Table(name = TABLE_NAME_ADMIN_ROLE)
 @AllArgsConstructor
 @NoArgsConstructor
 public class AdminRole {

@@ -24,7 +24,6 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 public enum ModuleType {
-
     THEME("theme", "Theme", "web", "themes"),
     WEB_PLUGIN("web-plugin", "Web Plugin", "web", "plugins"),
     SOCKET_APP("socket-app", "Socket App", "socket", "apps"),

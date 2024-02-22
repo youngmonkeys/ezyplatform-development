@@ -21,11 +21,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_SETTING;
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_settings")
+@Table(name = TABLE_NAME_SETTING)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Setting {

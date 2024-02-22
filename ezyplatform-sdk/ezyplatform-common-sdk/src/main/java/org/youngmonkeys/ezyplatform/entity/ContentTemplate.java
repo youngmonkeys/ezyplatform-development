@@ -21,11 +21,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_CONTENT_TEMPLATE;
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_content_templates")
+@Table(name = TABLE_NAME_CONTENT_TEMPLATE)
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContentTemplate {

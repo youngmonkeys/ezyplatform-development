@@ -24,10 +24,12 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_ADMIN;
+
 @Setter
 @Getter
 @Entity
-@Table(name = "ezy_admins")
+@Table(name = TABLE_NAME_ADMIN)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Admin {

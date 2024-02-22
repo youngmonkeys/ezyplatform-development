@@ -28,7 +28,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRoleId implements Serializable {
-
     @Column(name = "role_id")
     private long roleId;
 

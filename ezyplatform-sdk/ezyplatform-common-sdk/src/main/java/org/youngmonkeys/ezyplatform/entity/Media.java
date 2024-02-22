@@ -22,12 +22,13 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_medias")
+@Table(name = TABLE_NAME_MEDIA)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Media {

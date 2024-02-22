@@ -21,11 +21,13 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_DATA_INDEX;
+
 @Getter
 @Setter
 @ToString
 @Entity
-@Table(name = "ezy_data_indices")
+@Table(name = TABLE_NAME_DATA_INDEX)
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataIndex {

@@ -21,12 +21,14 @@ import lombok.*;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_ROLE_FEATURE;
+
 @Getter
 @Setter
 @ToString
 @Entity
 @IdClass(RoleFeatureId.class)
-@Table(name = "ezy_role_features")
+@Table(name = TABLE_NAME_ROLE_FEATURE)
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoleFeature {
