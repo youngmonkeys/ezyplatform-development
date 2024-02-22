@@ -185,6 +185,7 @@ public class DefaultUserMetaService implements UserMetaService {
             userId
         )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     UserMeta::getMetaKey,
@@ -207,6 +208,7 @@ public class DefaultUserMetaService implements UserMetaService {
             metaValues
         )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     UserMeta::getMetaValue,

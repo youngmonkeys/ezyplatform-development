@@ -41,7 +41,7 @@ public class DefaultUserKeywordService
             entity = modelToEntityConverter.toEntity(model);
             try {
                 userKeywordRepository.save(entity);
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 logger.info("add user keyword: {} failed: {}", entity, e.getMessage());
             }
         }

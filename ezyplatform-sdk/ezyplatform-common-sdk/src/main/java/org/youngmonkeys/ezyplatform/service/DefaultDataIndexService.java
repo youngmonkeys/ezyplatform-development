@@ -45,7 +45,7 @@ public class DefaultDataIndexService
         }
         try {
             dataIndexRepository.save(entity);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             logger.info("add data keyword: {} failed: {}", entity, e.getMessage());
         }
     }
