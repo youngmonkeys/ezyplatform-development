@@ -19,7 +19,8 @@ package org.youngmonkeys.ezyplatform.test.data;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.performance.Performance;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.data.PaginationParameter;
 
@@ -54,7 +55,8 @@ public class ParameterMapFetcherTest {
         Asserts.assertEquals(actual, expectation, false);
     }
 
-    @Data
+    @Getter
+    @Setter
     public static class AParameterListFetcher implements PaginationParameter {
         private long hello = 1;
         private String world = "a";
