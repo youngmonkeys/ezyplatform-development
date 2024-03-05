@@ -28,4 +28,6 @@ public interface UserRoleRepository
     void deleteByUserId(long userId);
 
     void deleteByUserIdIn(Collection<Long> userIds);
+
+    int countByRoleId(long roleId);
 }
