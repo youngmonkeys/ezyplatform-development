@@ -16,8 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyfox.function.EzyExceptionFunction;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
+import org.youngmonkeys.ezyplatform.entity.DataType;
 import org.youngmonkeys.ezyplatform.util.Uris;
 
 import java.util.Collections;
@@ -82,6 +84,16 @@ public interface SettingService {
         );
     }
 
+    default void saveSetting(
+        String name,
+        DataType dataType,
+        Object value
+    ) {
+        throw new EzyNotImplementedException(
+            "saveSetting has not implemented yet"
+        );
+    }
+
     String getDecryptionValue(String settingName);
 
     default <T> T getCachedValue(String settingName) {
@@ -95,6 +107,12 @@ public interface SettingService {
     long getMaxUploadFileSize();
 
     Set<String> getAcceptedMediaMimeTypes();
+
+    default String encryptValue(String settingValue) {
+        throw new EzyNotImplementedException(
+            "encryptValue has not implemented yet"
+        );
+    }
 
     String decryptValue(String encryptedSettingValue);
 

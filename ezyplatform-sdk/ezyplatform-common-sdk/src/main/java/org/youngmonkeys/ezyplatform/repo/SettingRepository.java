@@ -23,5 +23,7 @@ import java.time.LocalDateTime;
 
 public interface SettingRepository extends EzyDatabaseRepository<Long, Setting> {
 
+    void deleteByName(String name);
+
     Setting findByNameAndUpdatedAtGt(String name, LocalDateTime updatedAt);
 }

@@ -193,6 +193,17 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
+    public Setting toSettingEntity(
+        String name,
+        DataType dataType,
+        Object value
+    ) {
+        Setting entity = new Setting();
+        mergeToSettingEntity(name, dataType, value, entity);
+        entity.setCreatedAt(entity.getUpdatedAt());
+        return entity;
+    }
+
     public List<NotificationReceiver> toEntities(
         long notificationId,
         AddNotificationModel model
@@ -288,6 +299,26 @@ public class DefaultModelToEntityConverter {
         entity.setDataId(model.getDataId());
         entity.setKeyword(model.getKeyword());
         entity.setPriority(model.getPriority());
+        entity.setUpdatedAt(clock.nowDateTime());
+    }
+
+    public void mergeToSettingEntity(
+        String name,
+        DataType dataType,
+        Object value,
+        Setting entity
+    ) {
+        String valueString = EMPTY_STRING;
+        if (value != null) {
+            if (dataType == DataType.JSON) {
+                valueString = valueToJson(value);
+            } else {
+                valueString = String.valueOf(value);
+            }
+        }
+        entity.setName(name);
+        entity.setDataType(dataType);
+        entity.setValue(valueString);
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
