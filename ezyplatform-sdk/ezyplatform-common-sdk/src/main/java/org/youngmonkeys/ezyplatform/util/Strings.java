@@ -183,6 +183,6 @@ public final class Strings {
                 String.valueOf(param.getValue())
             );
         }
-        return content;
+        return content.replaceAll("\\s+", " ");
     }
 }

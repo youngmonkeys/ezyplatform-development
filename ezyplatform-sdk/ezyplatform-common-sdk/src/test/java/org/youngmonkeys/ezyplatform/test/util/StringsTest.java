@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.test.util;
 
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.performance.Performance;
@@ -253,5 +254,19 @@ public class StringsTest extends BaseTest {
             "a"
         );
         Asserts.assertNull(firstNotBlankValue("", ""));
+    }
+
+    @Test
+    public void fromTemplateAndParametersTest() {
+        Asserts.assertEquals(
+            fromTemplateAndParameters(
+                "hello ${vocative} ${who}",
+                EzyMapBuilder.mapBuilder()
+                    .put("vocative", " ")
+                    .put("who", "Dzung")
+                    .toMap()
+            ),
+            "hello Dzung"
+        );
     }
 }
