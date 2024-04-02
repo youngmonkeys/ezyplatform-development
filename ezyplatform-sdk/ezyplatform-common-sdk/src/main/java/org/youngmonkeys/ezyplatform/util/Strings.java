@@ -171,4 +171,18 @@ public final class Strings {
         }
         return null;
     }
+
+    public static String fromTemplateAndParameters(
+        String template,
+        Map<String, Object> parameters
+    ) {
+        String content = template;
+        for (Map.Entry<String, Object> param : parameters.entrySet()) {
+            content = content.replace(
+                "${" + param.getKey() + "}",
+                String.valueOf(param.getValue())
+            );
+        }
+        return content;
+    }
 }
