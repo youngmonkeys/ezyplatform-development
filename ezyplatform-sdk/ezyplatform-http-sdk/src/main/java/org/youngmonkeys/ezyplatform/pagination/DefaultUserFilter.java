@@ -26,6 +26,7 @@ import java.util.Collection;
 public class DefaultUserFilter implements UserFilter {
     public final String status;
     public final Collection<String> statuses;
+    public final String likeKeyword;
     public final Collection<String> keywords;
     public final Collection<Long> roleIds;
     public final Collection<String> roleNames;
@@ -33,6 +34,7 @@ public class DefaultUserFilter implements UserFilter {
     protected DefaultUserFilter(Builder<?> builder) {
         this.status = builder.status;
         this.statuses = builder.statuses;
+        this.likeKeyword = builder.likeKeyword;
         this.keywords = builder.keywords;
         this.roleIds = builder.roleIds;
         this.roleNames = builder.roleNames;
@@ -64,6 +66,20 @@ public class DefaultUserFilter implements UserFilter {
         if (statuses != null) {
             answer.and("e.status in :statuses");
         }
+        if (likeKeyword != null) {
+            answer.and(
+                new EzyQueryConditionBuilder()
+                    .append("(")
+                    .append("e.phone LIKE CONCAT('%',:likeKeyword,'%')")
+                    .or("e.email LIKE CONCAT('%',:likeKeyword,'%')")
+                    .or("e.displayName LIKE CONCAT('%',:likeKeyword,'%')")
+                    .or("e.username LIKE CONCAT('%',:likeKeyword,'%')")
+                    .or("e.uuid LIKE CONCAT('%',:likeKeyword,'%')")
+                    .or("e.id LIKE CONCAT('%',:likeKeyword,'%')")
+                    .append(")")
+                    .build()
+            );
+        }
         if (keywords != null) {
             answer.and("k.keyword IN :keywords");
         }
@@ -82,6 +98,7 @@ public class DefaultUserFilter implements UserFilter {
 
         private String status;
         private Collection<String> statuses;
+        public String likeKeyword;
         private Collection<String> keywords;
         private Collection<Long> roleIds;
         private Collection<String> roleNames;
@@ -93,6 +110,11 @@ public class DefaultUserFilter implements UserFilter {
 
         public T statuses(Collection<String> statuses) {
             this.statuses = statuses;
+            return (T) this;
+        }
+
+        public T likeKeyword(String likeKeyword) {
+            this.likeKeyword = likeKeyword;
             return (T) this;
         }
 
