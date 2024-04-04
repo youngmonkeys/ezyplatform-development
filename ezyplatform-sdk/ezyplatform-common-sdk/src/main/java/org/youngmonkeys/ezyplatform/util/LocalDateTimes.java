@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
@@ -24,6 +25,15 @@ import static com.tvd12.ezyfox.io.EzyDates.toInstant;
 public final class LocalDateTimes {
 
     private LocalDateTimes() {}
+
+    public static long toTimestamp(
+        LocalDate localDate,
+        ZoneId zoneId
+    ) {
+        return localDate == null
+            ? 0L
+            : toInstant(localDate, zoneId).toEpochMilli();
+    }
 
     public static long toTimestamp(
         LocalDateTime localDateTime,
