@@ -356,7 +356,7 @@ public class MediaControllerService extends EzyLoggable {
     }
 
     public PaginationModel<MediaResponse> getMediaList(
-        long ownerId,
+        long ownerUserId,
         String nextPageToken,
         String prevPageToken,
         boolean lastPage,
@@ -367,7 +367,29 @@ public class MediaControllerService extends EzyLoggable {
             paginationMediaService,
             DefaultMediaFilter
                 .builder()
-                .ownerUserId(ownerId)
+                .ownerUserId(ownerUserId)
+                .build(),
+            nextPageToken,
+            prevPageToken,
+            lastPage,
+            limit
+        );
+        return pagination.map(modelToResponseConverter::toResponse);
+    }
+
+    public PaginationModel<MediaResponse> getAdminMediaList(
+        long ownerAdminId,
+        String nextPageToken,
+        String prevPageToken,
+        boolean lastPage,
+        int limit
+    ) {
+        commonValidator.validatePageSize(limit);
+        PaginationModel<MediaModel> pagination = getPaginationModel(
+            paginationMediaService,
+            DefaultMediaFilter
+                .builder()
+                .ownerAdminId(ownerAdminId)
                 .build(),
             nextPageToken,
             prevPageToken,

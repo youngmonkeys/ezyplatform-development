@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import static org.youngmonkeys.ezyplatform.model.MediaModel.toMeMediaUrlOrDefault;
 import static org.youngmonkeys.ezyplatform.model.MediaModel.toMediaUrlOrDefault;
 
 @Getter
@@ -75,5 +76,9 @@ public class MediaNameModel {
 
     public String getUrlOrDefault(String defaultUrl) {
         return toMediaUrlOrDefault(name, url, defaultUrl);
+    }
+
+    public String getMeUrlOrDefault(String defaultUrl) {
+        return toMeMediaUrlOrDefault(name, url, defaultUrl);
     }
 }

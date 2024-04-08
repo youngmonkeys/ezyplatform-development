@@ -24,10 +24,7 @@ import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
 import org.youngmonkeys.ezyplatform.exception.AdminAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.AdminInvalidAccessTokenException;
 import org.youngmonkeys.ezyplatform.exception.AdminWaiting2FaAccessTokenException;
-import org.youngmonkeys.ezyplatform.model.AdminAccessTokenModel;
-import org.youngmonkeys.ezyplatform.model.AdminModel;
-import org.youngmonkeys.ezyplatform.model.AdminNameModel;
-import org.youngmonkeys.ezyplatform.model.UuidNameModel;
+import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.repo.AdminAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminRepository;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
@@ -137,6 +134,17 @@ public class DefaultAdminService implements AdminService {
                     resultToModelConverter::toModel
                 )
             );
+    }
+
+    @Override
+    public AvatarCoverImageIdsModel getAdminAvatarCoverImageIdsById(
+        long adminId
+    ) {
+        return resultToModelConverter.toModel(
+            adminRepository.findAdminAvatarCoverImageIdsById(
+                adminId
+            )
+        );
     }
 
     @Override

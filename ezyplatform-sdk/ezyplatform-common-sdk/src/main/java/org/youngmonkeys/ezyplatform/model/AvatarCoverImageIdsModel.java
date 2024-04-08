@@ -17,17 +17,11 @@
 package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Getter
 @Builder
-@EqualsAndHashCode(of = "id")
-public class UserRoleNameModel {
-    private long id;
-    private String name;
-    private String displayName;
-    private int priority;
-    private long createdAt;
-    private long updatedAt;
+public class AvatarCoverImageIdsModel {
+    private long avatarImageId;
+    private long coverImageId;
 }

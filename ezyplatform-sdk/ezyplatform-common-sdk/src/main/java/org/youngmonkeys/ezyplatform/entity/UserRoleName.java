@@ -37,6 +37,8 @@ public class UserRoleName {
 
     private String name;
 
+    private int priority;
+
     @Column(name = "display_name")
     private String displayName;
 

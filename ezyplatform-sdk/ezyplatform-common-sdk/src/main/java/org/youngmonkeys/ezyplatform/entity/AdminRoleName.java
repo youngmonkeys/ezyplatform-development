@@ -40,6 +40,8 @@ public class AdminRoleName {
     @Column(name = "display_name")
     private String displayName;
 
+    private int priority;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

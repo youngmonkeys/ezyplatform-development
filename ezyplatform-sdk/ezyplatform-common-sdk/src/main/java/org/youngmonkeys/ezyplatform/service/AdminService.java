@@ -16,10 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import org.youngmonkeys.ezyplatform.model.AdminAccessTokenModel;
-import org.youngmonkeys.ezyplatform.model.AdminModel;
-import org.youngmonkeys.ezyplatform.model.AdminNameModel;
-import org.youngmonkeys.ezyplatform.model.UuidNameModel;
+import org.youngmonkeys.ezyplatform.model.*;
 
 import java.util.Collection;
 import java.util.Map;
@@ -53,6 +50,10 @@ public interface AdminService {
 
     Map<Long, UuidNameModel> getAdminUuidNameMapByIds(
         Collection<Long> adminIds
+    );
+
+    AvatarCoverImageIdsModel getAdminAvatarCoverImageIdsById(
+        long adminId
     );
 
     UuidNameModel getAdminUuidNameByUuid(String uuid);

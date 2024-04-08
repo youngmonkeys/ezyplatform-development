@@ -22,15 +22,20 @@ import lombok.Getter;
 
 @Getter
 public class DefaultMediaFilter implements MediaFilter {
+    public final Long ownerAdminId;
     public final Long ownerUserId;
 
     protected DefaultMediaFilter(Builder<?> builder) {
+        this.ownerAdminId = builder.ownerAdminId;
         this.ownerUserId = builder.ownerUserId;
     }
 
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
+        if (ownerAdminId != null) {
+            answer.and("e.ownerAdminId = :ownerAdminId");
+        }
         if (ownerUserId != null) {
             answer.and("e.ownerUserId = :ownerUserId");
         }
@@ -45,7 +50,13 @@ public class DefaultMediaFilter implements MediaFilter {
     public static class Builder<T extends Builder<T>>
         implements EzyBuilder<DefaultMediaFilter> {
 
+        private Long ownerAdminId;
         private Long ownerUserId;
+
+        public T ownerAdminId(Long ownerAdminId) {
+            this.ownerAdminId = ownerAdminId;
+            return (T) this;
+        }
 
         public T ownerUserId(Long ownerUserId) {
             this.ownerUserId = ownerUserId;

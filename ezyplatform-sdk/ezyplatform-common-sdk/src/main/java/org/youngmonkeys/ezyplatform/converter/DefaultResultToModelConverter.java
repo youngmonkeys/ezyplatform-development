@@ -18,8 +18,10 @@ package org.youngmonkeys.ezyplatform.converter;
 
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.model.AdminNameModel;
+import org.youngmonkeys.ezyplatform.model.AvatarCoverImageIdsModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
+import org.youngmonkeys.ezyplatform.result.AvatarCoverImageIdsResult;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.util.LocalDateTimes;
@@ -39,6 +41,18 @@ public class DefaultResultToModelConverter {
         return UuidNameModel.builder()
             .uuid(result.getUuid())
             .displayName(result.getDisplayName())
+            .build();
+    }
+
+    public AvatarCoverImageIdsModel toModel(
+        AvatarCoverImageIdsResult result
+    ) {
+        if (result == null) {
+            return null;
+        }
+        return AvatarCoverImageIdsModel.builder()
+            .avatarImageId(result.getAvatarImageId())
+            .coverImageId(result.getCoverImageId())
             .build();
     }
 

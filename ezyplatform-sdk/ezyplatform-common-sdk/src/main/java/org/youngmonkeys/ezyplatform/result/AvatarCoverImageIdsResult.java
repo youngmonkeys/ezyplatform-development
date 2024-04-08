@@ -14,20 +14,16 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.result;
 
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
+import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
-@Builder
-@EqualsAndHashCode(of = "id")
-public class UserRoleNameModel {
-    private long id;
-    private String name;
-    private String displayName;
-    private int priority;
-    private long createdAt;
-    private long updatedAt;
+@Setter
+@EzyQueryResult
+public class AvatarCoverImageIdsResult {
+    private long avatarImageId;
+    private long coverImageId;
 }

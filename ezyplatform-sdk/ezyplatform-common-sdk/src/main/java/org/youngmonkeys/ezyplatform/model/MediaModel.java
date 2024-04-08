@@ -68,7 +68,21 @@ public class MediaModel {
             : mediaUrl;
     }
 
+    public static String toMeMediaUrlOrDefault(
+        String mediaName,
+        String mediaUrl,
+        String defaultUrl
+    ) {
+        return isBlank(mediaUrl)
+            ? isBlank(mediaName) ? defaultUrl : "/api/v1/me/media/" + mediaName
+            : mediaUrl;
+    }
+
     public String getUrlOrDefault(String defaultUrl) {
         return toMediaUrlOrDefault(name, url, defaultUrl);
+    }
+
+    public String getMeUrlOrDefault(String defaultUrl) {
+        return toMeMediaUrlOrDefault(name, url, defaultUrl);
     }
 }
