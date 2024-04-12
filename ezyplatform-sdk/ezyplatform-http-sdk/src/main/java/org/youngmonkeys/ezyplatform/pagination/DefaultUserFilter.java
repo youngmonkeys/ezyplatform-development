@@ -66,6 +66,15 @@ public class DefaultUserFilter implements UserFilter {
         if (statuses != null) {
             answer.and("e.status in :statuses");
         }
+        if (keywords != null) {
+            answer.and("k.keyword IN :keywords");
+        }
+        if (roleIds != null) {
+            answer.and("l.roleId IN :roleIds");
+        }
+        if (roleNames != null) {
+            answer.and("m.roleName IN :roleNames");
+        }
         if (likeKeyword != null) {
             answer.and(
                 new EzyQueryConditionBuilder()
@@ -79,15 +88,6 @@ public class DefaultUserFilter implements UserFilter {
                     .append(")")
                     .build()
             );
-        }
-        if (keywords != null) {
-            answer.and("k.keyword IN :keywords");
-        }
-        if (roleIds != null) {
-            answer.and("l.roleId IN :roleIds");
-        }
-        if (roleNames != null) {
-            answer.and("m.roleName IN :roleNames");
         }
         return answer.build();
     }
