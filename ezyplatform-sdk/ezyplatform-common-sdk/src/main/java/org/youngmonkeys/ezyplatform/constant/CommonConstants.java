@@ -162,6 +162,8 @@ public final class CommonConstants {
         = "web_max_upload_file_size";
     public static final String SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES
         = "web_accepted_media_mime_types";
+    public static final String SETTING_NAME_WEB_SITE_NAME
+        = "web_site_name";
     public static final String SETTING_NAME_WEB_SITE_TITLE
         = "web_site_title";
     public static final String SETTING_NAME_WEB_SITE_TAGLINE
