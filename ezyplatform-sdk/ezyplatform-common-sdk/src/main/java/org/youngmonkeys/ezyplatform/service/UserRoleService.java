@@ -18,11 +18,28 @@ package org.youngmonkeys.ezyplatform.service;
 
 import java.util.Set;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1500_RECORDS;
+
 public interface UserRoleService {
 
     long getRoleIdByName(String roleName);
 
     Set<Long> getRoleIdsByUserId(long userId);
+
+    Set<Long> getUserIdsByRoleId(long roleId, int limit);
+
+    default Set<Long> getUserIdsByRoleId(long roleId) {
+        return getUserIdsByRoleId(
+            roleId,
+            LIMIT_1500_RECORDS
+        );
+    }
+
+    Set<Long> getUserIdsByRoleName(String roleName, int limit);
+
+    default Set<Long> getUserIdsByRoleName(String roleName) {
+        return getUserIdsByRoleName(roleName, LIMIT_1500_RECORDS);
+    }
 
     boolean containsUserRole(long userId, long roleId);
 

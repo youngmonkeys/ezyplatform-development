@@ -22,4 +22,8 @@ public enum UserStatus {
     ARCHIVED,
     BLOCKED,
     DELETED;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

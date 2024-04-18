@@ -23,6 +23,7 @@ import org.youngmonkeys.ezyplatform.entity.UserRoleName;
 import org.youngmonkeys.ezyplatform.repo.UserRoleNameRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRoleRepository;
 
+import java.util.Collections;
 import java.util.Set;
 
 import static com.tvd12.ezyfox.io.EzySets.newHashSet;
@@ -54,6 +55,30 @@ public class DefaultUserRoleService implements UserRoleService {
             ),
             UserRole::getRoleId
         );
+    }
+
+    @Override
+    public Set<Long> getUserIdsByRoleId(long roleId, int limit) {
+        return newHashSet(
+            userRoleRepository.findListByField(
+                "roleId",
+                roleId,
+                0,
+                limit
+            ),
+            UserRole::getUserId
+        );
+    }
+
+    @Override
+    public Set<Long> getUserIdsByRoleName(
+        String roleName,
+        int limit
+    ) {
+        long roleId = getRoleIdByName(roleName);
+        return roleId > 0
+            ? getUserIdsByRoleId(roleId, limit)
+            : Collections.emptySet();
     }
 
     @Override

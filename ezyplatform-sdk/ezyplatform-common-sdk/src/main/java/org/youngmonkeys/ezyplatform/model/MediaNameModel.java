@@ -74,6 +74,10 @@ public class MediaNameModel {
             : media.getUrlOrDefault(defaultUrl);
     }
 
+    public String getUrlOrNull() {
+        return getUrlOrDefault(null);
+    }
+
     public String getUrlOrDefault(String defaultUrl) {
         return toMediaUrlOrDefault(name, url, defaultUrl);
     }

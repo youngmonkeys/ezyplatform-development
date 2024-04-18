@@ -78,6 +78,10 @@ public class MediaModel {
             : mediaUrl;
     }
 
+    public String getUrlOrNull() {
+        return getUrlOrDefault(null);
+    }
+
     public String getUrlOrDefault(String defaultUrl) {
         return toMediaUrlOrDefault(name, url, defaultUrl);
     }
