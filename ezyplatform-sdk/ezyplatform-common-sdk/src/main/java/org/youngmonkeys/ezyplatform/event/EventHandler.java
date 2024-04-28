@@ -34,4 +34,8 @@ public interface EventHandler<D, R> {
             return getClass().getName();
         }
     }
+
+    default int getPriority() {
+        return 0;
+    }
 }

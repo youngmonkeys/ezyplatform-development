@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.bean.EzySingletonFactory;
 import com.tvd12.ezyfox.concurrent.EzyLazyInitializer;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,6 +37,7 @@ public class EventHandlerManager {
                 .getSingletonsOf(EventHandler.class)
             )
                 .stream()
+                .sorted(Comparator.comparingInt(EventHandler::getPriority))
                 .collect(
                     Collectors.groupingBy(
                         EventHandler::getEventName,
