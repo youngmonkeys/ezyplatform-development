@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
 import lombok.Getter;
+import org.youngmonkeys.ezyplatform.entity.MediaType;
 
 import static org.youngmonkeys.ezyplatform.model.MediaModel.toMeMediaUrlOrDefault;
 import static org.youngmonkeys.ezyplatform.model.MediaModel.toMediaUrlOrDefault;
@@ -28,6 +29,7 @@ public class MediaNameModel {
     private long id;
     private String name;
     private String originalName;
+    private MediaType type;
     private String url;
 
     public static MediaNameModel fromMediaModel(
@@ -40,6 +42,7 @@ public class MediaNameModel {
             .id(model.getId())
             .name(model.getName())
             .originalName(model.getOriginalName())
+            .type(model.getType())
             .url(model.getUrl())
             .build();
     }

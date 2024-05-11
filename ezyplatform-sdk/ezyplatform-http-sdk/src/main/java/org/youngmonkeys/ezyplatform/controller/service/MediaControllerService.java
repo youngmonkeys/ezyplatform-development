@@ -21,11 +21,17 @@ import com.tvd12.ezyfox.bean.EzySingletonFactory;
 import com.tvd12.ezyfox.concurrent.EzyLazyInitializer;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyReturner;
+import com.tvd12.ezyhttp.client.HttpClient;
+import com.tvd12.ezyhttp.client.data.DownloadFileResult;
 import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.Metadata;
 import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
@@ -43,6 +49,7 @@ import org.youngmonkeys.ezyplatform.response.MediaResponse;
 import org.youngmonkeys.ezyplatform.service.MediaService;
 import org.youngmonkeys.ezyplatform.service.PaginationMediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
+import org.youngmonkeys.ezyplatform.util.Uris;
 import org.youngmonkeys.ezyplatform.validator.CommonValidator;
 import org.youngmonkeys.ezyplatform.validator.MediaValidator;
 
@@ -52,16 +59,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModel;
 
 public class MediaControllerService extends EzyLoggable {
 
+    private final HttpClient httpClient;
     private final EventHandlerManager eventHandlerManager;
     private final FileSystemManager fileSystemManager;
     private final ResourceDownloadManager resourceDownloadManager;
@@ -76,7 +87,13 @@ public class MediaControllerService extends EzyLoggable {
     private final EzyInputStreamLoader inputStreamLoader;
     private final ObjectMapper objectMapper;
 
+    private final EzyLazyInitializer<TikaConfig> tika =
+        new EzyLazyInitializer<>(() ->
+            EzyReturner.returnWithException(TikaConfig::new)
+        );
+
     public MediaControllerService(
+        HttpClient httpClient,
         EventHandlerManager eventHandlerManager,
         FileSystemManager fileSystemManager,
         ResourceDownloadManager resourceDownloadManager,
@@ -91,6 +108,7 @@ public class MediaControllerService extends EzyLoggable {
         EzyInputStreamLoader inputStreamLoader,
         ObjectMapper objectMapper
     ) {
+        this.httpClient = httpClient;
         this.mediaService = mediaService;
         this.paginationMediaService = paginationMediaService;
         this.settingService = settingService;
@@ -219,6 +237,59 @@ public class MediaControllerService extends EzyLoggable {
             );
             FolderProxy.deleteFile(filePath);
             notifyMediaEvent(new MediaRemovedEvent(media));
+        }
+    }
+
+    public long saveMediaFile(
+        MediaType mediaType,
+        String mediaUrl,
+        UploadFrom from,
+        long ownerAdminId,
+        long ownerUserId
+    ) {
+        if (isBlank(mediaUrl)) {
+            return 0L;
+        }
+        try {
+            File outFolder = fileSystemManager.getMediaFolderPath(
+                mediaType
+            );
+            String fileName = mediaService.generateMediaFileName(
+                mediaUrl,
+                Uris.getFileExtensionInUrl(mediaUrl)
+            );
+            DownloadFileResult result = httpClient.download(
+                mediaUrl,
+                outFolder,
+                fileName
+            );
+            org.apache.tika.mime.MediaType tikaMediaType;
+            try (
+                InputStream inputStream = Files.newInputStream(
+                    outFolder
+                        .toPath()
+                        .resolve(result.getNewFileName())
+                )
+            ) {
+                tikaMediaType = tika.get().getDetector().detect(
+                    TikaInputStream.get(inputStream),
+                    new Metadata()
+                );
+            }
+            MediaModel media = mediaService.addMedia(
+                AddMediaModel.builder()
+                    .fileName(result.getNewFileName())
+                    .originalFileName(result.getOriginalFileName())
+                    .mediaType(mediaType)
+                    .mimeType(tikaMediaType.toString())
+                    .ownerId(ownerAdminId > 0 ? ownerAdminId : ownerUserId)
+                    .build(),
+                from
+            );
+            return media.getId();
+        } catch (Exception e) {
+            logger.info("can not download media from url: {}", mediaUrl, e);
+            return 0L;
         }
     }
 

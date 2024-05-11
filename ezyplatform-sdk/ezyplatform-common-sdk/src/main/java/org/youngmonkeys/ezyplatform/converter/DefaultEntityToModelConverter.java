@@ -256,6 +256,8 @@ public class DefaultEntityToModelConverter {
             .imageId(entity.getImageId())
             .imageUrl(imageUrl)
             .description(entity.getDescription())
+            .sourceType(entity.getSourceType())
+            .sourceId(entity.getSourceId())
             .createdAt(toTimestamp(entity.getCreatedAt()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
             .build();

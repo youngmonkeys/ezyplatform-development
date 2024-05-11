@@ -78,4 +78,25 @@ public final class Uris {
         }
         return EzyStrings.toDisplayName(host);
     }
+
+    public static String getFileExtensionInUrl(String url) {
+        if (isBlank(url)) {
+            return null;
+        }
+        int index = -1;
+        int length = url.length();
+        for (int i = length - 1; i >= 0; --i) {
+            char ch = url.charAt(i);
+            if (ch == '.') {
+                index = i + 1;
+                break;
+            }
+            if (ch == '/') {
+                break;
+            }
+        }
+        return (index >= 0 && index < length)
+            ? url.substring(index)
+            : null;
+    }
 }

@@ -31,6 +31,7 @@ public final class CommonConstants {
 
     public static final String TRUE_STRING = "true";
     public static final String FALSE_STRING = "false";
+    public static final String UNKNOWN = "UNKNOWN";
 
     public static final String PATTERN_U_INT_NUMBER = "[0-9]+";
     public static final String PATTERN_COMMON_STRING = "[a-zA-Z0-9\\s]+";

@@ -28,6 +28,8 @@ public class LinkModel {
     private long imageId;
     private String imageUrl;
     private String description;
+    private String sourceType;
+    private long sourceId;
     private long createdAt;
     private long updatedAt;
 }

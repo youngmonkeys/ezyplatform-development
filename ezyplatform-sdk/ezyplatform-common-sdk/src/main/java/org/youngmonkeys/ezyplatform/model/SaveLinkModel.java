@@ -24,6 +24,8 @@ import lombok.Getter;
 public class SaveLinkModel {
     private String linkUri;
     private String linkType;
-    private long linkImageId;
+    private String sourceType;
     private String description;
+    private long sourceId;
+    private long linkImageId;
 }

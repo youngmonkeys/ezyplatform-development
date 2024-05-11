@@ -73,4 +73,22 @@ public class UrisTest {
             "Youngmonkeys"
         );
     }
+
+    @Test
+    public void getFileExtensionInUrlTest() {
+        Asserts.assertEquals(
+            Uris.getFileExtensionInUrl("https://hello.world/abc.jpg"),
+            "jpg"
+        );
+        Asserts.assertNull(
+            Uris.getFileExtensionInUrl("https://hello.world/abc.")
+        );
+        Asserts.assertNull(
+            Uris.getFileExtensionInUrl("https://hello.world/abc")
+        );
+        Asserts.assertNull(
+            Uris.getFileExtensionInUrl(null)
+        );
+        Asserts.assertNull(Uris.getFileExtensionInUrl("abc"));
+    }
 }

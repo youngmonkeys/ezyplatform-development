@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.constant.CommonConstants;
 import org.youngmonkeys.ezyplatform.entity.*;
 import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH;
 
 @AllArgsConstructor
@@ -283,10 +285,16 @@ public class DefaultModelToEntityConverter {
     }
 
     public void mergeToEntity(SaveLinkModel model, Link entity) {
+        String sourceType = model.getSourceType();
+        if (isBlank(sourceType)) {
+            sourceType = CommonConstants.UNKNOWN;
+        }
         entity.setLinkUri(model.getLinkUri());
         entity.setLinkType(model.getLinkType());
         entity.setImageId(model.getLinkImageId());
         entity.setDescription(model.getDescription());
+        entity.setSourceType(sourceType);
+        entity.setSourceId(model.getSourceId());
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
