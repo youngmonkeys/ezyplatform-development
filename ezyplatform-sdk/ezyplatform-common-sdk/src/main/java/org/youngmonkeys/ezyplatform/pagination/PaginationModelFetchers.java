@@ -64,4 +64,39 @@ public final class PaginationModelFetchers {
         }
         return paginationService.getPreviousPage(filter, prevPageToken, limit);
     }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private <T> PaginationModel<T> getPaginationModelBySortOrder(
+        PaginationService paginationService,
+        ComplexPaginationParameterConverter paginationParameterConverter,
+        Object filter,
+        String sortOrder,
+        String nextPageToken,
+        String prevPageToken,
+        boolean lastPage,
+        int limit
+    ) {
+        String actualNextPageToken = nextPageToken;
+        String actualPrevPageToken = prevPageToken;
+        if (sortOrder != null
+            && nextPageToken == null
+            && prevPageToken == null
+        ) {
+            if (lastPage) {
+                actualPrevPageToken = paginationParameterConverter
+                    .getDefaultPageToken(sortOrder);
+            } else {
+                actualNextPageToken = paginationParameterConverter
+                    .getDefaultPageToken(sortOrder);
+            }
+        }
+        return getPaginationModel(
+            paginationService,
+            filter,
+            actualNextPageToken,
+            actualPrevPageToken,
+            lastPage,
+            limit
+        );
+    }
 }
