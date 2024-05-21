@@ -81,6 +81,13 @@ public final class CommonConstants {
     public static final int MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH =
         600;
 
+    public static final int LIMIT_30_RECORDS = 30;
+    public static final int LIMIT_50_RECORDS = 50;
+    public static final int LIMIT_100_RECORDS = 100;
+    public static final int LIMIT_120_RECORDS = 120;
+    public static final int LIMIT_150_RECORDS = 150;
+    public static final int LIMIT_300_RECORDS = 300;
+    public static final int LIMIT_500_RECORDS = 500;
     public static final int LIMIT_1500_RECORDS = 1500;
     public static final int LIMIT_3000_RECORDS = 3000;
 
