@@ -29,12 +29,15 @@ import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import lombok.Setter;
+import org.eclipse.jetty.http.BadMessageException;
+import org.eclipse.jetty.util.Utf8Appendable;
 import org.youngmonkeys.ezyplatform.exception.*;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 import org.youngmonkeys.ezyplatform.web.view.WebViews;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import java.nio.file.InvalidPathException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -147,6 +150,58 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
             return ResponseEntity.badRequest(e.getErrors());
         }
         return Redirect.to(addLanguageToUri(request, "/bad-request"));
+    }
+
+    @TryCatch(BadMessageException.class)
+    public Object handle(
+        HttpServletRequest request,
+        RequestArguments arguments,
+        BadMessageException e
+    ) {
+        return handleCommonBadRequestException(
+            request,
+            arguments,
+            e
+        );
+    }
+
+    @TryCatch(InvalidPathException.class)
+    public Object handle(
+        HttpServletRequest request,
+        RequestArguments arguments,
+        InvalidPathException e
+    ) {
+        return handleCommonBadRequestException(
+            request,
+            arguments,
+            e
+        );
+    }
+
+    @TryCatch(Utf8Appendable.NotUtf8Exception.class)
+    public Object handle(
+        HttpServletRequest request,
+        RequestArguments arguments,
+        Utf8Appendable.NotUtf8Exception e
+    ) {
+        return handleCommonBadRequestException(
+            request,
+            arguments,
+            e
+        );
+    }
+
+    @TryCatch(IllegalArgumentException.class)
+    public Object handle(
+        HttpServletRequest request,
+        RequestArguments arguments,
+        IllegalArgumentException e
+    ) {
+        return handleCommonBadRequestException(
+            request,
+            arguments,
+            e
+        );
     }
 
     @TryCatch(ResourceNotFoundException.class)
@@ -301,6 +356,22 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                     e.getValueName(),
                     "invalid"
                 )
+            );
+        }
+        return Redirect.to(addLanguageToUri(request, "/bad-request"));
+    }
+
+    protected Object handleCommonBadRequestException(
+        HttpServletRequest request,
+        RequestArguments arguments,
+        Exception e
+    ) {
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage(), e);
+        HttpMethod method = arguments.getMethod();
+        String uriTemplate = arguments.getUriTemplate();
+        if (requestUriManager.isApiURI(method, uriTemplate)) {
+            return ResponseEntity.badRequest(
+                Collections.singletonMap("request", "invalid")
             );
         }
         return Redirect.to(addLanguageToUri(request, "/bad-request"));
