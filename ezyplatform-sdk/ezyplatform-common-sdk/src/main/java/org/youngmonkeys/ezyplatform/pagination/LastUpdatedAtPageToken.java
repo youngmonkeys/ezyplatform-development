@@ -41,12 +41,14 @@ public class LastUpdatedAtPageToken {
         int itemCount,
         Supplier<LocalDateTime> lastUpdatedAtSupplier
     ) {
-        LocalDateTime newLastUpdatedAt = itemCount == 0
-            ? updatedAt
-            : lastUpdatedAtSupplier.get();
-        int newOffset = newLastUpdatedAt.isAfter(updatedAt)
-            ? 0
-            : offset + itemCount;
+        int newOffset = 0;
+        LocalDateTime newLastUpdatedAt = updatedAt;
+        if (itemCount > 0) {
+            newLastUpdatedAt = lastUpdatedAtSupplier.get();
+            if (newLastUpdatedAt.equals(updatedAt)) {
+                newOffset = offset + itemCount;
+            }
+        }
         return new LastUpdatedAtPageToken(
             newLastUpdatedAt,
             newOffset,

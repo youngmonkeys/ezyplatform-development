@@ -71,7 +71,14 @@ public final class Keywords {
                 longKeywordLength -= Objects.requireNonNull(firstWord).length();
                 longKeywordLength -= 1;
             }
-            answer.add(wordTrim.toLowerCase());
+            String wordTrimLowerCase = wordTrim.toLowerCase();
+            answer.add(wordTrimLowerCase);
+            if (wordTrimLowerCase.length() > 2) {
+                answer.add(wordTrimLowerCase.substring(0, 2));
+            }
+            if (wordTrimLowerCase.length() > 3) {
+                answer.add(wordTrimLowerCase.substring(0, 3));
+            }
             String longKeywordString = String.join(" ", longKeyword);
             answer.add(longKeywordString.toLowerCase());
         }

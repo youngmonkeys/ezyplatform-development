@@ -37,8 +37,14 @@ public class KeywordsTest {
         // then
         Set<String> expectation = Sets.newHashSet(
             "lucky",
+            "lu",
+            "luc",
             "wheel",
+            "wh",
+            "whe",
             "game",
+            "ga",
+            "gam",
             "lucky wheel",
             "lucky wheel game"
         );
@@ -73,8 +79,14 @@ public class KeywordsTest {
         // then
         Set<String> expectation = Sets.newHashSet(
             "lucky",
+            "lu",
+            "luc",
             "wheel",
+            "wh",
+            "whe",
             "game",
+            "ga",
+            "gam",
             "lucky wheel",
             "wheel game"
         );
