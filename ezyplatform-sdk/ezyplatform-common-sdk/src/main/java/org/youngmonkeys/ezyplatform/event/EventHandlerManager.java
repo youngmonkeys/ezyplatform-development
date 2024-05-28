@@ -58,9 +58,10 @@ public class EventHandlerManager {
         List<EventHandler> handlers = eventHandlersByName
             .get()
             .getOrDefault(eventName, Collections.emptyList());
+        boolean voidEvent = data instanceof VoidEvent;
         for (EventHandler handler : handlers) {
             Object result = handler.handleEventData(data);
-            if (result != null) {
+            if (!voidEvent && result != null) {
                 return (R) result;
             }
         }

@@ -381,18 +381,41 @@ public class MediaControllerService extends EzyLoggable {
         if (mediaType == MediaType.IMAGE
             || mediaType == MediaType.AVATAR
         ) {
-            ImageSize imageSize = mediaService.getMediaImageSize(
+            ImageSize imageSize = mediaService.getMediaImageSizeOrNull(
                 media.getName(),
                 media.getType()
             );
+            if (imageSize == null) {
+                File mediaFilePath = eventHandlerManager.handleEvent(
+                    new GetMediaFilePathEvent(media)
+                );
+                if (mediaFilePath != null) {
+                    imageSize = mediaService.getMediaImageSizeOrDefault(
+                        mediaFilePath
+                    );
+                }
+            }
+            if (imageSize == null) {
+                imageSize = ImageSize.ZERO;
+            }
             width = imageSize.getWidth();
             height = imageSize.getHeight();
             size = imageSize.getSize();
         } else {
-            size = mediaService.getMediaFileLength(
+            size = mediaService.getMediaFileLengthOrNegative(
                 mediaType,
                 media.getName()
             );
+            if (size < 0) {
+                File mediaFilePath = eventHandlerManager.handleEvent(
+                    new GetMediaFilePathEvent(media)
+                );
+                if (mediaFilePath != null) {
+                    size = mediaService.getMediaFileLengthOrZero(
+                        mediaFilePath
+                    );
+                }
+            }
         }
         return MediaDetailsModel.from(media)
             .width(width)

@@ -22,6 +22,7 @@ import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 import org.youngmonkeys.ezyplatform.model.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
@@ -122,6 +123,13 @@ public interface MediaService {
         String mediaName
     );
 
+    long getMediaFileLengthOrNegative(
+        MediaType mediaType,
+        String mediaName
+    );
+
+    long getMediaFileLengthOrZero(File mediaFile);
+
     ImageSize getMediaImageSize(
         long mediaId
     ) throws IOException;
@@ -136,6 +144,15 @@ public interface MediaService {
     ) throws IOException {
         return getMediaImageSize(imageName, MediaType.IMAGE);
     }
+
+    ImageSize getMediaImageSizeOrNull(
+        String imageName,
+        MediaType mediaType
+    );
+
+    ImageSize getMediaImageSizeOrDefault(
+        File mediaFile
+    );
 
     default String generateMediaFileName() {
         return generateMediaFileName("", null);

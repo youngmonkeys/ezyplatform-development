@@ -31,6 +31,7 @@ public class MediaDetailsModel {
     private long id;
     private String name;
     private String originalName;
+    private String url;
     private UploadFrom uploadFrom;
     private MediaType type;
     private String mimeType;
@@ -48,6 +49,7 @@ public class MediaDetailsModel {
             .id(info.getId())
             .name(info.getName())
             .originalName(info.getOriginalName())
+            .url(info.getUrl())
             .uploadFrom(info.getUploadFrom())
             .type(info.getType())
             .mimeType(info.getMimeType())

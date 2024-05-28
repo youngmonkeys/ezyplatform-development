@@ -153,29 +153,53 @@ public class DefaultMediaService implements MediaService {
         MediaType mediaType,
         String mediaName
     ) {
+        long fileLength = getMediaFileLengthOrNegative(
+            mediaType,
+            mediaName
+        );
+        if (fileLength >= 0) {
+            return fileLength;
+        }
+        throw new ResourceNotFoundException("media");
+    }
+
+    @Override
+    public long getMediaFileLengthOrNegative(
+        MediaType mediaType,
+        String mediaName
+    ) {
         File mediaFile = fileSystemManager.getMediaFilePath(
             mediaType.getFolder(),
             mediaName
         );
-        if (!mediaFile.exists()) {
-            throw new ResourceNotFoundException("media");
+        if (mediaFile.exists()) {
+            return mediaFile.length();
         }
-        return mediaFile.length();
+        return -1L;
     }
+
+    @Override
+    public long getMediaFileLengthOrZero(File mediaFile) {
+        if (mediaFile.exists()) {
+            return mediaFile.length();
+        }
+        return 0L;
+    }
+
 
     @Override
     public ImageSize getMediaImageSize(
         String imageName,
         MediaType mediaType
     ) {
-        File mediaFile = fileSystemManager.getMediaFilePath(
-            mediaType.getFolder(),
-            imageName
+        ImageSize imageSize = getMediaImageSizeOrNull(
+            imageName,
+            mediaType
         );
-        if (!mediaFile.exists()) {
-            throw new ResourceNotFoundException("media");
+        if (imageSize != null) {
+            return imageSize;
         }
-        return ImageProxy.getImageSize(mediaFile);
+        throw new ResourceNotFoundException("media");
     }
 
     @Override
@@ -193,5 +217,30 @@ public class DefaultMediaService implements MediaService {
             media.getName(),
             media.getType()
         );
+    }
+
+    @Override
+    public ImageSize getMediaImageSizeOrNull(
+        String imageName,
+        MediaType mediaType
+    ) {
+        File mediaFile = fileSystemManager.getMediaFilePath(
+            mediaType.getFolder(),
+            imageName
+        );
+        if (mediaFile.exists()) {
+            return ImageProxy.getImageSize(mediaFile);
+        }
+        return null;
+    }
+
+    @Override
+    public ImageSize getMediaImageSizeOrDefault(
+        File mediaFile
+    ) {
+        if (mediaFile.exists()) {
+            return ImageProxy.getImageSize(mediaFile);
+        }
+        return ImageSize.ZERO;
     }
 }
