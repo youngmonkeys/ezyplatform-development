@@ -24,12 +24,10 @@ import org.youngmonkeys.ezyplatform.model.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
@@ -96,18 +94,28 @@ public interface MediaService {
 
     boolean containsMedia(long mediaId);
 
-    List<MediaModel> getMediaListByIds(
-        Collection<Long> mediaIds
-    );
-
-    default Map<Long, MediaModel> getMediaMapByIds(
+    default List<MediaModel> getMediaListByIds(
         Collection<Long> mediaIds
     ) {
-        return newHashMap(
+        Map<Long, MediaModel> mediaMap = getMediaMapByIds(mediaIds);
+        return mediaIds.stream()
+            .map(mediaMap::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    }
+
+    default List<MediaNameModel> getMediaNameListByIds(
+        Collection<Long> mediaIds
+    ) {
+        return newArrayList(
             getMediaListByIds(mediaIds),
-            MediaModel::getId
+            MediaNameModel::fromMediaModel
         );
     }
+
+    Map<Long, MediaModel> getMediaMapByIds(
+        Collection<Long> mediaIds
+    );
 
     default Map<Long, MediaNameModel> getMediaNameMapByIds(
         Collection<Long> mediaIds

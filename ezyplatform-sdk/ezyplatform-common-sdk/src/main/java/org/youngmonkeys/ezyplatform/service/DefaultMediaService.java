@@ -35,9 +35,8 @@ import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
-
-import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class DefaultMediaService implements MediaService {
@@ -136,16 +135,21 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public List<MediaModel> getMediaListByIds(
+    public Map<Long, MediaModel> getMediaMapByIds(
         Collection<Long> mediaIds
     ) {
         if (mediaIds.isEmpty()) {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
-        return newArrayList(
-            mediaRepository.findListByIds(mediaIds),
-            entityToModelConverter::toModel
-        );
+        return mediaRepository.findListByIds(mediaIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Media::getId,
+                    entityToModelConverter::toModel,
+                    (o, n) -> n
+                )
+            );
     }
 
     @Override
