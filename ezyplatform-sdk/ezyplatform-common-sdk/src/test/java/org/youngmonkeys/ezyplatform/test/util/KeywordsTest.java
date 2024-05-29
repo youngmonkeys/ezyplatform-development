@@ -131,4 +131,21 @@ public class KeywordsTest {
         // then
         Asserts.assertEquals(actual, Collections.emptySet());
     }
+
+    @Test
+    public void toKeywordsBySplash() {
+        // given
+        String str = "a/b/c";
+
+        // when
+        Set<String> actual = Keywords.toKeywords(str, false);
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Sets.newHashSet(
+                "a b c", "a", "b", "a b", "c"
+            )
+        );
+    }
 }

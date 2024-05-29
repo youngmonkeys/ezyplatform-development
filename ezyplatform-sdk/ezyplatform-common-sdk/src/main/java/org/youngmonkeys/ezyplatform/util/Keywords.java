@@ -97,7 +97,7 @@ public final class Keywords {
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < str.length(); ++i) {
             char ch = str.charAt(i);
-            if (isWordSeparator(ch)) {
+            if (isWordSeparator(ch) || ch == '/') {
                 if (buffer.length() == 0) {
                     continue;
                 }
