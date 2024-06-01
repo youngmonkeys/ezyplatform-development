@@ -76,8 +76,9 @@ public final class CommonConstants {
     public static final int MAX_LENGTH_WEBSITE_TAGLINE = 120;
     public static final int MAX_LENGTH_PAGE_TITLE_SEPARATOR = 12;
     public static final int MAX_LENGTH_ENUM_NAME = 25;
-    public static final int MAX_LENGTH_SEARCH_KEYWORD = 50;
-    public static final int MAX_SEARCH_KEYWORD_WORDS = 6;
+    public static final int MAX_LENGTH_SEARCH_KEYWORD = 120;
+    public static final int MAX_SEARCH_KEYWORD_WORDS = 30;
+    public static final int MAX_LENGTH_SEARCH_TEXT = 128;
     public static final int MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH =
         600;
 

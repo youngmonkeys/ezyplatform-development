@@ -16,42 +16,15 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
-import lombok.*;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
-
-import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_DATA_INDEX;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 @Getter
-@Setter
-@ToString
-@Entity
-@Table(name = TABLE_NAME_DATA_INDEX)
 @AllArgsConstructor
-@NoArgsConstructor
-public class DataIndex {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Column(name = "data_type")
+@EqualsAndHashCode
+public class DataIndexUniqueKey {
     private String dataType;
-
-    @Column(name = "data_id")
     private long dataId;
-
     private String keyword;
-
-    private int priority;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    public DataIndexUniqueKey uniqueKey() {
-        return new DataIndexUniqueKey(dataType, dataId, keyword);
-    }
 }

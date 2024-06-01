@@ -44,4 +44,8 @@ public interface CommonStorageFilter extends StorageFilter {
     default String groupBy() {
         return EMPTY_STRING;
     }
+
+    default String orderBy() {
+        return EMPTY_STRING;
+    }
 }

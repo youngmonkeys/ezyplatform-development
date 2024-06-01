@@ -16,36 +16,12 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
-import lombok.*;
-
-import javax.persistence.*;
-import java.time.LocalDateTime;
-
-import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_USER_KEYWORD;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 @Getter
-@Setter
-@ToString
-@Entity
-@Table(name = TABLE_NAME_USER_KEYWORD)
 @AllArgsConstructor
-@NoArgsConstructor
-public class UserKeyword {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
-
-    @Column(name = "user_id")
+public class UserKeywordUniqueKey {
     private long userId;
-
     private String keyword;
-
-    private int priority;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    public UserKeywordUniqueKey uniqueKey() {
-        return new UserKeywordUniqueKey(userId, keyword);
-    }
 }

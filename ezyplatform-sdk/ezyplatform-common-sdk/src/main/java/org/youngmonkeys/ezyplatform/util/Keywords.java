@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.util;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.*;
 
@@ -26,11 +27,11 @@ public final class Keywords {
 
     private Keywords() {}
 
-    public static Set<String> toKeywords(String str) {
+    public static List<String> toKeywords(String str) {
         return toKeywords(str, false);
     }
 
-    public static Set<String> toKeywords(
+    public static List<String> toKeywords(
         String str,
         boolean nullIfBlank
     ) {
@@ -41,15 +42,18 @@ public final class Keywords {
         );
     }
 
-    public static Set<String> toKeywords(
+    public static List<String> toKeywords(
         String str,
         boolean nullIfBlank,
         int maxKeywordLength
     ) {
         if (isBlank(str)) {
-            return nullIfBlank ? null : Collections.emptySet();
+            return nullIfBlank ? null : Collections.emptyList();
         }
-        Set<String> answer = new HashSet<>();
+        List<String> wordTrims = new ArrayList<>();
+        List<String> word2s = new ArrayList<>();
+        List<String> word3s = new ArrayList<>();
+        List<String> longKeywords = new ArrayList<>();
         List<String> words = splitString(str);
         int longKeywordLength = 0;
         Queue<String> longKeyword = null;
@@ -72,17 +76,24 @@ public final class Keywords {
                 longKeywordLength -= 1;
             }
             String wordTrimLowerCase = wordTrim.toLowerCase();
-            answer.add(wordTrimLowerCase);
+            wordTrims.add(wordTrimLowerCase);
             if (wordTrimLowerCase.length() > 2) {
-                answer.add(wordTrimLowerCase.substring(0, 2));
+                word2s.add(wordTrimLowerCase.substring(0, 2));
             }
             if (wordTrimLowerCase.length() > 3) {
-                answer.add(wordTrimLowerCase.substring(0, 3));
+                word3s.add(wordTrimLowerCase.substring(0, 3));
             }
             String longKeywordString = String.join(" ", longKeyword);
-            answer.add(longKeywordString.toLowerCase());
+            longKeywords.add(longKeywordString.toLowerCase());
         }
-        return answer;
+        List<String> answer = new ArrayList<>();
+        for (int i = longKeywords.size() - 1; i >= 0; --i) {
+            answer.add(longKeywords.get(i));
+        }
+        answer.addAll(wordTrims);
+        answer.addAll(word3s);
+        answer.addAll(word2s);
+        return answer.stream().distinct().collect(Collectors.toList());
     }
 
     public static String keywordFromEmail(String email) {

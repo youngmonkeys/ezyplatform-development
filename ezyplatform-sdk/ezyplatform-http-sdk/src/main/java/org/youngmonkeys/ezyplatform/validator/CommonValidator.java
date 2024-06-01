@@ -22,8 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotEmpty;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_LENGTH_SEARCH_KEYWORD;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_SEARCH_KEYWORD_WORDS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.*;
 
 public class CommonValidator {
@@ -43,6 +42,34 @@ public class CommonValidator {
         if (!isValidCollectionSize(collection)) {
             throw new HttpBadRequestException(
                 Collections.singletonMap(resourceName, "invalid")
+            );
+        }
+    }
+
+    public void validateSearchText(String textName, String textValue) {
+        validateSearchText(
+            textName,
+            textValue,
+            MAX_LENGTH_SEARCH_TEXT
+        );
+    }
+
+    public void validateSearchText(
+        String textName,
+        String textValue,
+        int maxLength
+    ) {
+        if (isNotEmpty(textValue) && textValue.length() > maxLength) {
+            throw new HttpBadRequestException(
+                Collections.singletonMap(textName, "invalid")
+            );
+        }
+    }
+
+    public void validateSearchUuid(String uuid) {
+        if (isNotEmpty(uuid) && !isValidUuid(uuid)) {
+            throw new HttpBadRequestException(
+                Collections.singletonMap("uuid", "invalid")
             );
         }
     }

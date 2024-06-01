@@ -20,6 +20,7 @@
 	<test name="All">
 		<packages>
 			<package name="org.youngmonkeys.ezyplatform.test.util"/>
+			<package name="org.youngmonkeys.ezyplatform.test.validator"/>
 		</packages>
 	</test>
 </suite>

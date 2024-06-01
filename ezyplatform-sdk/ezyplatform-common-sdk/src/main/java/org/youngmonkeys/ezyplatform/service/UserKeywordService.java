@@ -19,18 +19,29 @@ package org.youngmonkeys.ezyplatform.service;
 import org.youngmonkeys.ezyplatform.model.AddUserKeywordModel;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public interface UserKeywordService {
+
+    void addUserKeywords(
+        Collection<AddUserKeywordModel> userKeywords
+    );
 
     default void addUserKeywords(
         long userId,
         Collection<String> keywords
     ) {
-        keywords
-            .parallelStream()
-            .forEach(keyword ->
-                addUserKeyword(userId, keyword)
-            );
+        addUserKeywords(
+            keywords.stream()
+                .map(it ->
+                    AddUserKeywordModel.builder()
+                        .userId(userId)
+                        .keyword(it)
+                        .priority(it.length())
+                        .build()
+                )
+                .collect(Collectors.toList())
+        );
     }
 
     default void addUserKeyword(long userId, String keyword) {
@@ -38,9 +49,12 @@ public interface UserKeywordService {
             AddUserKeywordModel.builder()
                 .userId(userId)
                 .keyword(keyword)
+                .priority(keyword.length())
                 .build()
         );
     }
 
     void addUserKeyword(AddUserKeywordModel model);
+
+    boolean containsUserKeyword(long userId, String keyword);
 }

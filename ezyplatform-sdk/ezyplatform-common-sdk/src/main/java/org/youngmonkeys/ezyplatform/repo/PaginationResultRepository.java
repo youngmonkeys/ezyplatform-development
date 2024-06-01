@@ -381,7 +381,19 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         P paginationParameter,
         boolean nextPage
     ) {
-        return makeOrderBy(paginationParameter, nextPage);
+        return Stream.of(
+            makeOrderBy(filter),
+            makeOrderBy(paginationParameter, nextPage)
+        )
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.joining(", "));
+    }
+
+    protected String makeOrderBy(F filter) {
+        if (filter instanceof CommonStorageFilter) {
+            return ((CommonStorageFilter) filter).orderBy();
+        }
+        return EMPTY_STRING;
     }
 
     protected String makeOrderBy(P paginationParameter, boolean nextPage) {

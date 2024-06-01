@@ -16,13 +16,13 @@
 
 package org.youngmonkeys.ezyplatform.test.util;
 
+import com.tvd12.ezyfox.collect.Lists;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
-import org.testng.collections.Sets;
 import org.youngmonkeys.ezyplatform.util.Keywords;
 
 import java.util.Collections;
-import java.util.Set;
+import java.util.List;
 
 public class KeywordsTest {
 
@@ -32,21 +32,21 @@ public class KeywordsTest {
         String str = "Lucky Wheel Game";
 
         // when
-        Set<String> actual = Keywords.toKeywords(str);
+        List<String> actual = Keywords.toKeywords(str);
 
         // then
-        Set<String> expectation = Sets.newHashSet(
-            "lucky",
-            "lu",
-            "luc",
-            "wheel",
-            "wh",
-            "whe",
-            "game",
-            "ga",
-            "gam",
+        List<String> expectation = Lists.newArrayList(
+            "lucky wheel game",
             "lucky wheel",
-            "lucky wheel game"
+            "lucky",
+            "wheel",
+            "game",
+            "luc",
+            "whe",
+            "gam",
+            "lu",
+            "wh",
+            "ga"
         );
         Asserts.assertEquals(actual, expectation);
     }
@@ -57,13 +57,13 @@ public class KeywordsTest {
         String str = "Lucky Wheel Game";
 
         // when
-        Set<String> actual = Keywords.toKeywords(str, true, 1);
+        List<String> actual = Keywords.toKeywords(str, true, 1);
 
         // then
-        Set<String> expectation = Sets.newHashSet(
-            "l",
+        List<String> expectation = Lists.newArrayList(
+            "g",
             "w",
-            "g"
+            "l"
         );
         Asserts.assertEquals(actual, expectation);
     }
@@ -74,21 +74,21 @@ public class KeywordsTest {
         String str = "Lucky Wheel Game";
 
         // when
-        Set<String> actual = Keywords.toKeywords(str, true, 12);
+        List<String> actual = Keywords.toKeywords(str, true, 12);
 
         // then
-        Set<String> expectation = Sets.newHashSet(
-            "lucky",
-            "lu",
-            "luc",
-            "wheel",
-            "wh",
-            "whe",
-            "game",
-            "ga",
-            "gam",
+        List<String> expectation = Lists.newArrayList(
+            "wheel game",
             "lucky wheel",
-            "wheel game"
+            "lucky",
+            "wheel",
+            "game",
+            "luc",
+            "whe",
+            "gam",
+            "lu",
+            "wh",
+            "ga"
         );
         Asserts.assertEquals(actual, expectation);
     }
@@ -99,10 +99,10 @@ public class KeywordsTest {
         String str = "Lucky Wheel Game";
 
         // when
-        Set<String> actual = Keywords.toKeywords(str, true, 0);
+        List<String> actual = Keywords.toKeywords(str, true, 0);
 
         // then
-        Set<String> expectation = Sets.newHashSet(
+        List<String> expectation = Lists.newArrayList(
             ""
         );
         Asserts.assertEquals(actual, expectation);
@@ -114,7 +114,7 @@ public class KeywordsTest {
         String str = "";
 
         // when
-        Set<String> actual = Keywords.toKeywords(str, true);
+        List<String> actual = Keywords.toKeywords(str, true);
 
         // then
         Asserts.assertNull(actual);
@@ -126,10 +126,10 @@ public class KeywordsTest {
         String str = "";
 
         // when
-        Set<String> actual = Keywords.toKeywords(str, false);
+        List<String> actual = Keywords.toKeywords(str, false);
 
         // then
-        Asserts.assertEquals(actual, Collections.emptySet());
+        Asserts.assertEquals(actual, Collections.emptyList());
     }
 
     @Test
@@ -138,13 +138,13 @@ public class KeywordsTest {
         String str = "a/b/c";
 
         // when
-        Set<String> actual = Keywords.toKeywords(str, false);
+        List<String> actual = Keywords.toKeywords(str, false);
 
         // then
         Asserts.assertEquals(
             actual,
-            Sets.newHashSet(
-                "a b c", "a", "b", "a b", "c"
+            Lists.newArrayList(
+                "a b c", "a b", "a", "b", "c"
             )
         );
     }

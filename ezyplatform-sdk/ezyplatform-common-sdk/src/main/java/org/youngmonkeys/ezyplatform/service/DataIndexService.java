@@ -19,19 +19,33 @@ package org.youngmonkeys.ezyplatform.service;
 import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
 
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public interface DataIndexService {
+
+    void saveKeywords(
+        String dataType,
+        Collection<SaveDataKeywordModel> dataKeywords
+    );
 
     default void saveKeywords(
         String dataType,
         long dataId,
         Collection<String> keywords
     ) {
-        keywords
-            .parallelStream()
-            .forEach(keyword ->
-                saveKeyword(dataType, dataId, keyword)
-            );
+        saveKeywords(
+            dataType,
+            keywords
+                .stream()
+                .map(it ->
+                    SaveDataKeywordModel.builder()
+                        .dataId(dataId)
+                        .keyword(it)
+                        .priority(it.length())
+                        .build()
+                )
+                .collect(Collectors.toList())
+        );
     }
 
     default void saveKeyword(
@@ -44,9 +58,16 @@ public interface DataIndexService {
             SaveDataKeywordModel.builder()
                 .dataId(dataId)
                 .keyword(keyword)
+                .priority(keyword.length())
                 .build()
         );
     }
 
     void saveKeyword(String dataType, SaveDataKeywordModel model);
+
+    boolean containsDataIndex(
+        String dataType,
+        long dataId,
+        String keyword
+    );
 }

@@ -20,8 +20,12 @@ import com.tvd12.ezyfox.util.EzyLoggable;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.model.AddUserKeywordModel;
-import org.youngmonkeys.ezyplatform.entity.UserKeyword;
 import org.youngmonkeys.ezyplatform.repo.UserKeywordRepository;
+import org.youngmonkeys.ezyplatform.repo.UserKeywordTransactionalRepository;
+
+import java.util.Collection;
+
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 
 @AllArgsConstructor
 public class DefaultUserKeywordService
@@ -29,21 +33,31 @@ public class DefaultUserKeywordService
         implements UserKeywordService {
 
     private final UserKeywordRepository userKeywordRepository;
+    private final UserKeywordTransactionalRepository userKeywordTransactionalRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
     public void addUserKeyword(AddUserKeywordModel model) {
-        UserKeyword entity = userKeywordRepository.findByUserIdAndKeyword(
-            model.getUserId(),
-            model.getKeyword()
+        userKeywordTransactionalRepository.saveUserKeyword(
+            modelToEntityConverter.toEntity(model)
         );
-        if (entity == null) {
-            entity = modelToEntityConverter.toEntity(model);
-            try {
-                userKeywordRepository.save(entity);
-            } catch (Throwable e) {
-                logger.info("add user keyword: {} failed: {}", entity, e.getMessage());
-            }
-        }
+    }
+
+    @Override
+    public void addUserKeywords(Collection<AddUserKeywordModel> userKeywords) {
+        userKeywordTransactionalRepository.saveUserKeywords(
+            newArrayList(
+                userKeywords,
+                modelToEntityConverter::toEntity
+            )
+        );
+    }
+
+    @Override
+    public boolean containsUserKeyword(long userId, String keyword) {
+        return userKeywordRepository.findByUserIdAndKeyword(
+            userId,
+            keyword
+        ) != null;
     }
 }

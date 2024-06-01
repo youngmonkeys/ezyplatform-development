@@ -30,8 +30,13 @@ public class DefaultUserKeywordsExtractor implements UserKeywordsExtractor {
     @Override
     public Set<String> extract(User user) {
         Set<String> answer = new HashSet<>();
-        answer.add(String.valueOf(user.getId()));
+        if (isNotBlank(user.getPhone())) {
+            answer.add(user.getPhone());
+        }
         answer.add(user.getUsername());
+        if (isNotBlank(user.getDisplayName())) {
+            answer.addAll(toKeywords(user.getDisplayName()));
+        }
         if (isNotBlank(user.getEmail())) {
             answer.add(user.getEmail());
             String keyword = keywordFromEmail(user.getEmail());
@@ -39,12 +44,7 @@ public class DefaultUserKeywordsExtractor implements UserKeywordsExtractor {
                 answer.add(keyword);
             }
         }
-        if (isNotBlank(user.getDisplayName())) {
-            answer.addAll(toKeywords(user.getDisplayName()));
-        }
-        if (isNotBlank(user.getPhone())) {
-            answer.add(user.getPhone());
-        }
+        answer.add(String.valueOf(user.getId()));
         return answer;
     }
 }
