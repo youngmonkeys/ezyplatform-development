@@ -195,6 +195,16 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
+    public DataI18n toEntity(DataI18nModel model) {
+        DataI18n entity = new DataI18n();
+        entity.setDataType(model.getDataType());
+        entity.setDataId(model.getDataId());
+        entity.setLanguage(model.getLanguage());
+        entity.setFieldName(model.getFieldName());
+        entity.setFieldValue(model.getFieldValue());
+        return entity;
+    }
+
     public Setting toSettingEntity(
         String name,
         DataType dataType,
