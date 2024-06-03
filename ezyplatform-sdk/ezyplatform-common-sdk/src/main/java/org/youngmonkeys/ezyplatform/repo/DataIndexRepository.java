@@ -19,8 +19,20 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.DataIndex;
 
+import java.util.Collection;
+
 public interface DataIndexRepository
     extends EzyDatabaseRepository<Long, DataIndex> {
+
+    void deleteByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    );
+
+    void deleteByDataTypeAndDataIdIn(
+        String dataType,
+        Collection<Long> dataIds
+    );
 
     DataIndex findByDataTypeAndDataIdAndKeyword(
         String dataType,

@@ -65,6 +65,16 @@ public interface DataIndexService {
 
     void saveKeyword(String dataType, SaveDataKeywordModel model);
 
+    void deleteKeywordsByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    );
+
+    void deleteKeywordsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
     boolean containsDataIndex(
         String dataType,
         long dataId,

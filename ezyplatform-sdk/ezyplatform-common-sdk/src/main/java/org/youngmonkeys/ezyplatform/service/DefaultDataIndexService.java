@@ -60,6 +60,30 @@ public class DefaultDataIndexService
     }
 
     @Override
+    public void deleteKeywordsByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    ) {
+        dataIndexRepository.deleteByDataTypeAndDataId(
+            dataType,
+            dataId
+        );
+    }
+
+    @Override
+    public void deleteKeywordsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    ) {
+        if (dataIds.size() > 0) {
+            dataIndexRepository.deleteByDataTypeAndDataIdIn(
+                dataType,
+                dataIds
+            );
+        }
+    }
+
+    @Override
     public boolean containsDataIndex(
         String dataType,
         long dataId,

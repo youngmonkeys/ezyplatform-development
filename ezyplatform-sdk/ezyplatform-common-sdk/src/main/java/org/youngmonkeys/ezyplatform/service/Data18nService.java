@@ -33,6 +33,16 @@ public interface Data18nService {
         Collection<DataI18nFieldModel> fields
     );
 
+    void deleteKeywordsByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    );
+
+    void deleteKeywordsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
     String getDataI18nValueByTypeAndIdAndLanguageFieldName(
         String dataType,
         long dataId,

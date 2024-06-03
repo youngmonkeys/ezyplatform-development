@@ -44,6 +44,12 @@ public interface UserKeywordService {
         );
     }
 
+    void deleteUserKeywordsByUserId(long userId);
+
+    void deleteUserKeywordsByUserIds(
+        Collection<Long> userIds
+    );
+
     default void addUserKeyword(long userId, String keyword) {
         addUserKeyword(
             AddUserKeywordModel.builder()

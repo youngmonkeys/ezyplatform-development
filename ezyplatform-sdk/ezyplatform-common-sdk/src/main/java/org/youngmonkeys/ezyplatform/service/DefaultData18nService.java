@@ -65,6 +65,30 @@ public class DefaultData18nService implements Data18nService {
     }
 
     @Override
+    public void deleteKeywordsByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    ) {
+        dataI18nRepository.deleteByDataTypeAndDataId(
+            dataType,
+            dataId
+        );
+    }
+
+    @Override
+    public void deleteKeywordsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    ) {
+        if (dataIds.size() > 0) {
+            dataI18nRepository.deleteByDataTypeAndDataIdIn(
+                dataType,
+                dataIds
+            );
+        }
+    }
+
+    @Override
     public String getDataI18nValueByTypeAndIdAndLanguageFieldName(
         String dataType,
         long dataId,

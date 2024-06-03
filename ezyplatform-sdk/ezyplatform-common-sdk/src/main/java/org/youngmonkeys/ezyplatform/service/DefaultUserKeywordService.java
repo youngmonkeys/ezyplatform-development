@@ -54,6 +54,18 @@ public class DefaultUserKeywordService
     }
 
     @Override
+    public void deleteUserKeywordsByUserId(long userId) {
+        userKeywordRepository.deleteByUserId(userId);
+    }
+
+    @Override
+    public void deleteUserKeywordsByUserIds(Collection<Long> userIds) {
+        if (userIds.size() > 0) {
+            userKeywordRepository.deleteByUserIdIn(userIds);
+        }
+    }
+
+    @Override
     public boolean containsUserKeyword(long userId, String keyword) {
         return userKeywordRepository.findByUserIdAndKeyword(
             userId,

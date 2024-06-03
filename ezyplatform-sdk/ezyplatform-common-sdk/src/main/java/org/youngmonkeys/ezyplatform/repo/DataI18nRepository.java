@@ -26,6 +26,16 @@ import java.util.List;
 public interface DataI18nRepository
     extends EzyDatabaseRepository<DataI18nId, DataI18n> {
 
+    void deleteByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    );
+
+    void deleteByDataTypeAndDataIdIn(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
     List<DataI18n> findByDataTypeAndDataIdAndLanguage(
         String dataType,
         long dataId,
