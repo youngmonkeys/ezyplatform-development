@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2023 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,21 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.service;
+package org.youngmonkeys.ezyplatform.test;
 
-import org.youngmonkeys.ezyplatform.model.AddLetterModel;
-import org.youngmonkeys.ezyplatform.model.AddLetterReceiverModel;
+import com.tvd12.ezyfox.tool.EzySameObjectScriptCreator;
+import org.youngmonkeys.ezyplatform.entity.Letter;
 import org.youngmonkeys.ezyplatform.model.SimpleLetterModel;
 
-import java.util.Collection;
-import java.util.Map;
+public class ConvertScriptGenerator {
 
-public interface LetterService {
-
-    long addLetter(AddLetterModel model);
-
-    long addLetterReceiver(AddLetterReceiverModel model);
-
-    Map<Long, SimpleLetterModel> getLetterMapByIds(
-        Collection<Long> letterIds
-    );
+    public static void main(String[] args) {
+        String script = new EzySameObjectScriptCreator()
+            .originClass(Letter.class)
+            .originObjectName("entity")
+            .targetClass(SimpleLetterModel.class)
+            .targetObjectName("model")
+            .generateBuildScript();
+        System.out.println(script);
+    }
 }

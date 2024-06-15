@@ -153,7 +153,7 @@ public class DefaultEntityToModelConverter {
 
     public NotificationModel toModel(
         Notification notification,
-        NotificationReceiver entity,
+        NotificationReceiver notificationReceiver,
         boolean includeFromAdmin
     ) {
         return NotificationModel.builder()
@@ -165,21 +165,38 @@ public class DefaultEntityToModelConverter {
             .status(notification.getStatus())
             .fromAdminId(includeFromAdmin ? notification.getFromAdminId() : 0L)
             .fromUserId(notification.getFromUserId())
-            .toAdminId(entity.getToAdminId())
-            .toUserId(entity.getToUserId())
-            .notificationReceiverId(entity.getId())
-            .confidenceLevel(entity.getConfidenceLevel())
-            .importantLevel(entity.getImportantLevel())
-            .receiveStatus(entity.getStatus())
-            .sentAt(toTimestamp(entity.getSentAt()))
-            .receivedAt(toTimestamp(entity.getReceivedAt()))
-            .readAt(toTimestamp(entity.getReadAt()))
+            .toAdminId(notificationReceiver.getToAdminId())
+            .toUserId(notificationReceiver.getToUserId())
+            .notificationReceiverId(notificationReceiver.getId())
+            .confidenceLevel(notificationReceiver.getConfidenceLevel())
+            .importantLevel(notificationReceiver.getImportantLevel())
+            .receiveStatus(notificationReceiver.getStatus())
+            .sentAt(toTimestamp(notificationReceiver.getSentAt()))
+            .receivedAt(toTimestamp(notificationReceiver.getReceivedAt()))
+            .readAt(toTimestamp(notificationReceiver.getReadAt()))
+            .build();
+    }
+
+    public SimpleLetterModel toModel(Letter entity) {
+        if (entity == null) {
+            return null;
+        }
+        return SimpleLetterModel.builder()
+            .id(entity.getId())
+            .type(entity.getType())
+            .title(entity.getTitle())
+            .content(entity.getContent())
+            .fromAdminId(entity.getFromAdminId())
+            .fromUserId(entity.getFromUserId())
+            .parentId(entity.getParentId())
+            .status(entity.getStatus())
+            .createdAt(toTimestamp(entity.getCreatedAt()))
             .build();
     }
 
     public LetterModel toModel(
         Letter letter,
-        LetterReceiver entity
+        LetterReceiver letterReceiver
     ) {
         return LetterModel.builder()
             .id(letter.getId())
@@ -188,14 +205,33 @@ public class DefaultEntityToModelConverter {
             .status(letter.getStatus())
             .fromAdminId(letter.getFromAdminId())
             .fromUserId(letter.getFromUserId())
+            .toAdminId(letterReceiver.getToAdminId())
+            .toUserId(letterReceiver.getToUserId())
+            .parentId(letter.getParentId())
+            .letterReceiverId(letterReceiver.getId())
+            .notificationReceiverId(letterReceiver.getNotificationReceiverId())
+            .confidenceLevel(letterReceiver.getConfidenceLevel())
+            .importantLevel(letterReceiver.getImportantLevel())
+            .receiveStatus(letterReceiver.getStatus())
+            .sentAt(toTimestamp(letterReceiver.getSentAt()))
+            .receivedAt(toTimestamp(letterReceiver.getReceivedAt()))
+            .readAt(toTimestamp(letterReceiver.getReadAt()))
+            .build();
+    }
+
+    public LetterReceiverModel toModel(LetterReceiver entity) {
+        if (entity == null) {
+            return null;
+        }
+        return LetterReceiverModel.builder()
+            .id(entity.getId())
+            .letterId(entity.getLetterId())
             .toAdminId(entity.getToAdminId())
             .toUserId(entity.getToUserId())
-            .parentId(letter.getParentId())
-            .letterReceiverId(entity.getId())
             .notificationReceiverId(entity.getNotificationReceiverId())
             .confidenceLevel(entity.getConfidenceLevel())
             .importantLevel(entity.getImportantLevel())
-            .receiveStatus(entity.getStatus())
+            .status(entity.getStatus())
             .sentAt(toTimestamp(entity.getSentAt()))
             .receivedAt(toTimestamp(entity.getReceivedAt()))
             .readAt(toTimestamp(entity.getReadAt()))

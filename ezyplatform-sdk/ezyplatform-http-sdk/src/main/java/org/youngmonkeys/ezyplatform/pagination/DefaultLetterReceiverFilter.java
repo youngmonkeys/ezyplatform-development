@@ -21,11 +21,11 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 
 @Getter
-public class DefaultLetterFilter implements LetterFilter {
+public class DefaultLetterReceiverFilter implements LetterReceiverFilter {
     public final Long toUserId;
     public final Long toAdminId;
 
-    protected DefaultLetterFilter(Builder<?> builder) {
+    protected DefaultLetterReceiverFilter(Builder<?> builder) {
         this.toUserId = builder.toUserId;
         this.toAdminId = builder.toAdminId;
     }
@@ -44,7 +44,7 @@ public class DefaultLetterFilter implements LetterFilter {
 
     @SuppressWarnings("unchecked")
     public static class Builder<T extends Builder<T>>
-        implements EzyBuilder<DefaultLetterFilter> {
+        implements EzyBuilder<DefaultLetterReceiverFilter> {
 
         private Long toUserId;
         private Long toAdminId;
@@ -60,8 +60,8 @@ public class DefaultLetterFilter implements LetterFilter {
         }
 
         @Override
-        public DefaultLetterFilter build() {
-            return new DefaultLetterFilter(this);
+        public DefaultLetterReceiverFilter build() {
+            return new DefaultLetterReceiverFilter(this);
         }
     }
 }

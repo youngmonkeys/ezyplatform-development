@@ -17,21 +17,28 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.Letter;
 import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
 import org.youngmonkeys.ezyplatform.model.AddLetterModel;
 import org.youngmonkeys.ezyplatform.model.AddLetterReceiverModel;
+import org.youngmonkeys.ezyplatform.model.SimpleLetterModel;
 import org.youngmonkeys.ezyplatform.repo.LetterReceiverRepository;
 import org.youngmonkeys.ezyplatform.repo.LetterRepository;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class DefaultLetterService implements LetterService {
 
     private final LetterRepository letterRepository;
     private final LetterReceiverRepository letterReceiverRepository;
+    private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
@@ -53,5 +60,22 @@ public class DefaultLetterService implements LetterService {
         LetterReceiver entity = modelToEntityConverter.toEntity(model);
         letterReceiverRepository.save(entity);
         return entity.getId();
+    }
+
+    @Override
+    public Map<Long, SimpleLetterModel> getLetterMapByIds(
+        Collection<Long> letterIds
+    ) {
+        if (letterIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return letterRepository.findListByIds(letterIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Letter::getId,
+                    entityToModelConverter::toModel
+                )
+            );
     }
 }

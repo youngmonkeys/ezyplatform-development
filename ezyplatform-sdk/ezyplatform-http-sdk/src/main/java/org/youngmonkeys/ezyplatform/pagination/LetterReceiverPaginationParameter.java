@@ -16,6 +16,5 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
-public enum LetterPaginationSortOrder {
-    ID_DESC
-}
+public interface LetterReceiverPaginationParameter
+    extends CommonPaginationParameter {}

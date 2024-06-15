@@ -14,20 +14,6 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.repo;
+package org.youngmonkeys.ezyplatform.pagination;
 
-import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
-import org.youngmonkeys.ezyplatform.pagination.LetterReceiverFilter;
-import org.youngmonkeys.ezyplatform.pagination.LetterReceiverPaginationParameter;
-
-public class PaginationLetterReceiverRepository extends CommonPaginationRepository<
-    LetterReceiverFilter,
-    LetterReceiverPaginationParameter,
-    Long,
-    LetterReceiver> {
-
-    @Override
-    protected Class<LetterReceiver> getEntityType() {
-        return LetterReceiver.class;
-    }
-}
+public interface LetterReceiverFilter extends CommonStorageFilter {}

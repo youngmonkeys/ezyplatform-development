@@ -25,8 +25,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IdDescLetterPaginationParameter
-    implements LetterPaginationParameter {
+public class IdDescLetterReceiverPaginationParameter
+    implements LetterReceiverPaginationParameter {
 
     public Long id;
 
@@ -49,6 +49,6 @@ public class IdDescLetterPaginationParameter
 
     @Override
     public String sortOrder() {
-        return LetterPaginationSortOrder.ID_DESC.toString();
+        return LetterReceiverPaginationSortOrder.ID_DESC.toString();
     }
 }

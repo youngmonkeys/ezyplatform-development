@@ -16,18 +16,18 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
-import org.youngmonkeys.ezyplatform.model.LetterModel;
+import org.youngmonkeys.ezyplatform.model.LetterReceiverModel;
 
 import java.util.Map;
 import java.util.function.Function;
 
-public class LetterPaginationParameterConverter
+public class LetterReceiverPaginationParameterConverter
     extends ComplexPaginationParameterConverter<
         String,
-        LetterModel
+        LetterReceiverModel
     > {
 
-    public LetterPaginationParameterConverter(
+    public LetterReceiverPaginationParameterConverter(
         PaginationParameterConverter converter
     ) {
         super(converter);
@@ -38,19 +38,19 @@ public class LetterPaginationParameterConverter
         Map<String, Class<?>> map
     ) {
         map.put(
-            LetterPaginationSortOrder.ID_DESC.toString(),
-            IdDescLetterPaginationParameter.class
+            LetterReceiverPaginationSortOrder.ID_DESC.toString(),
+            IdDescLetterReceiverPaginationParameter.class
         );
     }
 
     @Override
     protected void addPaginationParameterExtractors(
-        Map<String, Function<LetterModel, Object>> map
+        Map<String, Function<LetterReceiverModel, Object>> map
     ) {
         map.put(
-            LetterPaginationSortOrder.ID_DESC.toString(),
-            model -> new IdDescLetterPaginationParameter(
-                model.getLetterReceiverId()
+            LetterReceiverPaginationSortOrder.ID_DESC.toString(),
+            model -> new IdDescLetterReceiverPaginationParameter(
+                model.getId()
             )
         );
     }

@@ -17,53 +17,43 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
-import org.youngmonkeys.ezyplatform.entity.Letter;
 import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
-import org.youngmonkeys.ezyplatform.model.LetterModel;
-import org.youngmonkeys.ezyplatform.pagination.IdDescLetterPaginationParameter;
-import org.youngmonkeys.ezyplatform.pagination.LetterFilter;
-import org.youngmonkeys.ezyplatform.pagination.LetterPaginationParameter;
-import org.youngmonkeys.ezyplatform.pagination.LetterPaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.model.LetterReceiverModel;
+import org.youngmonkeys.ezyplatform.pagination.IdDescLetterReceiverPaginationParameter;
+import org.youngmonkeys.ezyplatform.pagination.LetterReceiverFilter;
+import org.youngmonkeys.ezyplatform.pagination.LetterReceiverPaginationParameter;
+import org.youngmonkeys.ezyplatform.pagination.LetterReceiverPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.repo.LetterRepository;
 import org.youngmonkeys.ezyplatform.repo.PaginationLetterReceiverRepository;
-import org.youngmonkeys.ezyplatform.rx.Reactive;
-import org.youngmonkeys.ezyplatform.rx.RxOperationSupplier;
 
-public class PaginationLetterService extends CommonPaginationService<
-    LetterModel,
-    LetterFilter,
-    LetterPaginationParameter,
+public class PaginationLetterReceiverService extends CommonPaginationService<
+    LetterReceiverModel,
+    LetterReceiverFilter,
+    LetterReceiverPaginationParameter,
     Long,
     LetterReceiver> {
 
     private final LetterRepository letterRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
 
-    public PaginationLetterService(
+    public PaginationLetterReceiverService(
         PaginationLetterReceiverRepository repository,
         LetterRepository letterRepository,
         DefaultEntityToModelConverter entityToModelConverter,
-        LetterPaginationParameterConverter letterPaginationParameterConverter
+        LetterReceiverPaginationParameterConverter letterReceiverPaginationParameterConverter
     ) {
-        super(repository, letterPaginationParameterConverter);
+        super(repository, letterReceiverPaginationParameterConverter);
         this.letterRepository = letterRepository;
         this.entityToModelConverter = entityToModelConverter;
     }
 
     @Override
-    protected RxOperationSupplier<LetterReceiver> convertEntityRxSupplier() {
-        return letterReceiver -> Reactive.single(
-            letterReceiver
-        ).mapItem(it -> {
-            Letter letter = letterRepository.findById(
-                it.getLetterId()
-            );
-            return entityToModelConverter.toModel(letter, it);
-        });
+    protected LetterReceiverModel convertEntity(LetterReceiver entity) {
+        return entityToModelConverter.toModel(entity);
     }
 
     @Override
-    protected LetterPaginationParameter defaultPaginationParameter() {
-        return new IdDescLetterPaginationParameter();
+    protected LetterReceiverPaginationParameter defaultPaginationParameter() {
+        return new IdDescLetterReceiverPaginationParameter();
     }
 }

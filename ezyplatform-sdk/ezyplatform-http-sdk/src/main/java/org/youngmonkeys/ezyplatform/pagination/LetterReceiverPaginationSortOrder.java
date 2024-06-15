@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2023 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,8 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.repo;
+package org.youngmonkeys.ezyplatform.pagination;
 
-import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
-import org.youngmonkeys.ezyplatform.pagination.LetterReceiverFilter;
-import org.youngmonkeys.ezyplatform.pagination.LetterReceiverPaginationParameter;
-
-public class PaginationLetterReceiverRepository extends CommonPaginationRepository<
-    LetterReceiverFilter,
-    LetterReceiverPaginationParameter,
-    Long,
-    LetterReceiver> {
-
-    @Override
-    protected Class<LetterReceiver> getEntityType() {
-        return LetterReceiver.class;
-    }
+public enum LetterReceiverPaginationSortOrder {
+    ID_DESC
 }
