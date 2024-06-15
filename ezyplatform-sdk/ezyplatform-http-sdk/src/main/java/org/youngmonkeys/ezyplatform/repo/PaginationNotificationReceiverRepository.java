@@ -16,12 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
-import com.tvd12.ezyfox.database.annotation.EzyRepository;
 import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
 import org.youngmonkeys.ezyplatform.pagination.NotificationFilter;
 import org.youngmonkeys.ezyplatform.pagination.NotificationPaginationParameter;
 
-@EzyRepository
 public class PaginationNotificationReceiverRepository extends CommonPaginationRepository<
     NotificationFilter,
     NotificationPaginationParameter,

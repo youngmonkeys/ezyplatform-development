@@ -16,7 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import com.tvd12.ezyhttp.server.core.annotation.Service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.Letter;
@@ -28,7 +27,6 @@ import org.youngmonkeys.ezyplatform.repo.LetterRepository;
 
 import java.util.List;
 
-@Service
 @AllArgsConstructor
 public class DefaultLetterService implements LetterService {
 

@@ -16,12 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
-import com.tvd12.ezyfox.database.annotation.EzyRepository;
 import org.youngmonkeys.ezyplatform.entity.Media;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameter;
 
-@EzyRepository
 public class PaginationMediaRepository extends CommonPaginationRepository<
     MediaFilter,
     MediaPaginationParameter,

@@ -16,7 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import com.tvd12.ezyhttp.server.core.annotation.Service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.Notification;
@@ -28,7 +27,6 @@ import org.youngmonkeys.ezyplatform.repo.NotificationRepository;
 
 import java.util.List;
 
-@Service
 @AllArgsConstructor
 public class DefaultNotificationService implements NotificationService {
 

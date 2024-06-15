@@ -16,18 +16,25 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
-import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
-import org.youngmonkeys.ezyplatform.pagination.LetterFilter;
-import org.youngmonkeys.ezyplatform.pagination.LetterPaginationParameter;
+import org.youngmonkeys.ezyplatform.entity.DataIndex;
+import org.youngmonkeys.ezyplatform.pagination.DataIndexFilter;
+import org.youngmonkeys.ezyplatform.pagination.DataIndexPaginationParameter;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 
-public class PaginationLetterReceiverRepository extends CommonPaginationRepository<
-    LetterFilter,
-    LetterPaginationParameter,
+public class PaginationDataIndexRepository extends CommonPaginationResultRepository<
+    DataIndexFilter,
+    DataIndexPaginationParameter,
     Long,
-    LetterReceiver> {
+    DataIndex,
+    IdResult> {
 
     @Override
-    protected Class<LetterReceiver> getEntityType() {
-        return LetterReceiver.class;
+    protected Class<DataIndex> getEntityType() {
+        return DataIndex.class;
+    }
+
+    @Override
+    protected Class<IdResult> getResultType() {
+        return IdResult.class;
     }
 }
