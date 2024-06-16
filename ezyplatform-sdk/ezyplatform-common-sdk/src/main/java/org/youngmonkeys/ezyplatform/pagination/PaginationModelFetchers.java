@@ -66,7 +66,7 @@ public final class PaginationModelFetchers {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public <T> PaginationModel<T> getPaginationModelBySortOrder(
+    public static <T> PaginationModel<T> getPaginationModelBySortOrder(
         PaginationService paginationService,
         ComplexPaginationParameterConverter paginationParameterConverter,
         Object filter,
