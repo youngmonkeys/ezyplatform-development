@@ -25,8 +25,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IdDescNotificationPaginationParameter
-    implements NotificationPaginationParameter {
+public class IdDescNotificationReceiverPaginationParameter
+    implements NotificationReceiverPaginationParameter {
 
     public Long id;
 
@@ -49,6 +49,6 @@ public class IdDescNotificationPaginationParameter
 
     @Override
     public String sortOrder() {
-        return NotificationPaginationSortOrder.ID_DESC.toString();
+        return NotificationReceiverPaginationSortOrder.ID_DESC.toString();
     }
 }

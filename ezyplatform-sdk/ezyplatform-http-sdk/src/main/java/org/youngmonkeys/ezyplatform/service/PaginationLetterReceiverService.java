@@ -23,7 +23,6 @@ import org.youngmonkeys.ezyplatform.pagination.IdDescLetterReceiverPaginationPar
 import org.youngmonkeys.ezyplatform.pagination.LetterReceiverFilter;
 import org.youngmonkeys.ezyplatform.pagination.LetterReceiverPaginationParameter;
 import org.youngmonkeys.ezyplatform.pagination.LetterReceiverPaginationParameterConverter;
-import org.youngmonkeys.ezyplatform.repo.LetterRepository;
 import org.youngmonkeys.ezyplatform.repo.PaginationLetterReceiverRepository;
 
 public class PaginationLetterReceiverService extends CommonPaginationService<
@@ -33,17 +32,14 @@ public class PaginationLetterReceiverService extends CommonPaginationService<
     Long,
     LetterReceiver> {
 
-    private final LetterRepository letterRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
 
     public PaginationLetterReceiverService(
         PaginationLetterReceiverRepository repository,
-        LetterRepository letterRepository,
         DefaultEntityToModelConverter entityToModelConverter,
         LetterReceiverPaginationParameterConverter letterReceiverPaginationParameterConverter
     ) {
         super(repository, letterReceiverPaginationParameterConverter);
-        this.letterRepository = letterRepository;
         this.entityToModelConverter = entityToModelConverter;
     }
 

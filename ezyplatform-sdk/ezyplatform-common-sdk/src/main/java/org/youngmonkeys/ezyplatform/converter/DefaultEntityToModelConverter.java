@@ -151,6 +151,24 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
+    public SimpleNotificationModel toModel(Notification entity) {
+        if (entity == null) {
+            return null;
+        }
+        return SimpleNotificationModel.builder()
+            .id(entity.getId())
+            .type(entity.getType())
+            .title(entity.getTitle())
+            .content(entity.getContent())
+            .iconImage(entity.getIconImage())
+            .deepLink(entity.getDeepLink())
+            .fromAdminId(entity.getFromAdminId())
+            .fromUserId(entity.getFromUserId())
+            .status(entity.getStatus())
+            .createdAt(toTimestamp(entity.getCreatedAt()))
+            .build();
+    }
+
     public NotificationModel toModel(
         Notification notification,
         NotificationReceiver notificationReceiver,
@@ -174,6 +192,26 @@ public class DefaultEntityToModelConverter {
             .sentAt(toTimestamp(notificationReceiver.getSentAt()))
             .receivedAt(toTimestamp(notificationReceiver.getReceivedAt()))
             .readAt(toTimestamp(notificationReceiver.getReadAt()))
+            .build();
+    }
+
+    public NotificationReceiverModel toModel(
+        NotificationReceiver entity
+    ) {
+        if (entity == null) {
+            return null;
+        }
+        return NotificationReceiverModel.builder()
+            .id(entity.getId())
+            .notificationId(entity.getNotificationId())
+            .toAdminId(entity.getToAdminId())
+            .toUserId(entity.getToUserId())
+            .confidenceLevel(entity.getConfidenceLevel())
+            .importantLevel(entity.getImportantLevel())
+            .status(entity.getStatus())
+            .sentAt(toTimestamp(entity.getSentAt()))
+            .receivedAt(toTimestamp(entity.getReceivedAt()))
+            .readAt(toTimestamp(entity.getReadAt()))
             .build();
     }
 

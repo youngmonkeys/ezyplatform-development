@@ -14,20 +14,8 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.pagination;
 
-import com.tvd12.ezyfox.tool.EzySameObjectScriptCreator;
-import org.youngmonkeys.ezyplatform.model.NotificationModel;
-
-public class ConvertScriptGenerator {
-
-    public static void main(String[] args) {
-        String script = new EzySameObjectScriptCreator()
-            .originClass(NotificationModel.class)
-            .originObjectName("model")
-            .targetClass(NotificationModel.class)
-            .targetObjectName("response")
-            .generateBuildScript();
-        System.out.println(script);
-    }
+public enum NotificationReceiverPaginationSortOrder {
+    ID_DESC
 }

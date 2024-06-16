@@ -16,18 +16,18 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
-import org.youngmonkeys.ezyplatform.model.NotificationModel;
+import org.youngmonkeys.ezyplatform.model.NotificationReceiverModel;
 
 import java.util.Map;
 import java.util.function.Function;
 
-public class NotificationPaginationParameterConverter
+public class NotificationReceiverPaginationParameterConverter
     extends ComplexPaginationParameterConverter<
         String,
-        NotificationModel
+        NotificationReceiverModel
     > {
 
-    public NotificationPaginationParameterConverter(
+    public NotificationReceiverPaginationParameterConverter(
         PaginationParameterConverter converter
     ) {
         super(converter);
@@ -38,19 +38,19 @@ public class NotificationPaginationParameterConverter
         Map<String, Class<?>> map
     ) {
         map.put(
-            NotificationPaginationSortOrder.ID_DESC.toString(),
-            IdDescNotificationPaginationParameter.class
+            NotificationReceiverPaginationSortOrder.ID_DESC.toString(),
+            IdDescNotificationReceiverPaginationParameter.class
         );
     }
 
     @Override
     protected void addPaginationParameterExtractors(
-        Map<String, Function<NotificationModel, Object>> map
+        Map<String, Function<NotificationReceiverModel, Object>> map
     ) {
         map.put(
-            NotificationPaginationSortOrder.ID_DESC.toString(),
-            model -> new IdDescNotificationPaginationParameter(
-                model.getNotificationReceiverId()
+            NotificationReceiverPaginationSortOrder.ID_DESC.toString(),
+            model -> new IdDescNotificationReceiverPaginationParameter(
+                model.getId()
             )
         );
     }

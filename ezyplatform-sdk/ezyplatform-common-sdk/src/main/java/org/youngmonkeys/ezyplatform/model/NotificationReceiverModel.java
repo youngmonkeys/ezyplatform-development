@@ -14,6 +14,22 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.pagination;
+package org.youngmonkeys.ezyplatform.model;
 
-public interface NotificationFilter extends CommonStorageFilter {}
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+public class NotificationReceiverModel {
+    private long id;
+    private long notificationId;
+    private long toAdminId;
+    private long toUserId;
+    private String confidenceLevel;
+    private String importantLevel;
+    private String status;
+    private long sentAt;
+    private long receivedAt;
+    private long readAt;
+}

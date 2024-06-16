@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 youngmonkeys.org
+ * Copyright 2022 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,22 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.pagination;
+package org.youngmonkeys.ezyplatform.model;
 
-public interface NotificationPaginationParameter
-    extends CommonPaginationParameter {}
+import lombok.Builder;
+import lombok.Getter;
+
+@Getter
+@Builder
+public class SimpleNotificationModel {
+    private long id;
+    private String type;
+    private String title;
+    private String content;
+    private String iconImage;
+    private String deepLink;
+    private long fromAdminId;
+    private long fromUserId;
+    private String status;
+    private long createdAt;
+}

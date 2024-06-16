@@ -18,10 +18,18 @@ package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
 import org.youngmonkeys.ezyplatform.model.AddNotificationReceiverModel;
+import org.youngmonkeys.ezyplatform.model.SimpleNotificationModel;
+
+import java.util.Collection;
+import java.util.Map;
 
 public interface NotificationService {
 
     long addNotification(AddNotificationModel model);
 
     long addNotificationReceiver(AddNotificationReceiverModel model);
+
+    Map<Long, SimpleNotificationModel> getNotificationMapByIds(
+        Collection<Long> notificationIds
+    );
 }

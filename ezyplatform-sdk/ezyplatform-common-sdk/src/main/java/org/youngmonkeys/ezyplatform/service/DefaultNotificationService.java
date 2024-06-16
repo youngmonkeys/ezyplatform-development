@@ -17,21 +17,28 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.Notification;
 import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
 import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
 import org.youngmonkeys.ezyplatform.model.AddNotificationReceiverModel;
+import org.youngmonkeys.ezyplatform.model.SimpleNotificationModel;
 import org.youngmonkeys.ezyplatform.repo.NotificationReceiverRepository;
 import org.youngmonkeys.ezyplatform.repo.NotificationRepository;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 public class DefaultNotificationService implements NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final NotificationReceiverRepository notificationReceiverRepository;
+    private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
@@ -53,5 +60,22 @@ public class DefaultNotificationService implements NotificationService {
         NotificationReceiver entity = modelToEntityConverter.toEntity(model);
         notificationReceiverRepository.save(entity);
         return entity.getId();
+    }
+
+    @Override
+    public Map<Long, SimpleNotificationModel> getNotificationMapByIds(
+        Collection<Long> notificationIds
+    ) {
+        if (notificationIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return notificationRepository.findListByIds(notificationIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Notification::getId,
+                    entityToModelConverter::toModel
+                )
+            );
     }
 }

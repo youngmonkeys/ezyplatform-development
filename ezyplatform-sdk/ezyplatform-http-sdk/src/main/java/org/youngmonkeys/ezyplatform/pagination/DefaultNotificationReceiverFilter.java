@@ -21,11 +21,11 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 
 @Getter
-public class DefaultNotificationFilter implements NotificationFilter {
+public class DefaultNotificationReceiverFilter implements NotificationReceiverFilter {
     public final Long toUserId;
     public final Long toAdminId;
 
-    protected DefaultNotificationFilter(Builder<?> builder) {
+    protected DefaultNotificationReceiverFilter(Builder<?> builder) {
         this.toUserId = builder.toUserId;
         this.toAdminId = builder.toAdminId;
     }
@@ -44,7 +44,7 @@ public class DefaultNotificationFilter implements NotificationFilter {
 
     @SuppressWarnings("unchecked")
     public static class Builder<T extends Builder<T>>
-        implements EzyBuilder<DefaultNotificationFilter> {
+        implements EzyBuilder<DefaultNotificationReceiverFilter> {
 
         private Long toUserId;
         private Long toAdminId;
@@ -60,8 +60,8 @@ public class DefaultNotificationFilter implements NotificationFilter {
         }
 
         @Override
-        public DefaultNotificationFilter build() {
-            return new DefaultNotificationFilter(this);
+        public DefaultNotificationReceiverFilter build() {
+            return new DefaultNotificationReceiverFilter(this);
         }
     }
 }
