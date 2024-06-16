@@ -37,9 +37,10 @@ public class PaginationNotificationReceiverService extends CommonPaginationServi
     public PaginationNotificationReceiverService(
         PaginationNotificationReceiverRepository repository,
         DefaultEntityToModelConverter entityToModelConverter,
-        NotificationReceiverPaginationParameterConverter letterPaginationParameterConverter
+        NotificationReceiverPaginationParameterConverter
+            notificationReceiverPaginationParameterConverter
     ) {
-        super(repository, letterPaginationParameterConverter);
+        super(repository, notificationReceiverPaginationParameterConverter);
         this.entityToModelConverter = entityToModelConverter;
     }
 
