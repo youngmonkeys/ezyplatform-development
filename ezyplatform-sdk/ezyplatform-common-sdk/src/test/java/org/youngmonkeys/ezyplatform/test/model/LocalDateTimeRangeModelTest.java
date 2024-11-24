@@ -28,6 +28,94 @@ import java.time.Month;
 public class LocalDateTimeRangeModelTest {
 
     @Test
+    public void parseDayOfWeekTest() {
+        LocalDateTime now = LocalDateTime.of(2024, 11, 23, 13, 55);
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseDayOfWeek(now,"MONDAY"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2024, 11, 18).atStartOfDay(),
+                LocalDate.of(2024, 11, 19).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseDayOfWeek(now,"SATURDAY"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2024, 11, 23).atStartOfDay(),
+                LocalDate.of(2024, 11, 24).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseDayOfWeek(now,"SUNDAY"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2024, 11, 24).atStartOfDay(),
+                LocalDate.of(2024, 11, 25).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseDayOfWeek(null),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseDayOfWeek("HELLO"),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+    }
+
+    @Test
+    public void parseExtendedDayTest() {
+        LocalDateTime now = LocalDateTime.of(2024, 11, 23, 13, 55);
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedDay(now,"TODAY"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2024, 11, 23).atStartOfDay(),
+                LocalDate.of(2024, 11, 24).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedDay(now,"YESTERDAY"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2024, 11, 22).atStartOfDay(),
+                LocalDate.of(2024, 11, 23).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedDay(null),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedDay("HELLO"),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+    }
+
+    @Test
+    public void parseExtendedWeekTest() {
+        LocalDateTime now = LocalDateTime.of(2024, 11, 23, 13, 55);
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedWeek(now,"THIS_WEEK"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2024, 11, 18).atStartOfDay(),
+                LocalDate.of(2024, 11, 25).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedWeek(now,"LAST_WEEK"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2024, 11, 11).atStartOfDay(),
+                LocalDate.of(2024, 11, 18).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedWeek(null),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedWeek("HELLO"),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+    }
+
+    @Test
     public void parseYearsTest() {
         Asserts.assertEquals(
             LocalDateTimeRangeModel.parseYears(null),
@@ -184,6 +272,47 @@ public class LocalDateTimeRangeModelTest {
         Asserts.assertEquals(
             LocalDateTimeRangeModel.parseExtendedMonth("abc"),
             LocalDateTimeRangeModel.DEFAULT
+        );
+    }
+
+    @Test
+    public void parseExtendedYearTest() {
+        LocalDateTime now = LocalDateTime.of(2024, 11, 23, 13, 55);
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedYear(now,"THIS_YEAR"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2024, 1, 1).atStartOfDay(),
+                LocalDate.of(2025, 1, 1).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedYear(now,"LAST_YEAR"),
+            new LocalDateTimeRangeModel(
+                LocalDate.of(2023, 1, 1).atStartOfDay(),
+                LocalDate.of(2024, 1, 1).atStartOfDay()
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedYear(null),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseExtendedYear("HELLO"),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+    }
+
+    @Test
+    public void isEmptyTest() {
+        Asserts.assertTrue(LocalDateTimeRangeModel.DEFAULT.isEmpty());
+        Asserts.assertFalse(
+            new LocalDateTimeRangeModel(LocalDateTime.now(), null).isEmpty()
+        );
+        Asserts.assertFalse(
+            new LocalDateTimeRangeModel(null, LocalDateTime.now()).isEmpty()
+        );
+        Asserts.assertFalse(
+            new LocalDateTimeRangeModel(LocalDateTime.now(), LocalDateTime.now()).isEmpty()
         );
     }
 }

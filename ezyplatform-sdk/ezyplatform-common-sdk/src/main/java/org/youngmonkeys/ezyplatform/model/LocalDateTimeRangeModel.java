@@ -19,11 +19,16 @@ package org.youngmonkeys.ezyplatform.model;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.youngmonkeys.ezyplatform.constant.ExtendedDay;
 import org.youngmonkeys.ezyplatform.constant.ExtendedMonth;
+import org.youngmonkeys.ezyplatform.constant.ExtendedWeek;
+import org.youngmonkeys.ezyplatform.constant.ExtendedYear;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.time.temporal.TemporalAdjusters;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
@@ -169,6 +174,99 @@ public class LocalDateTimeRangeModel {
         return new LocalDateTimeRangeModel(start, end);
     }
 
+    public static LocalDateTimeRangeModel parseDayOfWeek(
+        String value
+    ) {
+        return parseDayOfWeek(LocalDateTime.now(), value);
+    }
+
+    public static LocalDateTimeRangeModel parseDayOfWeek(
+        LocalDateTime now,
+        String value
+    ) {
+        if (isBlank(value)) {
+            return LocalDateTimeRangeModel.DEFAULT;
+        }
+        DayOfWeek dayOfWeek;
+        try {
+            dayOfWeek = DayOfWeek.valueOf(value);
+        } catch (Exception e) {
+            return LocalDateTimeRangeModel.DEFAULT;
+        }
+        LocalDate start = now.toLocalDate().with(
+            dayOfWeek.compareTo(now.getDayOfWeek()) < 0
+                ? TemporalAdjusters.previousOrSame(dayOfWeek)
+                : TemporalAdjusters.nextOrSame(dayOfWeek)
+        );
+        LocalDate end = start.plusDays(1);
+        return new LocalDateTimeRangeModel(
+            start.atStartOfDay(),
+            end.atStartOfDay()
+        );
+    }
+
+    public static LocalDateTimeRangeModel parseExtendedDay(
+        String value
+    ) {
+        return parseExtendedDay(LocalDateTime.now(), value);
+    }
+
+    public static LocalDateTimeRangeModel parseExtendedDay(
+        LocalDateTime now,
+        String value
+    ) {
+        if (isBlank(value)) {
+            return LocalDateTimeRangeModel.DEFAULT;
+        }
+        LocalDate start = null;
+        LocalDate end = null;
+        ExtendedDay extendedDay = ExtendedDay.of(value);
+        if (extendedDay == ExtendedDay.TODAY) {
+            start = now.toLocalDate();
+            end = start.plusDays(1);
+        } else if (extendedDay == ExtendedDay.YESTERDAY) {
+            end = now.toLocalDate();
+            start = end.minusDays(1);
+        }
+        return new LocalDateTimeRangeModel(
+            start != null ? start.atStartOfDay() : null,
+            end != null ? end.atStartOfDay() : null
+        );
+    }
+
+    public static LocalDateTimeRangeModel parseExtendedWeek(
+        String value
+    ) {
+        return parseExtendedWeek(LocalDateTime.now(), value);
+    }
+
+    public static LocalDateTimeRangeModel parseExtendedWeek(
+        LocalDateTime now,
+        String value
+    ) {
+        if (isBlank(value)) {
+            return LocalDateTimeRangeModel.DEFAULT;
+        }
+        LocalDate start = null;
+        LocalDate end = null;
+        ExtendedWeek extendedWeek = ExtendedWeek.of(value);
+        if (extendedWeek == ExtendedWeek.THIS_WEEK) {
+            start = now.toLocalDate().with(
+                TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
+            );
+            end = start.plusDays(7);
+        } else if (extendedWeek == ExtendedWeek.LAST_WEEK) {
+            end = now.toLocalDate().with(
+                TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)
+            );
+            start = end.minusDays(7);
+        }
+        return new LocalDateTimeRangeModel(
+            start != null ? start.atStartOfDay() : null,
+            end != null ? end.atStartOfDay() : null
+        );
+    }
+
     public static LocalDateTimeRangeModel parseExtendedMonth(
         String value
     ) {
@@ -199,5 +297,38 @@ public class LocalDateTimeRangeModel {
             start != null ? start.atStartOfDay() : null,
             end != null ? end.atStartOfDay() : null
         );
+    }
+
+    public static LocalDateTimeRangeModel parseExtendedYear(
+        String value
+    ) {
+        return parseExtendedYear(LocalDateTime.now(), value);
+    }
+
+    public static LocalDateTimeRangeModel parseExtendedYear(
+        LocalDateTime now,
+        String value
+    ) {
+        if (isBlank(value)) {
+            return LocalDateTimeRangeModel.DEFAULT;
+        }
+        LocalDate start = null;
+        LocalDate end = null;
+        ExtendedYear extendedYear = ExtendedYear.of(value);
+        if (extendedYear == ExtendedYear.THIS_YEAR) {
+            start = LocalDate.of(now.getYear(), 1, 1);
+            end = start.plusYears(1);
+        } else if (extendedYear == ExtendedYear.LAST_YEAR) {
+            end = LocalDate.of(now.getYear(), 1, 1);
+            start = end.minusYears(1);
+        }
+        return new LocalDateTimeRangeModel(
+            start != null ? start.atStartOfDay() : null,
+            end != null ? end.atStartOfDay() : null
+        );
+    }
+
+    public boolean isEmpty() {
+        return start == null && end == null;
     }
 }
