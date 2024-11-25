@@ -224,6 +224,18 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void toDashLowerCaseWithoutSpecialCharactersColonTest() {
+        // given
+        String str = "Thong bao: Cap Nhat";
+
+        // when
+        String actual = toLowerDashCaseWithoutSpecialCharacters(str);
+
+        // then
+        Asserts.assertEquals(actual,"thong-bao-cap-nhat");
+    }
+
+    @Test
     public void toBigIntegerOrZeroTest() {
         Asserts.assertEquals(
             toBigIntegerOrZero("1"),
