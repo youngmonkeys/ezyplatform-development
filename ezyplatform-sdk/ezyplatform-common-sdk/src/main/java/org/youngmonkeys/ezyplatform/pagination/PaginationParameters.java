@@ -61,16 +61,32 @@ public final class PaginationParameters {
         boolean nextPage,
         String... fieldNames
     ) {
+        return makeOrderBy(
+            sortOrder,
+            nextPage,
+            new String[] { entityName },
+            fieldNames
+        );
+    }
+
+    public static String makeOrderBy(
+        SortOrder sortOrder,
+        boolean nextPage,
+        String[] entityNames,
+        String[] fieldNames
+    ) {
         SortOrder actualSortOrder = nextPage
             ? sortOrder
             : sortOrder.getReverse();
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < fieldNames.length; ++i) {
+            String entityName = entityNames.length > i
+                ? entityNames[i]
+                : entityNames[0];
             builder
                 .append(entityName)
                 .append('.')
-                .append(fieldNames[i]);
-            builder
+                .append(fieldNames[i])
                 .append(' ')
                 .append(actualSortOrder);
             if (i < fieldNames.length - 1) {
@@ -121,12 +137,46 @@ public final class PaginationParameters {
         boolean nextPage,
         String... fieldNames
     ) {
+        return makePaginationCondition(
+            sortOrder,
+            nextPage,
+            new String[] { entityName },
+            fieldNames,
+            fieldNames
+        );
+    }
+
+    public static String makePaginationCondition(
+        SortOrder sortOrder,
+        boolean nextPage,
+        String[] entityNames,
+        String[] fieldNames
+    ) {
+        return makePaginationCondition(
+            sortOrder,
+            nextPage,
+            entityNames,
+            fieldNames,
+            fieldNames
+        );
+    }
+
+    public static String makePaginationCondition(
+        SortOrder sortOrder,
+        boolean nextPage,
+        String[] entityNames,
+        String[] fieldNames,
+        String[] parameterNames
+    ) {
         SortOrder actualSortOrder = nextPage
             ? sortOrder
             : sortOrder.getReverse();
         int fieldCount = fieldNames.length;
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < fieldCount; ++i) {
+            String entityName = entityNames.length > i
+                ? entityNames[i]
+                : entityNames[0];
             builder
                 .append(entityName)
                 .append('.')
@@ -134,16 +184,19 @@ public final class PaginationParameters {
                 .append(' ')
                 .append(actualSortOrder.getSign())
                 .append(" :")
-                .append(fieldNames[i]);
+                .append(parameterNames[i]);
             if (fieldCount > 1 && i < fieldCount - 1) {
                 builder.append(" OR (");
                 for (int k = 0; k <= i; ++k) {
+                    entityName = entityNames.length > i
+                        ? entityNames[k]
+                        : entityNames[0];
                     builder
                         .append(entityName)
                         .append('.')
                         .append(fieldNames[k])
                         .append(" = :")
-                        .append(fieldNames[k])
+                        .append(parameterNames[k])
                         .append(" AND ");
                 }
             }

@@ -26,6 +26,7 @@
 			<package name="org.youngmonkeys.ezyplatform.test.extractor"/>
 			<package name="org.youngmonkeys.ezyplatform.test.io"/>
 			<package name="org.youngmonkeys.ezyplatform.test.model"/>
+			<package name="org.youngmonkeys.ezyplatform.test.pagination"/>
 			<package name="org.youngmonkeys.ezyplatform.test.repo"/>
 			<package name="org.youngmonkeys.ezyplatform.test.rx"/>
 			<package name="org.youngmonkeys.ezyplatform.test.security"/>

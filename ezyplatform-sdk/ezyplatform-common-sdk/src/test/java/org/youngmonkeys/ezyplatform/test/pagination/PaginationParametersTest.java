@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.test.pagination;
 
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
+import org.youngmonkeys.ezyplatform.pagination.SortOrder;
 
 import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.*;
 
@@ -103,6 +104,21 @@ public class PaginationParametersTest {
 
         // then
         Asserts.assertEquals(actual, "e.hello ASC, e.world ASC");
+    }
+
+    @Test
+    public void makeOrderByTest() {
+        // given
+        // when
+        String actual = makeOrderBy(
+            SortOrder.ASC,
+            true,
+            new String[] { "e", "a" },
+            new String[] { "hello", "world" }
+        );
+
+        // then
+        Asserts.assertEquals(actual, "e.hello ASC, a.world ASC");
     }
 
     @Test
@@ -250,6 +266,26 @@ public class PaginationParametersTest {
             "e.hello > :hello " +
                 "OR (e.hello = :hello AND e.young > :young " +
                 "OR (e.hello = :hello AND e.young = :young AND e.monkeys > :monkeys))"
+        );
+    }
+
+    @Test
+    public void makePaginationConditionTest() {
+        // given
+        // when
+        String actual = makePaginationCondition(
+            SortOrder.DESC,
+            false,
+            new String[] { "e", "a", "b" },
+            new String[] { "hello", "young", "monkeys" }
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            "e.hello > :hello " +
+                "OR (e.hello = :hello AND a.young > :young " +
+                "OR (e.hello = :hello AND a.young = :young AND b.monkeys > :monkeys))"
         );
     }
 }
