@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyCollections;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
 import org.youngmonkeys.ezyplatform.entity.UserRoleId;
@@ -23,8 +24,11 @@ import org.youngmonkeys.ezyplatform.entity.UserRoleName;
 import org.youngmonkeys.ezyplatform.repo.UserRoleNameRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRoleRepository;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzySets.newHashSet;
 
@@ -44,6 +48,38 @@ public class DefaultUserRoleService implements UserRoleService {
         return userRoleName == null
             ? 0L
             : userRoleName.getId();
+    }
+
+    @Override
+    public Set<Long> getRoleIdsByNames(
+        Collection<String> roleNames
+    ) {
+        if (EzyCollections.isEmpty(roleNames)) {
+            return Collections.emptySet();
+        }
+        return userRoleNameRepository
+            .findByNameIn(roleNames)
+            .stream()
+            .map(UserRoleName::getId)
+            .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Map<String, Long> getRoleIdMapByNames(
+        Collection<String> roleNames
+    ) {
+        if (EzyCollections.isEmpty(roleNames)) {
+            return Collections.emptyMap();
+        }
+        return userRoleNameRepository
+            .findByNameIn(roleNames)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    UserRoleName::getName,
+                    UserRoleName::getId
+                )
+            );
     }
 
     @Override

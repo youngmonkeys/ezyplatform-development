@@ -19,5 +19,13 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.UserRoleName;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface UserRoleNameRepository
-    extends EzyDatabaseRepository<Long, UserRoleName> {}
+    extends EzyDatabaseRepository<Long, UserRoleName> {
+
+    List<UserRoleName> findByNameIn(
+        Collection<String> roleNames
+    );
+}

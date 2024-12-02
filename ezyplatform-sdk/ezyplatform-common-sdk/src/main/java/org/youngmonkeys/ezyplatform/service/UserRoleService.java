@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1500_RECORDS;
@@ -23,6 +25,14 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1500_R
 public interface UserRoleService {
 
     long getRoleIdByName(String roleName);
+
+    Set<Long> getRoleIdsByNames(
+        Collection<String> roleNames
+    );
+
+    Map<String, Long> getRoleIdMapByNames(
+        Collection<String> roleNames
+    );
 
     Set<Long> getRoleIdsByUserId(long userId);
 
