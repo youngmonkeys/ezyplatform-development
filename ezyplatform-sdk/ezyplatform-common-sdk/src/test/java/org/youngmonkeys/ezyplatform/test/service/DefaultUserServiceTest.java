@@ -16,14 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.test.service;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-
-import java.time.LocalDateTime;
-
+import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -38,8 +32,9 @@ import org.youngmonkeys.ezyplatform.service.DefaultUserService;
 import org.youngmonkeys.ezyplatform.service.UserAccessTokenService;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
-import com.tvd12.test.assertion.Asserts;
-import com.tvd12.test.util.RandomUtil;
+import java.time.LocalDateTime;
+
+import static org.mockito.Mockito.*;
 
 public class DefaultUserServiceTest {
     private ClockProxy clockProxy;
@@ -86,7 +81,7 @@ public class DefaultUserServiceTest {
     @Test
     public void validateUserAccessTokenSuccessTest() {
         // given
-        long userId = RandomUtil.randomLong();
+        long userId = RandomUtil.randomLong(1L, Long.MAX_VALUE);
         String accessToken = RandomUtil.randomShortAlphabetString();
 
         LocalDateTime now = LocalDateTime.now();

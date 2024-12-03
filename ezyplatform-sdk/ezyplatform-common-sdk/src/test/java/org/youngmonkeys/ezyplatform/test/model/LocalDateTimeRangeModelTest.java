@@ -17,13 +17,18 @@
 package org.youngmonkeys.ezyplatform.test.model;
 
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.constant.ExtendedMonth;
 import org.youngmonkeys.ezyplatform.model.LocalDateTimeRangeModel;
+import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class LocalDateTimeRangeModelTest {
 
@@ -136,6 +141,13 @@ public class LocalDateTimeRangeModelTest {
             )
         );
         Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseYears("2024 - 2025"),
+            new LocalDateTimeRangeModel(
+                LocalDateTime.of(2024, 1, 1, 0, 0),
+                LocalDateTime.of(2025, 1, 1, 0, 0)
+            )
+        );
+        Asserts.assertEquals(
             LocalDateTimeRangeModel.parseYears("a|b"),
             LocalDateTimeRangeModel.DEFAULT
         );
@@ -160,6 +172,13 @@ public class LocalDateTimeRangeModelTest {
         );
         Asserts.assertEquals(
             LocalDateTimeRangeModel.parseMonths("2024-01|2025-02"),
+            new LocalDateTimeRangeModel(
+                LocalDateTime.of(2024, 1, 1, 0, 0),
+                LocalDateTime.of(2025, 2, 1, 0, 0)
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseMonths("2024-01 - 2025-02"),
             new LocalDateTimeRangeModel(
                 LocalDateTime.of(2024, 1, 1, 0, 0),
                 LocalDateTime.of(2025, 2, 1, 0, 0)
@@ -196,6 +215,13 @@ public class LocalDateTimeRangeModelTest {
             )
         );
         Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseDays("2024-01-01 - 2025-02-03"),
+            new LocalDateTimeRangeModel(
+                LocalDateTime.of(2024, 1, 1, 0, 0),
+                LocalDateTime.of(2025, 2, 3, 0, 0)
+            )
+        );
+        Asserts.assertEquals(
             LocalDateTimeRangeModel.parseDays("a|b"),
             LocalDateTimeRangeModel.DEFAULT
         );
@@ -220,6 +246,13 @@ public class LocalDateTimeRangeModelTest {
         );
         Asserts.assertEquals(
             LocalDateTimeRangeModel.parseDateTimes("2024-01-01T01:00:00|2025-02-03T04:05:06"),
+            new LocalDateTimeRangeModel(
+                LocalDateTime.of(2024, 1, 1, 1, 0),
+                LocalDateTime.of(2025, 2, 3, 4, 5, 6)
+            )
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseDateTimes("2024-01-01T01:00:00 - 2025-02-03T04:05:06"),
             new LocalDateTimeRangeModel(
                 LocalDateTime.of(2024, 1, 1, 1, 0),
                 LocalDateTime.of(2025, 2, 3, 4, 5, 6)
@@ -298,6 +331,44 @@ public class LocalDateTimeRangeModelTest {
         );
         Asserts.assertEquals(
             LocalDateTimeRangeModel.parseExtendedYear("HELLO"),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+    }
+
+    @Test
+    public void parseTimestamps() {
+        // given
+        long timestampStart = RandomUtil.randomLong(1L, Long.MAX_VALUE);
+        long timestampEnd = RandomUtil.randomLong(1L, Long.MAX_VALUE);
+
+        LocalDateTime start = LocalDateTime.now();
+        LocalDateTime end = start.plusMonths(1);
+        ClockProxy clockProxy = mock(ClockProxy.class);
+        when(clockProxy.toLocalDateTime(timestampStart)).thenReturn(start);
+        when(clockProxy.toLocalDateTime(timestampEnd)).thenReturn(end);
+
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseTimestamps(
+                clockProxy,
+                timestampStart,
+                timestampEnd
+            ),
+            new LocalDateTimeRangeModel(start, end)
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseTimestamps(
+                clockProxy,
+                null,
+                null
+            ),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseTimestamps(clockProxy, 0L, 0L),
+            LocalDateTimeRangeModel.DEFAULT
+        );
+        Asserts.assertEquals(
+            LocalDateTimeRangeModel.parseTimestamps(clockProxy, -1L, -1L),
             LocalDateTimeRangeModel.DEFAULT
         );
     }

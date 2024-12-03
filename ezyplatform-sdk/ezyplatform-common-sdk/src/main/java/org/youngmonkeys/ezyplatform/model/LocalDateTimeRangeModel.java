@@ -51,8 +51,10 @@ public class LocalDateTimeRangeModel {
         }
         LocalDate start = null;
         LocalDate end = null;
-        if (value.contains("|")) {
-            String[] strs = value.split("\\|");
+        if (value.contains("|") || value.contains(" - ")) {
+            String[] strs = value.contains("|")
+                ? value.split("\\|")
+                : value.split(" - ");
             try {
                 int year = Integer.parseInt(strs[0]);
                 start = LocalDate.of(year, 1, 1);
@@ -87,8 +89,10 @@ public class LocalDateTimeRangeModel {
         }
         LocalDate start = null;
         LocalDate end = null;
-        if (value.contains("|")) {
-            String[] strs = value.split("\\|");
+        if (value.contains("|") || value.contains(" - ")) {
+            String[] strs = value.contains("|")
+                ? value.split("\\|")
+                : value.split(" - ");
             try {
                 start = LocalDate.parse(strs[0] + "-01");
             } catch (Exception e) {
@@ -120,8 +124,10 @@ public class LocalDateTimeRangeModel {
         }
         LocalDate start = null;
         LocalDate end = null;
-        if (value.contains("|")) {
-            String[] strs = value.split("\\|");
+        if (value.contains("|") || value.contains(" - ")) {
+            String[] strs = value.contains("|")
+                ? value.split("\\|")
+                : value.split(" - ");
             try {
                 start = LocalDate.parse(strs[0]);
             } catch (Exception e) {
@@ -153,8 +159,10 @@ public class LocalDateTimeRangeModel {
         }
         LocalDateTime start = null;
         LocalDateTime end = null;
-        if (value.contains("|")) {
-            String[] strs = value.split("\\|");
+        if (value.contains("|") || value.contains(" - ")) {
+            String[] strs = value.contains("|")
+                ? value.split("\\|")
+                : value.split(" - ");
             try {
                 start = LocalDateTime.parse(strs[0]);
             } catch (Exception e) {
