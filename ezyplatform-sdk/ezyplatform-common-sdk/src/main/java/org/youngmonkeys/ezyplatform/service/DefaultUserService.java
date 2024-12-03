@@ -240,10 +240,17 @@ public class DefaultUserService implements UserService {
         if (accessToken == null) {
             throw new UserInvalidAccessTokenException(null);
         }
+        long userId = accessTokenService.extractUserId(accessToken);
+        if (userId <= 0L) {
+            throw new UserInvalidAccessTokenException(accessToken);
+        }
         UserAccessToken entity = accessTokenRepository.findById(
             accessToken
         );
         if (entity == null) {
+            throw new UserInvalidAccessTokenException(accessToken);
+        }
+        if (userId != entity.getUserId()) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
         AccessTokenStatus status = entity.getStatus();
@@ -256,10 +263,6 @@ public class DefaultUserService implements UserService {
                     accessToken
                 );
             }
-            throw new UserInvalidAccessTokenException(accessToken);
-        }
-        long userId = accessTokenService.extractUserId(accessToken);
-        if (userId != entity.getUserId()) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
         LocalDateTime now = clock.nowDateTime();

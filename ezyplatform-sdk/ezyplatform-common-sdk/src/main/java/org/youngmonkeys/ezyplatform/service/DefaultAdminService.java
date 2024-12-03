@@ -206,10 +206,17 @@ public class DefaultAdminService implements AdminService {
         if (accessToken == null) {
             throw new AdminInvalidAccessTokenException("null");
         }
+        long adminId = accessTokenService.extractAdminId(accessToken);
+        if (adminId <= 0L) {
+            throw new AdminInvalidAccessTokenException(accessToken);
+        }
         AdminAccessToken entity = accessTokenRepository.findById(
             accessToken
         );
         if (entity == null) {
+            throw new AdminInvalidAccessTokenException(accessToken);
+        }
+        if (adminId != entity.getAdminId()) {
             throw new AdminInvalidAccessTokenException(accessToken);
         }
         AccessTokenStatus status = entity.getStatus();
@@ -222,10 +229,6 @@ public class DefaultAdminService implements AdminService {
                     accessToken
                 );
             }
-            throw new AdminInvalidAccessTokenException(accessToken);
-        }
-        long adminId = accessTokenService.extractAdminId(accessToken);
-        if (adminId != entity.getAdminId()) {
             throw new AdminInvalidAccessTokenException(accessToken);
         }
         LocalDateTime now = clock.nowDateTime();
