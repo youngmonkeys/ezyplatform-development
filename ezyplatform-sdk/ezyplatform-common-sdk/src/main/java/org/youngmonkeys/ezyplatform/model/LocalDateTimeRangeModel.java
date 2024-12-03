@@ -23,6 +23,7 @@ import org.youngmonkeys.ezyplatform.constant.ExtendedDay;
 import org.youngmonkeys.ezyplatform.constant.ExtendedMonth;
 import org.youngmonkeys.ezyplatform.constant.ExtendedWeek;
 import org.youngmonkeys.ezyplatform.constant.ExtendedYear;
+import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -326,6 +327,22 @@ public class LocalDateTimeRangeModel {
             start != null ? start.atStartOfDay() : null,
             end != null ? end.atStartOfDay() : null
         );
+    }
+
+    public static LocalDateTimeRangeModel parseTimestamps(
+        ClockProxy clock,
+        Long timestampStart,
+        Long timestampEnd
+    ) {
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        if (timestampStart != null && timestampStart >= 0) {
+            start = clock.toLocalDateTime(timestampStart);
+        }
+        if (timestampEnd != null && timestampEnd >= 0) {
+            end = clock.toLocalDateTime(timestampEnd);
+        }
+        return new LocalDateTimeRangeModel(start, end);
     }
 
     public boolean isEmpty() {
