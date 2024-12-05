@@ -213,12 +213,14 @@ public class NumbersTest {
     public void fromRandomTextTest() {
         // given
         // when
+        long id0 = fromRandomText("61234561");
         long id1 = fromRandomText("21212345");
         long id2 = fromRandomText("01234567");
         long id3 = fromRandomText("0123456789");
         long id4 = fromRandomText("912345678901");
 
         // then
+        Asserts.assertEquals(id0, 1L);
         Asserts.assertEquals(id1, 12345L);
         Asserts.assertEquals(id2, 1234567L);
         Asserts.assertEquals(id3, 123456789L);
