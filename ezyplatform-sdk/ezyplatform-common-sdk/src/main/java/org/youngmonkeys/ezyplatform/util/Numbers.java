@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.util;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.concurrent.ThreadLocalRandom;
 
 public final class Numbers {
 
@@ -136,5 +137,41 @@ public final class Numbers {
         return value == null
             ? null
             : stripTrailingZeros(value).toPlainString();
+    }
+
+    public static String toRandomText(long number, int minLength) {
+        String suffix = String.valueOf(number);
+        if (suffix.length() >= minLength - 1) {
+            return "0" + suffix;
+        }
+        int randomLength = minLength - suffix.length() - 1;
+        if (randomLength > 9) {
+            randomLength = 9;
+        }
+        StringBuilder randomNumber = new StringBuilder();
+        for (int i = 0; i < randomLength; ++i) {
+            randomNumber.append(
+                ThreadLocalRandom.current().nextInt(1, 9)
+            );
+        }
+        int zeroLength = minLength - randomLength - suffix.length() - 1;
+        if (zeroLength > 0) {
+            for (int i = 0; i < zeroLength; ++i) {
+                randomNumber.append("0");
+            }
+        }
+        return String.valueOf(randomLength) + randomNumber + suffix;
+    }
+
+    public static long fromRandomText(String randomText) {
+        int randomLength = Integer.parseInt(
+            randomText.substring(0, 1)
+        );
+        if (randomLength == 0) {
+            return Long.parseLong(randomText);
+        }
+        return Long.parseLong(
+            randomText.substring(randomLength + 1)
+        );
     }
 }
