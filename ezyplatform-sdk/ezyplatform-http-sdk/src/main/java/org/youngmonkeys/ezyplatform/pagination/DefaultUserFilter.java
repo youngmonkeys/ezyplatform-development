@@ -75,8 +75,14 @@ public class DefaultUserFilter implements UserFilter {
         if (keywords != null) {
             answer.and("k.keyword IN :keywords");
         }
+        if (roleId != null) {
+            answer.and("l.roleId = :roleId");
+        }
         if (roleIds != null) {
             answer.and("l.roleId IN :roleIds");
+        }
+        if (roleName != null) {
+            answer.and("m.name = :roleName");
         }
         if (roleNames != null) {
             answer.and("m.name IN :roleNames");
