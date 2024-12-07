@@ -28,7 +28,9 @@ public class DefaultUserFilter implements UserFilter {
     public final Collection<String> statuses;
     public final String likeKeyword;
     public final Collection<String> keywords;
+    public final Long roleId;
     public final Collection<Long> roleIds;
+    public final String roleName;
     public final Collection<String> roleNames;
 
     protected DefaultUserFilter(Builder<?> builder) {
@@ -36,7 +38,9 @@ public class DefaultUserFilter implements UserFilter {
         this.statuses = builder.statuses;
         this.likeKeyword = builder.likeKeyword;
         this.keywords = builder.keywords;
+        this.roleId = builder.roleId;
         this.roleIds = builder.roleIds;
+        this.roleName = builder.roleName;
         this.roleNames = builder.roleNames;
     }
 
@@ -47,13 +51,15 @@ public class DefaultUserFilter implements UserFilter {
         if (keywords != null) {
             queryString.append(" INNER JOIN UserKeyword k ON e.id = k.userId");
         }
-        if (roleIds != null) {
+        if (roleId != null
+            || roleIds != null
+            || roleName != null
+            || roleNames != null
+        ) {
             queryString.append(" INNER JOIN UserRole l ON e.id = l.userId");
-        }
-        if (roleNames != null) {
-            queryString
-                .append(" INNER JOIN UserRole l ON e.id = l.userId")
-                .append(" INNER JOIN UserRoleName m ON m.id = m.roleId");
+            if (roleName != null || roleNames != null) {
+                queryString.append(" INNER JOIN UserRoleName m ON m.id = l.roleId");
+            }
         }
     }
 
@@ -73,7 +79,7 @@ public class DefaultUserFilter implements UserFilter {
             answer.and("l.roleId IN :roleIds");
         }
         if (roleNames != null) {
-            answer.and("m.roleName IN :roleNames");
+            answer.and("m.name IN :roleNames");
         }
         if (likeKeyword != null) {
             answer.and(
@@ -100,7 +106,9 @@ public class DefaultUserFilter implements UserFilter {
         private Collection<String> statuses;
         public String likeKeyword;
         private Collection<String> keywords;
+        private Long roleId;
         private Collection<Long> roleIds;
+        private String roleName;
         private Collection<String> roleNames;
 
         public T status(String status) {
@@ -123,8 +131,18 @@ public class DefaultUserFilter implements UserFilter {
             return (T) this;
         }
 
+        public T roleId(Long roleId) {
+            this.roleId = roleId;
+            return (T) this;
+        }
+
         public T roleIds(Collection<Long> roleIds) {
             this.roleIds = roleIds;
+            return (T) this;
+        }
+
+        public T roleName(String roleName) {
+            this.roleName = roleName;
             return (T) this;
         }
 
