@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
 import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
@@ -25,6 +26,8 @@ import org.youngmonkeys.ezyplatform.entity.DataType;
 import org.youngmonkeys.ezyplatform.entity.Setting;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.repo.SettingRepository;
+
+import java.util.Collection;
 
 public abstract class MutableSettingService
     extends DefaultSettingService {
@@ -47,6 +50,68 @@ public abstract class MutableSettingService
         );
         this.settingRepository = settingRepository;
         this.modelToEntityConverter = modelToEntityConverter;
+    }
+
+    public void setLastUpdateTime(String settingName) {
+        setLastUpdateTime(settingName, System.currentTimeMillis());
+    }
+
+    public void setLastUpdateTime(String settingName, long time) {
+        setLongValue(
+            settingName + LAST_UPDATE_TIME_SUFFIX,
+            time
+        );
+    }
+
+    public void setBooleanValue(String settingName, Boolean value) {
+        saveSetting(
+            settingName,
+            DataType.BOOLEAN,
+            value
+        );
+    }
+
+    public void setIntValue(String settingName, Integer value) {
+        saveSetting(
+            settingName,
+            DataType.INTEGER,
+            value
+        );
+    }
+
+    public void setLongValue(String settingName, Long value) {
+        saveSetting(
+            settingName,
+            DataType.LONG,
+            value
+        );
+    }
+
+    public void setTextValue(String settingName, String value) {
+        saveSetting(
+            settingName,
+            DataType.STRING,
+            value
+        );
+    }
+
+    public void setUrlValue(String settingName, String url) {
+        saveSetting(
+            settingName,
+            DataType.URL,
+            url
+        );
+    }
+
+    public void setArrayValue(
+        String settingName,
+        Collection<?> array
+    ) {
+        saveSetting(
+            settingName,
+            DataType.ARRAY,
+            EzyStrings.join(array, ",")
+        );
     }
 
     @Override

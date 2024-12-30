@@ -294,6 +294,7 @@ public class LocalDateTimeRangeModel {
         ExtendedMonth extendedMonth = ExtendedMonth.of(value);
         if (extendedMonth == ExtendedMonth.THIS_MONTH) {
             start = LocalDate.of(now.getYear(), now.getMonth(), 1);
+            end = start.plusMonths(1);
         } else if (extendedMonth == ExtendedMonth.LAST_MONTH) {
             end = LocalDate.of(now.getYear(), now.getMonth(), 1);
             start = end.minusMonths(1);

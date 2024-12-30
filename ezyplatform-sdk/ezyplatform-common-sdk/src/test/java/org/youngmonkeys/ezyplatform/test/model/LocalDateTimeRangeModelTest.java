@@ -285,7 +285,9 @@ public class LocalDateTimeRangeModelTest {
             LocalDateTimeRangeModel.parseExtendedMonth(ExtendedMonth.THIS_MONTH.toString()),
             new LocalDateTimeRangeModel(
                 LocalDate.of(now.getYear(), now.getMonth(), 1).atStartOfDay(),
-                null
+                LocalDate
+                    .of(now.getYear(), now.getMonth(), 1).atStartOfDay()
+                    .plusMonths(1)
             )
         );
         Asserts.assertEquals(
