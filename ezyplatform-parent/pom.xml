@@ -54,6 +54,7 @@
         <thymeleaf.version>3.1.1.RELEASE</thymeleaf.version>
         <mysql.connector.version>8.0.32</mysql.connector.version>
         <tika.version>2.7.0</tika.version>
+        <rhino.version>1.7.15</rhino.version>
         <maven.assembly.plugin.version>3.3.0</maven.assembly.plugin.version>
     </properties>
 
