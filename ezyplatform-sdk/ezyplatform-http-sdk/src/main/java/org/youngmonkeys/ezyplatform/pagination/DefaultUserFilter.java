@@ -26,22 +26,32 @@ import java.util.Collection;
 public class DefaultUserFilter implements UserFilter {
     public final String status;
     public final Collection<String> statuses;
+    public final String uniqueKeyword;
     public final String likeKeyword;
     public final Collection<String> keywords;
     public final Long roleId;
     public final Collection<Long> roleIds;
     public final String roleName;
     public final Collection<String> roleNames;
+    public final Long exclusiveRoleId;
+    public final Collection<Long> exclusiveRoleIds;
+    public final String exclusiveRoleName;
+    public final Collection<String> exclusiveRoleNames;
 
     protected DefaultUserFilter(Builder<?> builder) {
         this.status = builder.status;
         this.statuses = builder.statuses;
+        this.uniqueKeyword = builder.uniqueKeyword;
         this.likeKeyword = builder.likeKeyword;
         this.keywords = builder.keywords;
         this.roleId = builder.roleId;
         this.roleIds = builder.roleIds;
         this.roleName = builder.roleName;
         this.roleNames = builder.roleNames;
+        this.exclusiveRoleId = builder.exclusiveRoleId;
+        this.exclusiveRoleIds = builder.exclusiveRoleIds;
+        this.exclusiveRoleName = builder.exclusiveRoleName;
+        this.exclusiveRoleNames = builder.exclusiveRoleNames;
     }
 
     @Override
@@ -55,14 +65,23 @@ public class DefaultUserFilter implements UserFilter {
             || roleIds != null
             || roleName != null
             || roleNames != null
+            || exclusiveRoleId != null
+            || exclusiveRoleName != null
+            || exclusiveRoleIds != null
+            || exclusiveRoleNames != null
         ) {
             queryString.append(" INNER JOIN UserRole l ON e.id = l.userId");
-            if (roleName != null || roleNames != null) {
+            if (roleName != null
+                || roleNames != null
+                || exclusiveRoleName != null
+                || exclusiveRoleNames != null
+            ) {
                 queryString.append(" INNER JOIN UserRoleName m ON m.id = l.roleId");
             }
         }
     }
 
+    @SuppressWarnings("MethodLength")
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
@@ -87,6 +106,31 @@ public class DefaultUserFilter implements UserFilter {
         if (roleNames != null) {
             answer.and("m.name IN :roleNames");
         }
+        if (exclusiveRoleId != null) {
+            answer.and("l.roleId <> :exclusiveRoleId");
+        }
+        if (exclusiveRoleIds != null) {
+            answer.and("l.roleId NOT IN :exclusiveRoleIds");
+        }
+        if (exclusiveRoleName != null) {
+            answer.and("m.name <> :exclusiveRoleName");
+        }
+        if (exclusiveRoleNames != null) {
+            answer.and("m.name NOT IN :exclusiveRoleNames");
+        }
+        if (uniqueKeyword != null) {
+            answer.and(
+                new EzyQueryConditionBuilder()
+                    .append("(")
+                    .append("e.username = :uniqueKeyword")
+                    .or("e.phone = :uniqueKeyword")
+                    .or("e.email = :uniqueKeyword")
+                    .or("e.uuid = :uniqueKeyword")
+                    .or("e.id = :uniqueKeyword")
+                    .append(")")
+                    .build()
+            );
+        }
         if (likeKeyword != null) {
             answer.and(
                 new EzyQueryConditionBuilder()
@@ -110,12 +154,17 @@ public class DefaultUserFilter implements UserFilter {
 
         private String status;
         private Collection<String> statuses;
-        public String likeKeyword;
+        private String uniqueKeyword;
+        private String likeKeyword;
         private Collection<String> keywords;
         private Long roleId;
         private Collection<Long> roleIds;
         private String roleName;
         private Collection<String> roleNames;
+        private Long exclusiveRoleId;
+        private Collection<Long> exclusiveRoleIds;
+        private String exclusiveRoleName;
+        private Collection<String> exclusiveRoleNames;
 
         public T status(String status) {
             this.status = status;
@@ -124,6 +173,11 @@ public class DefaultUserFilter implements UserFilter {
 
         public T statuses(Collection<String> statuses) {
             this.statuses = statuses;
+            return (T) this;
+        }
+
+        public T uniqueKeyword(String uniqueKeyword) {
+            this.uniqueKeyword = uniqueKeyword;
             return (T) this;
         }
 
@@ -154,6 +208,26 @@ public class DefaultUserFilter implements UserFilter {
 
         public T roleNames(Collection<String> roleNames) {
             this.roleNames = roleNames;
+            return (T) this;
+        }
+
+        public T exclusiveRoleId(Long exclusiveRoleId) {
+            this.exclusiveRoleId = exclusiveRoleId;
+            return (T) this;
+        }
+
+        public T exclusiveRoleIds(Collection<Long> exclusiveRoleIds) {
+            this.exclusiveRoleIds = exclusiveRoleIds;
+            return (T) this;
+        }
+
+        public T exclusiveRoleName(String exclusiveRoleName) {
+            this.exclusiveRoleName = exclusiveRoleName;
+            return (T) this;
+        }
+
+        public T exclusiveRoleNames(Collection<String> exclusiveRoleNames) {
+            this.exclusiveRoleNames = exclusiveRoleNames;
             return (T) this;
         }
 
