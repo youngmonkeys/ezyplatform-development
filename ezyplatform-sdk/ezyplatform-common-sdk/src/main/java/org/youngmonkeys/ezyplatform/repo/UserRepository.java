@@ -56,6 +56,14 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
     List<IdNameResult> findUserIdAndNameByIds(Collection<Long> ids);
 
     @EzyQuery(
+        "SELECT e.id, e.username, e.displayName " +
+            "FROM User e WHERE e.username in ?0"
+    )
+    List<IdNameResult> findUserIdAndNameByUsernames(
+        Collection<String> usernames
+    );
+
+    @EzyQuery(
         "SELECT e.id, e.uuid, e.displayName " +
             "FROM User e " +
             "WHERE e.id = ?0"

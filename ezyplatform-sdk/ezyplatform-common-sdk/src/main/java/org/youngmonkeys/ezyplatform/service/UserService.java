@@ -80,6 +80,10 @@ public interface UserService {
         Collection<Long> userIds
     );
 
+    Map<Long, UserNameModel> getUsernameMapByUsernames(
+        Collection<String> userNames
+    );
+
     UuidNameModel getUserUuidNameById(long userId);
 
     Map<Long, UuidNameModel> getUserUuidNameMapByIds(

@@ -136,6 +136,24 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public Map<Long, UserNameModel> getUsernameMapByUsernames(
+        Collection<String> userNames
+    ) {
+        if (userNames.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        List<IdNameResult> results = userRepository
+            .findUserIdAndNameByUsernames(userNames);
+        return results.stream()
+            .collect(
+                Collectors.toMap(
+                    IdNameResult::getId,
+                    resultToModelConverter::toUserNameModel
+                )
+            );
+    }
+
+    @Override
     public UuidNameModel getUserUuidNameById(long userId) {
         return resultToModelConverter.toModel(
             userRepository.findUserUuidNameById(userId)
