@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2024 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,17 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Builder;
-import lombok.Getter;
+import com.tvd12.ezyfox.io.EzyStrings;
 
-@Getter
-@Builder
-public class AdminNameModel implements NamedModel {
-    private long adminId;
-    private String username;
-    private String displayName;
+public interface NamedModel {
 
-    @JsonIgnore
-    public String getNameAndUsername() {
-        return getName() + "<" + username + ">";
+    String getUsername();
+
+    String getDisplayName();
+
+    default String getName() {
+        String username = getUsername();
+        String displayName = getDisplayName();
+        return EzyStrings.isBlank(displayName) ? username : displayName;
     }
 }

@@ -16,13 +16,12 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
-import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class UserModel {
+public class UserModel implements NamedModel {
     private long id;
     private String uuid;
     private String username;
@@ -37,8 +36,4 @@ public class UserModel {
     private String activationKey;
     private long createdAt;
     private long updatedAt;
-
-    public String getName() {
-        return EzyStrings.isBlank(displayName) ? username : displayName;
-    }
 }

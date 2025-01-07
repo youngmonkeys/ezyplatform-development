@@ -16,14 +16,13 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
-import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.AdminStatus;
 
 @Getter
 @Builder
-public class AdminModel {
+public class AdminModel implements NamedModel {
     private long id;
     private String uuid;
     private String username;
@@ -37,8 +36,4 @@ public class AdminModel {
     private AdminStatus status;
     private long createdAt;
     private long updatedAt;
-
-    public String getName() {
-        return EzyStrings.isBlank(displayName) ? username : displayName;
-    }
 }

@@ -17,13 +17,12 @@
 package org.youngmonkeys.ezyplatform.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
-public class UserNameModel {
+public class UserNameModel implements NamedModel {
     private long userId;
     private String username;
     private String displayName;
@@ -37,10 +36,6 @@ public class UserNameModel {
             .username(model.getUsername())
             .displayName(model.getDisplayName())
             .build();
-    }
-
-    public String getName() {
-        return EzyStrings.isBlank(displayName) ? username : displayName;
     }
 
     @JsonIgnore
