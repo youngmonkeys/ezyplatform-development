@@ -44,6 +44,7 @@ import org.youngmonkeys.ezyplatform.io.FolderProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.pagination.DefaultMediaFilter;
+import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
 import org.youngmonkeys.ezyplatform.service.MediaService;
@@ -145,7 +146,7 @@ public class MediaControllerService extends EzyLoggable {
         Part filePart = request.getPart("file");
         if (filePart == null) {
             Collection<Part> parts = request.getParts();
-            if (parts.size() > 0) {
+            if (!parts.isEmpty()) {
                 filePart = parts.iterator().next();
             }
         }
@@ -450,7 +451,7 @@ public class MediaControllerService extends EzyLoggable {
     }
 
     public PaginationModel<MediaResponse> getMediaList(
-        long ownerUserId,
+        MediaFilter filter,
         String nextPageToken,
         String prevPageToken,
         boolean lastPage,
@@ -459,6 +460,23 @@ public class MediaControllerService extends EzyLoggable {
         commonValidator.validatePageSize(limit);
         PaginationModel<MediaModel> pagination = getPaginationModel(
             paginationMediaService,
+            filter,
+            nextPageToken,
+            prevPageToken,
+            lastPage,
+            limit
+        );
+        return pagination.map(modelToResponseConverter::toResponse);
+    }
+
+    public PaginationModel<MediaResponse> getMediaList(
+        long ownerUserId,
+        String nextPageToken,
+        String prevPageToken,
+        boolean lastPage,
+        int limit
+    ) {
+        return getMediaList(
             DefaultMediaFilter
                 .builder()
                 .ownerUserId(ownerUserId)
@@ -468,7 +486,6 @@ public class MediaControllerService extends EzyLoggable {
             lastPage,
             limit
         );
-        return pagination.map(modelToResponseConverter::toResponse);
     }
 
     public PaginationModel<MediaResponse> getAdminMediaList(
@@ -478,9 +495,7 @@ public class MediaControllerService extends EzyLoggable {
         boolean lastPage,
         int limit
     ) {
-        commonValidator.validatePageSize(limit);
-        PaginationModel<MediaModel> pagination = getPaginationModel(
-            paginationMediaService,
+        return getMediaList(
             DefaultMediaFilter
                 .builder()
                 .ownerAdminId(ownerAdminId)
@@ -490,7 +505,6 @@ public class MediaControllerService extends EzyLoggable {
             lastPage,
             limit
         );
-        return pagination.map(modelToResponseConverter::toResponse);
     }
 
     private MediaModel saveMediaInformation(
