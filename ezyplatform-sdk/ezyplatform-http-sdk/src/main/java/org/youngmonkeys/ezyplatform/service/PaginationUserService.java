@@ -37,9 +37,9 @@ public class PaginationUserService extends CommonPaginationService<
     public PaginationUserService(
         PaginationUserRepository repository,
         DefaultEntityToModelConverter entityToModelConverter,
-        UserPaginationParameterConverter userPaginationParameterConverter
+        UserPaginationParameterConverter paginationParameterConverter
     ) {
-        super(repository, userPaginationParameterConverter);
+        super(repository, paginationParameterConverter);
         this.entityToModelConverter = entityToModelConverter;
     }
 

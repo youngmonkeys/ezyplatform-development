@@ -27,6 +27,17 @@ public class AdminNameModel implements NamedModel {
     private String username;
     private String displayName;
 
+    public static AdminNameModel fromAdminModel(AdminModel model) {
+        if (model == null) {
+            return null;
+        }
+        return AdminNameModel.builder()
+            .adminId(model.getId())
+            .username(model.getUsername())
+            .displayName(model.getDisplayName())
+            .build();
+    }
+
     @JsonIgnore
     public String getNameAndUsername() {
         return getName() + "<" + username + ">";

@@ -37,9 +37,9 @@ public class PaginationLetterService extends CommonPaginationService<
     public PaginationLetterService(
         PaginationLetterRepository repository,
         DefaultEntityToModelConverter entityToModelConverter,
-        LetterPaginationParameterConverter letterPaginationParameterConverter
+        LetterPaginationParameterConverter paginationParameterConverter
     ) {
-        super(repository, letterPaginationParameterConverter);
+        super(repository, paginationParameterConverter);
         this.entityToModelConverter = entityToModelConverter;
     }
 

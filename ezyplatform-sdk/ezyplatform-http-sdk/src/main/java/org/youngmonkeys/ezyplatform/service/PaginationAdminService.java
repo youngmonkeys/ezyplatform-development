@@ -17,39 +17,39 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
-import org.youngmonkeys.ezyplatform.entity.Media;
-import org.youngmonkeys.ezyplatform.model.MediaModel;
-import org.youngmonkeys.ezyplatform.pagination.IdDescMediaPaginationParameter;
-import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
-import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameter;
-import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameterConverter;
-import org.youngmonkeys.ezyplatform.repo.PaginationMediaRepository;
+import org.youngmonkeys.ezyplatform.entity.Admin;
+import org.youngmonkeys.ezyplatform.model.AdminModel;
+import org.youngmonkeys.ezyplatform.pagination.AdminCommonPaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.pagination.AdminFilter;
+import org.youngmonkeys.ezyplatform.pagination.AdminPaginationParameter;
+import org.youngmonkeys.ezyplatform.pagination.IdDescAdminPaginationParameter;
+import org.youngmonkeys.ezyplatform.repo.PaginationAdminRepository;
 
-public class PaginationMediaService extends CommonPaginationService<
-    MediaModel,
-    MediaFilter,
-    MediaPaginationParameter,
+public class PaginationAdminService extends CommonPaginationService<
+    AdminModel,
+    AdminFilter,
+    AdminPaginationParameter,
     Long,
-    Media> {
+    Admin> {
 
     private final DefaultEntityToModelConverter entityToModelConverter;
 
-    public PaginationMediaService(
-        PaginationMediaRepository repository,
+    public PaginationAdminService(
+        PaginationAdminRepository repository,
         DefaultEntityToModelConverter entityToModelConverter,
-        MediaPaginationParameterConverter paginationParameterConverter
+        AdminCommonPaginationParameterConverter paginationParameterConverter
     ) {
         super(repository, paginationParameterConverter);
         this.entityToModelConverter = entityToModelConverter;
     }
 
     @Override
-    protected MediaModel convertEntity(Media media) {
-        return entityToModelConverter.toModel(media);
+    protected AdminModel convertEntity(Admin user) {
+        return entityToModelConverter.toModel(user);
     }
 
     @Override
-    protected MediaPaginationParameter defaultPaginationParameter() {
-        return new IdDescMediaPaginationParameter();
+    protected AdminPaginationParameter defaultPaginationParameter() {
+        return new IdDescAdminPaginationParameter();
     }
 }

@@ -37,9 +37,9 @@ public class PaginationLetterReceiverService extends CommonPaginationService<
     public PaginationLetterReceiverService(
         PaginationLetterReceiverRepository repository,
         DefaultEntityToModelConverter entityToModelConverter,
-        LetterReceiverPaginationParameterConverter letterReceiverPaginationParameterConverter
+        LetterReceiverPaginationParameterConverter paginationParameterConverter
     ) {
-        super(repository, letterReceiverPaginationParameterConverter);
+        super(repository, paginationParameterConverter);
         this.entityToModelConverter = entityToModelConverter;
     }
 

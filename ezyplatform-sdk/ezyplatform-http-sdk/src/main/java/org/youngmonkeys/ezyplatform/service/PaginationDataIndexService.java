@@ -34,9 +34,9 @@ public class PaginationDataIndexService extends CommonPaginationResultService<
 
     public PaginationDataIndexService(
         PaginationDataIndexRepository repository,
-        DataIndexPaginationParameterConverter dataIndexPaginationParameterConverter
+        DataIndexPaginationParameterConverter paginationParameterConverter
     ) {
-        super(repository, dataIndexPaginationParameterConverter);
+        super(repository, paginationParameterConverter);
     }
 
     @Override
