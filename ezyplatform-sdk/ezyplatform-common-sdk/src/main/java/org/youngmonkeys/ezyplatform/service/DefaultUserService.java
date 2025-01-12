@@ -136,7 +136,7 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Map<Long, UserNameModel> getUsernameMapByUsernames(
+    public Map<String, UserNameModel> getUsernameMapByUsernames(
         Collection<String> userNames
     ) {
         if (userNames.isEmpty()) {
@@ -147,7 +147,7 @@ public class DefaultUserService implements UserService {
         return results.stream()
             .collect(
                 Collectors.toMap(
-                    IdNameResult::getId,
+                    IdNameResult::getUsername,
                     resultToModelConverter::toUserNameModel
                 )
             );
