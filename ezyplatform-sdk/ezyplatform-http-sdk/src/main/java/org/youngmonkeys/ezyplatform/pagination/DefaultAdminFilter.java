@@ -1,18 +1,18 @@
 /*
  * Copyright 2022 youngmonkeys.org
- * 
+ *
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://youngmonkeys.org/licenses/ezyplatform-1.0.0.txt
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
 package org.youngmonkeys.ezyplatform.pagination;
 
@@ -27,7 +27,7 @@ import java.util.Collection;
 public class DefaultAdminFilter implements AdminFilter {
     public final Collection<Long> ids;
     public final AdminStatus status;
-    public final Collection<String> statuses;
+    public final Collection<AdminStatus> statuses;
     public final String uniqueKeyword;
     public final String likeKeyword;
     public final Long roleId;
@@ -63,18 +63,36 @@ public class DefaultAdminFilter implements AdminFilter {
             || roleIds != null
             || roleName != null
             || roleNames != null
-            || exclusiveRoleId != null
-            || exclusiveRoleName != null
-            || exclusiveRoleIds != null
-            || exclusiveRoleNames != null
         ) {
             queryString.append(" INNER JOIN AdminRole l ON e.id = l.adminId");
             if (roleName != null
                 || roleNames != null
-                || exclusiveRoleName != null
-                || exclusiveRoleNames != null
             ) {
                 queryString.append(" INNER JOIN AdminRoleName m ON m.id = l.roleId");
+            }
+        }
+        if (exclusiveRoleId != null
+            || exclusiveRoleName != null
+            || exclusiveRoleIds != null
+            || exclusiveRoleNames != null
+        ) {
+            queryString.append(" LEFT JOIN AdminRole l ON e.id = l.adminId");
+            if (exclusiveRoleId != null) {
+                queryString.append(" AND l.roleId = :exclusiveRoleId");
+            }
+            if (exclusiveRoleIds != null) {
+                queryString.append(" AND l.roleId IN :exclusiveRoleIds");
+            }
+            if (exclusiveRoleName != null
+                || exclusiveRoleNames != null
+            ) {
+                queryString.append(" LEFT JOIN AdminRoleName m ON m.id = l.roleId");
+                if (exclusiveRoleName != null) {
+                    queryString.append(" AND m.name = :exclusiveRoleName");
+                }
+                if (exclusiveRoleNames != null) {
+                    queryString.append(" AND m.name IN :exclusiveRoleNames");
+                }
             }
         }
     }
@@ -104,17 +122,11 @@ public class DefaultAdminFilter implements AdminFilter {
         if (roleNames != null) {
             answer.and("m.name IN :roleNames");
         }
-        if (exclusiveRoleId != null) {
-            answer.and("l.roleId <> :exclusiveRoleId");
+        if (exclusiveRoleId != null || exclusiveRoleIds != null) {
+            answer.and("l.roleId IS NULL");
         }
-        if (exclusiveRoleIds != null) {
-            answer.and("l.roleId NOT IN :exclusiveRoleIds");
-        }
-        if (exclusiveRoleName != null) {
-            answer.and("m.name <> :exclusiveRoleName");
-        }
-        if (exclusiveRoleNames != null) {
-            answer.and("m.name NOT IN :exclusiveRoleNames");
+        if (exclusiveRoleName != null || exclusiveRoleNames != null) {
+            answer.and("m.id IS NULL");
         }
         if (uniqueKeyword != null) {
             answer.and(
@@ -151,7 +163,7 @@ public class DefaultAdminFilter implements AdminFilter {
         implements EzyBuilder<DefaultAdminFilter> {
         private Collection<Long> ids;
         private AdminStatus status;
-        private Collection<String> statuses;
+        private Collection<AdminStatus> statuses;
         private String uniqueKeyword;
         private String likeKeyword;
         private Long roleId;
@@ -173,7 +185,7 @@ public class DefaultAdminFilter implements AdminFilter {
             return (T) this;
         }
 
-        public T statuses(Collection<String> statuses) {
+        public T statuses(Collection<AdminStatus> statuses) {
             this.statuses = statuses;
             return (T) this;
         }

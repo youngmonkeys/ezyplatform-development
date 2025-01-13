@@ -65,18 +65,36 @@ public class DefaultUserFilter implements UserFilter {
             || roleIds != null
             || roleName != null
             || roleNames != null
-            || exclusiveRoleId != null
-            || exclusiveRoleName != null
-            || exclusiveRoleIds != null
-            || exclusiveRoleNames != null
         ) {
             queryString.append(" INNER JOIN UserRole l ON e.id = l.userId");
             if (roleName != null
                 || roleNames != null
-                || exclusiveRoleName != null
-                || exclusiveRoleNames != null
             ) {
                 queryString.append(" INNER JOIN UserRoleName m ON m.id = l.roleId");
+            }
+        }
+        if (exclusiveRoleId != null
+            || exclusiveRoleName != null
+            || exclusiveRoleIds != null
+            || exclusiveRoleNames != null
+        ) {
+            queryString.append(" LEFT JOIN UserRole l ON e.id = l.userId");
+            if (exclusiveRoleId != null) {
+                queryString.append(" AND l.roleId = :exclusiveRoleId");
+            }
+            if (exclusiveRoleIds != null) {
+                queryString.append(" AND l.roleId IN :exclusiveRoleIds");
+            }
+            if (exclusiveRoleName != null
+                || exclusiveRoleNames != null
+            ) {
+                queryString.append(" LEFT JOIN UserRoleName m ON m.id = l.roleId");
+                if (exclusiveRoleName != null) {
+                    queryString.append(" AND m.name = :exclusiveRoleName");
+                }
+                if (exclusiveRoleNames != null) {
+                    queryString.append(" AND m.name IN :exclusiveRoleNames");
+                }
             }
         }
     }
@@ -106,17 +124,11 @@ public class DefaultUserFilter implements UserFilter {
         if (roleNames != null) {
             answer.and("m.name IN :roleNames");
         }
-        if (exclusiveRoleId != null) {
-            answer.and("l.roleId <> :exclusiveRoleId");
+        if (exclusiveRoleId != null || exclusiveRoleIds != null) {
+            answer.and("l.roleId IS NULL");
         }
-        if (exclusiveRoleIds != null) {
-            answer.and("l.roleId NOT IN :exclusiveRoleIds");
-        }
-        if (exclusiveRoleName != null) {
-            answer.and("m.name <> :exclusiveRoleName");
-        }
-        if (exclusiveRoleNames != null) {
-            answer.and("m.name NOT IN :exclusiveRoleNames");
+        if (exclusiveRoleName != null || exclusiveRoleNames != null) {
+            answer.and("m.id IS NULL");
         }
         if (uniqueKeyword != null) {
             answer.and(
