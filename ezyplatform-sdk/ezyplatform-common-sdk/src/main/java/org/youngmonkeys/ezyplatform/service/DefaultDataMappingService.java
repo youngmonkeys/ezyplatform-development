@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.repo.DataMappingRepository;
 import org.youngmonkeys.ezyplatform.result.DataFromToIdResult;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -129,6 +130,9 @@ public class DefaultDataMappingService implements DataMappingService {
         String mappingName,
         Collection<Long> fromDataIds
     ) {
+        if (fromDataIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return dataMappingRepository
             .findDataFromToIdsByMappingNameAndFromDataIdInOrderByMappedAtDesc(
                 mappingName,
@@ -149,6 +153,9 @@ public class DefaultDataMappingService implements DataMappingService {
         String mappingName,
         Collection<Long> fromDataIds
     ) {
+        if (fromDataIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return dataMappingRepository
             .findDataFromToIdsByMappingNameAndFromDataIdInOrderByMappedAtDesc(
                 mappingName,
@@ -171,6 +178,9 @@ public class DefaultDataMappingService implements DataMappingService {
         String mappingName,
         Collection<Long> toDataIds
     ) {
+        if (toDataIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return dataMappingRepository
             .findDataFromToIdsByMappingNameAndToDataIdInOrderByMappedAtDesc(
                 mappingName,
@@ -191,6 +201,9 @@ public class DefaultDataMappingService implements DataMappingService {
         String mappingName,
         Collection<Long> toDataIds
     ) {
+        if (toDataIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
         return dataMappingRepository
             .findDataFromToIdsByMappingNameAndToDataIdInOrderByMappedAtDesc(
                 mappingName,
@@ -213,6 +226,9 @@ public class DefaultDataMappingService implements DataMappingService {
         String mappingName,
         Collection<Long> fromDataIds
     ) {
+        if (fromDataIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return dataMappingRepository
             .findByMappingNameAndFromDataIdInOrderByMappedAtDesc(
                 mappingName,
@@ -228,6 +244,9 @@ public class DefaultDataMappingService implements DataMappingService {
         String mappingName,
         Collection<Long> toDataIds
     ) {
+        if (toDataIds.isEmpty()) {
+            return Collections.emptyList();
+        }
         return dataMappingRepository
             .findByMappingNameAndToDataIdInOrderByMappedAtDesc(
                 mappingName,

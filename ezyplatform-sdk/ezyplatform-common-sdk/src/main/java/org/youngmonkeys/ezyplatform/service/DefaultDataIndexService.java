@@ -75,7 +75,7 @@ public class DefaultDataIndexService
         String dataType,
         Collection<Long> dataIds
     ) {
-        if (dataIds.size() > 0) {
+        if (!dataIds.isEmpty()) {
             dataIndexRepository.deleteByDataTypeAndDataIdIn(
                 dataType,
                 dataIds
