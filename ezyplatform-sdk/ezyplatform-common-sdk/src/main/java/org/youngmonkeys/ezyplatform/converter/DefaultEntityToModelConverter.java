@@ -337,6 +337,19 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
+    public DataMappingModel toModel(DataMapping entity) {
+        if (entity == null) {
+            return null;
+        }
+        return DataMappingModel.builder()
+            .mappingName(entity.getMappingName())
+            .fromDataId(entity.getFromDataId())
+            .toDataId(entity.getToDataId())
+            .metadata(entity.getMetadata())
+            .mappedAt(toTimestamp(entity.getMappedAt()))
+            .build();
+    }
+
     public long toTimestamp(LocalDateTime localDateTime) {
         return LocalDateTimes.toTimestamp(localDateTime, zoneId);
     }

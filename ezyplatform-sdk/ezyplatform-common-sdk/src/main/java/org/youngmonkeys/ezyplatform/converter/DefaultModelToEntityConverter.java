@@ -26,8 +26,11 @@ import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH;
@@ -205,6 +208,16 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
+    public DataMapping toEntity(SaveDataMappingModel model) {
+        DataMapping entity = new DataMapping();
+        entity.setMappingName(model.getMappingName());
+        entity.setFromDataId(model.getFromDataId());
+        entity.setToDataId(model.getToDataId());
+        entity.setMetadata(model.getMetadata());
+        entity.setMappedAt(clock.nowDateTime());
+        return entity;
+    }
+
     public Setting toSettingEntity(
         String name,
         DataType dataType,
@@ -280,6 +293,62 @@ public class DefaultModelToEntityConverter {
             entities.add(entity);
         }
         return entities;
+    }
+
+    public List<DataMapping> toEntities(
+        String mappingName,
+        Collection<Long> fromDataIds,
+        Long toDataId
+    ) {
+        LocalDateTime now = clock.nowDateTime();
+        return newArrayList(
+            fromDataIds,
+            fromDataId -> {
+                DataMapping entity = new DataMapping();
+                entity.setMappingName(mappingName);
+                entity.setFromDataId(fromDataId);
+                entity.setToDataId(toDataId);
+                entity.setMappedAt(now);
+                return entity;
+            }
+        );
+    }
+
+    public List<DataMapping> toEntities(
+        String mappingName,
+        Long fromDataId,
+        Collection<Long> toDataIds
+    ) {
+        LocalDateTime now = clock.nowDateTime();
+        return newArrayList(
+            toDataIds,
+            toDataId -> {
+                DataMapping entity = new DataMapping();
+                entity.setMappingName(mappingName);
+                entity.setFromDataId(fromDataId);
+                entity.setToDataId(toDataId);
+                entity.setMappedAt(now);
+                return entity;
+            }
+        );
+    }
+
+    public List<DataMapping> toEntities(
+        String mappingName,
+        Map<Long, Long> toDataIdByFromDataId
+    ) {
+        LocalDateTime now = clock.nowDateTime();
+        return newArrayList(
+            toDataIdByFromDataId.entrySet(),
+            e -> {
+                DataMapping entity = new DataMapping();
+                entity.setMappingName(mappingName);
+                entity.setFromDataId(e.getKey());
+                entity.setToDataId(e.getValue());
+                entity.setMappedAt(now);
+                return entity;
+            }
+        );
     }
 
     public void mergeToEntity(
