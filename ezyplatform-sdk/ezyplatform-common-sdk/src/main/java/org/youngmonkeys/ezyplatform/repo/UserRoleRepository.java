@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
 import org.youngmonkeys.ezyplatform.entity.UserRoleId;
 
@@ -28,6 +29,17 @@ public interface UserRoleRepository
     void deleteByUserId(long userId);
 
     void deleteByUserIdIn(Collection<Long> userIds);
+
+    @EzyQuery(
+        "SELECT ur FROM UserRole ur " +
+            "INNER JOIN User u ON ur.userId = u.id " +
+            "INNER JOIN UserRoleName r ON ur.roleId = r.id " +
+            "WHERE u.username = ?0 AND r.name = ?1"
+    )
+    UserRole findByUsernameAndRoleName(
+        String username,
+        String roleName
+    );
 
     int countByRoleId(long roleId);
 }

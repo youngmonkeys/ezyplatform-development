@@ -296,6 +296,14 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public boolean containsUserByUsername(String username) {
+        return userRepository.containsByField(
+            "username",
+            username
+        );
+    }
+
+    @Override
     public long countUsersByStatus(String status) {
         return userRepository.countByStatus(status);
     }

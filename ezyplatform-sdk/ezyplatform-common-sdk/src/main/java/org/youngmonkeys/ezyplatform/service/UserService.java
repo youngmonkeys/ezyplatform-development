@@ -103,6 +103,8 @@ public interface UserService {
 
     boolean containsUserById(long id);
 
+    boolean containsUserByUsername(String username);
+
     long countUsersByStatus(String status);
 
     default long countActivatedUsers() {

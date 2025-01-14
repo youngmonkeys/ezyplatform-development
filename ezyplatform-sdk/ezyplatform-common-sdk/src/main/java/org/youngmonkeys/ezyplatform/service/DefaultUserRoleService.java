@@ -134,4 +134,15 @@ public class DefaultUserRoleService implements UserRoleService {
         return userRoleName != null
             && containsUserRole(userId, userRoleName.getId());
     }
+
+    @Override
+    public boolean containsUserRole(
+        String username,
+        String roleName
+    ) {
+        return userRoleRepository.findByUsernameAndRoleName(
+            username,
+            roleName
+        ) != null;
+    }
 }
