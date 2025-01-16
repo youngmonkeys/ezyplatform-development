@@ -267,6 +267,10 @@ public interface SettingService {
         }
     }
 
+    default String getNodeName() {
+        return getTextValue(SETTING_NODE_NAME);
+    }
+
     default String getWebSiteName() {
         String siteTitle = getTextValue(
             SETTING_NAME_WEB_SITE_TITLE
@@ -289,10 +293,24 @@ public interface SettingService {
         );
     }
 
+    default String getAdminTimeFormat() {
+        return getTextValue(
+            SETTING_NAME_ADMIN_TIME_FORMAT,
+            DEFAULT_TIME_FORMAT
+        );
+    }
+
     default String getAdminDateTimeFormat() {
         return getTextValue(
             SETTING_NAME_ADMIN_DATETIME_FORMAT,
             DEFAULT_DATETIME_FORMAT
+        );
+    }
+
+    default String getAdminDateMinuteFormat() {
+        return getTextValue(
+            SETTING_NAME_ADMIN_DATE_MINUTE_FORMAT,
+            DEFAULT_DATE_MINUTE_FORMAT
         );
     }
 
@@ -303,10 +321,24 @@ public interface SettingService {
         );
     }
 
+    default String getWebTimeFormat() {
+        return getTextValue(
+            SETTING_NAME_WEB_TIME_FORMAT,
+            DEFAULT_TIME_FORMAT
+        );
+    }
+
     default String getWebDateTimeFormat() {
         return getTextValue(
             SETTING_NAME_WEB_DATETIME_FORMAT,
             DEFAULT_DATETIME_FORMAT
+        );
+    }
+
+    default String getWebDateMinuteFormat() {
+        return getTextValue(
+            SETTING_NAME_WEB_DATE_MINUTE_FORMAT,
+            DEFAULT_DATE_MINUTE_FORMAT
         );
     }
 
