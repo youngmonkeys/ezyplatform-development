@@ -182,7 +182,11 @@ public final class Strings {
                 "${" + param.getKey() + "}",
                 String.valueOf(param.getValue())
             );
+            content = content.replace(
+                "{{" + param.getKey() + "}}",
+                String.valueOf(param.getValue())
+            );
         }
-        return content.replaceAll("\\s+", " ");
+        return content.replaceAll(" {2,}", " ");
     }
 }

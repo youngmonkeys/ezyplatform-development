@@ -272,13 +272,13 @@ public class StringsTest extends BaseTest {
     public void fromTemplateAndParametersTest() {
         Asserts.assertEquals(
             fromTemplateAndParameters(
-                "hello ${vocative} ${who}",
+                "hello ${vocative} ${who} 1\n2 3\t4",
                 EzyMapBuilder.mapBuilder()
                     .put("vocative", " ")
                     .put("who", "Dzung")
                     .toMap()
             ),
-            "hello Dzung"
+            "hello Dzung 1\n2 3\t4"
         );
     }
 }
