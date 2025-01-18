@@ -57,4 +57,35 @@ public class JavascriptExecutorsTest {
         Asserts.assertEquals(result1, new BigDecimal("20.50"));
         Asserts.assertEquals(result2, new BigDecimal("21"));
     }
+
+    @Test
+    public void executeReturnTest() {
+        // given
+        String script = "if (foo < 10) { 20; } else { bar; }";
+        Map<String, Object> parameters = EzyMapBuilder
+            .mapBuilder()
+            .put("foo", new BigDecimal("10.2"))
+            .put("bar", new BigDecimal("10.3"))
+            .toMap();
+
+        // when
+        BigDecimal result1 = JavascriptExecutors
+            .execute(
+                script,
+                parameters,
+                2,
+                RoundingMode.UP
+            );
+        BigDecimal result2 = JavascriptExecutors
+            .execute(
+                script,
+                parameters,
+                0,
+                RoundingMode.UP
+            );
+
+        // then
+        Asserts.assertEquals(result1, new BigDecimal("10.30"));
+        Asserts.assertEquals(result2, new BigDecimal("11"));
+    }
 }
