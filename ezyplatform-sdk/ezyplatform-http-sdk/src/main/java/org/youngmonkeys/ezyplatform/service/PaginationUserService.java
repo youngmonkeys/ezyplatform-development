@@ -25,6 +25,8 @@ import org.youngmonkeys.ezyplatform.pagination.UserPaginationParameter;
 import org.youngmonkeys.ezyplatform.pagination.UserPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.repo.PaginationUserRepository;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_USER;
+
 public class PaginationUserService extends CommonPaginationService<
     UserModel,
     UserFilter,
@@ -32,15 +34,25 @@ public class PaginationUserService extends CommonPaginationService<
     Long,
     User> {
 
+    private final DataRecordCountService dataRecordCountService;
     private final DefaultEntityToModelConverter entityToModelConverter;
 
     public PaginationUserService(
+        DataRecordCountService dataRecordCountService,
         PaginationUserRepository repository,
         DefaultEntityToModelConverter entityToModelConverter,
         UserPaginationParameterConverter paginationParameterConverter
     ) {
         super(repository, paginationParameterConverter);
+        this.dataRecordCountService = dataRecordCountService;
         this.entityToModelConverter = entityToModelConverter;
+    }
+
+    @Override
+    protected long getTotalItems(UserFilter filter) {
+        return dataRecordCountService.getRecordCount(
+            TABLE_NAME_USER
+        );
     }
 
     @Override

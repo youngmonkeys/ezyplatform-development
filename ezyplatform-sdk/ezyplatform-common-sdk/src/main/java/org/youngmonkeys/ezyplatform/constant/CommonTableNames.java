@@ -29,6 +29,7 @@ public final class CommonTableNames {
     public static final String TABLE_NAME_DATA_I18N = "ezy_data_i18n";
     public static final String TABLE_NAME_DATA_MAPPING = "ezy_data_mappings";
     public static final String TABLE_NAME_DATA_META = "ezy_data_meta";
+    public static final String TABLE_NAME_DATA_RECORD_COUNT = "ezy_data_record_counts";
     public static final String TABLE_NAME_LETTER = "ezy_letters";
     public static final String TABLE_NAME_LETTER_RECEIVER = "ezy_letter_receivers";
     public static final String TABLE_NAME_LINK = "ezy_links";

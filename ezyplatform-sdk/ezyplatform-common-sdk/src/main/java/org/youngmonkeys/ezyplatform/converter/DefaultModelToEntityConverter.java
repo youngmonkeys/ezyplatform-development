@@ -229,6 +229,15 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
+    public DataRecordCount toNewDataRecordCount(
+        String dataType
+    ) {
+        DataRecordCount entity = new DataRecordCount();
+        entity.setDataType(dataType);
+        entity.setLastCountedAt(clock.nowDateTime());
+        return entity;
+    }
+
     public List<NotificationReceiver> toEntities(
         long notificationId,
         AddNotificationModel model
