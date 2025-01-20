@@ -46,6 +46,12 @@ public interface UserService {
         Collection<Long> userIds
     );
 
+    long getUserIdByUsername(String username);
+
+    long getUserIdByEmail(String email);
+
+    long getUserIdByPhone(String phone);
+
     Long getUserIdByUuid(String uuid);
 
     Map<String, Long> getUserIdMapByUuids(

@@ -34,6 +34,24 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT e.id FROM User e " +
+            "WHERE e.username = ?0"
+    )
+    IdResult findUserIdByUsername(String username);
+
+    @EzyQuery(
+        "SELECT e.id FROM User e " +
+            "WHERE e.email = ?0"
+    )
+    IdResult findUserIdByEmail(String email);
+
+    @EzyQuery(
+        "SELECT e.id FROM User e " +
+            "WHERE e.phone = ?0"
+    )
+    IdResult findUserIdByPhone(String phone);
+
+    @EzyQuery(
+        "SELECT e.id FROM User e " +
             "WHERE e.uuid = ?0"
     )
     IdResult findUserIdByUuid(String uuid);

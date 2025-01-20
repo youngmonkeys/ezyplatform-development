@@ -185,6 +185,25 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public long getUserIdByUsername(String username) {
+        IdResult result = userRepository
+            .findUserIdByUsername(username);
+        return result != null ? result.getId() : 0L;
+    }
+
+    @Override
+    public long getUserIdByEmail(String email) {
+        IdResult result = userRepository.findUserIdByEmail(email);
+        return result != null ? result.getId() : 0L;
+    }
+
+    @Override
+    public long getUserIdByPhone(String phone) {
+        IdResult result = userRepository.findUserIdByPhone(phone);
+        return result != null ? result.getId() : 0L;
+    }
+
+    @Override
     public Long getUserIdByUuid(String uuid) {
         IdResult result = userRepository.findUserIdByUuid(uuid);
         return result != null ? result.getId() : null;
