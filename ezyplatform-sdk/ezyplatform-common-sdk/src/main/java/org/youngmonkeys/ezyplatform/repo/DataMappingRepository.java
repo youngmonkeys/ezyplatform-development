@@ -28,6 +28,26 @@ import java.util.List;
 public interface DataMappingRepository
     extends EzyDatabaseRepository<DataMappingId, DataMapping> {
 
+    void deleteByMappingNameAndFromDataId(
+        String mappingName,
+        long fromDataId
+    );
+
+    void deleteByMappingNameAndToDataId(
+        String mappingName,
+        long toDataId
+    );
+
+    void deleteByMappingNameAndFromDataIdIn(
+        String mappingName,
+        Collection<Long> fromDataIds
+    );
+
+    void deleteByMappingNameAndToDataIdIn(
+        String mappingName,
+        Collection<Long> toDataIds
+    );
+
     @EzyQuery(
         "SELECT e FROM DataMapping e " +
             "WHERE e.mappingName = ?0 " +

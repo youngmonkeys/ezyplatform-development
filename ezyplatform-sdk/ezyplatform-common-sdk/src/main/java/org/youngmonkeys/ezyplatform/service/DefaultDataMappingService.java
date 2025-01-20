@@ -19,16 +19,17 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
+import org.youngmonkeys.ezyplatform.entity.DataMappingId;
 import org.youngmonkeys.ezyplatform.model.DataMappingModel;
 import org.youngmonkeys.ezyplatform.model.SaveDataMappingModel;
 import org.youngmonkeys.ezyplatform.repo.DataMappingRepository;
 import org.youngmonkeys.ezyplatform.result.DataFromToIdResult;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzySets.newHashSet;
 
 @AllArgsConstructor
 public class DefaultDataMappingService implements DataMappingService {
@@ -98,6 +99,133 @@ public class DefaultDataMappingService implements DataMappingService {
     }
 
     @Override
+    public void removeDataMapping(
+        String mappingName,
+        long fromDataId,
+        long toDataId
+    ) {
+        dataMappingRepository.delete(
+            new DataMappingId(
+                mappingName,
+                fromDataId,
+                toDataId
+            )
+        );
+    }
+
+    @Override
+    public void removeDataMappingByFromDataId(
+        String mappingName,
+        long fromDataId
+    ) {
+        dataMappingRepository.deleteByMappingNameAndFromDataId(
+            mappingName,
+            fromDataId
+        );
+    }
+
+    @Override
+    public void removeDataMappingByToDataId(
+        String mappingName,
+        long toDataId
+    ) {
+        dataMappingRepository.deleteByMappingNameAndToDataId(
+            mappingName,
+            toDataId
+        );
+    }
+
+    @Override
+    public void removeDataMappings(
+        String mappingName,
+        long fromDataId,
+        Collection<Long> toDataIds
+    ) {
+        if (toDataIds.isEmpty()) {
+            return;
+        }
+        dataMappingRepository.deleteByIds(
+            newArrayList(
+                toDataIds,
+                toDataId -> new DataMappingId(
+                    mappingName,
+                    fromDataId,
+                    toDataId
+                )
+            )
+        );
+    }
+
+    @Override
+    public void removeDataMappings(
+        String mappingName,
+        Collection<Long> fromDataIds,
+        long toDataId
+    ) {
+        if (fromDataIds.isEmpty()) {
+            return;
+        }
+        dataMappingRepository.deleteByIds(
+            newArrayList(
+                fromDataIds,
+                fromDataId -> new DataMappingId(
+                    mappingName,
+                    fromDataId,
+                    toDataId
+                )
+            )
+        );
+    }
+
+    @Override
+    public void removeDataMappings(
+        String mappingName,
+        Map<Long, Long> toDataIdByFromDataId
+    ) {
+        if (toDataIdByFromDataId.isEmpty()) {
+            return;
+        }
+        dataMappingRepository.deleteByIds(
+            newArrayList(
+                toDataIdByFromDataId.entrySet(),
+                e -> new DataMappingId(
+                    mappingName,
+                    e.getKey(),
+                    e.getValue()
+                )
+            )
+        );
+    }
+
+    @Override
+    public void removeDataMappingsByFromDataIds(
+        String mappingName,
+        Collection<Long> fromDataIds
+    ) {
+        if (fromDataIds.isEmpty()) {
+            return;
+        }
+        dataMappingRepository.deleteByMappingNameAndFromDataIdIn(
+            mappingName,
+            fromDataIds
+        );
+    }
+
+    @Override
+    public void removeDataMappingsByToDataIds(
+        String mappingName,
+        Collection<Long> toDataIds
+    ) {
+        if (toDataIds.isEmpty()) {
+            return;
+        }
+        dataMappingRepository.deleteByMappingNameAndToDataIdIn(
+            mappingName,
+            toDataIds
+        );
+    }
+
+    @Override
     public DataMappingModel getMappingToDataByNameAndFromDataId(
         String mappingName,
         long fromDataId
@@ -126,7 +254,25 @@ public class DefaultDataMappingService implements DataMappingService {
     }
 
     @Override
-    public Map<Long, Long> getMappingToDataIdByNameAndFromDataIds(
+    public Set<Long> getMappingToDataIdsByNameAndFromDataIds(
+        String mappingName,
+        Collection<Long> fromDataIds
+    ) {
+        if (fromDataIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return newHashSet(
+            dataMappingRepository
+                .findDataFromToIdsByMappingNameAndFromDataIdInOrderByMappedAtDesc(
+                    mappingName,
+                    fromDataIds
+                ),
+            DataFromToIdResult::getToDataId
+        );
+    }
+
+    @Override
+    public Map<Long, Long> getMappingToDataIdMapByNameAndFromDataIds(
         String mappingName,
         Collection<Long> fromDataIds
     ) {
@@ -149,7 +295,7 @@ public class DefaultDataMappingService implements DataMappingService {
     }
 
     @Override
-    public Map<Long, List<Long>> getMappingToDataIdsByNameAndFromDataIds(
+    public Map<Long, List<Long>> getMappingToDataIdsMapByNameAndFromDataIds(
         String mappingName,
         Collection<Long> fromDataIds
     ) {
@@ -174,7 +320,25 @@ public class DefaultDataMappingService implements DataMappingService {
     }
 
     @Override
-    public Map<Long, Long> getMappingFromDataIdByNameAndToDataIds(
+    public Set<Long> getMappingFromDataIdsByNameAndToDataIds(
+        String mappingName,
+        Collection<Long> toDataIds
+    ) {
+        if (toDataIds.isEmpty()) {
+            return Collections.emptySet();
+        }
+        return newHashSet(
+            dataMappingRepository
+                .findDataFromToIdsByMappingNameAndToDataIdInOrderByMappedAtDesc(
+                    mappingName,
+                    toDataIds
+                ),
+            DataFromToIdResult::getFromDataId
+        );
+    }
+
+    @Override
+    public Map<Long, Long> getMappingFromDataIdMapByNameAndToDataIds(
         String mappingName,
         Collection<Long> toDataIds
     ) {
@@ -197,7 +361,7 @@ public class DefaultDataMappingService implements DataMappingService {
     }
 
     @Override
-    public Map<Long, List<Long>> getMappingFromDataIdsByNameAndToDataIds(
+    public Map<Long, List<Long>> getMappingFromDataIdsMapByNameAndToDataIds(
         String mappingName,
         Collection<Long> toDataIds
     ) {

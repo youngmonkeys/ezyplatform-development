@@ -21,6 +21,7 @@ import org.youngmonkeys.ezyplatform.model.DataMappingModel;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public interface DataMappingService {
 
@@ -47,6 +48,49 @@ public interface DataMappingService {
         Map<Long, Long> toDataIdByFromDataId
     );
 
+    void removeDataMapping(
+        String mappingName,
+        long fromDataId,
+        long toDataId
+    );
+
+    void removeDataMappingByFromDataId(
+        String mappingName,
+        long fromDataId
+    );
+
+    void removeDataMappingByToDataId(
+        String mappingName,
+        long toDataId
+    );
+
+    void removeDataMappings(
+        String mappingName,
+        long fromDataId,
+        Collection<Long> toDataIds
+    );
+
+    void removeDataMappings(
+        String mappingName,
+        Collection<Long> fromDataIds,
+        long toDataId
+    );
+
+    void removeDataMappings(
+        String mappingName,
+        Map<Long, Long> toDataIdByFromDataId
+    );
+
+    void removeDataMappingsByFromDataIds(
+        String mappingName,
+        Collection<Long> fromDataIds
+    );
+
+    void removeDataMappingsByToDataIds(
+        String mappingName,
+        Collection<Long> toDataIds
+    );
+
     DataMappingModel getMappingToDataByNameAndFromDataId(
         String mappingName,
         long fromDataId
@@ -57,22 +101,32 @@ public interface DataMappingService {
         long toDataId
     );
 
-    Map<Long, Long> getMappingToDataIdByNameAndFromDataIds(
+    Set<Long> getMappingToDataIdsByNameAndFromDataIds(
         String mappingName,
         Collection<Long> fromDataIds
     );
 
-    Map<Long, List<Long>> getMappingToDataIdsByNameAndFromDataIds(
+    Map<Long, Long> getMappingToDataIdMapByNameAndFromDataIds(
         String mappingName,
         Collection<Long> fromDataIds
     );
 
-    Map<Long, Long> getMappingFromDataIdByNameAndToDataIds(
+    Map<Long, List<Long>> getMappingToDataIdsMapByNameAndFromDataIds(
+        String mappingName,
+        Collection<Long> fromDataIds
+    );
+
+    Set<Long> getMappingFromDataIdsByNameAndToDataIds(
         String mappingName,
         Collection<Long> toDataIds
     );
 
-    Map<Long, List<Long>> getMappingFromDataIdsByNameAndToDataIds(
+    Map<Long, Long> getMappingFromDataIdMapByNameAndToDataIds(
+        String mappingName,
+        Collection<Long> toDataIds
+    );
+
+    Map<Long, List<Long>> getMappingFromDataIdsMapByNameAndToDataIds(
         String mappingName,
         Collection<Long> toDataIds
     );
