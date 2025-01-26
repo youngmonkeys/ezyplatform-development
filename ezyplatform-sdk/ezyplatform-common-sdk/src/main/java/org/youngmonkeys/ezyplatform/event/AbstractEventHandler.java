@@ -44,8 +44,11 @@ public abstract class AbstractEventHandler<D, R>
     }
 
     protected R handleException(Exception e) {
+        processException(e);
         return null;
     }
+
+    protected void processException(Exception e) {}
 
     @Override
     public String getEventName() {

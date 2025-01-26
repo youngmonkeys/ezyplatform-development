@@ -33,6 +33,10 @@ public final class CommonConstants {
     public static final String FALSE_STRING = "false";
     public static final String UNKNOWN = "UNKNOWN";
 
+    public static final String PARAMETER_TYPE_NAME_DATE = "Date";
+    public static final String PARAMETER_TYPE_NAME_TIME = "Time";
+    public static final String PARAMETER_TYPE_NAME_DATETIME = "DateTime";
+
     public static final String PATTERN_U_INT_NUMBER = "[0-9]+";
     public static final String PATTERN_COMMON_STRING = "[a-zA-Z0-9\\s]+";
     public static final String PATTERN_COMMON_NAME = "(([A-Z][a-zA-Z0-9]+[\\s])|([A-Z][a-zA-Z0-9]+))+";
