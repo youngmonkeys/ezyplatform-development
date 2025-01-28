@@ -253,6 +253,20 @@ public class DefaultDataMappingService implements DataMappingService {
         );
     }
 
+    public Set<Long> getMappingToDataIdsByNameAndFromDataId(
+        String mappingName,
+        long fromDataId
+    ) {
+        return newHashSet(
+            dataMappingRepository
+                .findDataFromToIdsByMappingNameAndFromDataIdOrderByMappedAtDesc(
+                    mappingName,
+                    fromDataId
+                ),
+            DataFromToIdResult::getToDataId
+        );
+    }
+
     @Override
     public Set<Long> getMappingToDataIdsByNameAndFromDataIds(
         String mappingName,
@@ -317,6 +331,20 @@ public class DefaultDataMappingService implements DataMappingService {
                     )
                 )
             );
+    }
+
+    public Set<Long> getMappingFromDataIdsByNameAndToDataId(
+        String mappingName,
+        long toDataId
+    ) {
+        return newHashSet(
+            dataMappingRepository
+                .findDataFromToIdsByMappingNameAndToDataIdOrderByMappedAtDesc(
+                    mappingName,
+                    toDataId
+                ),
+            DataFromToIdResult::getFromDataId
+        );
     }
 
     @Override

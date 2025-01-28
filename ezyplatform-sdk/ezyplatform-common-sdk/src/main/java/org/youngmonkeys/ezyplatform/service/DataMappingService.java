@@ -101,6 +101,11 @@ public interface DataMappingService {
         long toDataId
     );
 
+    Set<Long> getMappingToDataIdsByNameAndFromDataId(
+        String mappingName,
+        long fromDataId
+    );
+
     Set<Long> getMappingToDataIdsByNameAndFromDataIds(
         String mappingName,
         Collection<Long> fromDataIds
@@ -114,6 +119,11 @@ public interface DataMappingService {
     Map<Long, List<Long>> getMappingToDataIdsMapByNameAndFromDataIds(
         String mappingName,
         Collection<Long> fromDataIds
+    );
+
+    Set<Long> getMappingFromDataIdsByNameAndToDataId(
+        String mappingName,
+        long toDataId
     );
 
     Set<Long> getMappingFromDataIdsByNameAndToDataIds(

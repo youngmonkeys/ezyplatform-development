@@ -71,6 +71,28 @@ public interface DataMappingRepository
     );
 
     @EzyQuery(
+        "SELECT e.fromDataId, e.toDataId FROM DataMapping e " +
+            "WHERE e.mappingName = ?0 " +
+            "AND e.fromDataId = ?1 " +
+            "ORDER BY e.mappedAt DESC"
+    )
+    List<DataFromToIdResult> findDataFromToIdsByMappingNameAndFromDataIdOrderByMappedAtDesc(
+        String mappingName,
+        long fromDataId
+    );
+
+    @EzyQuery(
+        "SELECT e.fromDataId, e.toDataId FROM DataMapping e " +
+            "WHERE e.mappingName = ?0 " +
+            "AND e.toDataId = ?1 " +
+            "ORDER BY e.mappedAt DESC"
+    )
+    List<DataFromToIdResult> findDataFromToIdsByMappingNameAndToDataIdOrderByMappedAtDesc(
+        String mappingName,
+        long toDataId
+    );
+
+    @EzyQuery(
         "SELECT e FROM DataMapping e " +
             "WHERE e.mappingName = ?0 " +
             "AND e.fromDataId IN ?1 " +
