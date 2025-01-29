@@ -16,11 +16,16 @@
 
 package org.youngmonkeys.ezyplatform.test.pagination;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.io.EzyStrings;
+import com.tvd12.ezyhttp.core.json.ObjectMapperBuilder;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.pagination.LastUpdatedAtPageToken;
 
 import java.time.LocalDateTime;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MIN_SQL_DATETIME;
 
 public class LastUpdatedAtPageTokenTest {
 
@@ -109,8 +114,422 @@ public class LastUpdatedAtPageTokenTest {
                 now,
                 0,
                 100,
+                true
+            )
+        );
+    }
+
+    @Test
+    public void newLastPageTokenIdFetcherNullCase() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                1,
+                () -> now.plusDays(1L),
+                () -> EzyStrings.NULL
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now.plusDays(1L),
+                0,
+                100,
                 false
             )
         );
+    }
+
+    @Test
+    public void newLastPageTokenIdFetcherNull2Case() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                1,
+                () -> now.plusDays(1L),
+                () -> null
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now.plusDays(1L),
+                0,
+                100,
+                false
+            )
+        );
+    }
+
+    @Test
+    public void newLastPageTokenNormalCaseIdNumber() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            1L,
+            null,
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                1,
+                () -> now.plusDays(1L),
+                () -> 1L
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now.plusDays(1L),
+                0L,
+                null,
+                0,
+                100,
+                false
+            )
+        );
+    }
+
+    @Test
+    public void newLastPageTokenEqualsCaseIdNumber() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            0L,
+            null,
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                100,
+                () -> now,
+                () -> 1L
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now,
+                1L,
+                null,
+                0,
+                100,
+                true
+            )
+        );
+    }
+
+    @Test
+    public void newLastPageTokenNoItemCaseWithIdNumber() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            1L,
+            null,
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                0,
+                () -> now,
+                () -> 2L
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now,
+                1L,
+                null,
+                0,
+                100,
+                true
+            )
+        );
+    }
+
+    @Test
+    public void newLastPageTokenNullCaseIdNumber() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            1L,
+            null,
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                2,
+                () -> now,
+                () -> null
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now,
+                1L,
+                null,
+                2,
+                100,
+                true
+            )
+        );
+    }
+
+    @Test
+    public void newLastPageTokenNormalCaseIdText() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            0L,
+            "1",
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                1,
+                () -> now.plusDays(1L),
+                () -> "0"
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now.plusDays(1L),
+                0L,
+                null,
+                0,
+                100,
+                false
+            )
+        );
+    }
+
+    @Test
+    public void newLastPageTokenEqualsCaseIdText() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            0L,
+            "0",
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                100,
+                () -> now,
+                () -> "1"
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now,
+                0L,
+                "1",
+                0,
+                100,
+                true
+            )
+        );
+    }
+
+    @Test
+    public void newLastPageTokenNoItemCaseWithIdText() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
+            now,
+            0L,
+            "1",
+            0,
+            100,
+            true
+        );
+
+        // when
+        LastUpdatedAtPageToken actual = instance
+            .newLastPageToken(
+                0,
+                () -> now,
+                () -> "2"
+            );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            new LastUpdatedAtPageToken(
+                now,
+                0L,
+                "1",
+                0,
+                100,
+                true
+            )
+        );
+    }
+
+    @Test
+    public void allArgsConstructorTest() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        LastUpdatedAtPageToken pageToken = new LastUpdatedAtPageToken(
+            now,
+            0L,
+            "0",
+            0,
+            100,
+            false
+        );
+
+        // when
+        // then
+        Asserts.assertEquals(
+            pageToken.getUpdatedAt(),
+            now
+        );
+        Asserts.assertEquals(
+            pageToken.getIdNumber(),
+            0L
+        );
+        Asserts.assertEquals(
+            pageToken.getIdText(),
+            "0"
+        );
+        Asserts.assertEquals(
+            pageToken.getOffset(),
+            0
+        );
+        Asserts.assertEquals(
+            pageToken.getLimit(),
+            100
+        );
+        Asserts.assertFalse(pageToken.isFetchGreaterThanOrEquals());
+    }
+
+    @Test
+    public void noArgsConstructorTest() {
+        // given
+        LastUpdatedAtPageToken pageToken = new LastUpdatedAtPageToken();
+
+        // when
+        // then
+        Asserts.assertNull(pageToken.getUpdatedAt());
+        Asserts.assertEquals(
+            pageToken.getIdNumber(),
+            0L
+        );
+        Asserts.assertNull(pageToken.getIdText());
+        Asserts.assertEquals(
+            pageToken.getOffset(),
+            0
+        );
+        Asserts.assertEquals(
+            pageToken.getLimit(),
+            0
+        );
+        Asserts.assertFalse(pageToken.isFetchGreaterThanOrEquals());
+    }
+
+    @Test
+    public void defaultPageTokenTest() {
+        // given
+        LastUpdatedAtPageToken pageToken = LastUpdatedAtPageToken
+            .defaultPageToken();
+
+        // when
+        // then
+        Asserts.assertEquals(
+            pageToken.getUpdatedAt(),
+            MIN_SQL_DATETIME
+        );
+        Asserts.assertEquals(
+            pageToken.getIdNumber(),
+            0L
+        );
+        Asserts.assertNull(pageToken.getIdText());
+        Asserts.assertEquals(
+            pageToken.getOffset(),
+            0
+        );
+        Asserts.assertEquals(
+            pageToken.getLimit(),
+            100
+        );
+        Asserts.assertTrue(pageToken.isFetchGreaterThanOrEquals());
+    }
+
+    @Test
+    public void jsonTest() throws Exception {
+        // given
+        LastUpdatedAtPageToken pageToken = LastUpdatedAtPageToken
+            .defaultPageToken();
+        ObjectMapper objectMapper = new ObjectMapperBuilder()
+            .build();
+
+        // when
+        String json = objectMapper.writeValueAsString(pageToken);
+
+        // then
+        LastUpdatedAtPageToken value = objectMapper
+            .readValue(json, LastUpdatedAtPageToken.class);
+        Asserts.assertEquals(value, pageToken);
     }
 }

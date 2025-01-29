@@ -54,4 +54,12 @@ public class ClockProxy {
             zoneId
         );
     }
+
+    public LocalDateTime nowDateTimeIfNull(
+        LocalDateTime value
+    ) {
+        return value != null
+            ? value
+            : nowDateTime();
+    }
 }
