@@ -54,63 +54,31 @@ public class LastUpdatedAtPageToken {
 
     public LastUpdatedAtPageToken newLastPageToken(
         int itemCount,
-        Supplier<LocalDateTime> lastUpdatedAtSupplier
-    ) {
-        int newOffset = offset;
-        LocalDateTime newLastUpdatedAt = updatedAt;
-        boolean newFetchGreaterThanOrEquals = true;
-        if (itemCount > 0) {
-            newLastUpdatedAt = lastUpdatedAtSupplier.get();
-            if (newLastUpdatedAt.equals(updatedAt)) {
-                newOffset = offset + itemCount;
-            } else {
-                newOffset = 0;
-                newFetchGreaterThanOrEquals = false;
-            }
-        }
-        return new LastUpdatedAtPageToken(
-            newLastUpdatedAt,
-            newOffset,
-            limit,
-            newFetchGreaterThanOrEquals
-        );
-    }
-
-    public LastUpdatedAtPageToken newLastPageToken(
-        int itemCount,
         Supplier<LocalDateTime> lastUpdatedAtSupplier,
         Supplier<Object> lastIdSupplier
     ) {
-        int newOffset = offset;
         long newLastIdNumber = idNumber;
         String newLastIdText = idText;
         LocalDateTime newLastUpdatedAt = updatedAt;
-        boolean newFetchGreaterThanOrEquals = true;
         if (itemCount > 0)  {
             newLastUpdatedAt = lastUpdatedAtSupplier.get();
-            if (newLastUpdatedAt.equals(updatedAt)) {
-                Object newLastId = lastIdSupplier.get();
-                if (newLastId == null) {
-                    newOffset = offset + itemCount;
-                } else if (newLastId instanceof Number) {
-                    newLastIdNumber = ((Number) newLastId).longValue();
+            Object newLastId = lastIdSupplier.get();
+            if (newLastId != null) {
+                if (newLastId instanceof Number) {
+                    newLastIdNumber = ((Number) newLastId)
+                        .longValue();
                 } else {
                     newLastIdText = String.valueOf(newLastId);
                 }
-            } else {
-                newLastIdNumber = 0L;
-                newLastIdText = null;
-                newOffset = 0;
-                newFetchGreaterThanOrEquals = false;
             }
         }
         return new LastUpdatedAtPageToken(
             newLastUpdatedAt,
             newLastIdNumber,
             newLastIdText,
-            newOffset,
+            offset,
             limit,
-            newFetchGreaterThanOrEquals
+            Boolean.TRUE
         );
     }
 

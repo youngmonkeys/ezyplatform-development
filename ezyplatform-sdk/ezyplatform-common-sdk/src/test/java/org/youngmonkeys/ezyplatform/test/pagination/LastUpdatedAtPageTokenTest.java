@@ -30,96 +30,6 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MIN_SQL_DATE
 public class LastUpdatedAtPageTokenTest {
 
     @Test
-    public void newLastPageTokenNormalCase() {
-        // given
-        LocalDateTime now = LocalDateTime.now();
-        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
-            now,
-            0,
-            100,
-            true
-        );
-
-        // when
-        LastUpdatedAtPageToken actual = instance
-            .newLastPageToken(
-                1,
-                () -> now.plusDays(1L)
-            );
-
-        // then
-        Asserts.assertEquals(
-            actual,
-            new LastUpdatedAtPageToken(
-                now.plusDays(1L),
-                0,
-                100,
-                false
-            )
-        );
-    }
-
-    @Test
-    public void newLastPageTokenEqualsCase() {
-        // given
-        LocalDateTime now = LocalDateTime.now();
-        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
-            now,
-            0,
-            100,
-            true
-        );
-
-        // when
-        LastUpdatedAtPageToken actual = instance
-            .newLastPageToken(
-                100,
-                () -> now
-            );
-
-        // then
-        Asserts.assertEquals(
-            actual,
-            new LastUpdatedAtPageToken(
-                now,
-                100,
-                100,
-                true
-            )
-        );
-    }
-
-    @Test
-    public void newLastPageTokenNoItemCase() {
-        // given
-        LocalDateTime now = LocalDateTime.now();
-        LastUpdatedAtPageToken instance = new LastUpdatedAtPageToken(
-            now,
-            0,
-            100,
-            true
-        );
-
-        // when
-        LastUpdatedAtPageToken actual = instance
-            .newLastPageToken(
-                0,
-                () -> now
-            );
-
-        // then
-        Asserts.assertEquals(
-            actual,
-            new LastUpdatedAtPageToken(
-                now,
-                0,
-                100,
-                true
-            )
-        );
-    }
-
-    @Test
     public void newLastPageTokenIdFetcherNullCase() {
         // given
         LocalDateTime now = LocalDateTime.now();
@@ -144,8 +54,10 @@ public class LastUpdatedAtPageTokenTest {
             new LastUpdatedAtPageToken(
                 now.plusDays(1L),
                 0,
+                EzyStrings.NULL,
+                0,
                 100,
-                false
+                true
             )
         );
     }
@@ -176,7 +88,7 @@ public class LastUpdatedAtPageTokenTest {
                 now.plusDays(1L),
                 0,
                 100,
-                false
+                true
             )
         );
     }
@@ -207,11 +119,11 @@ public class LastUpdatedAtPageTokenTest {
             actual,
             new LastUpdatedAtPageToken(
                 now.plusDays(1L),
-                0L,
+                1L,
                 null,
                 0,
                 100,
-                false
+                true
             )
         );
     }
@@ -314,7 +226,7 @@ public class LastUpdatedAtPageTokenTest {
                 now,
                 1L,
                 null,
-                2,
+                0,
                 100,
                 true
             )
@@ -348,10 +260,10 @@ public class LastUpdatedAtPageTokenTest {
             new LastUpdatedAtPageToken(
                 now.plusDays(1L),
                 0L,
-                null,
+                "0",
                 0,
                 100,
-                false
+                true
             )
         );
     }

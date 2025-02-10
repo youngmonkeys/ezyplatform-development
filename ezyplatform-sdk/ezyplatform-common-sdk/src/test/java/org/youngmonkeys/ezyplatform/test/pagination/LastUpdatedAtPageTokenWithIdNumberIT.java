@@ -121,7 +121,7 @@ public class LastUpdatedAtPageTokenWithIdNumberIT {
         // then
         Asserts.assertEquals(
             nextPageToken,
-            new LastUpdatedAtPageToken(next, 0L, null, 0, 4, false)
+            new LastUpdatedAtPageToken(next, 4L, null, 0, 4, true)
         );
     }
 
