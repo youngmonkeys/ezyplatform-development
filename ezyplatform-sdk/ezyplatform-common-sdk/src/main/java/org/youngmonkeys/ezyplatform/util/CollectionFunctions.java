@@ -26,7 +26,7 @@ public final class CollectionFunctions {
     public static <E, C extends Collection<E>> C toNullIfEmpty(
         C collection
     ) {
-        return collection == null || collection.size() > 0
+        return collection == null || !collection.isEmpty()
             ? collection
             : null;
     }
