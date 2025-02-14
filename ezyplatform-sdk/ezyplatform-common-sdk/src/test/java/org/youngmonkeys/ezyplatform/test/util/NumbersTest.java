@@ -226,4 +226,16 @@ public class NumbersTest {
         Asserts.assertEquals(id3, 123456789L);
         Asserts.assertEquals(id4, 1L);
     }
+
+    @Test
+    public void isFloatingPointTextTest() {
+        Asserts.assertTrue(isFloatingPointText("12.3"));
+        Asserts.assertTrue(isFloatingPointText("0.3"));
+        Asserts.assertTrue(isFloatingPointText("+0.3"));
+        Asserts.assertTrue(isFloatingPointText("-0.3"));
+        Asserts.assertFalse(isFloatingPointText("abc"));
+        Asserts.assertFalse(isFloatingPointText("8"));
+        Asserts.assertFalse(isFloatingPointText("88"));
+        Asserts.assertFalse(isFloatingPointText("888"));
+    }
 }
