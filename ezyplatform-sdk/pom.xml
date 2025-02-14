@@ -69,5 +69,6 @@
 		<module>ezyplatform-web-sdk</module>
 		<module>ezyplatform-common-sdk</module>
         <module>ezyplatform-http-sdk</module>
+        <module>ezyplatform-test-sdk</module>
     </modules>
 </project>

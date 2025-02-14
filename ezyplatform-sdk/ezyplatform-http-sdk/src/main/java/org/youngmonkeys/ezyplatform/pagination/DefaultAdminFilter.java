@@ -149,8 +149,6 @@ public class DefaultAdminFilter implements AdminFilter {
                     .or("e.email LIKE CONCAT('%',:likeKeyword,'%')")
                     .or("e.displayName LIKE CONCAT('%',:likeKeyword,'%')")
                     .or("e.username LIKE CONCAT('%',:likeKeyword,'%')")
-                    .or("e.uuid LIKE CONCAT('%',:likeKeyword,'%')")
-                    .or("e.id LIKE CONCAT('%',:likeKeyword,'%')")
                     .append(")")
                     .build()
             );
