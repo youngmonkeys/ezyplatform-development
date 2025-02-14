@@ -50,9 +50,11 @@ public class PaginationUserService extends CommonPaginationService<
 
     @Override
     protected long getTotalItems(UserFilter filter) {
-        return dataRecordCountService.getRecordCount(
-            TABLE_NAME_USER
-        );
+        return filter.hasNoParameter()
+            ? dataRecordCountService.getRecordCount(
+                TABLE_NAME_USER
+            )
+            : super.getTotalItems(filter);
     }
 
     @Override

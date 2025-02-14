@@ -28,4 +28,10 @@ public interface ParameterMapFetcher {
     default Map<String, Object> getParameters() {
         return getObjectProperties(this);
     }
+
+    @JsonIgnore
+    default boolean hasNoParameter() {
+        return getObjectProperties(this, true)
+            .isEmpty();
+    }
 }

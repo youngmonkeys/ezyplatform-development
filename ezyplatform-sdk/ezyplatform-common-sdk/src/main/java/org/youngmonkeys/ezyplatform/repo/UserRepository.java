@@ -114,5 +114,142 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
     )
     IdUuidNameResult findUserUuidNameByUuid(String uuid);
 
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id) as id, " +
+            "e.username as username, " +
+            "e.displayName as displayName " +
+            "FROM User e " +
+            "WHERE e.phone = ?0 " +
+            "OR e.email = ?0 " +
+            "OR e.displayName = ?0 " +
+            "OR e.username = ?0"
+    )
+    List<IdNameResult> findUsernameByUniqueKeyword(
+        String keyword,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id) as id, " +
+            "e.username as username, " +
+            "e.displayName as displayName " +
+            "FROM User e " +
+            "WHERE e.phone IN ?0 " +
+            "OR e.email IN ?0 " +
+            "OR e.displayName IN ?0 " +
+            "OR e.username IN ?0"
+    )
+    List<IdNameResult> findUsernameByUniqueKeywords(
+        Collection<String> keywords,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id) as id, " +
+            "e.username as username, " +
+            "e.displayName as displayName " +
+            "FROM User e " +
+            "WHERE e.phone LIKE CONCAT('%',?0,'%') " +
+            "OR e.email LIKE CONCAT('%',?0,'%') " +
+            "OR e.displayName LIKE CONCAT('%',?0,'%') " +
+            "OR e.username LIKE CONCAT('%',?0,'%')"
+    )
+    List<IdNameResult> findUsernameByKeyword(
+        String keyword,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id) as id, " +
+            "e.username as username, " +
+            "e.displayName as displayName " +
+            "FROM User e " +
+            "INNER JOIN UserKeyword k ON e.id = k.userId " +
+            "WHERE k.keyword in ?0"
+    )
+    List<IdNameResult> findUsernameByKeywords(
+        Collection<String> keywords,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id) as id, " +
+            "e.username as username, " +
+            "e.displayName as displayName " +
+            "FROM User e " +
+            "INNER JOIN UserRole a ON e.id = a.userId " +
+            "WHERE a.roleId in ?0 AND (" +
+            "e.phone LIKE CONCAT('%',?1,'%') " +
+            "OR e.email LIKE CONCAT('%',?1,'%') " +
+            "OR e.displayName LIKE CONCAT('%',?1,'%') " +
+            "OR e.username LIKE CONCAT('%',?1,'%')" +
+            ")"
+    )
+    List<IdNameResult> findUsernameByKeywordAndRoleIds(
+        Collection<Long> roleIds,
+        String keyword,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id) as id, " +
+            "e.username as username, " +
+            "e.displayName as displayName " +
+            "FROM User e " +
+            "INNER JOIN UserRole a ON e.id = a.userId " +
+            "INNER JOIN UserKeyword b ON e.id = b.userId " +
+            "WHERE a.roleId in ?0 AND b.keyword in ?1"
+    )
+    List<IdNameResult> findUsernameByKeywordsAndRoleIds(
+        Collection<Long> roleIds,
+        Collection<String> keywords,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id) as id, " +
+            "e.username as username, " +
+            "e.displayName as displayName " +
+            "FROM User e " +
+            "INNER JOIN UserRole a ON e.id = a.userId " +
+            "INNER JOIN UserRoleName b ON b.id = a.roleId " +
+            "INNER JOIN UserKeyword c ON e.id = c.userId " +
+            "WHERE b.name in ?0 AND (" +
+            "e.phone LIKE CONCAT('%',?1,'%') " +
+            "OR e.email LIKE CONCAT('%',?1,'%') " +
+            "OR e.displayName LIKE CONCAT('%',?1,'%') " +
+            "OR e.username LIKE CONCAT('%',?1,'%')" +
+            ")"
+    )
+    List<IdNameResult> findUsernameByKeywordAndRoleNames(
+        Collection<String> roleNames,
+        String keyword,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id) as id, " +
+            "e.username as username, " +
+            "e.displayName as displayName " +
+            "FROM User e " +
+            "INNER JOIN UserRole a ON e.id = a.userId " +
+            "INNER JOIN UserRoleName b ON b.id = a.roleId " +
+            "INNER JOIN UserKeyword c ON e.id = c.userId " +
+            "WHERE b.name in ?0 AND c.keyword in ?1"
+    )
+    List<IdNameResult> findUsernameByKeywordsAndRoleNames(
+        Collection<String> roleNames,
+        Collection<String> keywords,
+        Next next
+    );
+
     long countByStatus(String status);
 }

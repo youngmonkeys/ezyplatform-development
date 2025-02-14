@@ -196,6 +196,8 @@ public final class CommonConstants {
         = "web_page_title_separator";
     public static final String SETTING_NAME_WEB_AUTO_PASS_MANAGEMENT_URIS
         = "web_auto_pass_management_uris";
+    public static final String SETTING_NAME_WEB_ALLOW_SEARCH_USER_BY_LIKE_OPERATOR =
+        "web_allow_search_user_by_like_operator";
     public static final String SETTING_NAME_WEB_SITE_ICON_URL = "web_site_icon_url";
     public static final String SETTING_NAME_WEB_SITE_LOGO_URL = "web_site_logo_url";
     public static final String SETTING_NAME_ADMIN_URL = "admin_url";

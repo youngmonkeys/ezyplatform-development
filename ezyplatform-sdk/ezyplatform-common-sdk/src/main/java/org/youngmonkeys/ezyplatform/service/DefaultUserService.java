@@ -41,7 +41,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.util.Next.limit;
 
+@SuppressWarnings("MethodCount")
 @AllArgsConstructor
 public class DefaultUserService implements UserService {
 
@@ -319,6 +321,108 @@ public class DefaultUserService implements UserService {
         return userRepository.containsByField(
             "username",
             username
+        );
+    }
+
+    public List<UserNameModel> simpleSearch(
+        String keyword,
+        int limit
+    ) {
+        List<IdNameResult> results = userRepository
+            .findUsernameByUniqueKeyword(
+                keyword,
+                limit(limit)
+            );
+        if (results.isEmpty()) {
+            results = userRepository.findUsernameByKeyword(
+                keyword,
+                limit(limit)
+            );
+        }
+        return newArrayList(
+            results,
+            resultToModelConverter::toUserNameModel
+        );
+    }
+
+    public List<UserNameModel> simpleSearch(
+        Collection<String> keywords,
+        int limit
+    ) {
+        List<IdNameResult> results = userRepository
+            .findUsernameByUniqueKeywords(
+                keywords,
+                limit(limit)
+            );
+        if (results.isEmpty()) {
+            results = userRepository.findUsernameByKeywords(
+                keywords,
+                limit(limit)
+            );
+        }
+        return newArrayList(
+            results,
+            resultToModelConverter::toUserNameModel
+        );
+    }
+
+    public List<UserNameModel> simpleSearchWithRoleIds(
+        Collection<Long> roleIds,
+        String keyword,
+        int limit
+    ) {
+        return newArrayList(
+            userRepository.findUsernameByKeywordAndRoleIds(
+                roleIds,
+                keyword,
+                limit(limit)
+            ),
+            resultToModelConverter::toUserNameModel
+        );
+    }
+
+    public List<UserNameModel> simpleSearchWithRoleIds(
+        Collection<Long> roleIds,
+        Collection<String> keywords,
+        int limit
+    ) {
+        return newArrayList(
+            userRepository.findUsernameByKeywordsAndRoleIds(
+                roleIds,
+                keywords,
+                limit(limit)
+            ),
+            resultToModelConverter::toUserNameModel
+        );
+    }
+
+    public List<UserNameModel> simpleSearchWithRoleNames(
+        Collection<String> roleNames,
+        String keyword,
+        int limit
+    ) {
+        return newArrayList(
+            userRepository.findUsernameByKeywordAndRoleNames(
+                roleNames,
+                keyword,
+                limit(limit)
+            ),
+            resultToModelConverter::toUserNameModel
+        );
+    }
+
+    public List<UserNameModel> simpleSearchWithRoleNames(
+        Collection<String> roleNames,
+        Collection<String> keywords,
+        int limit
+    ) {
+        return newArrayList(
+            userRepository.findUsernameByKeywordsAndRoleNames(
+                roleNames,
+                keywords,
+                limit(limit)
+            ),
+            resultToModelConverter::toUserNameModel
         );
     }
 
