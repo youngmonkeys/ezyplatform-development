@@ -162,6 +162,8 @@ public final class CommonConstants {
         = "admin_reset_password_token_expired_in_day";
     public static final String SETTING_NAME_ADMIN_SSO_ALLOWED_ORIGINS =
         "admin_sso_allowed_origins";
+    public static final String SETTING_NAME_ADMIN_LANGUAGE_MESSAGES_MAP =
+        "admin_language_messages_map";
     public static final String SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY
         = "user_token_expired_in_day";
     public static final String SETTING_NAME_USER_MAX_LOGIN_FAILURES
@@ -198,6 +200,8 @@ public final class CommonConstants {
         = "web_auto_pass_management_uris";
     public static final String SETTING_NAME_WEB_ALLOW_SEARCH_USER_BY_LIKE_OPERATOR =
         "web_allow_search_user_by_like_operator";
+    public static final String SETTING_NAME_WEB_LANGUAGE_MESSAGES_MAP =
+        "web_language_messages_map";
     public static final String SETTING_NAME_WEB_SITE_ICON_URL = "web_site_icon_url";
     public static final String SETTING_NAME_WEB_SITE_LOGO_URL = "web_site_logo_url";
     public static final String SETTING_NAME_ADMIN_URL = "admin_url";

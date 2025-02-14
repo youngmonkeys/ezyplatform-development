@@ -114,6 +114,17 @@ public abstract class MutableSettingService
         );
     }
 
+    public void setObjectValue(
+        String settingName,
+        Object value
+    ) {
+        saveSetting(
+            settingName,
+            DataType.JSON,
+            value
+        );
+    }
+
     @Override
     public void saveSetting(
         String name,
