@@ -16,8 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
+import java.util.function.Function;
 
 public final class CollectionFunctions {
 
@@ -37,5 +37,21 @@ public final class CollectionFunctions {
         return collection == null
             ? Collections.emptyList()
             : collection;
+    }
+
+    public static <E, V> List<E> distinctByField(
+        Collection<E> collection,
+        Function<E, V> fieldValueExtractor
+    ) {
+        Set<V> distinctValues = new HashSet<>();
+        List<E> newList = new ArrayList<>();
+        for (E item : collection) {
+            V fieldValue = fieldValueExtractor.apply(item);
+            if (!distinctValues.contains(fieldValue)) {
+                distinctValues.add(fieldValue);
+                newList.add(item);
+            }
+        }
+        return newList;
     }
 }
