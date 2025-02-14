@@ -22,6 +22,7 @@ import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
 import com.tvd12.test.performance.Performance;
+import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 
 import java.math.BigInteger;
@@ -208,11 +209,13 @@ public class StringsTest extends BaseTest {
     @Test
     public void emptyIfNullTest() {
         // given
+        String text = RandomUtil.randomShortAlphabetString();
+
         // when
         // then
         Asserts.assertEquals(
-            emptyIfNull("hello"),
-            "hello"
+            emptyIfNull(text),
+            text
         );
         Asserts.assertEquals(
             emptyIfNull(null),
@@ -579,5 +582,32 @@ public class StringsTest extends BaseTest {
         Asserts.assertEquals(actual7, dateTime.toString());
         Asserts.assertEquals(actual8, dateTime.toString());
         Asserts.assertEquals(actual9, dateTime.toString());
+    }
+
+    @Test
+    public void indexOfTextInStringIgnoreCaseTest() {
+        // given
+        String text = "YMSxxx5xxxtvd12xxxORDER123";
+
+        // when
+        int index1 = indexOfTextInStringIgnoreCase(
+            text,
+            "YMS"
+        );
+        int index2 = indexOfTextInStringIgnoreCase(
+            text,
+            "xxx",
+            3
+        );
+        int index3 = indexOfTextInStringIgnoreCase(
+            text,
+            "order",
+            6
+        );
+
+        // then
+        Asserts.assertEquals(index1, 0);
+        Asserts.assertEquals(index2, 3);
+        Asserts.assertEquals(index3, 18);
     }
 }

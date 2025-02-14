@@ -337,4 +337,29 @@ public final class Strings {
         }
         return answer;
     }
+
+    public static int indexOfTextInStringIgnoreCase(
+        String message,
+        String keyword
+    ) {
+        return indexOfTextInStringIgnoreCase(message, keyword, 0);
+    }
+
+    public static int indexOfTextInStringIgnoreCase(
+        String message,
+        String keyword,
+        int startIndex
+    ) {
+        int index = message.indexOf(
+            keyword,
+            startIndex
+        );
+        if (index < 0) {
+            index = message.indexOf(
+                keyword.toUpperCase(),
+                startIndex
+            );
+        }
+        return index;
+    }
 }
