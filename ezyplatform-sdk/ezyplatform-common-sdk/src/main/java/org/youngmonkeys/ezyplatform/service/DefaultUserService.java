@@ -20,9 +20,11 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
+import org.youngmonkeys.ezyplatform.entity.User;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 import org.youngmonkeys.ezyplatform.exception.UserAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.UserInvalidAccessTokenException;
+import org.youngmonkeys.ezyplatform.exception.UserNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.UserWaiting2FaAccessTokenException;
 import org.youngmonkeys.ezyplatform.model.UserAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
@@ -42,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.util.Next.limit;
+import static org.youngmonkeys.ezyplatform.util.StringConverters.trimOrNull;
 
 @SuppressWarnings("MethodCount")
 @AllArgsConstructor
@@ -53,6 +56,36 @@ public class DefaultUserService implements UserService {
     private final UserAccessTokenRepository accessTokenRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultResultToModelConverter resultToModelConverter;
+
+    public void updateUserEmail(
+        long userId,
+        String email
+    ) {
+        User user = getUserEntityByIdOrThrow(userId);
+        user.setEmail(trimOrNull(email));
+        user.setUpdatedAt(clock.nowDateTime());
+        userRepository.save(user);
+    }
+
+    public void updateUserPhone(
+        long userId,
+        String phone
+    ) {
+        User user = getUserEntityByIdOrThrow(userId);
+        user.setPhone(trimOrNull(phone));
+        user.setUpdatedAt(clock.nowDateTime());
+        userRepository.save(user);
+    }
+
+    public void updateUserDisplayName(
+        long userId,
+        String displayName
+    ) {
+        User user = getUserEntityByIdOrThrow(userId);
+        user.setDisplayName(trimOrNull(displayName));
+        user.setUpdatedAt(clock.nowDateTime());
+        userRepository.save(user);
+    }
 
     public List<String> getAllUserStatuses() {
         return newArrayList(
@@ -487,5 +520,13 @@ public class DefaultUserService implements UserService {
     @Override
     public long countUsersByStatus(String status) {
         return userRepository.countByStatus(status);
+    }
+
+    protected User getUserEntityByIdOrThrow(long userId) {
+        User entity = userRepository.findById(userId);
+        if (entity == null) {
+            throw new UserNotFoundException(userId);
+        }
+        return entity;
     }
 }
