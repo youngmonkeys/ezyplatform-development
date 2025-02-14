@@ -28,6 +28,7 @@ import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
 
+@SuppressWarnings("MethodCount")
 public interface UserService {
 
     UserModel getUserById(long userId);
@@ -112,6 +113,40 @@ public interface UserService {
     boolean containsUserByUsername(String username);
 
     long countUsersByStatus(String status);
+
+    List<UserNameModel> simpleSearch(
+        String keyword,
+        int limit
+    );
+
+    List<UserNameModel> simpleSearch(
+        Collection<String> keywords,
+        int limit
+    );
+
+    List<UserNameModel> simpleSearchWithRoleIds(
+        Collection<Long> roleIds,
+        String keyword,
+        int limit
+    );
+
+    List<UserNameModel> simpleSearchWithRoleIds(
+        Collection<Long> roleIds,
+        Collection<String> keywords,
+        int limit
+    );
+
+    List<UserNameModel> simpleSearchWithRoleNames(
+        Collection<String> roleNames,
+        String keyword,
+        int limit
+    );
+
+    List<UserNameModel> simpleSearchWithRoleNames(
+        Collection<String> roleNames,
+        Collection<String> keywords,
+        int limit
+    );
 
     default long countActivatedUsers() {
         return countUsersByStatus(

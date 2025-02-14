@@ -324,6 +324,7 @@ public class DefaultUserService implements UserService {
         );
     }
 
+    @Override
     public List<UserNameModel> simpleSearch(
         String keyword,
         int limit
@@ -345,6 +346,7 @@ public class DefaultUserService implements UserService {
         );
     }
 
+    @Override
     public List<UserNameModel> simpleSearch(
         Collection<String> keywords,
         int limit
@@ -366,6 +368,7 @@ public class DefaultUserService implements UserService {
         );
     }
 
+    @Override
     public List<UserNameModel> simpleSearchWithRoleIds(
         Collection<Long> roleIds,
         String keyword,
@@ -381,6 +384,7 @@ public class DefaultUserService implements UserService {
         );
     }
 
+    @Override
     public List<UserNameModel> simpleSearchWithRoleIds(
         Collection<Long> roleIds,
         Collection<String> keywords,
@@ -396,6 +400,7 @@ public class DefaultUserService implements UserService {
         );
     }
 
+    @Override
     public List<UserNameModel> simpleSearchWithRoleNames(
         Collection<String> roleNames,
         String keyword,
@@ -411,6 +416,7 @@ public class DefaultUserService implements UserService {
         );
     }
 
+    @Override
     public List<UserNameModel> simpleSearchWithRoleNames(
         Collection<String> roleNames,
         Collection<String> keywords,
