@@ -114,6 +114,58 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public List<UserModel> getUserListByUsernames(
+        Collection<String> usernames
+    ) {
+        if (usernames.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return newArrayList(
+            userRepository.findByUsernameIn(usernames),
+            entityToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<UserModel> getUserListByPhones(
+        Collection<String> phones
+    ) {
+        if (phones.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return newArrayList(
+            userRepository.findByPhoneIn(phones),
+            entityToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<UserModel> getUserListByEmails(
+        Collection<String> emails
+    ) {
+        if (emails.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return newArrayList(
+            userRepository.findByEmailIn(emails),
+            entityToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<UserModel> getUserListByUuids(
+        Collection<String> uuids
+    ) {
+        if (uuids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return newArrayList(
+            userRepository.findByUuidIn(uuids),
+            entityToModelConverter::toModel
+        );
+    }
+
+    @Override
     public UserNameModel getUsernameById(long userId) {
         return resultToModelConverter.toUserNameModel(
             userRepository.findUserIdAndNameById(userId)

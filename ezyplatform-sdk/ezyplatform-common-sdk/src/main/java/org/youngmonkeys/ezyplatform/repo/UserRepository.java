@@ -114,6 +114,14 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
     )
     IdUuidNameResult findUserUuidNameByUuid(String uuid);
 
+    List<User> findByUsernameIn(Collection<String> usernames);
+
+    List<User> findByPhoneIn(Collection<String> phones);
+
+    List<User> findByEmailIn(Collection<String> emails);
+
+    List<User> findByUuidIn(Collection<String> uuid);
+
     @EzyQuery(
         "SELECT " +
             "DISTINCT(e.id) as id, " +

@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
 
@@ -45,6 +46,22 @@ public interface UserService {
 
     List<UserModel> getUserListByIds(
         Collection<Long> userIds
+    );
+
+    List<UserModel> getUserListByUsernames(
+        Collection<String> usernames
+    );
+
+    List<UserModel> getUserListByPhones(
+        Collection<String> phones
+    );
+
+    List<UserModel> getUserListByEmails(
+        Collection<String> emails
+    );
+
+    List<UserModel> getUserListByUuids(
+        Collection<String> uuids
     );
 
     long getUserIdByUsername(String username);
@@ -106,6 +123,62 @@ public interface UserService {
             getUserListByIds(userIds),
             UserModel::getId
         );
+    }
+
+    default Map<String, UserModel> getUserMapByUsernames(
+        Collection<String> usernames
+    ) {
+        return getUserListByUsernames(usernames)
+            .stream()
+            .filter(it -> it.getUsername() != null)
+            .collect(
+                Collectors.toMap(
+                    UserModel::getUsername,
+                    it -> it
+                )
+            );
+    }
+
+    default Map<String, UserModel> getUserMapByEmails(
+        Collection<String> emails
+    ) {
+        return getUserListByEmails(emails)
+            .stream()
+            .filter(it -> it.getEmail() != null)
+            .collect(
+                Collectors.toMap(
+                    UserModel::getEmail,
+                    it -> it
+                )
+            );
+    }
+
+    default Map<String, UserModel> getUserMapByPhones(
+        Collection<String> phones
+    ) {
+        return getUserListByPhones(phones)
+            .stream()
+            .filter(it -> it.getPhone() != null)
+            .collect(
+                Collectors.toMap(
+                    UserModel::getPhone,
+                    it -> it
+                )
+            );
+    }
+
+    default Map<String, UserModel> getUserMapByUuids(
+        Collection<String> uuids
+    ) {
+        return getUserListByUuids(uuids)
+            .stream()
+            .filter(it -> it.getUuid() != null)
+            .collect(
+                Collectors.toMap(
+                    UserModel::getUuid,
+                    it -> it
+                )
+            );
     }
 
     boolean containsUserById(long id);
