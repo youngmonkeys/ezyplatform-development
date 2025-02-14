@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,14 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.constant;
 
-import lombok.*;
+import javax.swing.text.html.HTML;
 
-@Getter
-@Builder
-public class ContentTemplateModel {
-    private long id;
-    private String type;
-    private String name;
-    private String titleTemplate;
-    private String contentTemplate;
-    private String contentType;
-    private long creatorId;
-    private String status;
-    private long createdAt;
-    private long updatedAt;
+public enum CommonContentType {
+    TEXT,
+    HTML,
+    MARKDOWN,
+    JSON,
+    JAVASCRIPT
 }

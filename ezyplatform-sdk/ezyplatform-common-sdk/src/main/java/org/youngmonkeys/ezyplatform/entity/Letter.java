@@ -42,6 +42,9 @@ public class Letter {
 
     private String content;
 
+    @Column(name = "content_type")
+    private String contentType;
+
     @Column(name = "from_admin_id")
     private long fromAdminId;
 

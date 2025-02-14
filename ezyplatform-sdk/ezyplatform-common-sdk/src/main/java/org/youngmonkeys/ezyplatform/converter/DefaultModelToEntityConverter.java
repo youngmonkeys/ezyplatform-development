@@ -72,6 +72,7 @@ public class DefaultModelToEntityConverter {
         Letter letter = new Letter();
         letter.setTitle(model.getTitle());
         letter.setContent(model.getContent());
+        letter.setContentType(model.getContentType());
         letter.setType(model.getType());
         letter.setFromAdminId(model.getFromAdminId());
         letter.setFromUserId(model.getFromUserId());
@@ -85,6 +86,7 @@ public class DefaultModelToEntityConverter {
         Notification notification = new Notification();
         notification.setTitle(model.getTitle());
         notification.setContent(model.getContent());
+        notification.setContentType(model.getContentType());
         notification.setIconImage(model.getIconImage());
         notification.setType(model.getType());
         notification.setFromAdminId(model.getFromAdminId());

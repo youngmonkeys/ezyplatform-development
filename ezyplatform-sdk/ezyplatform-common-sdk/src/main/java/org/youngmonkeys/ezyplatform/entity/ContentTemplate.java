@@ -47,6 +47,9 @@ public class ContentTemplate {
     @Column(name = "content_template")
     private String contentTemplate;
 
+    @Column(name = "content_type")
+    private String contentType;
+
     @Column(name = "creator_id")
     private long creatorId;
 

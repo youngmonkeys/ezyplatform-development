@@ -26,6 +26,7 @@ public class SimpleNotificationModel {
     private String type;
     private String title;
     private String content;
+    private String contentType;
     private String iconImage;
     private String deepLink;
     private long fromAdminId;

@@ -42,6 +42,9 @@ public class Notification {
 
     private String content;
 
+    @Column(name = "content_type")
+    private String contentType;
+
     @Column(name = "icon_image")
     private String iconImage;
 

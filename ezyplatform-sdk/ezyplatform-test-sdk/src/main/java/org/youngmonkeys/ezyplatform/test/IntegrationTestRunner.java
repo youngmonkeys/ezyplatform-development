@@ -42,7 +42,7 @@ public class IntegrationTestRunner {
         IntegrationTestRunner.class
     );
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "CallToPrintStackTrace"})
     public static void run(Class<?> bootstrapClass) throws Exception {
         EzyHttpApplication application = EzyHttpApplication
             .start(
@@ -56,31 +56,27 @@ public class IntegrationTestRunner {
             its.forEach(it -> {
                 String testName = it.getClass().getSimpleName();
                 LOGGER.info("Start integration test: {}", testName);
-                try {
-                    long startTime = System.currentTimeMillis();
-                    it.test();
-                    long endTime = System.currentTimeMillis();
-                    long elapsedTime = endTime - startTime;
-                    LOGGER.info(
-                        "Finish integration test: {}, elapsed time: {}ms ({}s)",
-                        testName,
-                        elapsedTime,
-                        BigDecimal
-                            .valueOf(elapsedTime)
-                            .divide(
-                                BigDecimal.valueOf(1000),
-                                3,
-                                RoundingMode.HALF_UP
-                            )
-                    );
-                } catch (Exception e) {
-                    LOGGER.info("Integration test: {} has failed", testName, e);
-                }
+                long startTime = System.currentTimeMillis();
+                it.test();
+                long endTime = System.currentTimeMillis();
+                long elapsedTime = endTime - startTime;
+                LOGGER.info(
+                    "Finish integration test: {}, elapsed time: {}ms ({}s)",
+                    testName,
+                    elapsedTime,
+                    BigDecimal
+                        .valueOf(elapsedTime)
+                        .divide(
+                            BigDecimal.valueOf(1000),
+                            3,
+                            RoundingMode.HALF_UP
+                        )
+                );
             });
             System.exit(0);
-        } catch (Exception e) {
-            LOGGER.info("Start integration error", e);
-            System.out.println(-1);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            System.exit(-1);
         }
     }
 }

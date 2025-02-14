@@ -28,6 +28,7 @@ public class AddLetterModel {
     private final String type;
     private final String title;
     private final String content;
+    private final String contentType;
     private final long fromAdminId;
     private final long fromUserId;
     private final long parentId;
@@ -43,6 +44,7 @@ public class AddLetterModel {
         this.type = builder.type;
         this.title = builder.title;
         this.content = builder.content;
+        this.contentType = builder.contentType;
         this.fromAdminId = builder.fromAdminId;
         this.fromUserId = builder.fromUserId;
         this.parentId = builder.parentId;
@@ -63,6 +65,7 @@ public class AddLetterModel {
         protected String type;
         protected String title;
         protected String content;
+        protected String contentType;
         protected long fromAdminId;
         protected long fromUserId;
         protected long parentId;
@@ -86,6 +89,11 @@ public class AddLetterModel {
 
         public Builder content(String content) {
             this.content = content;
+            return this;
+        }
+
+        public Builder contentType(String contentType) {
+            this.contentType = contentType;
             return this;
         }
 

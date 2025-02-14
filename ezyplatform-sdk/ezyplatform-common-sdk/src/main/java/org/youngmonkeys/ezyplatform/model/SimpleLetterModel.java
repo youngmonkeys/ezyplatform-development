@@ -26,6 +26,7 @@ public class SimpleLetterModel {
     private String type;
     private String title;
     private String content;
+    private String contentType;
     private long fromAdminId;
     private long fromUserId;
     private long parentId;

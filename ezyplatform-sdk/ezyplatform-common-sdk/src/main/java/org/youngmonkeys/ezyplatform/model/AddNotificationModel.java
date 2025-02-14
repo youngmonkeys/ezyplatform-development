@@ -17,7 +17,7 @@
 package org.youngmonkeys.ezyplatform.model;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import lombok.*;
+import lombok.Getter;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -28,6 +28,7 @@ public class AddNotificationModel {
     private final String type;
     private final String title;
     private final String content;
+    private final String contentType;
     private final String iconImage;
     private final String deepLink;
     private final long fromAdminId;
@@ -43,6 +44,7 @@ public class AddNotificationModel {
         this.type = builder.type;
         this.title = builder.title;
         this.content = builder.content;
+        this.contentType = builder.contentType;
         this.iconImage = builder.iconImage;
         this.deepLink = builder.deepLink;
         this.fromAdminId = builder.fromAdminId;
@@ -63,6 +65,7 @@ public class AddNotificationModel {
         protected String type;
         protected String title;
         protected String content;
+        protected String contentType;
         protected String iconImage;
         protected String deepLink;
         protected long fromAdminId;
@@ -86,6 +89,11 @@ public class AddNotificationModel {
 
         public Builder content(String content) {
             this.content = content;
+            return this;
+        }
+
+        public Builder contentType(String contentType) {
+            this.contentType = contentType;
             return this;
         }
 
