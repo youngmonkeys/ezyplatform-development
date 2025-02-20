@@ -33,6 +33,8 @@ import java.util.List;
 })
 @PropertiesSources({
     "config.properties",
+    "platform.properties",
+    "setup.properties",
     "settings/platform.properties",
     "settings/setup.properties"
 })
@@ -57,7 +59,14 @@ public class IntegrationTestRunner {
                 String testName = it.getClass().getSimpleName();
                 LOGGER.info("Start integration test: {}", testName);
                 long startTime = System.currentTimeMillis();
-                it.test();
+                try {
+                    it.test();
+                } catch (Exception e) {
+                    throw new RuntimeException(
+                        "Run integration test: " + testName + " failed",
+                        e
+                    );
+                }
                 long endTime = System.currentTimeMillis();
                 long elapsedTime = endTime - startTime;
                 LOGGER.info(

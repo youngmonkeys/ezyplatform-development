@@ -18,5 +18,5 @@ package org.youngmonkeys.ezyplatform.test;
 
 public interface IntegrationTest {
 
-    void test();
+    void test() throws Exception;
 }

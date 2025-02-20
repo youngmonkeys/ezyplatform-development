@@ -23,6 +23,22 @@ import org.youngmonkeys.ezyplatform.validator.DefaultValidator;
 public class DefaultValidatorTest {
 
     @Test
+    public void isValidEmailTest() {
+        Asserts.assertTrue(
+            DefaultValidator.isValidEmail("dung@youngmonkey.org")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidEmail("dung@youngmonkey.academy")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidEmail("dung@youngmonkey.aaacademy")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidEmail("dung@youngmonkey.aaaacademy")
+        );
+    }
+
+    @Test
     public void isValidPhoneTest() {
         Asserts.assertTrue(
             DefaultValidator.isValidUIntNumber("123")

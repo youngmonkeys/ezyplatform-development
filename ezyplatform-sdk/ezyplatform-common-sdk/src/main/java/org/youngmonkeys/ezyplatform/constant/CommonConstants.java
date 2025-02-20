@@ -44,7 +44,7 @@ public final class CommonConstants {
     public static final String PATTERN_DATE_TIME = "yyyy-MM-dd HH:mm:ss";
     public static final String PATTERN_TIME = "HH:mm:ss";
     public static final String PATTERN_USERNAME = "[a-zA-Z0-9_.-]{3,64}";
-    public static final String PATTERN_EMAIL = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$";
+    public static final String PATTERN_EMAIL = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,9}$";
     public static final String PATTERN_PHONE =
         "(^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$)|(^(\\+\\d{1,2})?[\\d]{6,15})";
     public static final String PATTERN_HTTP_URL =
