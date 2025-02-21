@@ -36,7 +36,7 @@ public class NumbersTest {
 
     @Test
     public void toLongOrZeroTest() {
-        Asserts.assertEquals(toLongOrZero(null), 0);
+        Asserts.assertEquals(toLongOrZero(null), 0L);
         Asserts.assertEquals(toLongOrZero("10"), 10L);
         Asserts.assertEquals(toLongOrZero("10a"), 0L);
     }
