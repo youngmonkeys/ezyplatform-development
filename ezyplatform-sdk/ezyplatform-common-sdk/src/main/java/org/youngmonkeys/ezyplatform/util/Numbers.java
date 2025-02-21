@@ -66,7 +66,7 @@ public final class Numbers {
 
     public static int toIntOrZero(String value) {
         try {
-            return Integer.parseInt(value);
+            return value != null ? Integer.parseInt(value) : 0;
         } catch (Exception e) {
             return 0;
         }
@@ -74,7 +74,7 @@ public final class Numbers {
 
     public static long toLongOrZero(String value) {
         try {
-            return Long.parseLong(value);
+            return value != null ? Long.parseLong(value) : 0L;
         } catch (Exception e) {
             return 0L;
         }
