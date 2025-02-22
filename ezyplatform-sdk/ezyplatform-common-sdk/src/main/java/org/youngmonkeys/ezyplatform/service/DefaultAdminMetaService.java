@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
+import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaTransactionalRepository;
 
@@ -233,6 +234,29 @@ public class DefaultAdminMetaService implements AdminMetaService {
             .collect(
                 Collectors.toMap(
                     AdminMeta::getAdminId,
+                    AdminMeta::getMetaValue,
+                    (o, n) -> n
+                )
+            );
+    }
+
+    @Override
+    public Map<String, String> getAdminMetaValueMapByAdminIdAndMetaKeys(
+        long adminId,
+        Collection<String> metaKeys
+    ) {
+        if (metaKeys.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return adminMetaRepository.findByAdminIdAndMetaKeyIn(
+                adminId,
+                metaKeys
+            )
+            .stream()
+            .filter(it -> it.getMetaValue() != null)
+            .collect(
+                Collectors.toMap(
+                    AdminMeta::getMetaKey,
                     AdminMeta::getMetaValue,
                     (o, n) -> n
                 )

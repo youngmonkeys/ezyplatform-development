@@ -20,6 +20,7 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
+import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 
 import java.util.Collection;
 import java.util.List;
@@ -70,5 +71,10 @@ public interface AdminMetaRepository
     List<AdminMeta> findByAdminIdInAndMetaKey(
         Collection<Long> adminIds,
         String metaKey
+    );
+
+    List<AdminMeta> findByAdminIdAndMetaKeyIn(
+        long adminId,
+        Collection<String> metaKeys
     );
 }

@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.util.EzyEntry;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -24,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
@@ -325,5 +327,37 @@ public interface DataMetaService {
             ),
             valueConverter
         );
+    }
+
+    Map<String, String> getDataMetaValueMapByDataIdAndMetaKeys(
+        String dataType,
+        long dataId,
+        Collection<String> metaKeys
+    );
+
+    default Map<String, String> getLatestMetaValueMapByDataIdAndMetaKeys(
+        String dataType,
+        long dataId,
+        Collection<String> metaKeys
+    ) {
+        return metaKeys
+            .parallelStream()
+            .map(it ->
+                EzyEntry.of(
+                    it,
+                    getLatestMetaValueByDataIdAndMetaKey(
+                        dataType,
+                        dataId,
+                        it
+                    )
+                )
+            )
+            .filter(it -> it.getValue() != null)
+            .collect(
+                Collectors.toMap(
+                    EzyEntry::getKey,
+                    EzyEntry::getValue
+                )
+            );
     }
 }

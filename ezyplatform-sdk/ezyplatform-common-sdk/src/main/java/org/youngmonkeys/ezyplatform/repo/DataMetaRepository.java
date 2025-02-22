@@ -21,6 +21,7 @@ import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.DataMeta;
 import org.youngmonkeys.ezyplatform.entity.DataMeta;
+import org.youngmonkeys.ezyplatform.entity.DataMeta;
 
 import java.util.Collection;
 import java.util.List;
@@ -81,5 +82,11 @@ public interface DataMetaRepository
         String dataType,
         Collection<Long> dataIds,
         String metaKey
+    );
+
+    List<DataMeta> findByDataTypeAndDataIdAndMetaKeyIn(
+        String dataType,
+        long dataId,
+        Collection<String> metaKeys
     );
 }

@@ -240,4 +240,27 @@ public class DefaultUserMetaService implements UserMetaService {
                 )
             );
     }
+
+    @Override
+    public Map<String, String> getUserMetaValueMapByUserIdAndMetaKeys(
+        long userId,
+        Collection<String> metaKeys
+    ) {
+        if (metaKeys.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return userMetaRepository.findByUserIdAndMetaKeyIn(
+                userId,
+                metaKeys
+            )
+            .stream()
+            .filter(it -> it.getMetaValue() != null)
+            .collect(
+                Collectors.toMap(
+                    UserMeta::getMetaKey,
+                    UserMeta::getMetaValue,
+                    (o, n) -> n
+                )
+            );
+    }
 }
