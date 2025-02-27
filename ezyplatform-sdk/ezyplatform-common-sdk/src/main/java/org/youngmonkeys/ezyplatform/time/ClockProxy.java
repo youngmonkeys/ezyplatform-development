@@ -32,7 +32,7 @@ public class ClockProxy {
     private final Clock clock;
     private final ZoneId zoneId;
 
-    public LocalDate newDate() {
+    public LocalDate nowDate() {
         return nowDateTime().toLocalDate();
     }
 

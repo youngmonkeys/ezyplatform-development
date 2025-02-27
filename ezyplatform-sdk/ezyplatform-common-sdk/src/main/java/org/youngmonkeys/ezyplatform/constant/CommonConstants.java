@@ -62,8 +62,6 @@ public final class CommonConstants {
     public static final String PATTERN_CONTRACT_ADDRESS = "[a-zA-Z0-9]{8,64}";
     public static final String PATTERN_WALLET_ADDRESS = "[a-zA-Z0-9]{8,64}";
 
-    public static final String PASSWORD_SALT = "$2a$10$48rTBuvOefj6u2o4IXJ3ve";
-
     public static final String PREFIX_HTTP_URL = "http://";
     public static final String PREFIX_HTTPS_URL = "https://";
 

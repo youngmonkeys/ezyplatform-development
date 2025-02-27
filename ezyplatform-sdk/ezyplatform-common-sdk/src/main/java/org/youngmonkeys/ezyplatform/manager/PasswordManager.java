@@ -16,17 +16,13 @@
 
 package org.youngmonkeys.ezyplatform.manager;
 
-import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyfox.security.BCrypt;
 import com.tvd12.ezyfox.util.EzyLoggable;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PASSWORD_SALT;
-
-@EzySingleton
 public class PasswordManager extends EzyLoggable {
 
     public String hashPassword(String password) {
-        return BCrypt.hashpw(password, PASSWORD_SALT);
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
     public boolean isMatchingPassword(
