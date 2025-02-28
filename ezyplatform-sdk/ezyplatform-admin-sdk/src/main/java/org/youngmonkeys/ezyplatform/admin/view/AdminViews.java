@@ -55,6 +55,8 @@ public final class AdminViews {
         String requestUri = request.getRequestURI();
         if (addCallbackUri
             && HttpMethod.GET.equalsValue(method)
+            && !requestUri.equals("/register")
+            && !requestUri.equals("/login")
             && !requestUri.equals("/logout")
         ) {
             String queryString = request.getQueryString();

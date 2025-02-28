@@ -108,7 +108,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(Collections.singletonMap("token", "invalid"))
                 .build();
         }
-        return WebViews.redirectToLogin(request);
+        return WebViews.redirectToLogin(request, true);
     }
 
     @TryCatch(UserAccessTokenExpiredException.class)
@@ -126,7 +126,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(Collections.singletonMap("token", "expired"))
                 .build();
         }
-        return WebViews.redirectToLogin(request);
+        return WebViews.redirectToLogin(request, true);
     }
 
     @TryCatch(IncorrectPasswordException.class)
