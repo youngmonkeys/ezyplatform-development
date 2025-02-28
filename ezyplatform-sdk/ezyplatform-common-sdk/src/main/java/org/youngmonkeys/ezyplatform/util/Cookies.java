@@ -16,26 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
-import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
-
 public final class Cookies {
 
     private Cookies() {}
-
-    public static String extractCookieDomain(String host) {
-        if (isBlank(host)) {
-            return EMPTY_STRING;
-        }
-        int dotCount = 0;
-        for (int i = host.length() - 1; i >= 0; --i) {
-            char ch = host.charAt(i);
-            if (ch == '.') {
-                if ((++dotCount) == 2) {
-                    return host.substring(i);
-                }
-            }
-        }
-        return host;
-    }
 }

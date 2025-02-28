@@ -16,27 +16,4 @@
 
 package org.youngmonkeys.ezyplatform.test.util;
 
-import com.tvd12.test.assertion.Asserts;
-import org.testng.annotations.Test;
-
-import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static org.youngmonkeys.ezyplatform.util.Cookies.extractCookieDomain;
-
-public class CookiesTest {
-
-    @Test
-    public void extractCookieDomainTest() {
-        Asserts.assertEquals(
-            extractCookieDomain(null),
-            EMPTY_STRING
-        );
-        Asserts.assertEquals(
-            extractCookieDomain("youngmonkeys.org"),
-            "youngmonkeys.org"
-        );
-        Asserts.assertEquals(
-            extractCookieDomain("v2.youngmonkeys.org"),
-            ".youngmonkeys.org"
-        );
-    }
-}
+public class CookiesTest {}
