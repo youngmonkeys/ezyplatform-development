@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,13 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
-import lombok.Builder;
-import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
+public interface AccessTokenModel {
 
-import java.time.LocalDateTime;
+    long getExpiredAtTimestamp();
 
-@Getter
-@Builder
-public class AdminAccessTokenModel
-    implements AccessTokenModel {
-    private long adminId;
-    private String accessToken;
-    private long renewalCount;
-    private AccessTokenStatus status;
-    private LocalDateTime createdAt;
-    private LocalDateTime expiredAt;
-    private long createdAtTimestamp;
-    private long expiredAtTimestamp;
+    default int getMaxAge() {
+        long now = System.currentTimeMillis();
+        long accessTokenExpiredAt = getExpiredAtTimestamp();
+        return (int) ((accessTokenExpiredAt - now) / 1000);
+    }
 }

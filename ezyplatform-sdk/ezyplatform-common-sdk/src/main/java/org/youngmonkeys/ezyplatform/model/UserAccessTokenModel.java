@@ -24,7 +24,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
-public class UserAccessTokenModel {
+public class UserAccessTokenModel
+    implements AccessTokenModel {
     private long userId;
     private String accessToken;
     private long renewalCount;
