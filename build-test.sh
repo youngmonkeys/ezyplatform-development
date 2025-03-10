@@ -14,6 +14,8 @@
  # limitations under the License.
 #
 
+set -e
+
 cd ezyplatform-devtools
 mvn clean install
 cd ..
