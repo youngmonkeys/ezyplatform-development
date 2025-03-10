@@ -21,15 +21,17 @@ import org.youngmonkeys.ezyplatform.model.KeywordsModel;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.pagination.DefaultUserFilter;
+import org.youngmonkeys.ezyplatform.pagination.UserPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.service.PaginationUserService;
 
-import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModel;
+import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModelBySortOrder;
 import static org.youngmonkeys.ezyplatform.util.StringConverters.trimOrNull;
 
 @AllArgsConstructor
 public class UserControllerService {
 
     private final PaginationUserService paginationUserService;
+    private final UserPaginationParameterConverter userPaginationParameterConverter;
 
     public PaginationModel<UserModel> getUserPagination(
         String keyword,
@@ -40,13 +42,37 @@ public class UserControllerService {
         boolean lastPage,
         int limit
     ) {
+        return getUserPagination(
+            keyword,
+            allowSearchUserByLikeOperator,
+            filterBuilder,
+            null,
+            nextPageToken,
+            prevPageToken,
+            lastPage,
+            limit
+        );
+    }
+
+    public PaginationModel<UserModel> getUserPagination(
+        String keyword,
+        boolean allowSearchUserByLikeOperator,
+        DefaultUserFilter.Builder<?> filterBuilder,
+        String sortOrder,
+        String nextPageToken,
+        String prevPageToken,
+        boolean lastPage,
+        int limit
+    ) {
         PaginationModel<UserModel> pagination =
             PaginationModel.emptyPagination();
         String nullableKeyword = trimOrNull(keyword);
         if (nullableKeyword == null) {
-            pagination = getPaginationModel(
+            pagination = getPaginationModelBySortOrder(
                 paginationUserService,
+                userPaginationParameterConverter,
                 filterBuilder.build(),
+                sortOrder,
                 nextPageToken,
                 prevPageToken,
                 lastPage,
@@ -54,11 +80,13 @@ public class UserControllerService {
             );
         }
         if (nullableKeyword != null) {
-            pagination = getPaginationModel(
+            pagination = getPaginationModelBySortOrder(
                 paginationUserService,
+                userPaginationParameterConverter,
                 filterBuilder
                     .uniqueKeyword(nullableKeyword)
                     .build(),
+                sortOrder,
                 nextPageToken,
                 prevPageToken,
                 lastPage,
@@ -69,13 +97,15 @@ public class UserControllerService {
                     keyword,
                     allowSearchUserByLikeOperator
                 );
-                pagination = getPaginationModel(
+                pagination = getPaginationModelBySortOrder(
                     paginationUserService,
+                    userPaginationParameterConverter,
                     filterBuilder
                         .uniqueKeyword(null)
                         .likeKeyword(keywords.getLikeKeyword())
                         .keywords(keywords.getKeywords())
                         .build(),
+                    sortOrder,
                     nextPageToken,
                     prevPageToken,
                     lastPage,

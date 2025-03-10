@@ -41,6 +41,14 @@ public class UserPaginationParameterConverter
             UserPaginationSortOrder.ID_DESC.toString(),
             IdDescUserPaginationParameter.class
         );
+        map.put(
+            UserPaginationSortOrder.USERNAME_ASC_ID_ASC.toString(),
+            UsernameAscIdAscUserPaginationParameter.class
+        );
+        map.put(
+            UserPaginationSortOrder.USERNAME_DESC_ID_DESC.toString(),
+            UsernameDescIdDescUserPaginationParameter.class
+        );
     }
 
     @Override
@@ -50,6 +58,20 @@ public class UserPaginationParameterConverter
         map.put(
             UserPaginationSortOrder.ID_DESC.toString(),
             model -> new IdDescUserPaginationParameter(
+                model.getId()
+            )
+        );
+        map.put(
+            UserPaginationSortOrder.USERNAME_ASC_ID_ASC.toString(),
+            model -> new UsernameAscIdAscUserPaginationParameter(
+                model.getUsername(),
+                model.getId()
+            )
+        );
+        map.put(
+            UserPaginationSortOrder.USERNAME_DESC_ID_DESC.toString(),
+            model -> new UsernameDescIdDescUserPaginationParameter(
+                model.getUsername(),
                 model.getId()
             )
         );

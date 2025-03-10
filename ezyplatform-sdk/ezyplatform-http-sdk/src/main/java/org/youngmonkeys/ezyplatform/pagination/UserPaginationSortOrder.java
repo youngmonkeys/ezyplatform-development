@@ -17,5 +17,7 @@
 package org.youngmonkeys.ezyplatform.pagination;
 
 public enum UserPaginationSortOrder {
-    ID_DESC
+    ID_DESC,
+    USERNAME_DESC_ID_DESC,
+    USERNAME_ASC_ID_ASC
 }
