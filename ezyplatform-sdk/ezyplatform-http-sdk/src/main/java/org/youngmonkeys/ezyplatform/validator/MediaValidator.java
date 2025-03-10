@@ -49,7 +49,7 @@ public class MediaValidator {
         if (!isValidMediaName(mediaName)) {
             errors.put("mediaName", "invalid");
         }
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             throw new HttpBadRequestException(errors);
         }
     }
@@ -58,7 +58,9 @@ public class MediaValidator {
         Part filePart,
         boolean avatar
     ) throws IOException {
+        long fileSize = 0L;
         String extension = null;
+        String mimeType = null;
         org.apache.tika.mime.MediaType mediaType = null;
         Map<String, String> errors = new HashMap<>();
         if (filePart == null) {
@@ -72,7 +74,8 @@ public class MediaValidator {
             if (EzyStrings.isNoContent(extension)) {
                 errors.put("fileType", "invalid");
             }
-            if (filePart.getSize() > settingService.getMaxUploadFileSize()) {
+            fileSize = filePart.getSize();
+            if (fileSize > settingService.getMaxUploadFileSize()) {
                 errors.put("uploadSize", "over");
             }
             try (TikaInputStream tikaInputStream =
@@ -83,9 +86,10 @@ public class MediaValidator {
                     new Metadata()
                 );
             }
+            mimeType = mediaType.toString();
             Set<String> acceptedMediaMimeTypes = settingService
                 .getAcceptedMediaMimeTypes();
-            if (!acceptedMediaMimeTypes.contains(mediaType.toString())
+            if (!acceptedMediaMimeTypes.contains(mimeType)
                 && !acceptedMediaMimeTypes.contains("*")) {
                 errors.put("fileType", "invalid");
             }
@@ -93,12 +97,12 @@ public class MediaValidator {
                 errors.put("fileType", "invalid");
             }
         }
-        if (errors.size() > 0) {
+        if (!errors.isEmpty()) {
             throw new HttpBadRequestException(errors);
         }
-        String mimeType = mediaType.toString();
         return FileMetadata.builder()
             .mimeType(mimeType)
+            .fileSize(fileSize)
             .extension(getExtensionOfMimeType(mimeType, extension))
             .mediaType(avatar ? AVATAR : ofMimeTypeName(mediaType.getType()))
             .build();

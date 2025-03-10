@@ -35,7 +35,8 @@ public class DataMetaTransactionalRepository
         String dataType,
         long dataId,
         String metaKey,
-        String metaValue
+        String metaValue,
+        String metaTextValue
     ) {
         EntityManager entityManager = databaseContext.createEntityManager();
         try {
@@ -62,6 +63,7 @@ public class DataMetaTransactionalRepository
                 }
                 entity.setMetaValue(metaValue);
                 entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+                entity.setMetaTextValue(metaTextValue);
                 entityManager.merge(entity);
                 transaction.commit();
             } catch (Exception e) {

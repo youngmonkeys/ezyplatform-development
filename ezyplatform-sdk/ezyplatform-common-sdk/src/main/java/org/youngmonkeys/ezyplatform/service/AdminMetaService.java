@@ -16,7 +16,9 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
+import com.tvd12.reflections.util.Predicates;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -25,11 +27,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
-import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 
+@SuppressWarnings("MethodCount")
 public interface AdminMetaService {
 
     void saveAdminMeta(
@@ -133,10 +136,24 @@ public interface AdminMetaService {
         );
     }
 
-    void saveAdminMetaUniqueKey(
+    default void saveAdminMetaUniqueKey(
         long adminId,
         String metaKey,
         String metaValue
+    ) {
+        saveAdminMetaUniqueKey(
+            adminId,
+            metaKey,
+            metaValue,
+            null
+        );
+    }
+
+    void saveAdminMetaUniqueKey(
+        long adminId,
+        String metaKey,
+        String metaValue,
+        String metaTextValue
     );
 
     default void saveAdminMetaUniqueKeys(
@@ -216,6 +233,28 @@ public interface AdminMetaService {
         return value != null ? value : defaultValue;
     }
 
+    String getMetaTextValueByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    );
+
+    String getLatestMetaTextValueByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    );
+
+    default String getMetaTextValueByAdminIdAndMetaKeyOrDefault(
+        long adminId,
+        String metaKey,
+        String defaultValue
+    ) {
+        String value = getMetaTextValueByAdminIdAndMetaKey(
+            adminId,
+            metaKey
+        );
+        return value != null ? value : defaultValue;
+    }
+
     default BigDecimal getMetaDecimalValueByAdminIdAndMetaKey(
         long adminId,
         String metaKey
@@ -272,18 +311,40 @@ public interface AdminMetaService {
         String metaKey
     );
 
-    default <V> Map<Long, V> getAdminMetaValueMapByAdminIds(
+    @SuppressWarnings("unchecked")
+    default  <T> Map<Long, T> getAdminMetaValueMapByAdminIds(
         Collection<Long> adminIds,
         String metaKey,
-        Function<String, V> valueConverter
+        Function<String, T> valueConverter
     ) {
-        return newHashMapNewValues(
-            getAdminMetaValueMapByAdminIds(
-                adminIds,
-                metaKey
-            ),
+        return getAdminMetaValueMapByAdminIds(
+            adminIds,
+            metaKey,
+            Predicates.alwaysTrue(),
             valueConverter
         );
+    }
+
+    default <T> Map<Long, T> getAdminMetaValueMapByAdminIds(
+        Collection<Long> adminIds,
+        String metaKey,
+        Predicate<String> valueFilter,
+        Function<String, T> valueConverter
+    ) {
+        return getAdminMetaValueMapByAdminIds(
+            adminIds,
+            metaKey
+        )
+            .entrySet()
+            .stream()
+            .filter(e -> e.getValue() != null)
+            .filter(e -> valueFilter.test(e.getValue()))
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> valueConverter.apply(e.getValue())
+                )
+            );
     }
 
     Map<String, String> getAdminMetaValueMapByAdminIdAndMetaKeys(
@@ -310,5 +371,34 @@ public interface AdminMetaService {
                     EzyEntry::getValue
                 )
             );
+    }
+
+    Map<Long, String> getAdminMetaTextValueMapByAdminIds(
+        Collection<Long> adminIds,
+        String metaKey
+    );
+
+    default Map<Long, BigDecimal> getAdminMetaBigDecimalValueMapByAdminIds(
+        Collection<Long> adminIds,
+        String metaKey
+    ) {
+        return getAdminMetaValueMapByAdminIds(
+            adminIds,
+            metaKey,
+            EzyStrings::isNotBlank,
+            BigDecimal::new
+        );
+    }
+
+    default Map<Long, BigInteger> getAdminMetaBigIntegerValueMapByAdminIds(
+        Collection<Long> adminIds,
+        String metaKey
+    ) {
+        return getAdminMetaValueMapByAdminIds(
+            adminIds,
+            metaKey,
+            EzyStrings::isNotBlank,
+            BigInteger::new
+        );
     }
 }

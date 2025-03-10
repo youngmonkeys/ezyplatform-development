@@ -34,7 +34,8 @@ public class AdminMetaTransactionalRepository
     public void saveAdminMetaUniqueKey(
         long adminId,
         String metaKey,
-        String metaValue
+        String metaValue,
+        String metaTextValue
     ) {
         EntityManager entityManager = databaseContext.createEntityManager();
         try {
@@ -58,6 +59,7 @@ public class AdminMetaTransactionalRepository
                 }
                 entity.setMetaValue(metaValue);
                 entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+                entity.setMetaTextValue(metaTextValue);
                 entityManager.merge(entity);
                 transaction.commit();
             } catch (Exception e) {

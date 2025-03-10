@@ -19,7 +19,6 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
-import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaTransactionalRepository;
 
@@ -77,12 +76,14 @@ public class DefaultAdminMetaService implements AdminMetaService {
     public void saveAdminMetaUniqueKey(
         long adminId,
         String metaKey,
-        String metaValue
+        String metaValue,
+        String metaTextValue
     ) {
         adminMetaTransactionalRepository.saveAdminMetaUniqueKey(
             adminId,
             metaKey,
-            metaValue
+            metaValue,
+            metaTextValue
         );
     }
 
@@ -165,6 +166,32 @@ public class DefaultAdminMetaService implements AdminMetaService {
     }
 
     @Override
+    public String getMetaTextValueByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    ) {
+        return adminMetaRepository.findByAdminIdAndMetaKey(
+                adminId,
+                metaKey
+            )
+            .map(AdminMeta::getMetaTextValue)
+            .orElse(null);
+    }
+
+    @Override
+    public String getLatestMetaTextValueByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    ) {
+        return adminMetaRepository.findByAdminIdAndMetaKeyOrderByIdDesc(
+                adminId,
+                metaKey
+            )
+            .map(AdminMeta::getMetaTextValue)
+            .orElse(null);
+    }
+
+    @Override
     public List<String> getMetaValuesByAdminIdAndMetaKey(
         long adminId,
         String metaKey,
@@ -186,6 +213,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
             adminId
         )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     AdminMeta::getMetaKey,
@@ -208,6 +236,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
                 metaValues
             )
             .stream()
+            .filter(it -> it.getMetaValue() != null)
             .collect(
                 Collectors.toMap(
                     AdminMeta::getMetaValue,
@@ -258,6 +287,29 @@ public class DefaultAdminMetaService implements AdminMetaService {
                 Collectors.toMap(
                     AdminMeta::getMetaKey,
                     AdminMeta::getMetaValue,
+                    (o, n) -> n
+                )
+            );
+    }
+
+    @Override
+    public Map<Long, String> getAdminMetaTextValueMapByAdminIds(
+        Collection<Long> adminIds,
+        String metaKey
+    ) {
+        if (adminIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return adminMetaRepository.findByAdminIdInAndMetaKey(
+                adminIds,
+                metaKey
+            )
+            .stream()
+            .filter(it -> it.getMetaTextValue() != null)
+            .collect(
+                Collectors.toMap(
+                    AdminMeta::getAdminId,
+                    AdminMeta::getMetaTextValue,
                     (o, n) -> n
                 )
             );

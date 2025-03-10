@@ -34,7 +34,8 @@ public class UserMetaTransactionalRepository
     public void saveUserMetaUniqueKey(
         long userId,
         String metaKey,
-        String metaValue
+        String metaValue,
+        String metaTextValue
     ) {
         EntityManager entityManager = databaseContext.createEntityManager();
         try {
@@ -58,6 +59,7 @@ public class UserMetaTransactionalRepository
                 }
                 entity.setMetaValue(metaValue);
                 entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+                entity.setMetaTextValue(metaTextValue);
                 entityManager.merge(entity);
                 transaction.commit();
             } catch (Exception e) {

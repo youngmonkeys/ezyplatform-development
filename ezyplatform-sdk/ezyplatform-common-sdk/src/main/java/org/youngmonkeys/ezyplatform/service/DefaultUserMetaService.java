@@ -76,12 +76,14 @@ public class DefaultUserMetaService implements UserMetaService {
     public void saveUserMetaUniqueKey(
         long userId,
         String metaKey,
-        String metaValue
+        String metaValue,
+        String metaTextValue
     ) {
         userMetaTransactionalRepository.saveUserMetaUniqueKey(
             userId,
             metaKey,
-            metaValue
+            metaValue,
+            metaTextValue
         );
     }
 
@@ -160,6 +162,32 @@ public class DefaultUserMetaService implements UserMetaService {
                 metaKey
             )
             .map(UserMeta::getMetaValue)
+            .orElse(null);
+    }
+
+    @Override
+    public String getMetaTextValueByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    ) {
+        return userMetaRepository.findByUserIdAndMetaKey(
+                userId,
+                metaKey
+            )
+            .map(UserMeta::getMetaTextValue)
+            .orElse(null);
+    }
+
+    @Override
+    public String getLatestMetaTextValueByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    ) {
+        return userMetaRepository.findByUserIdAndMetaKeyOrderByIdDesc(
+                userId,
+                metaKey
+            )
+            .map(UserMeta::getMetaTextValue)
             .orElse(null);
     }
 
@@ -259,6 +287,29 @@ public class DefaultUserMetaService implements UserMetaService {
                 Collectors.toMap(
                     UserMeta::getMetaKey,
                     UserMeta::getMetaValue,
+                    (o, n) -> n
+                )
+            );
+    }
+
+    @Override
+    public Map<Long, String> getUserMetaTextValueMapByUserIds(
+        Collection<Long> userIds,
+        String metaKey
+    ) {
+        if (userIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return userMetaRepository.findByUserIdInAndMetaKey(
+                userIds,
+                metaKey
+            )
+            .stream()
+            .filter(it -> it.getMetaTextValue() != null)
+            .collect(
+                Collectors.toMap(
+                    UserMeta::getUserId,
+                    UserMeta::getMetaTextValue,
                     (o, n) -> n
                 )
             );

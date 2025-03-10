@@ -16,7 +16,9 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
+import com.tvd12.reflections.util.Predicates;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -25,11 +27,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
-import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 
+@SuppressWarnings("MethodCount")
 public interface UserMetaService {
 
     void saveUserMeta(
@@ -133,10 +136,24 @@ public interface UserMetaService {
         );
     }
 
-    void saveUserMetaUniqueKey(
+    default void saveUserMetaUniqueKey(
         long userId,
         String metaKey,
         String metaValue
+    ) {
+        saveUserMetaUniqueKey(
+            userId,
+            metaKey,
+            metaValue,
+            null
+        );
+    }
+
+    void saveUserMetaUniqueKey(
+        long userId,
+        String metaKey,
+        String metaValue,
+        String metaTextValue
     );
 
     default void saveUserMetaUniqueKeys(
@@ -216,6 +233,28 @@ public interface UserMetaService {
         return value != null ? value : defaultValue;
     }
 
+    String getMetaTextValueByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    );
+
+    String getLatestMetaTextValueByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    );
+
+    default String getMetaTextValueByUserIdAndMetaKeyOrDefault(
+        long userId,
+        String metaKey,
+        String defaultValue
+    ) {
+        String value = getMetaTextValueByUserIdAndMetaKey(
+            userId,
+            metaKey
+        );
+        return value != null ? value : defaultValue;
+    }
+
     default BigDecimal getMetaDecimalValueByUserIdAndMetaKey(
         long userId,
         String metaKey
@@ -272,15 +311,40 @@ public interface UserMetaService {
         String metaKey
     );
 
-    default <V> Map<Long, V> getUserMetaValueMapByUserIds(
+    @SuppressWarnings("unchecked")
+    default  <T> Map<Long, T> getUserMetaValueMapByUserIds(
         Collection<Long> userIds,
         String metaKey,
-        Function<String, V> valueConverter
+        Function<String, T> valueConverter
     ) {
-        return newHashMapNewValues(
-            getUserMetaValueMapByUserIds(userIds, metaKey),
+        return getUserMetaValueMapByUserIds(
+            userIds,
+            metaKey,
+            Predicates.alwaysTrue(),
             valueConverter
         );
+    }
+
+    default <T> Map<Long, T> getUserMetaValueMapByUserIds(
+        Collection<Long> userIds,
+        String metaKey,
+        Predicate<String> valueFilter,
+        Function<String, T> valueConverter
+    ) {
+        return getUserMetaValueMapByUserIds(
+            userIds,
+            metaKey
+        )
+            .entrySet()
+            .stream()
+            .filter(e -> e.getValue() != null)
+            .filter(e -> valueFilter.test(e.getValue()))
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> valueConverter.apply(e.getValue())
+                )
+            );
     }
 
     Map<String, String> getUserMetaValueMapByUserIdAndMetaKeys(
@@ -307,5 +371,34 @@ public interface UserMetaService {
                     EzyEntry::getValue
                 )
             );
+    }
+
+    Map<Long, String> getUserMetaTextValueMapByUserIds(
+        Collection<Long> userIds,
+        String metaKey
+    );
+
+    default Map<Long, BigDecimal> getUserMetaBigDecimalValueMapByUserIds(
+        Collection<Long> userIds,
+        String metaKey
+    ) {
+        return getUserMetaValueMapByUserIds(
+            userIds,
+            metaKey,
+            EzyStrings::isNotBlank,
+            BigDecimal::new
+        );
+    }
+
+    default Map<Long, BigInteger> getUserMetaBigIntegerValueMapByUserIds(
+        Collection<Long> userIds,
+        String metaKey
+    ) {
+        return getUserMetaValueMapByUserIds(
+            userIds,
+            metaKey,
+            EzyStrings::isNotBlank,
+            BigInteger::new
+        );
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2024 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.data;
+package org.youngmonkeys.ezyplatform.event;
 
-import lombok.Builder;
-import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.MediaType;
+public class MediaUploadEventHandler
+    extends AbstractEventHandler<MediaUploadEvent, Void> {
 
-@Getter
-@Builder
-public class FileMetadata {
-    private final String mimeType;
-    private final String extension;
-    private final MediaType mediaType;
-    private final long fileSize;
+    @Override
+    public String getEventName() {
+        return MediaUploadEvent.class.getName();
+    }
 }

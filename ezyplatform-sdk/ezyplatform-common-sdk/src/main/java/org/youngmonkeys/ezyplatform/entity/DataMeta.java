@@ -51,4 +51,7 @@ public class DataMeta {
 
     @Column(name = "meta_number_value")
     private BigInteger metaNumberValue;
+
+    @Column(name = "meta_text_value")
+    private String metaTextValue;
 }

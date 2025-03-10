@@ -81,13 +81,15 @@ public class DefaultDataMetaService implements DataMetaService {
         String dataType,
         long dataId,
         String metaKey,
-        String metaValue
+        String metaValue,
+        String metaTextValue
     ) {
         dataMetaTransactionalRepository.saveDataMetaUniqueKey(
             dataType,
             dataId,
             metaKey,
-            metaValue
+            metaValue,
+            metaTextValue
         );
     }
 
@@ -178,6 +180,36 @@ public class DefaultDataMetaService implements DataMetaService {
             metaKey
         )
             .map(DataMeta::getMetaValue)
+            .orElse(null);
+    }
+
+    @Override
+    public String getMetaTextValueByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    ) {
+        return dataMetaRepository.findByDataTypeAndDataIdAndMetaKey(
+                dataType,
+                dataId,
+                metaKey
+            )
+            .map(DataMeta::getMetaTextValue)
+            .orElse(null);
+    }
+
+    @Override
+    public String getLatestMetaTextValueByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    ) {
+        return dataMetaRepository.findByDataTypeDataIdAndMetaKeyOrderByIdDesc(
+                dataType,
+                dataId,
+                metaKey
+            )
+            .map(DataMeta::getMetaTextValue)
             .orElse(null);
     }
 
@@ -289,6 +321,31 @@ public class DefaultDataMetaService implements DataMetaService {
                 Collectors.toMap(
                     DataMeta::getMetaKey,
                     DataMeta::getMetaValue,
+                    (o, n) -> n
+                )
+            );
+    }
+
+    @Override
+    public Map<Long, String> getDataMetaTextValueMapByDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey
+    ) {
+        if (dataIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dataMetaRepository.findByDataTypeAndDataIdInAndMetaKey(
+                dataType,
+                dataIds,
+                metaKey
+            )
+            .stream()
+            .filter(it -> it.getMetaTextValue() != null)
+            .collect(
+                Collectors.toMap(
+                    DataMeta::getDataId,
+                    DataMeta::getMetaTextValue,
                     (o, n) -> n
                 )
             );

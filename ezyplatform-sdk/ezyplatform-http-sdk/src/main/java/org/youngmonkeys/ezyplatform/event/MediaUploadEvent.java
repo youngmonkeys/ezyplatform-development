@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,17 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.data;
+package org.youngmonkeys.ezyplatform.event;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.MediaType;
+import org.youngmonkeys.ezyplatform.data.FileMetadata;
+import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 
 @Getter
-@Builder
-public class FileMetadata {
-    private final String mimeType;
-    private final String extension;
-    private final MediaType mediaType;
-    private final long fileSize;
+@AllArgsConstructor
+public class MediaUploadEvent {
+    private UploadFrom uploadFrom;
+    private long ownerId;
+    private FileMetadata fileMetadata;
 }

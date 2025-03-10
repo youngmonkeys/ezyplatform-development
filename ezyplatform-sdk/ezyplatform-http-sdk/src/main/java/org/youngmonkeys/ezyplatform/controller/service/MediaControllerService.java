@@ -129,6 +129,7 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
+    @SuppressWarnings("MethodLength")
     public void addMedia(
         HttpServletRequest request,
         HttpServletResponse response,
@@ -153,6 +154,13 @@ public class MediaControllerService extends EzyLoggable {
         FileMetadata fileMetadata = mediaValidator.validateFilePart(
             filePart,
             avatar
+        );
+        eventHandlerManager.handleEvent(
+            new MediaUploadEvent(
+                uploadFrom,
+                ownerId,
+                fileMetadata
+            )
         );
         //noinspection ConstantConditions
         String submittedFileName = filePart.getSubmittedFileName();

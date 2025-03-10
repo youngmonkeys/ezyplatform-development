@@ -16,7 +16,9 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
+import com.tvd12.reflections.util.Predicates;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -25,11 +27,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
-import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 
+@SuppressWarnings("MethodCount")
 public interface DataMetaService {
 
     void saveDataMeta(
@@ -148,11 +151,27 @@ public interface DataMetaService {
         );
     }
 
-    void saveDataMetaUniqueKey(
+    default void saveDataMetaUniqueKey(
         String dataType,
         long dataId,
         String metaKey,
         String metaValue
+    ) {
+        saveDataMetaUniqueKey(
+            dataType,
+            dataId,
+            metaKey,
+            metaValue,
+            null
+        );
+    }
+
+    void saveDataMetaUniqueKey(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue,
+        String metaTextValue
     );
 
     default void saveDataMetaUniqueKeys(
@@ -245,6 +264,32 @@ public interface DataMetaService {
         return value != null ? value : defaultValue;
     }
 
+    String getMetaTextValueByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    );
+
+    String getLatestMetaTextValueByDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    );
+
+    default String getMetaTextValueByDataIdAndMetaKeyOrDefault(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String defaultValue
+    ) {
+        String value = getMetaTextValueByDataIdAndMetaKey(
+            dataType,
+            dataId,
+            metaKey
+        );
+        return value != null ? value : defaultValue;
+    }
+
     default BigDecimal getMetaDecimalValueByDataIdAndMetaKey(
         String dataType,
         long dataId,
@@ -313,20 +358,44 @@ public interface DataMetaService {
         String metaKey
     );
 
-    default <V> Map<Long, V> getDataMetaValueMapByDataIds(
+    @SuppressWarnings("unchecked")
+    default  <T> Map<Long, T> getDataMetaValueMapByDataIds(
         String dataType,
         Collection<Long> dataIds,
         String metaKey,
-        Function<String, V> valueConverter
+        Function<String, T> valueConverter
     ) {
-        return newHashMapNewValues(
-            getDataMetaValueMapByDataIds(
-                dataType,
-                dataIds,
-                metaKey
-            ),
+        return getDataMetaValueMapByDataIds(
+            dataType,
+            dataIds,
+            metaKey,
+            Predicates.alwaysTrue(),
             valueConverter
         );
+    }
+
+    default <T> Map<Long, T> getDataMetaValueMapByDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        Predicate<String> valueFilter,
+        Function<String, T> valueConverter
+    ) {
+        return getDataMetaValueMapByDataIds(
+            dataType,
+            dataIds,
+            metaKey
+        )
+            .entrySet()
+            .stream()
+            .filter(e -> e.getValue() != null)
+            .filter(e -> valueFilter.test(e.getValue()))
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> valueConverter.apply(e.getValue())
+                )
+            );
     }
 
     Map<String, String> getDataMetaValueMapByDataIdAndMetaKeys(
@@ -359,5 +428,39 @@ public interface DataMetaService {
                     EzyEntry::getValue
                 )
             );
+    }
+
+    Map<Long, String> getDataMetaTextValueMapByDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey
+    );
+
+    default Map<Long, BigDecimal> getDataMetaBigDecimalValueMapByDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey
+    ) {
+        return getDataMetaValueMapByDataIds(
+            dataType,
+            dataIds,
+            metaKey,
+            EzyStrings::isNotBlank,
+            BigDecimal::new
+        );
+    }
+
+    default Map<Long, BigInteger> getDataMetaBigIntegerValueMapByDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey
+    ) {
+        return getDataMetaValueMapByDataIds(
+            dataType,
+            dataIds,
+            metaKey,
+            EzyStrings::isNotBlank,
+            BigInteger::new
+        );
     }
 }
