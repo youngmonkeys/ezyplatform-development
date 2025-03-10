@@ -20,7 +20,6 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
-import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 
 import java.util.Collection;
 import java.util.List;
