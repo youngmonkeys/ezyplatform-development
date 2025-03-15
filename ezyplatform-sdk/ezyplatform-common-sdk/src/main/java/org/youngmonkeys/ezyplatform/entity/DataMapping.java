@@ -19,7 +19,8 @@ package org.youngmonkeys.ezyplatform.entity;
 import lombok.*;
 
 import javax.persistence.*;
-
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_DATA_MAPPING;
@@ -44,6 +45,20 @@ public class DataMapping {
     @Id
     @Column(name = "to_data_id")
     private long toDataId;
+
+    @Column(name = "display_order")
+    private int displayOrder;
+
+    private BigInteger quantity;
+
+    @Column(name = "remaining_quantity")
+    private BigInteger remainingQuantity;
+
+    @Column(name = "decimal_data")
+    private BigDecimal decimalData;
+
+    @Column(name = "text_data")
+    private String textData;
 
     private String metadata;
 

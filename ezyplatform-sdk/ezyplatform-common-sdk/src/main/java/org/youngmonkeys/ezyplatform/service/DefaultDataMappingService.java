@@ -40,18 +40,25 @@ public class DefaultDataMappingService implements DataMappingService {
 
     @Override
     public void saveDataMapping(
+        SaveDataMappingModel model
+    ) {
+        dataMappingRepository.save(
+            modelToEntityConverter.toEntity(model)
+        );
+    }
+
+    @Override
+    public void saveDataMapping(
         String mappingName,
         long fromDataId,
         long toDataId
     ) {
-        dataMappingRepository.save(
-            modelToEntityConverter.toEntity(
-                SaveDataMappingModel.builder()
-                    .mappingName(mappingName)
-                    .fromDataId(fromDataId)
-                    .toDataId(toDataId)
-                    .build()
-            )
+        saveDataMapping(
+            SaveDataMappingModel.builder()
+                .mappingName(mappingName)
+                .fromDataId(fromDataId)
+                .toDataId(toDataId)
+                .build()
         );
     }
 

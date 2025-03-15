@@ -24,6 +24,8 @@ import org.youngmonkeys.ezyplatform.entity.*;
 import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -215,6 +217,23 @@ public class DefaultModelToEntityConverter {
         entity.setMappingName(model.getMappingName());
         entity.setFromDataId(model.getFromDataId());
         entity.setToDataId(model.getToDataId());
+        entity.setDisplayOrder(model.getDisplayOrder());
+        BigInteger quantity = model.getQuantity();
+        if (quantity == null) {
+            quantity = BigInteger.ZERO;
+        }
+        entity.setQuantity(quantity);
+        BigInteger remainingQuantity = model.getRemainingQuantity();
+        if (remainingQuantity == null) {
+            remainingQuantity = BigInteger.ZERO;
+        }
+        entity.setRemainingQuantity(remainingQuantity);
+        BigDecimal decimalData = model.getDecimalData();
+        if (decimalData == null) {
+            decimalData = BigDecimal.ZERO;
+        }
+        entity.setDecimalData(decimalData);
+        entity.setTextData(model.getTextData());
         entity.setMetadata(model.getMetadata());
         entity.setMappedAt(clock.nowDateTime());
         return entity;

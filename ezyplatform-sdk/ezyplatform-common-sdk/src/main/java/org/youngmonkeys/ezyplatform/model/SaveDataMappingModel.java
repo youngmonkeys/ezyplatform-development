@@ -19,11 +19,19 @@ package org.youngmonkeys.ezyplatform.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 @Getter
 @Builder
 public class SaveDataMappingModel {
     private String mappingName;
     private long fromDataId;
     private long toDataId;
+    private int displayOrder;
+    private BigInteger quantity;
+    private BigInteger remainingQuantity;
+    private BigDecimal decimalData;
+    private String textData;
     private String metadata;
 }

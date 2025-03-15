@@ -16,12 +16,11 @@
 
 package org.youngmonkeys.ezyplatform.constant;
 
-import javax.swing.text.html.HTML;
-
 public enum CommonContentType {
     TEXT,
     HTML,
     MARKDOWN,
     JSON,
-    JAVASCRIPT
+    JAVASCRIPT,
+    TEMPLATE
 }

@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.model.DataMappingModel;
+import org.youngmonkeys.ezyplatform.model.SaveDataMappingModel;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,6 +25,10 @@ import java.util.Map;
 import java.util.Set;
 
 public interface DataMappingService {
+
+    void saveDataMapping(
+        SaveDataMappingModel model
+    );
 
     void saveDataMapping(
         String mappingName,
