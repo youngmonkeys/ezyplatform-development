@@ -346,12 +346,19 @@ public class DefaultEntityToModelConverter {
         if (entity == null) {
             return null;
         }
+        LocalDateTime mappedAt = entity.getMappedAt();
         return DataMappingModel.builder()
             .mappingName(entity.getMappingName())
             .fromDataId(entity.getFromDataId())
             .toDataId(entity.getToDataId())
+            .displayOrder(entity.getDisplayOrder())
+            .quantity(entity.getQuantity())
+            .remainingQuantity(entity.getQuantity())
+            .decimalData(entity.getDecimalData())
+            .textData(entity.getTextData())
             .metadata(entity.getMetadata())
-            .mappedAt(toTimestamp(entity.getMappedAt()))
+            .mappedAt(toTimestamp(mappedAt))
+            .mappedAtLocalDataTime(mappedAt)
             .build();
     }
 

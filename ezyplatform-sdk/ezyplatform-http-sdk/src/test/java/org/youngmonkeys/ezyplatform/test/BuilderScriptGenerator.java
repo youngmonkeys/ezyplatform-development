@@ -14,27 +14,14 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.test;
 
-import lombok.Builder;
-import lombok.Getter;
+import com.tvd12.ezyfox.tool.EzyBuilderCreator;
+import org.youngmonkeys.ezyplatform.pagination.DefaultDataMappingFilter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDateTime;
-
-@Getter
-@Builder
-public class DataMappingModel {
-    private String mappingName;
-    private long fromDataId;
-    private long toDataId;
-    private int displayOrder;
-    private BigInteger quantity;
-    private BigInteger remainingQuantity;
-    private BigDecimal decimalData;
-    private String textData;
-    private String metadata;
-    private long mappedAt;
-    private LocalDateTime mappedAtLocalDataTime;
+public class BuilderScriptGenerator {
+    public static void main(String[] args) throws Exception {
+        EzyBuilderCreator creator = new EzyBuilderCreator();
+        System.out.println(creator.create(DefaultDataMappingFilter.class));
+    }
 }

@@ -14,27 +14,21 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.repo;
 
-import lombok.Builder;
-import lombok.Getter;
+import org.youngmonkeys.ezyplatform.entity.DataMapping;
+import org.youngmonkeys.ezyplatform.entity.DataMappingId;
+import org.youngmonkeys.ezyplatform.pagination.DataMappingFilter;
+import org.youngmonkeys.ezyplatform.pagination.DataMappingPaginationParameter;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.time.LocalDateTime;
+public class PaginationDataMappingRepository extends CommonPaginationRepository<
+    DataMappingFilter,
+    DataMappingPaginationParameter,
+    DataMappingId,
+    DataMapping> {
 
-@Getter
-@Builder
-public class DataMappingModel {
-    private String mappingName;
-    private long fromDataId;
-    private long toDataId;
-    private int displayOrder;
-    private BigInteger quantity;
-    private BigInteger remainingQuantity;
-    private BigDecimal decimalData;
-    private String textData;
-    private String metadata;
-    private long mappedAt;
-    private LocalDateTime mappedAtLocalDataTime;
+    @Override
+    protected Class<DataMapping> getEntityType() {
+        return DataMapping.class;
+    }
 }
