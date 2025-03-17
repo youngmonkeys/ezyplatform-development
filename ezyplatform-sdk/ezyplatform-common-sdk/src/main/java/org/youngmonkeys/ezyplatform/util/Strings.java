@@ -317,10 +317,10 @@ public final class Strings {
         }
         String[] strs = variableName.split("\\|\\|");
         String actualVariableName = strs[0];
-        Object value = parameters.getOrDefault(
-            actualVariableName,
-            EMPTY_STRING
-        );
+        Object value = parameters.get(actualVariableName);
+        if (value == null) {
+            value = EMPTY_STRING;
+        }
         String type = strs.length > 1 ? strs[1] : null;
         String format = strs.length > 2 ? strs[2] : null;
         String answer;
