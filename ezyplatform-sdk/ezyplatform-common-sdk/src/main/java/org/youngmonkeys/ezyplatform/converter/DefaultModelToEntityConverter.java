@@ -342,17 +342,15 @@ public class DefaultModelToEntityConverter {
         Collection<Long> fromDataIds,
         Long toDataId
     ) {
-        LocalDateTime now = clock.nowDateTime();
         return newArrayList(
             fromDataIds,
-            fromDataId -> {
-                DataMapping entity = new DataMapping();
-                entity.setMappingName(mappingName);
-                entity.setFromDataId(fromDataId);
-                entity.setToDataId(toDataId);
-                entity.setMappedAt(now);
-                return entity;
-            }
+            fromDataId -> toEntity(
+                SaveDataMappingModel.builder()
+                    .mappingName(mappingName)
+                    .fromDataId(fromDataId)
+                    .toDataId(toDataId)
+                    .build()
+            )
         );
     }
 
@@ -361,17 +359,15 @@ public class DefaultModelToEntityConverter {
         Long fromDataId,
         Collection<Long> toDataIds
     ) {
-        LocalDateTime now = clock.nowDateTime();
         return newArrayList(
             toDataIds,
-            toDataId -> {
-                DataMapping entity = new DataMapping();
-                entity.setMappingName(mappingName);
-                entity.setFromDataId(fromDataId);
-                entity.setToDataId(toDataId);
-                entity.setMappedAt(now);
-                return entity;
-            }
+            toDataId -> toEntity(
+                SaveDataMappingModel.builder()
+                    .mappingName(mappingName)
+                    .fromDataId(fromDataId)
+                    .toDataId(toDataId)
+                    .build()
+            )
         );
     }
 
@@ -379,17 +375,15 @@ public class DefaultModelToEntityConverter {
         String mappingName,
         Map<Long, Long> toDataIdByFromDataId
     ) {
-        LocalDateTime now = clock.nowDateTime();
         return newArrayList(
             toDataIdByFromDataId.entrySet(),
-            e -> {
-                DataMapping entity = new DataMapping();
-                entity.setMappingName(mappingName);
-                entity.setFromDataId(e.getKey());
-                entity.setToDataId(e.getValue());
-                entity.setMappedAt(now);
-                return entity;
-            }
+            e -> toEntity(
+                SaveDataMappingModel.builder()
+                    .mappingName(mappingName)
+                    .fromDataId(e.getKey())
+                    .toDataId(e.getValue())
+                    .build()
+            )
         );
     }
 
