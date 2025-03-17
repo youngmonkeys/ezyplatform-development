@@ -239,6 +239,18 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
+    public UniqueData toEntity(UniqueDataModel model) {
+        UniqueData entity = new UniqueData();
+        entity.setDataType(model.getDataType());
+        entity.setDataId(model.getDataId());
+        entity.setUniqueKey(model.getUniqueKey());
+        entity.setTextValue(model.getTextValue());
+        entity.setNumberValue(model.getNumberValue());
+        entity.setDecimalValue(model.getDecimalValue());
+        entity.setMetadata(model.getMetadata());
+        return entity;
+    }
+
     public Setting toSettingEntity(
         String name,
         DataType dataType,

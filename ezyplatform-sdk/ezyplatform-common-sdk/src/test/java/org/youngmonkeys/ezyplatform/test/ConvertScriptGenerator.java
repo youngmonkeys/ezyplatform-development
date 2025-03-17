@@ -17,17 +17,18 @@
 package org.youngmonkeys.ezyplatform.test;
 
 import com.tvd12.ezyfox.tool.EzySameObjectScriptCreator;
-import org.youngmonkeys.ezyplatform.model.NotificationModel;
+import org.youngmonkeys.ezyplatform.entity.UniqueData;
+import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
 
 public class ConvertScriptGenerator {
 
     public static void main(String[] args) {
         String script = new EzySameObjectScriptCreator()
-            .originClass(NotificationModel.class)
-            .originObjectName("model")
-            .targetClass(NotificationModel.class)
-            .targetObjectName("response")
-            .generateBuildScript();
+            .originClass(UniqueData.class)
+            .originObjectName("entity")
+            .targetClass(UniqueDataModel.class)
+            .targetObjectName("model")
+            .generateBuildFuncScript();
         System.out.println(script);
     }
 }

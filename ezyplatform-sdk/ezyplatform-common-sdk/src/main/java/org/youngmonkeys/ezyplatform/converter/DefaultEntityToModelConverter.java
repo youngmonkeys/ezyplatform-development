@@ -362,6 +362,21 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
+    public UniqueDataModel toModel(UniqueData entity) {
+        if (entity == null) {
+            return  null;
+        }
+        return UniqueDataModel.builder()
+            .dataType(entity.getDataType())
+            .dataId(entity.getDataId())
+            .uniqueKey(entity.getUniqueKey())
+            .textValue(entity.getTextValue())
+            .numberValue(entity.getNumberValue())
+            .decimalValue(entity.getDecimalValue())
+            .metadata(entity.getMetadata())
+            .build();
+    }
+
     public long toTimestamp(LocalDateTime localDateTime) {
         return LocalDateTimes.toTimestamp(localDateTime, zoneId);
     }

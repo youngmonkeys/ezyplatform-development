@@ -38,6 +38,7 @@ public final class CommonTableNames {
     public static final String TABLE_NAME_NOTIFICATION_RECEIVER = "ezy_notification_receivers";
     public static final String TABLE_NAME_ROLE_FEATURE = "ezy_role_features";
     public static final String TABLE_NAME_SETTING = "ezy_settings";
+    public static final String TABLE_NAME_UNIQUE_DATA = "ezy_unique_data";
     public static final String TABLE_NAME_USER = "ezy_users";
     public static final String TABLE_NAME_USER_ACCESS_TOKEN = "ezy_user_access_tokens";
     public static final String TABLE_NAME_USER_KEYWORD = "ezy_user_keywords";
