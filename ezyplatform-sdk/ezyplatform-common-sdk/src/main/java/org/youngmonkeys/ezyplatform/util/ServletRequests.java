@@ -42,12 +42,15 @@ public final class ServletRequests {
             ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         }
         if (isUnknownIp(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (isUnknownIp(ip)) {
             ip = requestDirectly ? request.getRemoteAddr() : UNKNOWN_IP;
         }
         return ip;
     }
     
     public static boolean isUnknownIp(String ip) {
-        return ip == null || ip.length() == 0 || UNKNOWN_IP.equalsIgnoreCase(ip);
+        return ip == null || ip.isEmpty() || UNKNOWN_IP.equalsIgnoreCase(ip);
     }
 }
