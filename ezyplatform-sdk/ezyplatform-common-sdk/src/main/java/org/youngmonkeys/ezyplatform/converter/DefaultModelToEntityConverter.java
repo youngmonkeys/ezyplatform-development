@@ -36,6 +36,8 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH;
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigDecimalOrZero;
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @AllArgsConstructor
 public class DefaultModelToEntityConverter {
@@ -244,9 +246,18 @@ public class DefaultModelToEntityConverter {
         entity.setDataType(model.getDataType());
         entity.setDataId(model.getDataId());
         entity.setUniqueKey(model.getUniqueKey());
-        entity.setTextValue(model.getTextValue());
-        entity.setNumberValue(model.getNumberValue());
-        entity.setDecimalValue(model.getDecimalValue());
+        String textValue = model.getTextValue();
+        entity.setTextValue(textValue);
+        BigInteger numberValue = model.getNumberValue();
+        if (numberValue == null) {
+            numberValue = toBigIntegerOrZero(textValue);
+        }
+        entity.setNumberValue(numberValue);
+        BigDecimal decimalValue = model.getDecimalValue();
+        if (decimalValue == null) {
+            decimalValue = toBigDecimalOrZero(textValue);
+        }
+        entity.setDecimalValue(decimalValue);
         entity.setMetadata(model.getMetadata());
         return entity;
     }

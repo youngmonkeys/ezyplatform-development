@@ -25,6 +25,7 @@ import com.tvd12.test.performance.Performance;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -282,6 +283,10 @@ public class StringsTest extends BaseTest {
             BigInteger.ONE
         );
         Asserts.assertEquals(
+            toBigIntegerOrZero("-1"),
+            new BigInteger("-1")
+        );
+        Asserts.assertEquals(
             toBigIntegerOrZero("1.1"),
             BigInteger.ZERO
         );
@@ -289,14 +294,76 @@ public class StringsTest extends BaseTest {
             toBigIntegerOrZero("true"),
             BigInteger.ZERO
         );
+        Asserts.assertEquals(
+            toBigIntegerOrZero("-"),
+            BigInteger.ZERO
+        );
+        Asserts.assertEquals(
+            toBigIntegerOrZero(null),
+            BigInteger.ZERO
+        );
+        Asserts.assertEquals(
+            toBigIntegerOrZero(""),
+            BigInteger.ZERO
+        );
+        Asserts.assertEquals(
+            toBigIntegerOrZero(" "),
+            BigInteger.ZERO
+        );
 
         //noinspection ResultOfMethodCallIgnored
         long time = Performance
             .create()
-            .loop(10000)
             .test(() -> toBigIntegerOrZero("hello world"))
             .getTime();
         System.out.println("toBigIntegerOrZero elapsed time: " + time);
+    }
+
+    @Test
+    public void toBigDecimalOrZeroTest() {
+        Asserts.assertEquals(
+            toBigDecimalOrZero("1"),
+            BigDecimal.ONE
+        );
+        Asserts.assertEquals(
+            toBigDecimalOrZero("-1"),
+            new BigDecimal("-1")
+        );
+        Asserts.assertEquals(
+            toBigDecimalOrZero("1.1"),
+            new BigDecimal("1.1")
+        );
+        Asserts.assertEquals(
+            toBigDecimalOrZero("true"),
+            BigDecimal.ZERO
+        );
+        Asserts.assertEquals(
+            toBigDecimalOrZero("-"),
+            BigDecimal.ZERO
+        );
+        Asserts.assertEquals(
+            toBigDecimalOrZero("1.1.1"),
+            BigDecimal.ZERO
+        );
+        Asserts.assertEquals(
+            toBigDecimalOrZero(null),
+            BigDecimal.ZERO
+        );
+        Asserts.assertEquals(
+            toBigDecimalOrZero(""),
+            BigDecimal.ZERO
+        );
+        Asserts.assertEquals(
+            toBigDecimalOrZero(" "),
+            BigDecimal.ZERO
+        );
+
+        //noinspection ResultOfMethodCallIgnored
+        long time = Performance
+            .create()
+            .test(() -> toBigDecimalOrZero("hello world"))
+            .getTime();
+        System.out.println("toBigDecimalOrZero elapsed time: " + time);
     }
 
     @Test
