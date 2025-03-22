@@ -1,4 +1,4 @@
-package ${basePackageName}.admin.repo;
+package ${basePackageName}.${moduleTypeLowercase}.repo;
 
 import com.tvd12.ezyfox.database.annotation.EzyRepository;
 import ${basePackageName}.repo.Pagination${entityClassName}Repository;

@@ -14,12 +14,12 @@
  * limitations under the License.
 */
 
-package ${basePackageName}.admin.service;
+package ${basePackageName}.${moduleTypeLowercase}.service;
 
 import com.tvd12.ezyhttp.server.core.annotation.Service;
-import ${basePackageName}.admin.converter.${moduleType}${moduleName}EntityToModelConverter;
-import ${basePackageName}.admin.pagination.${moduleType}${entityClassName}PaginationParameterConverter;
-import ${basePackageName}.admin.repo.${moduleType}Pagination${entityClassName}Repository;
+import ${basePackageName}.${moduleTypeLowercase}.converter.${moduleType}${moduleName}EntityToModelConverter;
+import ${basePackageName}.${moduleTypeLowercase}.pagination.${moduleType}${entityClassName}PaginationParameterConverter;
+import ${basePackageName}.${moduleTypeLowercase}.repo.${moduleType}Pagination${entityClassName}Repository;
 import ${basePackageName}.service.Pagination${entityClassName}Service;
 
 @Service

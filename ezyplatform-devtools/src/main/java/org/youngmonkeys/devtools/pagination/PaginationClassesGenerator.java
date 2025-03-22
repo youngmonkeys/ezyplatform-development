@@ -317,6 +317,7 @@ public class PaginationClassesGenerator {
             .replace("${entityClassName}", entityClassName)
             .replace("${tableName}", tableName)
             .replace("${moduleType}", moduleType)
+            .replace("${moduleTypeLowercase}", moduleType.toLowerCase())
             .replace("${moduleName}", moduleName);
         String moduleNameFull = projectName + "-" + moduleNameSuffix;
         Path folderPath = baseFolderPath.resolve(moduleNameFull);

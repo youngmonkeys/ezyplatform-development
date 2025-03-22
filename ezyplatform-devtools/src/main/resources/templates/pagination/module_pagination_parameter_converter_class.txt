@@ -1,8 +1,8 @@
-package ${basePackageName}.admin.pagination;
+package ${basePackageName}.${moduleTypeLowercase}.pagination;
 
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import ${basePackageName}.pagination.${entityClassName}PaginationParameterConverter;
-import org.youngmonkeys.ezyplatform.admin.pagination.${moduleType}PaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.${moduleTypeLowercase}.pagination.${moduleType}PaginationParameterConverter;
 
 @EzySingleton
 public class ${moduleType}${entityClassName}PaginationParameterConverter
