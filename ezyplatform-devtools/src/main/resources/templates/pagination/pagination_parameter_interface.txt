@@ -1,0 +1,6 @@
+package ${basePackageName}.pagination;
+
+import org.youngmonkeys.ezyplatform.pagination.CommonPaginationParameter;
+
+public interface ${entityClassName}PaginationParameter
+    extends CommonPaginationParameter {}

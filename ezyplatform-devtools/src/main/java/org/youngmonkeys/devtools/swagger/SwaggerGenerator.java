@@ -665,7 +665,7 @@ public class SwaggerGenerator {
 
         SwaggerTemplate() throws IOException {
             InputStream inputStream = new EzyAnywayInputStreamLoader()
-                .load("swagger-template.txt");
+                .load("templates/swagger.txt");
             List<String> lines = EzyInputStreams.toLines(inputStream);
             templateByName = new HashMap<>();
             String currentTemplateName;

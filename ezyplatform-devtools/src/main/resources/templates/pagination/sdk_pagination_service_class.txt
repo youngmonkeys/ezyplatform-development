@@ -1,0 +1,41 @@
+package ${basePackageName}.service;
+
+import ${basePackageName}.converter.${moduleName}EntityToModelConverter;
+import ${basePackageName}.entity.${entityClassName};
+import ${basePackageName}.model.${entityClassName}Model;
+import ${basePackageName}.pagination.${entityClassName}Filter;
+import ${basePackageName}.pagination.${entityClassName}PaginationParameter;
+import ${basePackageName}.pagination.${entityClassName}PaginationParameterConverter;
+import ${basePackageName}.pagination.IdDesc${entityClassName}PaginationParameter;
+import ${basePackageName}.repo.Pagination${entityClassName}Repository;
+import org.youngmonkeys.ezyplatform.service.CommonPaginationService;
+
+public class Pagination${entityClassName}Service extends CommonPaginationService<
+    ${entityClassName}Model,
+    ${entityClassName}Filter,
+    ${entityClassName}PaginationParameter,
+    Long,
+    ${entityClassName}> {
+
+    private final ${moduleName}EntityToModelConverter entityToModelConverter;
+
+    public Pagination${entityClassName}Service(
+        Pagination${entityClassName}Repository repository,
+        ${moduleName}EntityToModelConverter entityToModelConverter,
+        ${entityClassName}PaginationParameterConverter paginationParameterConverter
+    ) {
+        super(repository, paginationParameterConverter);
+        this.entityToModelConverter = entityToModelConverter;
+    }
+
+
+    @Override
+    protected ${entityClassName}Model convertEntity(${entityClassName} entity) {
+        return entityToModelConverter.toModel(entity);
+    }
+
+    @Override
+    protected ${entityClassName}PaginationParameter defaultPaginationParameter() {
+        return new IdDesc${entityClassName}PaginationParameter();
+    }
+}

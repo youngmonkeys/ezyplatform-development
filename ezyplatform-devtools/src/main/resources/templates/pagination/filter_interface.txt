@@ -1,0 +1,5 @@
+package ${basePackageName}.pagination;
+
+import org.youngmonkeys.ezyplatform.pagination.CommonStorageFilter;
+
+public interface ${entityClassName}Filter extends CommonStorageFilter {}

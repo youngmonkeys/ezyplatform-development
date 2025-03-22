@@ -1,0 +1,8 @@
+package ${basePackageName}.admin.repo;
+
+import com.tvd12.ezyfox.database.annotation.EzyRepository;
+import ${basePackageName}.repo.Pagination${entityClassName}Repository;
+
+@EzyRepository
+public class ${moduleType}Pagination${entityClassName}Repository
+    extends Pagination${entityClassName}Repository {}

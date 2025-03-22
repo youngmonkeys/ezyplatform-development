@@ -1,0 +1,6 @@
+package ${basePackageName}.pagination;
+
+public enum ${entityClassName}PaginationSortOrder {
+    ID_ASC,
+    ID_DESC
+}

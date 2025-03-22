@@ -1,0 +1,53 @@
+package ${basePackageName}.pagination;
+
+import ${basePackageName}.model.${entityClassName}Model;
+import org.youngmonkeys.ezyplatform.pagination.ComplexPaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.pagination.PaginationParameterConverter;
+
+import java.util.Map;
+import java.util.function.Function;
+
+public class ${entityClassName}PaginationParameterConverter
+    extends ComplexPaginationParameterConverter<
+        String,
+        ${entityClassName}Model
+    > {
+
+    public ${entityClassName}PaginationParameterConverter(
+        PaginationParameterConverter converter
+    ) {
+        super(converter);
+    }
+
+    @Override
+    protected void mapPaginationParametersToTypes(
+        Map<String, Class<?>> map
+    ) {
+        map.put(
+            ${entityClassName}PaginationSortOrder.ID_ASC.toString(),
+            IdAsc${entityClassName}PaginationParameter.class
+        );
+        map.put(
+            ${entityClassName}PaginationSortOrder.ID_DESC.toString(),
+            IdDesc${entityClassName}PaginationParameter.class
+        );
+    }
+
+    @Override
+    protected void addPaginationParameterExtractors(
+        Map<String, Function<${entityClassName}Model, Object>> map
+    ) {
+        map.put(
+            ${entityClassName}PaginationSortOrder.ID_ASC.toString(),
+            model -> new IdAsc${entityClassName}PaginationParameter(
+                model.getId()
+            )
+        );
+        map.put(
+            ${entityClassName}PaginationSortOrder.ID_DESC.toString(),
+            model -> new IdDesc${entityClassName}PaginationParameter(
+                model.getId()
+            )
+        );
+    }
+}

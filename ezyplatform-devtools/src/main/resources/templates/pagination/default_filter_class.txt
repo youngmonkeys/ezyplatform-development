@@ -1,0 +1,40 @@
+package ${basePackageName}.pagination;
+
+import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.util.Collection;
+
+@Getter
+@Builder
+public class Default${entityClassName}Filter implements ${entityClassName}Filter {
+    public final Collection<String> keywords;
+    public final String likeKeyword;
+
+    @Override
+    public void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {
+        if (keywords != null) {
+            queryString.append(" INNER JOIN DataIndex k ON e.id = k.dataId");
+        }
+    }
+
+    @Override
+    public String matchingCondition() {
+        EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
+        if (keywords != null) {
+            answer
+                .and("k.dataType = '${tableName}'")
+                .and("k.keyword IN :keywords");
+        }
+        if (likeKeyword != null) {
+            answer.and(
+                "(e.name LIKE CONCAT('%',:likeKeyword,'%') " +
+                    "OR e.displayName LIKE CONCAT('%',:likeKeyword,'%'))"
+            );
+        }
+        return answer.build();
+    }
+}

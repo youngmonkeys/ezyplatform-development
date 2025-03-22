@@ -1,0 +1,16 @@
+package ${basePackageName}.admin.pagination;
+
+import com.tvd12.ezyfox.bean.annotation.EzySingleton;
+import ${basePackageName}.pagination.${entityClassName}PaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.admin.pagination.${moduleType}PaginationParameterConverter;
+
+@EzySingleton
+public class ${moduleType}${entityClassName}PaginationParameterConverter
+    extends ${entityClassName}PaginationParameterConverter {
+
+    public ${moduleType}${entityClassName}PaginationParameterConverter(
+        ${moduleType}PaginationParameterConverter converter
+    ) {
+        super(converter);
+    }
+}

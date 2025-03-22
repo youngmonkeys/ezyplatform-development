@@ -1,0 +1,18 @@
+package ${basePackageName}.repo;
+
+import ${basePackageName}.entity.${entityClassName};
+import ${basePackageName}.pagination.${entityClassName}Filter;
+import ${basePackageName}.pagination.${entityClassName}PaginationParameter;
+import org.youngmonkeys.ezyplatform.repo.CommonPaginationRepository;
+
+public class Pagination${entityClassName}Repository extends CommonPaginationRepository<
+    ${entityClassName}Filter,
+    ${entityClassName}PaginationParameter,
+    Long,
+    ${entityClassName}> {
+
+    @Override
+    protected Class<${entityClassName}> getEntityType() {
+        return ${entityClassName}.class;
+    }
+}
