@@ -224,6 +224,24 @@ public class DefaultAdminMetaService implements AdminMetaService {
     }
 
     @Override
+    public Map<String, String> getAdminMetaTextValues(
+        long adminId
+    ) {
+        return adminMetaRepository.findByAdminId(
+                adminId
+            )
+            .stream()
+            .filter(it -> it.getMetaTextValue() != null)
+            .collect(
+                Collectors.toMap(
+                    AdminMeta::getMetaKey,
+                    AdminMeta::getMetaTextValue,
+                    (o, n) -> n
+                )
+            );
+    }
+
+    @Override
     public Map<String, Long> getAdminIdMapByMetaValues(
         String metaKey,
         Collection<String> metaValues

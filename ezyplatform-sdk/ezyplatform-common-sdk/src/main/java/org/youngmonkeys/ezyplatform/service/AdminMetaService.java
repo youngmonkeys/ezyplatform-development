@@ -26,11 +26,13 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 @SuppressWarnings("MethodCount")
 public interface AdminMetaService {
@@ -99,6 +101,7 @@ public interface AdminMetaService {
     ) {
         metaValues
             .parallelStream()
+            .filter(Objects::nonNull)
             .forEach(metaValue ->
                 saveAdminMetaIfAbsent(
                     adminId,
@@ -115,6 +118,7 @@ public interface AdminMetaService {
     ) {
         metaValues
             .parallelStream()
+            .filter(Objects::nonNull)
             .forEach(metaValue ->
                 saveAdminMetaIfAbsent(
                     adminId,
@@ -163,11 +167,30 @@ public interface AdminMetaService {
         valueMap
             .entrySet()
             .parallelStream()
+            .filter(e -> e.getValue() != null)
             .forEach(e ->
                 saveAdminMetaUniqueKey(
                     adminId,
                     e.getKey(),
                     e.getValue()
+                )
+            );
+    }
+
+    default void saveAdminMetaTexValueUniqueKeys(
+        long adminId,
+        Map<String, Object> valueMap
+    ) {
+        valueMap
+            .entrySet()
+            .parallelStream()
+            .filter(e -> e.getValue() != null)
+            .forEach(e ->
+                saveAdminMetaUniqueKey(
+                    adminId,
+                    e.getKey(),
+                    EMPTY_STRING,
+                    Strings.from(e.getValue())
                 )
             );
     }
@@ -300,6 +323,8 @@ public interface AdminMetaService {
     }
 
     Map<String, String> getAdminMetaValues(long adminId);
+
+    Map<String, String> getAdminMetaTextValues(long adminId);
 
     Map<String, Long> getAdminIdMapByMetaValues(
         String metaKey,

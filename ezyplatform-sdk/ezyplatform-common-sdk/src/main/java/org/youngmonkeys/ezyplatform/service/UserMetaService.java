@@ -26,11 +26,13 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 @SuppressWarnings("MethodCount")
 public interface UserMetaService {
@@ -115,6 +117,7 @@ public interface UserMetaService {
     ) {
         metaValues
             .parallelStream()
+            .filter(Objects::nonNull)
             .forEach(metaValue ->
                 saveUserMetaIfAbsent(
                     userId,
@@ -163,11 +166,30 @@ public interface UserMetaService {
         valueMap
             .entrySet()
             .parallelStream()
+            .filter(e -> e.getValue() != null)
             .forEach(e ->
                 saveUserMetaUniqueKey(
                     userId,
                     e.getKey(),
                     e.getValue()
+                )
+            );
+    }
+
+    default void saveUserMetaTextValueUniqueKeys(
+        long userId,
+        Map<String, Object> valueMap
+    ) {
+        valueMap
+            .entrySet()
+            .parallelStream()
+            .filter(e -> e.getValue() != null)
+            .forEach(e ->
+                saveUserMetaUniqueKey(
+                    userId,
+                    e.getKey(),
+                    EMPTY_STRING,
+                    Strings.from(e.getValue())
                 )
             );
     }
@@ -300,6 +322,8 @@ public interface UserMetaService {
     }
 
     Map<String, String> getUserMetaValues(long userId);
+
+    Map<String, String> getUserMetaTextValues(long userId);
 
     Map<String, Long> getUserIdMapByMetaValues(
         String metaKey,

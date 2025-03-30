@@ -224,6 +224,24 @@ public class DefaultUserMetaService implements UserMetaService {
     }
 
     @Override
+    public Map<String, String> getUserMetaTextValues(
+        long userId
+    ) {
+        return userMetaRepository.findByUserId(
+                userId
+            )
+            .stream()
+            .filter(it -> it.getMetaTextValue() != null)
+            .collect(
+                Collectors.toMap(
+                    UserMeta::getMetaKey,
+                    UserMeta::getMetaTextValue,
+                    (o, n) -> n
+                )
+            );
+    }
+
+    @Override
     public Map<String, Long> getUserIdMapByMetaValues(
         String metaKey,
         Collection<String> metaValues

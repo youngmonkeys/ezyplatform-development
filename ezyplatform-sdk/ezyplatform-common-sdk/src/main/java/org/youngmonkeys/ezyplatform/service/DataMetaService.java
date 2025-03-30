@@ -26,11 +26,13 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 @SuppressWarnings("MethodCount")
 public interface DataMetaService {
@@ -109,6 +111,7 @@ public interface DataMetaService {
     ) {
         metaValues
             .parallelStream()
+            .filter(Objects::nonNull)
             .forEach(metaValue ->
                 saveDataMetaIfAbsent(
                     dataType,
@@ -127,6 +130,7 @@ public interface DataMetaService {
     ) {
         metaValues
             .parallelStream()
+            .filter(Objects::nonNull)
             .forEach(metaValue ->
                 saveDataMetaIfAbsent(
                     dataType,
@@ -182,12 +186,33 @@ public interface DataMetaService {
         valueMap
             .entrySet()
             .parallelStream()
+            .filter(e -> e.getValue() != null)
             .forEach(e ->
                 saveDataMetaUniqueKey(
                     dataType,
                     dataId,
                     e.getKey(),
                     e.getValue()
+                )
+            );
+    }
+
+    default void saveDataMetaTextValueUniqueKeys(
+        String dataType,
+        long dataId,
+        Map<String, Object> valueMap
+    ) {
+        valueMap
+            .entrySet()
+            .parallelStream()
+            .filter(e -> e.getValue() != null)
+            .forEach(e ->
+                saveDataMetaUniqueKey(
+                    dataType,
+                    dataId,
+                    e.getKey(),
+                    EMPTY_STRING,
+                    Strings.from(e.getValue())
                 )
             );
     }
@@ -342,6 +367,11 @@ public interface DataMetaService {
     }
 
     Map<String, String> getDataMetaValues(
+        String dataType,
+        long dataId
+    );
+
+    Map<String, String> getDataMetaTextValues(
         String dataType,
         long dataId
     );
