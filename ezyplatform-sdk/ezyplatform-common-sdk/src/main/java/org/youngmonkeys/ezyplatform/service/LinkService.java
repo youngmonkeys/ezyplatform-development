@@ -23,6 +23,11 @@ public interface LinkService {
 
     void saveLink(SaveLinkModel model);
 
+    void updateLink(
+        long linkId,
+        SaveLinkModel model
+    );
+
     void removeLinkById(long linkId);
 
     void removeLinkByUri(String uri);

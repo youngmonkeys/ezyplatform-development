@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.Link;
+import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.model.LinkModel;
 import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
 import org.youngmonkeys.ezyplatform.repo.LinkRepository;
@@ -44,6 +45,16 @@ public class DefaultLinkService implements LinkService {
         } else {
             modelToEntityConverter.mergeToEntity(model, entity);
         }
+        linkRepository.save(entity);
+    }
+
+    @Override
+    public void updateLink(
+        long linkId,
+        SaveLinkModel model
+    ) {
+        Link entity = getLinkByIdEntityOrThrow(linkId);
+        modelToEntityConverter.mergeToEntity(model, entity);
         linkRepository.save(entity);
     }
 
@@ -106,5 +117,13 @@ public class DefaultLinkService implements LinkService {
                     mediaService.getMediaNameById(link.getImageId())
                 )
         );
+    }
+
+    protected Link getLinkByIdEntityOrThrow(long linkId) {
+        Link link = linkRepository.findById(linkId);
+        if (link == null) {
+            throw new ResourceNotFoundException("link");
+        }
+        return link;
     }
 }
