@@ -283,6 +283,12 @@ public final class Strings {
                         varName,
                         parameters
                     );
+                    if (isBlank(value)) {
+                        value = translateEmptyCheckTernaryOperatorIfNeed(
+                            varName,
+                            parameters
+                        );
+                    }
                     if (value.isEmpty()) {
                         if (builder.length() > 0) {
                             ch = builder.charAt(builder.length() - 1);
@@ -400,6 +406,49 @@ public final class Strings {
             answer = from(value).trim();
         }
         return answer;
+    }
+
+    public static String translateEmptyCheckTernaryOperatorIfNeed(
+        String expression,
+        Map<String, Object> parameters
+    ) {
+        if (isBlank(expression)) {
+            return EMPTY_STRING;
+        }
+        int questionIndex = expression.indexOf('?');
+        int colonIndex = expression.indexOf(':');
+        int length = expression.length();
+        if (questionIndex <= 0
+            || colonIndex <= questionIndex
+            || colonIndex >= length - 1
+        ) {
+            return EMPTY_STRING;
+        }
+        String variable = expression
+            .substring(0, questionIndex).trim();
+        String value = from(parameters.get(variable));
+        if (isBlank(value)) {
+            String falseVariable = expression.substring(
+                colonIndex + 1,
+                length
+            ).trim();
+            return from(
+                parameters.getOrDefault(
+                    falseVariable,
+                    falseVariable
+                )
+            );
+        }
+        String trueVariable = expression.substring(
+            questionIndex + 1,
+            colonIndex
+        ).trim();
+        return from(
+            parameters.getOrDefault(
+                trueVariable,
+                trueVariable
+            )
+        );
     }
 
     public static int indexOfTextInStringIgnoreCase(

@@ -311,7 +311,6 @@ public class StringsTest extends BaseTest {
             BigInteger.ZERO
         );
 
-        //noinspection ResultOfMethodCallIgnored
         long time = Performance
             .create()
             .test(() -> toBigIntegerOrZero("hello world"))
@@ -358,7 +357,6 @@ public class StringsTest extends BaseTest {
             BigDecimal.ZERO
         );
 
-        //noinspection ResultOfMethodCallIgnored
         long time = Performance
             .create()
             .test(() -> toBigDecimalOrZero("hello world"))
@@ -553,6 +551,28 @@ public class StringsTest extends BaseTest {
             ),
             ""
         );
+        Asserts.assertEquals(
+            fromTemplateAndParameters(
+                "hello ${vocative} ${who} 1\n2${vocative ? br : }3\t4 ${foo ? bar : x} 5 ${foo ?} 6",
+                EzyMapBuilder.mapBuilder()
+                    .put("vocative", "Mr")
+                    .put("who", "Dzung")
+                    .put("br", "\n")
+                    .toMap()
+            ),
+            "hello Mr Dzung 1\n2\n3\t4 x 5 6"
+        );
+        Asserts.assertEquals(
+            fromTemplateAndParameters(
+                "hello ${vocative} ${who} 1\n2${vocative ? [br] : }3\t4 ${foo ? bar : x} 5 ${foo ?} 6",
+                EzyMapBuilder.mapBuilder()
+                    .put("vocative", "Mr")
+                    .put("who", "Dzung")
+                    .put("[br]", "\n")
+                    .toMap()
+            ),
+            "hello Mr Dzung 1\n2\n3\t4 x 5 6"
+        );
     }
 
     @Test
@@ -676,5 +696,83 @@ public class StringsTest extends BaseTest {
         Asserts.assertEquals(index1, 0);
         Asserts.assertEquals(index2, 3);
         Asserts.assertEquals(index3, 18);
+    }
+
+    @Test
+    public void translateEmptyCheckTernaryOperatorIfNeedTest() {
+        String result1 = translateEmptyCheckTernaryOperatorIfNeed(
+            null,
+            EzyMapBuilder.mapBuilder()
+                .toMap()
+        );
+        Asserts.assertTrue(result1.isEmpty());
+
+        String result2 = translateEmptyCheckTernaryOperatorIfNeed(
+            "",
+            EzyMapBuilder.mapBuilder()
+                .toMap()
+        );
+        Asserts.assertTrue(result2.isEmpty());
+
+        String result3 = translateEmptyCheckTernaryOperatorIfNeed(
+            "hello",
+            EzyMapBuilder.mapBuilder()
+                .toMap()
+        );
+        Asserts.assertTrue(result3.isEmpty());
+
+        String result4 = translateEmptyCheckTernaryOperatorIfNeed(
+            "hello ? world",
+            EzyMapBuilder.mapBuilder()
+                .toMap()
+        );
+        Asserts.assertTrue(result4.isEmpty());
+
+        String result5 = translateEmptyCheckTernaryOperatorIfNeed(
+            "hello ? world :",
+            EzyMapBuilder.mapBuilder()
+                .toMap()
+        );
+        Asserts.assertTrue(result5.isEmpty());
+
+        String result6 = translateEmptyCheckTernaryOperatorIfNeed(
+            "hello : world ? abc",
+            EzyMapBuilder.mapBuilder()
+                .toMap()
+        );
+        Asserts.assertTrue(result6.isEmpty());
+
+        String result7 = translateEmptyCheckTernaryOperatorIfNeed(
+            "hello ? world : abc ",
+            EzyMapBuilder.mapBuilder()
+                .toMap()
+        );
+        Asserts.assertEquals(result7, "abc");
+
+        String result8 = translateEmptyCheckTernaryOperatorIfNeed(
+            "hello ? world : abc ",
+            EzyMapBuilder.mapBuilder()
+                .put("hello", "yes")
+                .toMap()
+        );
+        Asserts.assertEquals(result8, "world");
+
+        String result9 = translateEmptyCheckTernaryOperatorIfNeed(
+            "hello ? world : abc ",
+            EzyMapBuilder.mapBuilder()
+                .put("hello", "yes")
+                .put("world", "foo")
+                .toMap()
+        );
+        Asserts.assertEquals(result9, "foo");
+
+        String result10 = translateEmptyCheckTernaryOperatorIfNeed(
+            "hello ? world : abc ",
+            EzyMapBuilder.mapBuilder()
+                .put("hello", "")
+                .put("abc", "bar")
+                .toMap()
+        );
+        Asserts.assertEquals(result10, "bar");
     }
 }
