@@ -1,0 +1,34 @@
+package ${basePackageName}.admin.it.repo;
+
+import com.tvd12.ezyfox.bean.annotation.EzySingleton;
+import com.tvd12.test.assertion.Asserts;
+import lombok.AllArgsConstructor;
+import org.youngmonkeys.devtools.InstanceRandom;
+import ${basePackageName}.admin.repo.Admin${entityClassName}Repository;
+import org.youngmonkeys.ecommerce.entity.${entityClassName};
+import org.youngmonkeys.ezyplatform.test.IntegrationTest;
+
+@EzySingleton
+@AllArgsConstructor
+public class Admin${entityClassName}RepositoryIT implements IntegrationTest {
+
+    private final Admin${entityClassName}Repository ${entityVariableName}Repository;
+
+    @Override
+    public void test() throws Exception {
+        saveFindTest();
+    }
+
+    private void saveFindTest() {
+        // given
+        ${entityClassName} entity = new InstanceRandom().randomObject(${entityClassName}.class);
+
+        // when
+        ${entityVariableName}Repository.save(entity);
+        ${entityClassName} actual = ${entityVariableName}Repository.findById(entity.getId());
+
+        // then
+        Asserts.assertNotNull(actual);
+        ${entityVariableName}Repository.delete(entity.getId());
+    }
+}

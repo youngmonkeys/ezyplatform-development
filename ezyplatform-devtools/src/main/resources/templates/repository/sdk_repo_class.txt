@@ -1,0 +1,7 @@
+package ${basePackageName}.repo;
+
+import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import ${basePackageName}.entity.${entityClassName};
+${importIdClass}
+public interface ${entityClassName}Repository
+    extends EzyDatabaseRepository<${idClassName}, ${entityClassName}> {}

@@ -165,81 +165,63 @@ public class PaginationClassesGenerator {
             "sdk",
             "pagination",
             entityClassName + "Filter",
-            filterInterfaceTemplate,
-            entityClassName,
-            tableName
+            filterInterfaceTemplate
         );
         generatePaginationClass(
             EMPTY_STRING,
             "sdk",
             "pagination",
             "Default" + entityClassName + "Filter",
-            defaultFilterClassTemplate,
-            entityClassName,
-            tableName
+            defaultFilterClassTemplate
         );
         generatePaginationClass(
             EMPTY_STRING,
             "sdk",
             "pagination",
             entityClassName + "PaginationParameter",
-            paginationParameterInterfaceTemplate,
-            entityClassName,
-            tableName
+            paginationParameterInterfaceTemplate
         );
         generatePaginationClass(
             EMPTY_STRING,
             "sdk",
             "pagination",
             entityClassName + "PaginationParameterConverter",
-            paginationParameterConverterClassTemplate,
-            entityClassName,
-            tableName
+            paginationParameterConverterClassTemplate
         );
         generatePaginationClass(
             EMPTY_STRING,
             "sdk",
             "pagination",
             entityClassName + "PaginationSortOrder",
-            paginationSortOrderClassTemplate,
-            entityClassName,
-            tableName
+            paginationSortOrderClassTemplate
         );
         generatePaginationClass(
             EMPTY_STRING,
             "sdk",
             "pagination",
             "IdAsc" + entityClassName + "PaginationParameter",
-            idAscPaginationParameterClass,
-            entityClassName,
-            tableName
+            idAscPaginationParameterClass
         );
         generatePaginationClass(
             EMPTY_STRING,
             "sdk",
             "pagination",
             "IdDesc" + entityClassName + "PaginationParameter",
-            idDescPaginationParameterClass,
-            entityClassName,
-            tableName
+            idDescPaginationParameterClass
         );
         generatePaginationClass(
             EMPTY_STRING,
             "sdk",
             "repo",
             "Pagination" + entityClassName + "Repository",
-            sdkPaginationRepoClassTemplate,
-            entityClassName,
-            tableName
+            sdkPaginationRepoClassTemplate
         );
         generatePaginationClass(
             EMPTY_STRING,
             "sdk",
             "service",
             "Pagination" + entityClassName + "Service",
-            sdkPaginationServiceClassTemplate,
-            entityClassName,
-            tableName
+            sdkPaginationServiceClassTemplate
         );
 
         // admin
@@ -248,56 +230,44 @@ public class PaginationClassesGenerator {
             "admin-plugin",
             "pagination",
             "Admin" + entityClassName + "PaginationParameterConverter",
-            modulePaginationParameterConverterClassTemplate,
-            entityClassName,
-            tableName
+            modulePaginationParameterConverterClassTemplate
         );
         generatePaginationClass(
             "Admin",
             "admin-plugin",
             "repo",
             "AdminPagination" + entityClassName + "Repository",
-            modulePaginationRepoClassTemplate,
-            entityClassName,
-            tableName
+            modulePaginationRepoClassTemplate
         );
         generatePaginationClass(
             "Admin",
             "admin-plugin",
             "service",
             "AdminPagination" + entityClassName + "Service",
-            modulePaginationServiceClassTemplate,
-            entityClassName,
-            tableName
+            modulePaginationServiceClassTemplate
         );
 
-        // admin
+        // web
         generatePaginationClass(
             "Web",
             "web-plugin",
             "pagination",
             "Web" + entityClassName + "PaginationParameterConverter",
-            modulePaginationParameterConverterClassTemplate,
-            entityClassName,
-            tableName
+            modulePaginationParameterConverterClassTemplate
         );
         generatePaginationClass(
             "Web",
             "web-plugin",
             "repo",
             "WebPagination" + entityClassName + "Repository",
-            modulePaginationRepoClassTemplate,
-            entityClassName,
-            tableName
+            modulePaginationRepoClassTemplate
         );
         generatePaginationClass(
             "Web",
             "web-plugin",
             "service",
             "WebPagination" + entityClassName + "Service",
-            modulePaginationServiceClassTemplate,
-            entityClassName,
-            tableName
+            modulePaginationServiceClassTemplate
         );
     }
 
@@ -306,9 +276,7 @@ public class PaginationClassesGenerator {
         String moduleNameSuffix,
         String subPackageName,
         String className,
-        String template,
-        String entityClassName,
-        String tableName
+        String template
     ) throws IOException {
         String moduleName = toDisplayName(projectName)
             .replace(" ", "");
