@@ -72,9 +72,11 @@ public class PaginationClassesGenerator {
 
     private final String basePackageName;
     private final String entityClassName;
+    private final String entityVariableName;
     private final String tableName;
     private final String projectName;
     private final Path baseFolderPath;
+    private final String adminIntegrationTestClassTemplate;
     private final String defaultFilterClassTemplate;
     private final String filterInterfaceTemplate;
     private final String idAscPaginationParameterClass;
@@ -97,6 +99,9 @@ public class PaginationClassesGenerator {
             packageName.indexOf(".entity")
         );
         entityClassName = entityClass.getSimpleName();
+        entityVariableName = entityClassName
+            .substring(0, 1)
+            .toUpperCase() + entityClassName.substring(1);
         Table tableAnnotation = entityClass.getDeclaredAnnotation(
             Table.class
         );
@@ -110,6 +115,9 @@ public class PaginationClassesGenerator {
         }
         baseFolderPath = baseFolderPathTemp;
         projectName = baseFolderPath.getFileName().toString();
+        this.adminIntegrationTestClassTemplate = readTemplate(
+            "admin_integration_test_class.txt"
+        );
         this.defaultFilterClassTemplate = readTemplate(
             "default_filter_class.txt"
         );
@@ -246,6 +254,13 @@ public class PaginationClassesGenerator {
             "AdminPagination" + entityClassName + "Service",
             modulePaginationServiceClassTemplate
         );
+        generatePaginationClass(
+            "Admin",
+            "admin-plugin",
+            "it.service",
+            "AdminPagination" + entityClassName + "ServiceIT",
+            adminIntegrationTestClassTemplate
+        );
 
         // web
         generatePaginationClass(
@@ -283,6 +298,7 @@ public class PaginationClassesGenerator {
         String content = template
             .replace("${basePackageName}", basePackageName)
             .replace("${entityClassName}", entityClassName)
+            .replace("${entityVariableName}", entityVariableName)
             .replace("${tableName}", tableName)
             .replace("${moduleType}", moduleType)
             .replace("${moduleTypeLowercase}", moduleType.toLowerCase())
@@ -294,8 +310,14 @@ public class PaginationClassesGenerator {
                 "Module: " + moduleNameFull + " doest not exists"
             );
         }
+        String mainFolder = "main";
+        if (subPackageName.contains("it")
+            && className.endsWith("IT")
+        ) {
+            mainFolder = "test";
+        }
         Path sourcePath = folderPath.resolve(
-            Paths.get("src", "main", "java")
+            Paths.get("src", mainFolder, "java")
         );
         String packageName = basePackageName;
         if (isNotBlank(moduleType)) {

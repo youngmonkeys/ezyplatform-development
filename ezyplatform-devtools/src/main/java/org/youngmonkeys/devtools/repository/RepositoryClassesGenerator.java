@@ -184,9 +184,9 @@ public class RepositoryClassesGenerator {
             moduleRepositoryInterfaceTemplate
         );
         generateRepositoryClass(
-            EMPTY_STRING,
+            "Admin",
             "admin-plugin",
-            "admin.it.repo",
+            "it.repo",
             "Admin" + entityClassName + "RepositoryIT",
             adminIntegrationTestClassTemplate
         );

@@ -1,0 +1,100 @@
+package ${basePackageName}.admin.it.service;
+
+import com.tvd12.ezyfox.bean.annotation.EzySingleton;
+import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.util.RandomUtil;
+import lombok.AllArgsConstructor;
+import org.youngmonkeys.devtools.InstanceRandom;
+import ${basePackageName}.admin.repo.Admin${entityClassName}Repository;
+import ${basePackageName}.admin.pagination.Admin${entityClassName}PaginationParameterConverter;
+import ${basePackageName}.admin.service.AdminPagination${entityClassName}Service;
+import ${basePackageName}.entity.${entityClassName};
+import ${basePackageName}.model.${entityClassName}Model;
+import ${basePackageName}.pagination.Default${entityClassName}Filter;
+import ${basePackageName}.pagination.${entityClassName}Filter;
+import ${basePackageName}.pagination.${entityClassName}PaginationSortOrder;
+import org.youngmonkeys.ezyplatform.model.PaginationModel;
+import org.youngmonkeys.ezyplatform.test.IntegrationTest;
+
+import java.math.BigDecimal;
+
+import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModel;
+
+@EzySingleton
+@AllArgsConstructor
+public class AdminPagination${entityClassName}ServiceIT
+    extends EzyLoggable
+    implements IntegrationTest {
+
+private final Admin${entityClassName}Repository ${entityVariableName}Repository;
+    private final AdminPagination${entityClassName}Service pagination${entityClassName}Service;
+    private final Admin${entityClassName}PaginationParameterConverter
+        paginationParameterConverter;
+
+    @Override
+    public void test() {
+        get${entityClassName}sOrderByPriceAndIdAscTest();
+        get${entityClassName}sOrderByPriceAndIdDescTest();
+    }
+
+    public void get${entityClassName}OrderByPriceAndIdAscTest() {
+        // given
+        ${entityClassName}Filter filter = Default${entityClassName}Filter
+            .builder()
+            .build();
+        String actualNextPageToken = paginationParameterConverter
+            .getDefaultPageToken(
+                ${entityClassName}PaginationSortOrder
+                    .ID_ASC
+                    .toString()
+            );
+        int limit = RandomUtil.randomSmallInt() + 1;
+
+        // when
+        ${entityClassName} entity = new InstanceRandom().randomObject(${entityClassName}.class);
+        ${entityVariableName}Repository.save(entity);
+        PaginationModel<${entityClassName}Model> pagination = getPaginationModel(
+            pagination${entityClassName}Service,
+            filter,
+            actualNextPageToken,
+            null,
+            false,
+            limit
+        );
+
+        // then
+        Asserts.assertTrue(pagination.getCount() > 0);
+        ${entityVariableName}Repository.delete(entity.getId());
+    }
+
+    public void get${entityClassName}OrderByPriceAndIdDescTest() {
+        // given
+        ${entityClassName}Filter filter = Default${entityClassName}Filter
+            .builder()
+            .build();
+        String actualPrevPageToken = paginationParameterConverter
+            .getDefaultPageToken(
+                ${entityClassName}PaginationSortOrder
+                    .ID_DESC
+                    .toString()
+            );
+        int limit = RandomUtil.randomSmallInt() + 1;
+
+        // when
+        ${entityClassName} entity = new InstanceRandom().randomObject(${entityClassName}.class);
+        ${entityVariableName}Repository.save(entity);
+        PaginationModel<${entityClassName}Model> pagination = getPaginationModel(
+            pagination${entityClassName}Service,
+            filter,
+            actualPrevPageToken,
+            null,
+            false,
+            limit
+        );
+
+        // then
+        Asserts.assertTrue(pagination.getCount() > 0);
+        ${entityVariableName}Repository.delete(entity.getId());
+    }
+}
