@@ -45,6 +45,8 @@ import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.pagination.DefaultMediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
+import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
+import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
 import org.youngmonkeys.ezyplatform.service.MediaService;
@@ -201,10 +203,44 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
+    public MediaModel addMedia(
+        long ownerId,
+        AddMediaFromUrlRequest request,
+        boolean notPublic,
+        UploadFrom uploadFrom
+    ) {
+        mediaValidator.validate(request);
+        String mediaName = mediaService.generateMediaFileName(
+            request.getUrl(),
+            request.getType().toString().toLowerCase()
+        );
+        AddMediaModel model = requestToModelConverter.toModel(
+            ownerId,
+            mediaName,
+            request,
+            notPublic
+        );
+        MediaModel media = mediaService.addMedia(model, uploadFrom);
+        notifyMediaEvent(new MediaAddedEvent(media.getId()));
+        return media;
+    }
+
     public void updateMedia(
         long mediaId,
         UpdateMediaRequest request
     ) {
+        mediaValidator.validate(request);
+        UpdateMediaModel model = requestToModelConverter
+            .toModel(mediaId, request);
+        mediaService.updateMedia(model);
+        notifyMediaEvent(new MediaUpdatedEvent(model.getMediaId()));
+    }
+
+    public void updateMedia(
+        long mediaId,
+        UpdateMediaIncludeUrlRequest request
+    ) {
+        mediaValidator.validate(request);
         UpdateMediaModel model = requestToModelConverter
             .toModel(mediaId, request);
         mediaService.updateMedia(model);
@@ -426,6 +462,9 @@ public class MediaControllerService extends EzyLoggable {
                 }
             }
         }
+        if (size < 0) {
+            size = 0;
+        }
         return MediaDetailsModel.from(media)
             .width(width)
             .height(height)
@@ -548,7 +587,7 @@ public class MediaControllerService extends EzyLoggable {
         return objectMapper.writeValueAsString(model);
     }
 
-    private void notifyMediaEvent(Object event) {
+    protected void notifyMediaEvent(Object event) {
         try {
             eventHandlerManager.handleEvent(event);
         } catch (Throwable e) {

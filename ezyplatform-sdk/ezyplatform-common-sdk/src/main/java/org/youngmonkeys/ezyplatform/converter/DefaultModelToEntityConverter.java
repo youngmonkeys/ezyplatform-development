@@ -402,11 +402,17 @@ public class DefaultModelToEntityConverter {
         UpdateMediaModel model,
         Media entity
     ) {
+        if (model.isUpdateType()) {
+            entity.setType(model.getType());
+        }
         entity.setAlternativeText(model.getAlternativeText());
         entity.setTitle(model.getTitle());
         entity.setCaption(model.getCaption());
         entity.setDescription(model.getDescription());
         entity.setPublicMedia(!model.isNotPublic());
+        if (model.isUpdateUrl()) {
+            entity.setUrl(model.getUrl());
+        }
         entity.setUpdatedAt(clock.nowDateTime());
     }
 

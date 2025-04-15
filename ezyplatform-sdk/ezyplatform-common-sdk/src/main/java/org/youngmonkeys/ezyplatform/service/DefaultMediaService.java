@@ -29,19 +29,25 @@ import org.youngmonkeys.ezyplatform.io.ImageProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
+import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
+
 @AllArgsConstructor
 public class DefaultMediaService implements MediaService {
 
     private final FileSystemManager fileSystemManager;
+    private final UniqueDataService uniqueDataService;
     private final MediaRepository mediaRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultModelToEntityConverter modelToEntityConverter;
@@ -55,6 +61,10 @@ public class DefaultMediaService implements MediaService {
     public MediaModel addMedia(AddMediaModel model, UploadFrom uploadFrom) {
         Media entity = modelToEntityConverter.toEntity(model, uploadFrom);
         mediaRepository.save(entity);
+        long mediaId = entity.getId();
+        if (model.isSaveDuration()) {
+            saveMediaDuration(mediaId, model.getDurationInMinutes());
+        }
         return entityToModelConverter.toModel(entity);
     }
 
@@ -78,6 +88,21 @@ public class DefaultMediaService implements MediaService {
         }
         modelToEntityConverter.mergeToEntity(model, entity);
         mediaRepository.save(entity);
+        long mediaId = entity.getId();
+        if (model.isUpdateDuration()) {
+            saveMediaDuration(mediaId, model.getDurationInMinutes());
+        }
+    }
+
+    public void saveMediaDuration(long mediaId, BigDecimal duration) {
+        uniqueDataService.saveDataMeta(
+            UniqueDataModel.builder()
+                .dataType(TABLE_NAME_MEDIA)
+                .dataId(mediaId)
+                .uniqueKey(META_KEY_DURATION_IN_MINUTES)
+                .decimalValue(duration != null ? duration : BigDecimal.ZERO)
+                .build()
+        );
     }
 
     @Override

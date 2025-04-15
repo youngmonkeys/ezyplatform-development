@@ -16,10 +16,34 @@
 
 package org.youngmonkeys.ezyplatform.converter;
 
+import org.youngmonkeys.ezyplatform.model.AddMediaModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
+import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
+import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.UNKNOWN_LOWERCASE;
+
 public class HttpRequestToModelConverter {
+
+    public AddMediaModel toModel(
+        long ownerId,
+        String mediaName,
+        AddMediaFromUrlRequest request,
+        boolean notPublic
+    ) {
+        return AddMediaModel.builder()
+            .ownerId(ownerId)
+            .url(request.getUrl())
+            .fileName(mediaName)
+            .originalFileName(request.getOriginalName())
+            .mediaType(request.getType())
+            .mimeType(UNKNOWN_LOWERCASE)
+            .notPublic(notPublic)
+            .saveDuration(request.isSaveDuration())
+            .durationInMinutes(request.getDurationInMinutes())
+            .build();
+    }
 
     public UpdateMediaModel toModel(
         long mediaId,
@@ -48,6 +72,26 @@ public class HttpRequestToModelConverter {
             .caption(request.getCaption())
             .description(request.getDescription())
             .notPublic(request.isNotPublic())
+            .build();
+    }
+
+    public UpdateMediaModel toModel(
+        long mediaId,
+        UpdateMediaIncludeUrlRequest request
+    ) {
+        return UpdateMediaModel.builder()
+            .mediaId(mediaId)
+            .updateType(true)
+            .type(request.getType())
+            .alternativeText(request.getAlternativeText())
+            .title(request.getTitle())
+            .caption(request.getCaption())
+            .description(request.getDescription())
+            .notPublic(request.isNotPublic())
+            .updateUrl(true)
+            .url(request.getUrl())
+            .updateDuration(request.isUpdateDuration())
+            .durationInMinutes(request.getDurationInMinutes())
             .build();
     }
 }

@@ -24,19 +24,27 @@ import org.apache.tika.config.TikaConfig;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
+import org.youngmonkeys.ezyplatform.entity.MediaType;
+import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
+import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
+import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 
 import javax.servlet.http.Part;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.ezyhttp.core.constant.ContentType.getExtensionOfMimeType;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_ACCEPTED_IMAGE_TYPES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.entity.MediaType.AVATAR;
 import static org.youngmonkeys.ezyplatform.entity.MediaType.ofMimeTypeName;
 import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidMediaName;
+import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidUrl;
 
 @AllArgsConstructor
 public class MediaValidator {
@@ -106,5 +114,114 @@ public class MediaValidator {
             .extension(getExtensionOfMimeType(mimeType, extension))
             .mediaType(avatar ? AVATAR : ofMimeTypeName(mediaType.getType()))
             .build();
+    }
+
+    public void validate(AddMediaFromUrlRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        MediaType type = request.getType();
+        if (type == null) {
+            errors.put("type", "required");
+        }
+        String originalName = request.getOriginalName();
+        if (isBlank(originalName)) {
+            errors.put("originalName", "required");
+        } else if (originalName.length() > MAX_MEDIA_ORIGINAL_NAME_LENGTH) {
+            errors.put("originalName", "overLength");
+        }
+        String url = request.getUrl();
+        if (isBlank(url)) {
+            errors.put("url", "required");
+        } else if (url.length() > MAX_MEDIA_URL_LENGTH) {
+            errors.put("url", "overLength");
+        } else if (!isValidUrl(url)) {
+            errors.put("url", "invalid");
+        }
+        BigDecimal durationInMinutes = request.getDurationInMinutes();
+        if (durationInMinutes != null
+            && durationInMinutes.compareTo(BigDecimal.ZERO) < 0
+        ) {
+            errors.put("durationInMinutes", "invalid");
+        }
+        if (!errors.isEmpty()) {
+            throw new HttpBadRequestException(errors);
+        }
+    }
+
+    public void validate(UpdateMediaRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        String alternativeText = request.getAlternativeText();
+        if (alternativeText != null
+            && alternativeText.length() > MAX_MEDIA_ALT_TEXT_LENGTH
+        ) {
+            errors.put("alternativeText", "overLength");
+        }
+        String title = request.getTitle();
+        if (title != null
+            && title.length() > MAX_MEDIA_TITLE_LENGTH
+        ) {
+            errors.put("title", "overLength");
+        }
+        String caption = request.getCaption();
+        if (caption != null
+            && caption.length() > MAX_MEDIA_CAPTION_LENGTH
+        ) {
+            errors.put("caption", "overLength");
+        }
+        String description = request.getDescription();
+        if (description != null
+            && description.length() > MAX_MEDIA_DESCRIPTION_LENGTH
+        ) {
+            errors.put("description", "overLength");
+        }
+        if (!errors.isEmpty()) {
+            throw new HttpBadRequestException(errors);
+        }
+    }
+
+    public void validate(UpdateMediaIncludeUrlRequest request) {
+        Map<String, String> errors = new HashMap<>();
+        String alternativeText = request.getAlternativeText();
+        if (alternativeText != null
+            && alternativeText.length() > MAX_MEDIA_ALT_TEXT_LENGTH
+        ) {
+            errors.put("alternativeText", "overLength");
+        }
+        String title = request.getTitle();
+        if (title != null
+            && title.length() > MAX_MEDIA_TITLE_LENGTH
+        ) {
+            errors.put("title", "overLength");
+        }
+        String caption = request.getCaption();
+        if (caption != null
+            && caption.length() > MAX_MEDIA_CAPTION_LENGTH
+        ) {
+            errors.put("caption", "overLength");
+        }
+        String description = request.getDescription();
+        if (description != null
+            && description.length() > MAX_MEDIA_DESCRIPTION_LENGTH
+        ) {
+            errors.put("description", "overLength");
+        }
+        String url = request.getUrl();
+        if (isNotBlank(url)) {
+            if (url.length() > MAX_MEDIA_URL_LENGTH) {
+                errors.put("url", "overLength");
+            } else if (!isValidUrl(url)) {
+                errors.put("url", "invalid");
+            }
+        }
+        if (request.isUpdateDuration()) {
+            BigDecimal durationInMinutes = request.getDurationInMinutes();
+            if (durationInMinutes != null
+                && durationInMinutes.compareTo(BigDecimal.ZERO) < 0
+            ) {
+                errors.put("durationInMinutes", "invalid");
+            }
+        }
+        if (!errors.isEmpty()) {
+            throw new HttpBadRequestException(errors);
+        }
     }
 }

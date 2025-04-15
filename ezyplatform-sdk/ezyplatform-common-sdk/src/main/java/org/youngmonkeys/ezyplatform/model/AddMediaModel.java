@@ -20,6 +20,8 @@ import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 
+import java.math.BigDecimal;
+
 @Getter
 @Builder
 public class AddMediaModel {
@@ -30,4 +32,6 @@ public class AddMediaModel {
     private MediaType mediaType;
     private String mimeType;
     private boolean notPublic;
+    private boolean saveDuration;
+    private BigDecimal durationInMinutes;
 }

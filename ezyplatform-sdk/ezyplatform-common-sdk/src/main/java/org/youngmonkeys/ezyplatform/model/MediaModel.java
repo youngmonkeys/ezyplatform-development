@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
@@ -78,6 +79,7 @@ public class MediaModel {
             : mediaUrl;
     }
 
+    @JsonIgnore
     public String getUrlOrNull() {
         return getUrlOrDefault(null);
     }

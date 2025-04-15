@@ -14,28 +14,21 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.request;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 
 import java.math.BigDecimal;
 
 @Getter
-@Builder
-public class UpdateMediaModel {
-    private long mediaId;
-    private String mediaName;
-    private boolean updateType;
+@Setter
+public class AddMediaFromUrlRequest {
     private MediaType type;
-    private String alternativeText;
-    private String title;
-    private String caption;
-    private String description;
-    private boolean notPublic;
-    private boolean updateUrl;
+    private String originalName;
     private String url;
-    private boolean updateDuration;
+    private boolean saveDuration;
     private BigDecimal durationInMinutes;
+    private boolean notPublic;
 }
