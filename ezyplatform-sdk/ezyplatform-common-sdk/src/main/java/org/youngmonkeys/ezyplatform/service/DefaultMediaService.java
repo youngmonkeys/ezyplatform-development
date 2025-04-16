@@ -63,7 +63,7 @@ public class DefaultMediaService implements MediaService {
         mediaRepository.save(entity);
         long mediaId = entity.getId();
         if (model.isSaveDuration()) {
-            saveMediaDuration(mediaId, model.getDurationInMinutes());
+            saveMediaDurationInMinutes(mediaId, model.getDurationInMinutes());
         }
         return entityToModelConverter.toModel(entity);
     }
@@ -90,11 +90,12 @@ public class DefaultMediaService implements MediaService {
         mediaRepository.save(entity);
         long mediaId = entity.getId();
         if (model.isUpdateDuration()) {
-            saveMediaDuration(mediaId, model.getDurationInMinutes());
+            saveMediaDurationInMinutes(mediaId, model.getDurationInMinutes());
         }
     }
 
-    public void saveMediaDuration(long mediaId, BigDecimal duration) {
+    @Override
+    public void saveMediaDurationInMinutes(long mediaId, BigDecimal duration) {
         uniqueDataService.saveDataMeta(
             UniqueDataModel.builder()
                 .dataType(TABLE_NAME_MEDIA)

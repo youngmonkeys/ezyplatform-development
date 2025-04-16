@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.model.*;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,7 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
+@SuppressWarnings("MethodCount")
 public interface MediaService {
 
     MediaModel addMedia(AddMediaModel model);
@@ -57,6 +59,27 @@ public interface MediaService {
     void updateMediaOwner(
         long mediaId,
         long ownerUserId
+    );
+
+    default void saveMediaDurationInSeconds(
+        long mediaId,
+        BigDecimal duration
+    ) {
+        saveMediaDurationInMinutes(
+            mediaId,
+            duration != null
+                ? duration.divide(
+                    BigDecimal.valueOf(60),
+                2,
+                    RoundingMode.HALF_UP
+                )
+                : BigDecimal.ZERO
+        );
+    }
+
+    void saveMediaDurationInMinutes(
+        long mediaId,
+        BigDecimal duration
     );
 
     MediaModel removeMedia(long mediaId);
@@ -179,6 +202,29 @@ public interface MediaService {
         return isBlank(extension)
             ? uniqueFileName
             : uniqueFileName + "." + extension;
+    }
+
+    default BigDecimal getMediaDurationInSeconds(
+        long mediaId
+    ) {
+        BigDecimal minutes = getMediaDurationInMinutes(mediaId);
+        return minutes != null
+            ? minutes.multiply(BigDecimal.valueOf(60))
+            : BigDecimal.ZERO;
+    }
+
+    default Map<Long, BigDecimal> getMediaDurationInSecondsByIds(
+        Collection<Long> mediaIds
+    ) {
+        return getMediaDurationInMinutesByIds(mediaIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e.getValue().multiply(BigDecimal.valueOf(60))
+                )
+            );
     }
 
     BigDecimal getMediaDurationInMinutes(long mediaId);
