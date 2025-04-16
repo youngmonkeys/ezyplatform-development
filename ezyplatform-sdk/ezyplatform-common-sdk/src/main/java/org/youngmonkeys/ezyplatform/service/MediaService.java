@@ -24,6 +24,7 @@ import org.youngmonkeys.ezyplatform.model.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -179,4 +180,10 @@ public interface MediaService {
             ? uniqueFileName
             : uniqueFileName + "." + extension;
     }
+
+    BigDecimal getMediaDurationInMinutes(long mediaId);
+
+    Map<Long, BigDecimal> getMediaDurationInMinutesByIds(
+        Collection<Long> mediaIds
+    );
 }

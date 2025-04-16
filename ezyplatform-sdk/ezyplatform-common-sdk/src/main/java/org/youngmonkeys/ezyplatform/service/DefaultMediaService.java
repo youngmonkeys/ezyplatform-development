@@ -272,4 +272,27 @@ public class DefaultMediaService implements MediaService {
         }
         return ImageSize.ZERO;
     }
+
+    @Override
+    public BigDecimal getMediaDurationInMinutes(long mediaId) {
+        return uniqueDataService.getUniqueDataValueByDataTypeAndDataIdAndUniqueKey(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_DURATION_IN_MINUTES,
+            UniqueDataModel::getDecimalValue,
+            BigDecimal.ZERO
+        );
+    }
+
+    @Override
+    public Map<Long, BigDecimal> getMediaDurationInMinutesByIds(
+        Collection<Long> mediaIds
+    ) {
+        return uniqueDataService.getUniqueDataValueMapByDataTypeAndDataIdsAndUniqueKey(
+            TABLE_NAME_MEDIA,
+            mediaIds,
+            META_KEY_DURATION_IN_MINUTES,
+            UniqueDataModel::getDecimalValue
+        );
+    }
 }
