@@ -21,13 +21,17 @@ import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.UniqueData;
 import org.youngmonkeys.ezyplatform.entity.UniqueDataId;
+import org.youngmonkeys.ezyplatform.model.UniqueDataKeyValueModel;
 import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
 import org.youngmonkeys.ezyplatform.repo.UniqueDataRepository;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 
 @AllArgsConstructor
 @SuppressWarnings("LineLength")
@@ -43,6 +47,32 @@ public class DefaultUniqueDataService implements UniqueDataService {
         uniqueDataRepository.save(
             modelToEntityConverter.toEntity(model)
         );
+    }
+
+    @Override
+    public void saveDataMetaList(List<UniqueDataModel> models) {
+        List<UniqueData> entities = newArrayList(
+            models,
+            modelToEntityConverter::toEntity
+        );
+        uniqueDataRepository.save(entities);
+    }
+
+    @Override
+    public void saveDataMetaList(
+        String dataType,
+        long dataId,
+        List<UniqueDataKeyValueModel> models
+    ) {
+        List<UniqueData> entities = newArrayList(
+            models,
+            it -> modelToEntityConverter.toEntity(
+                dataType,
+                dataId,
+                it
+            )
+        );
+        uniqueDataRepository.save(entities);
     }
 
     @Override
