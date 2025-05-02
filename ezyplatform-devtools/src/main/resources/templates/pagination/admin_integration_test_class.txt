@@ -34,11 +34,11 @@ private final Admin${entityClassName}Repository ${entityVariableName}Repository;
 
     @Override
     public void test() {
-        get${entityClassName}sOrderByPriceAndIdAscTest();
-        get${entityClassName}sOrderByPriceAndIdDescTest();
+        get${entityClassName}OrderByIdAscTest();
+        get${entityClassName}OrderByIdDescTest();
     }
 
-    public void get${entityClassName}OrderByPriceAndIdAscTest() {
+    public void get${entityClassName}OrderByIdAscTest() {
         // given
         ${entityClassName}Filter filter = Default${entityClassName}Filter
             .builder()
@@ -68,7 +68,7 @@ private final Admin${entityClassName}Repository ${entityVariableName}Repository;
         ${entityVariableName}Repository.delete(entity.getId());
     }
 
-    public void get${entityClassName}OrderByPriceAndIdDescTest() {
+    public void get${entityClassName}OrderByIdDescTest() {
         // given
         ${entityClassName}Filter filter = Default${entityClassName}Filter
             .builder()
