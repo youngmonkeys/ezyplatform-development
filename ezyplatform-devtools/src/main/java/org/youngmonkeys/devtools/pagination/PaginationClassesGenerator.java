@@ -101,7 +101,7 @@ public class PaginationClassesGenerator {
         entityClassName = entityClass.getSimpleName();
         entityVariableName = entityClassName
             .substring(0, 1)
-            .toUpperCase() + entityClassName.substring(1);
+            .toLowerCase() + entityClassName.substring(1);
         Table tableAnnotation = entityClass.getDeclaredAnnotation(
             Table.class
         );

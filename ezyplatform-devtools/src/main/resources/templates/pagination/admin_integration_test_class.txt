@@ -17,8 +17,6 @@ import ${basePackageName}.pagination.${entityClassName}PaginationSortOrder;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.test.IntegrationTest;
 
-import java.math.BigDecimal;
-
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModel;
 
 @EzySingleton
@@ -27,7 +25,7 @@ public class AdminPagination${entityClassName}ServiceIT
     extends EzyLoggable
     implements IntegrationTest {
 
-private final Admin${entityClassName}Repository ${entityVariableName}Repository;
+    private final Admin${entityClassName}Repository ${entityVariableName}Repository;
     private final AdminPagination${entityClassName}Service pagination${entityClassName}Service;
     private final Admin${entityClassName}PaginationParameterConverter
         paginationParameterConverter;
