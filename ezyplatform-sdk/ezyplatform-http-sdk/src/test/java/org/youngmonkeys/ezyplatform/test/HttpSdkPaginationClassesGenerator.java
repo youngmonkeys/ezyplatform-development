@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,13 @@
 
 package org.youngmonkeys.ezyplatform.test;
 
-import com.tvd12.ezyfox.tool.EzyBuilderCreator;
-import org.youngmonkeys.ezyplatform.pagination.DefaultContentTemplateFilter;
+import org.youngmonkeys.devtools.pagination.PaginationClassesGenerator;
+import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
 
-public class BuilderScriptGenerator {
+public class HttpSdkPaginationClassesGenerator {
+
     public static void main(String[] args) throws Exception {
-        EzyBuilderCreator creator = new EzyBuilderCreator();
-        System.out.println(creator.create(DefaultContentTemplateFilter.class));
+        new PaginationClassesGenerator(ContentTemplate.class)
+            .generate();
     }
 }
