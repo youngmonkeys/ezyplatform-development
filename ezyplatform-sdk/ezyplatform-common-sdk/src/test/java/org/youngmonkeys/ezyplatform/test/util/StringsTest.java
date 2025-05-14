@@ -255,13 +255,13 @@ public class StringsTest extends BaseTest {
     @Test
     public void toDashLowerCaseWithoutSpecialCharactersTest() {
         // given
-        String str = "hello !\"#$%&'()*+,-./:;<=>?@[\\\\]^_`{|}~ world \t I'm\nhere";
+        String str = "hello !\"#$%&'()*+,-./:;<=>?@[\\\\]^_`{|}~ world \t I'm\nhere–hello";
 
         // when
         String actual = toLowerDashCaseWithoutSpecialCharacters(str);
 
         // then
-        Asserts.assertEquals(actual,"hello---world---im-here");
+        Asserts.assertEquals(actual,"hello-world-im-here-hello");
     }
 
     @Test
@@ -274,6 +274,18 @@ public class StringsTest extends BaseTest {
 
         // then
         Asserts.assertEquals(actual,"thong-bao-cap-nhat");
+    }
+
+    @Test
+    public void toDashLowerCaseWithoutSpecialCharactersFirstTest() {
+        // given
+        String str = "--Thong bao: Cap Nhat";
+
+        // when
+        String actual = toLowerDashCaseWithoutSpecialCharacters(str);
+
+        // then
+        Asserts.assertEquals(actual,"-thong-bao-cap-nhat");
     }
 
     @Test

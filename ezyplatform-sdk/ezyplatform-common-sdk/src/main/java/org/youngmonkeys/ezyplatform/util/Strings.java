@@ -154,8 +154,14 @@ public final class Strings {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < str.length(); ++i) {
             char ch = str.charAt(i);
-            if (ch == '-' || ch == ' ' || ch == '\t' || ch == '\n') {
-                builder.append('-');
+            if (ch == '-' || ch == ' ' || ch == '\t' || ch == '\n' || ch == '–') {
+                int builderLength = builder.length();
+                char prevCh = builderLength > 0
+                    ? builder.charAt(builderLength - 1)
+                    : 0;
+                if (prevCh != '-') {
+                    builder.append('-');
+                }
             } else if (SPECIAL_CHARACTERS.indexOf(ch) < 0) {
                 builder.append(Character.toLowerCase(ch));
             }
