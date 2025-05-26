@@ -18,9 +18,7 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import lombok.Getter;
 
-@Getter
 public class DefaultLetterReceiverFilter implements LetterReceiverFilter {
     public final Long toUserId;
     public final Long toAdminId;

@@ -18,10 +18,8 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 
-@Getter
 public class DefaultMediaFilter implements MediaFilter {
     public final MediaType type;
     public final Long ownerAdminId;

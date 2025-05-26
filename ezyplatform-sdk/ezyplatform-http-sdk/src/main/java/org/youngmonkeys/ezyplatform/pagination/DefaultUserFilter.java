@@ -18,11 +18,9 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import lombok.Getter;
 
 import java.util.Collection;
 
-@Getter
 public class DefaultUserFilter implements UserFilter {
     public final String status;
     public final Collection<String> statuses;

@@ -18,13 +18,11 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import lombok.Getter;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-@Getter
 public class DefaultDataIndexFilter implements DataIndexFilter {
     public final String dataType;
     public final Collection<String> keywords;

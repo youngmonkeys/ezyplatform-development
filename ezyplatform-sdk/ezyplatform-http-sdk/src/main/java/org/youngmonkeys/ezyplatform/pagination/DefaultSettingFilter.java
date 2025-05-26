@@ -18,10 +18,8 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.DataType;
 
-@Getter
 public class DefaultSettingFilter implements SettingFilter {
     public final DataType dataType;
     public final String likeKeyword;

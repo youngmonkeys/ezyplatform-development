@@ -18,12 +18,10 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.AdminStatus;
 
 import java.util.Collection;
 
-@Getter
 public class DefaultAdminFilter implements AdminFilter {
     public final Collection<Long> ids;
     public final AdminStatus status;
