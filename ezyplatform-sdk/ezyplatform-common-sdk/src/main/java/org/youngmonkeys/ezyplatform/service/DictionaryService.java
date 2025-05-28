@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import java.util.function.Predicate;
+
 import static org.youngmonkeys.ezyplatform.util.Strings.toLowerDashCaseWithoutSpecialCharacters;
 
 public interface DictionaryService {
@@ -34,6 +36,16 @@ public interface DictionaryService {
     ) {
         return toLowerDashCaseWithoutSpecialCharacters(
             translateToAsciiString(input)
+        );
+    }
+
+    default String translateToStringInDashCase(
+        String input,
+        Predicate<Character> characterFilter
+    ) {
+        return toLowerDashCaseWithoutSpecialCharacters(
+            translateToAsciiString(input),
+            characterFilter
         );
     }
 }

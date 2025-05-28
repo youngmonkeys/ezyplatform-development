@@ -289,6 +289,33 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void toDashLowerCaseWithoutSpecialCharactersDoubleQuoteTest() {
+        // given
+        String str = "Thong bao: \"Cap Nhat\"";
+
+        // when
+        String actual = toLowerDashCaseWithoutSpecialCharacters(str);
+
+        // then
+        Asserts.assertEquals(actual,"thong-bao-cap-nhat");
+    }
+
+    @Test
+    public void toDashLowerCaseWithoutSpecialCharactersWithFilterTest() {
+        // given
+        String str = "Thong bao: \"Cap Nhat\"";
+
+        // when
+        String actual = toLowerDashCaseWithoutSpecialCharacters(
+            str,
+            ch -> ch != 'n' && ch != 'N'
+        );
+
+        // then
+        Asserts.assertEquals(actual,"thog-bao-cap-hat");
+    }
+
+    @Test
     public void toBigIntegerOrZeroTest() {
         Asserts.assertEquals(
             toBigIntegerOrZero("1"),

@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.util;
 
 import com.tvd12.ezyfox.io.EzyDates;
+import com.tvd12.reflections.util.Predicates;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -25,6 +26,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import static com.tvd12.ezyfox.io.EzyStrings.*;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
@@ -148,8 +150,19 @@ public final class Strings {
         return isBlank(str) ? EMPTY_STRING : str;
     }
 
+    @SuppressWarnings("unchecked")
     public static String toLowerDashCaseWithoutSpecialCharacters(
         String str
+    ) {
+        return toLowerDashCaseWithoutSpecialCharacters(
+            str,
+            Predicates.alwaysTrue()
+        );
+    }
+
+    public static String toLowerDashCaseWithoutSpecialCharacters(
+        String str,
+        Predicate<Character> characterFilter
     ) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < str.length(); ++i) {
@@ -162,7 +175,9 @@ public final class Strings {
                 if (prevCh != '-') {
                     builder.append('-');
                 }
-            } else if (SPECIAL_CHARACTERS.indexOf(ch) < 0) {
+            } else if (SPECIAL_CHARACTERS.indexOf(ch) < 0
+                && characterFilter.test(ch)
+            ) {
                 builder.append(Character.toLowerCase(ch));
             }
         }
