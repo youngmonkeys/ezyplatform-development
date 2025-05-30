@@ -252,6 +252,7 @@ public class MediaControllerService extends EzyLoggable {
         String mediaName,
         UpdateMediaRequest request
     ) {
+        mediaValidator.validate(request);
         UpdateMediaModel model = requestToModelConverter
             .toModel(mediaName, request);
         mediaService.updateMedia(ownerId, model);
