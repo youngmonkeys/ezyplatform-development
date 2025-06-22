@@ -16,8 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.Undefined;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -56,9 +58,17 @@ public final class JavascriptExecutors {
         RoundingMode roundingMode
     ) {
         Object result = execute(script, parameters);
-        return result == null
-            ? null
-            : new BigDecimal(result.toString()).setScale(
+        if (result == null) {
+            return null;
+        }
+        if (result instanceof Undefined) {
+            return null;
+        }
+        String resultStr = result.toString();
+        if (EzyStrings.NULL.equals(resultStr)) {
+            return null;
+        }
+        return new BigDecimal(resultStr).setScale(
             bigDecimalScale,
             roundingMode
         );

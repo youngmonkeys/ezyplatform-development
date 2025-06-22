@@ -23,6 +23,7 @@ import org.youngmonkeys.ezyplatform.util.JavascriptExecutors;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Collections;
 import java.util.Map;
 
 public class JavascriptExecutorsTest {
@@ -87,5 +88,77 @@ public class JavascriptExecutorsTest {
         // then
         Asserts.assertEquals(result1, new BigDecimal("10.30"));
         Asserts.assertEquals(result2, new BigDecimal("11"));
+    }
+
+    @Test
+    public void executeReturnNothingTest() {
+        // given
+        String script = "";
+
+        // when
+        BigDecimal result = JavascriptExecutors
+            .execute(
+                script,
+                Collections.emptyMap(),
+                2,
+                RoundingMode.UP
+            );
+
+        // then
+        Asserts.assertNull(result);
+    }
+
+    @Test
+    public void executeReturnNullTest() {
+        // given
+        String script = "null";
+
+        // when
+        BigDecimal result = JavascriptExecutors
+            .execute(
+                script,
+                Collections.emptyMap(),
+                2,
+                RoundingMode.UP
+            );
+
+        // then
+        Asserts.assertNull(result);
+    }
+
+    @Test
+    public void executeReturnNullFuncTest() {
+        // given
+        String script = "function a() {return null;} a();";
+
+        // when
+        BigDecimal result = JavascriptExecutors
+            .execute(
+                script,
+                Collections.emptyMap(),
+                2,
+                RoundingMode.UP
+            );
+
+        // then
+        Asserts.assertNull(result);
+    }
+
+    @Test
+    public void executeReturnNullStrTest() {
+        // given
+        String script = "'null'";
+
+        // when
+        BigDecimal result = JavascriptExecutors
+            .execute(
+                script,
+                Collections.emptyMap(),
+                2,
+                RoundingMode.UP
+            );
+
+        // then
+        Asserts.assertNull(result);
     }
 }

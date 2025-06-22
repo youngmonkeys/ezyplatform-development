@@ -21,6 +21,7 @@ import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyfox.util.EzyThreads;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.base.BaseTest;
+import com.tvd12.test.reflect.FieldUtil;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.rx.*;
@@ -29,6 +30,7 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -518,7 +520,7 @@ public class ReactiveTest extends BaseTest {
     }
 
     @Test
-    public void blockingGetInteruptTest() {
+    public void blockingGetInterruptTest() {
         // given
         // when
         AtomicReference<Throwable> ref = new AtomicReference<>();
@@ -548,6 +550,133 @@ public class ReactiveTest extends BaseTest {
             ((RxException) e).getExceptions().get(0),
             InterruptedException.class
         );
+    }
+
+    @Test
+    public void useCallingThreadTest() throws InterruptedException {
+        // given
+        Reactive.Multiple multiple = Reactive.multiple();
+        int sum = 0;
+        for (int i = 0 ; i < 100; ++i) {
+            int finalI = i;
+            multiple.register(
+                String.valueOf(i),
+                () -> {
+                    Thread.sleep(50);
+                    return finalI;
+                }
+            );
+            sum += i;
+        }
+
+        // when
+        Map<String, Integer> map = multiple
+            .blockingGet(RxValueMap::typedValueMap);
+
+        // then
+        Asserts.assertEquals(map.size(), 100);
+        Asserts.assertEquals(
+            map.values().stream().reduce(0, Integer::sum),
+            sum
+        );
+        AtomicInteger busyThreads = FieldUtil.getStaticFieldValue(
+            Reactive.class,
+            "NUMBER_OF_BUSY_THREADS"
+        );
+        Thread.sleep(100);
+        Asserts.assertEquals(busyThreads.get(), 0);
+    }
+
+    @Test
+    public void useCallingThreadExceptionsTest() {
+        // given
+        Reactive.Multiple multiple = Reactive.multiple();
+        for (int i = 0 ; i < 100; ++i) {
+            multiple.register(
+                String.valueOf(i),
+                () -> {
+                    Thread.sleep(50);
+                    throw new IllegalStateException("test");
+                }
+            );
+        }
+
+        // when
+        Throwable throwable = Asserts.assertThrows(multiple::blockingGet);
+
+        // then
+        Asserts.assertEqualsType(
+            throwable,
+            RxException.class
+        );
+    }
+
+    @Test
+    public void registerSimpleTest() throws InterruptedException {
+        // given
+        Reactive.Multiple multiple = Reactive.multiple();
+        int sum = 0;
+        for (int i = 0 ; i < 100; ++i) {
+            int finalI = i;
+            multiple.register(
+                () -> {
+                    Thread.sleep(50);
+                    return finalI;
+                }
+            );
+            sum += i;
+        }
+
+        // when
+        List<Integer> valueList = multiple
+            .blockingGet(RxValueMap::valueList);
+
+        // then
+        Asserts.assertEquals(valueList.size(), 100);
+        Asserts.assertEquals(
+            valueList.stream().reduce(0, Integer::sum),
+            sum
+        );
+        AtomicInteger busyThreads = FieldUtil.getStaticFieldValue(
+            Reactive.class,
+            "NUMBER_OF_BUSY_THREADS"
+        );
+        Thread.sleep(50);
+        Asserts.assertEquals(busyThreads.get(), 0);
+    }
+
+    @Test
+    public void registerOperationExceptionsTest() {
+        // given
+        Reactive.Multiple multiple = Reactive.multiple();
+        for (int i = 0 ; i < 100; ++i) {
+            multiple.registerOperation(
+                () -> {
+                    Thread.sleep(50);
+                    throw new IllegalStateException("test");
+                }
+            );
+        }
+
+        // when
+        Throwable throwable = Asserts.assertThrows(multiple::blockingGet);
+
+        // then
+        Asserts.assertEqualsType(
+            throwable,
+            RxException.class
+        );
+    }
+
+    @Test
+    public void registerRxNullTest() {
+        // given
+        Reactive.Multiple multiple = Reactive.multiple()
+            .registerRx("test", null);
+
+        // when
+        // then
+        multiple.blockingExecute();
     }
 
     @Test

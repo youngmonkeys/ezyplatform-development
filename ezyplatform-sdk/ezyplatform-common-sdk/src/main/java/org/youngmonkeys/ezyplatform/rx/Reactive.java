@@ -22,6 +22,7 @@ import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -29,10 +30,14 @@ public final class Reactive {
 
     private static ExecutorService executorService;
     private static final int DEFAULT_TIMEOUT_SECONDS = 15;
+    private static final int NUMBER_OF_THREADS =
+        Runtime.getRuntime().availableProcessors() * 4;
+    private static final AtomicInteger NUMBER_OF_BUSY_THREADS =
+        new AtomicInteger();
 
     static {
         executorService = EzyExecutors.newFixedThreadPool(
-            Runtime.getRuntime().availableProcessors() * 4,
+            NUMBER_OF_THREADS,
             "reactive"
         );
     }
@@ -346,19 +351,20 @@ public final class Reactive {
             List<Exception> exceptions = new CopyOnWriteArrayList<>();
             CountDownLatch countDown = new CountDownLatch(flattenTasks.size());
             for (InternalTask task : flattenTasks) {
-                executorService.execute(() -> {
-                    try {
-                        Object value = task.supplier.get();
-                        if (value != null) {
-                            task.resultMap.put(task.taskKey, value);
-                            task.done.set(true);
+                int busyThreads = NUMBER_OF_BUSY_THREADS.getAndUpdate(
+                    (v) -> v == NUMBER_OF_THREADS ? v : v + 1
+                );
+                if (busyThreads < NUMBER_OF_THREADS) {
+                    executorService.execute(() -> {
+                        try {
+                            executeTask(task, exceptions, countDown);
+                        } finally {
+                            NUMBER_OF_BUSY_THREADS.decrementAndGet();
                         }
-                    } catch (Exception e) {
-                        exceptions.add(e);
-                    } finally {
-                        countDown.countDown();
-                    }
-                });
+                    });
+                } else {
+                    executeTask(task, exceptions, countDown);
+                }
             }
             try {
                 if (!countDown.await(timeout, timeUnit)) {
@@ -377,6 +383,24 @@ public final class Reactive {
                 return result.castGet();
             } else {
                 throw new RxException(exceptions);
+            }
+        }
+
+        private void executeTask(
+            InternalTask task,
+            List<Exception> exceptions,
+            CountDownLatch countDown
+        ) {
+            try {
+                Object value = task.supplier.get();
+                if (value != null) {
+                    task.resultMap.put(task.taskKey, value);
+                    task.done.set(true);
+                }
+            } catch (Exception e) {
+                exceptions.add(e);
+            } finally {
+                countDown.countDown();
             }
         }
 
@@ -447,7 +471,7 @@ public final class Reactive {
                         ++rxMapCount;
                     }
                 }
-                if (rxMapCount == 0 && stack.size() > 0) {
+                if (rxMapCount == 0 && !stack.isEmpty()) {
                     Object taskKey = ((Entry) stack.pop()).getKey();
                     ResultValueMap parent = (ResultValueMap) stack.pop();
                     parent.put(taskKey, resultMap.castGet());
