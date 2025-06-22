@@ -64,9 +64,8 @@ public class VersionalLinkAttributeTagProcessor extends AbstractAttributeTagProc
     ) {
         Object version = context.getVariable("ezyResourceVersion");
         if (version == null) {
-            version = environmentManager.getPlatformVersion();
+            version = environmentManager.getServerStartTime();
         }
-
         String actualAttributeName = attributeValue;
         if (attributeValue.startsWith("${")) {
             IEngineConfiguration configuration = context.getConfiguration();
@@ -74,7 +73,6 @@ public class VersionalLinkAttributeTagProcessor extends AbstractAttributeTagProc
             IStandardExpression expression = parser.parseExpression(context, attributeValue);
             actualAttributeName = (String) expression.execute(context);
         }
-
         structureHandler.setAttribute(
             originalAttributeName,
             actualAttributeName + "?v=" + version

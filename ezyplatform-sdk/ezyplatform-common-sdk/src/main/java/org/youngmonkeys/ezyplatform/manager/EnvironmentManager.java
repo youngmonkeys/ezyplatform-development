@@ -27,6 +27,8 @@ public interface EnvironmentManager {
 
     String getPlatformVersion();
 
+    long getServerStartTime();
+
     default boolean isDevelopmentEnvironment() {
         String env = getEnvironment();
         return isNotBlank(env) && env.equals(ENVIRONMENT_DEVELOPMENT);
