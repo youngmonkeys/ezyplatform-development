@@ -27,6 +27,11 @@ public interface LinkRepository extends EzyDatabaseRepository<Long, Link> {
     
     void deleteByLinkUri(String linkUri);
 
+    @EzyQuery(
+        "SELECT e FROM Link e " +
+            "WHERE e.id > ?0 " +
+            "ORDER BY e.id ASC"
+    )
     List<Link> findByIdGt(long idExclusive, Next next);
 
     @EzyQuery(

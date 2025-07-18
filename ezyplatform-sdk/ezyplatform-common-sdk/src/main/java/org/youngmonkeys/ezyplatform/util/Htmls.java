@@ -443,7 +443,7 @@ public final class Htmls {
                 );
             }
         }
-        while (openTags.size() > 0) {
+        while (!openTags.isEmpty()) {
             String openTag = openTags.peek();
             if (NO_CLOSED_TAGS.contains(openTag)) {
                 openTags.pop();

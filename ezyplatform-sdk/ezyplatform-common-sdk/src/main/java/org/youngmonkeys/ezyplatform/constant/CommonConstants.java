@@ -216,6 +216,10 @@ public final class CommonConstants {
     public static final String SETTING_NAME_ENABLE_SUFFIX = "_enable";
     public static final String SETTING_NAME_ADMIN_ENABLE = "admin_enable";
     public static final String SETTING_NAME_SOCKET_ENABLE = "socket_enable";
+    public static final String SETTING_NAME_SOCKET_AUTO_RELOAD_SSL_ENABLE =
+        "socket_auto_reload_ssl_enable";
+    public static final String SETTING_NAME_SOCKET_AUTO_RELOAD_SLEEP_TIME =
+        "socket_auto_reload_sleep_time";
     public static final String SETTING_NAME_WEB_ENABLE = "web_enable";
     public static final String SETTING_NAME_WEB_LANGUAGES = "web_languages";
     public static final String SETTING_NAME_ALLOW_SEND_STATISTICS_DATA =
