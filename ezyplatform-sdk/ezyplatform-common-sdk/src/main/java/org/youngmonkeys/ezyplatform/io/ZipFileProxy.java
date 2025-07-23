@@ -64,7 +64,7 @@ public final class ZipFileProxy {
         ZipEntry zipEntry;
         byte[] buffer = new byte[1024];
         while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-            String entryName = zipEntry.getName();
+            String entryName = zipEntry.getName().replace('\\', '/');
             if (entryName.contains("..")) {
                 continue;
             }
