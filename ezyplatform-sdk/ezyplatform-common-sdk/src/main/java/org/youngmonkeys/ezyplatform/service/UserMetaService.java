@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
 import com.tvd12.reflections.util.Predicates;
+import org.youngmonkeys.ezyplatform.model.UserMetaModel;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -211,6 +212,14 @@ public interface UserMetaService {
             new BigDecimal(value)
         ).toBigInteger();
     }
+
+    void deleteUserMetaById(long id);
+
+    void deleteUserMetaByUserId(long userId);
+
+    void deleteUserMetaByUserIds(
+        Collection<Long> userIds
+    );
 
     boolean containsUserMeta(
         long userId,
@@ -425,4 +434,9 @@ public interface UserMetaService {
             BigInteger::new
         );
     }
+
+    List<UserMetaModel> getMetaListByUserIdAndMetaKeys(
+        long userId,
+        Collection<String> metaKeys
+    );
 }

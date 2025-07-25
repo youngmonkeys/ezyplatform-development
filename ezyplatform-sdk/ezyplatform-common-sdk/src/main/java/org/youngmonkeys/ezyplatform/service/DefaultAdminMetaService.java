@@ -18,7 +18,9 @@ package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
+import org.youngmonkeys.ezyplatform.model.AdminMetaModel;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaTransactionalRepository;
 
@@ -37,6 +39,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
 
     private final AdminMetaRepository adminMetaRepository;
     private final AdminMetaTransactionalRepository adminMetaTransactionalRepository;
+    private final DefaultEntityToModelConverter entityToModelConverter;
 
     @Override
     public void saveAdminMeta(
@@ -111,6 +114,25 @@ public class DefaultAdminMetaService implements AdminMetaService {
             metaKey,
             value
         );
+    }
+
+    @Override
+    public void deleteAdminMetaById(long id) {
+        adminMetaRepository.delete(id);
+    }
+
+    @Override
+    public void deleteAdminMetaByAdminId(long adminId) {
+        adminMetaRepository.deleteByAdminId(adminId);
+    }
+
+    @Override
+    public void deleteAdminMetaByAdminIds(
+        Collection<Long> adminIds
+    ) {
+        if (!adminIds.isEmpty()) {
+            adminMetaRepository.deleteByAdminIdIn(adminIds);
+        }
     }
 
     @Override
@@ -331,5 +353,19 @@ public class DefaultAdminMetaService implements AdminMetaService {
                     (o, n) -> n
                 )
             );
+    }
+
+    @Override
+    public List<AdminMetaModel> getMetaListByAdminIdAndMetaKeys(
+        long adminId,
+        Collection<String> metaKeys
+    ) {
+        return newArrayList(
+            adminMetaRepository.findByAdminIdAndMetaKeyIn(
+                adminId,
+                metaKeys
+            ),
+            entityToModelConverter::toModel
+        );
     }
 }

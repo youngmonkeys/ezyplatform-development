@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
 import com.tvd12.reflections.util.Predicates;
+import org.youngmonkeys.ezyplatform.model.AdminMetaModel;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -212,6 +213,14 @@ public interface AdminMetaService {
             new BigDecimal(value)
         ).toBigInteger();
     }
+
+    void deleteAdminMetaById(long id);
+
+    void deleteAdminMetaByAdminId(long adminId);
+
+    void deleteAdminMetaByAdminIds(
+        Collection<Long> adminIds
+    );
 
     boolean containsAdminMeta(
         long adminId,
@@ -426,4 +435,9 @@ public interface AdminMetaService {
             BigInteger::new
         );
     }
+
+    List<AdminMetaModel> getMetaListByAdminIdAndMetaKeys(
+        long adminId,
+        Collection<String> metaKeys
+    );
 }

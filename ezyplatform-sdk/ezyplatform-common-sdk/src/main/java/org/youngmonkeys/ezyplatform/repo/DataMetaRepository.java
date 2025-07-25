@@ -28,6 +28,16 @@ import java.util.Optional;
 public interface DataMetaRepository
     extends EzyDatabaseRepository<Long, DataMeta> {
 
+    void deleteByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    );
+
+    void deleteByDataTypeAndDataIdIn(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
     List<DataMeta> findByDataTypeAndDataId(
         String dataType,
         long dataId

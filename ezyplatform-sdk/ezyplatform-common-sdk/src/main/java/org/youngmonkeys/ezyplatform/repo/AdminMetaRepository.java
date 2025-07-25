@@ -28,6 +28,10 @@ import java.util.Optional;
 public interface AdminMetaRepository
     extends EzyDatabaseRepository<Long, AdminMeta> {
 
+    void deleteByAdminId(long adminId);
+
+    void deleteByAdminIdIn(Collection<Long> adminIds);
+
     List<AdminMeta> findByAdminId(long adminId);
 
     Optional<AdminMeta> findByMetaKeyAndMetaValue(

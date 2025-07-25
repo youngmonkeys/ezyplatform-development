@@ -18,7 +18,9 @@ package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.UserMeta;
+import org.youngmonkeys.ezyplatform.model.UserMetaModel;
 import org.youngmonkeys.ezyplatform.repo.UserMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.UserMetaTransactionalRepository;
 
@@ -37,6 +39,7 @@ public class DefaultUserMetaService implements UserMetaService {
 
     private final UserMetaRepository userMetaRepository;
     private final UserMetaTransactionalRepository userMetaTransactionalRepository;
+    private final DefaultEntityToModelConverter entityToModelConverter;
 
     @Override
     public void saveUserMeta(
@@ -111,6 +114,25 @@ public class DefaultUserMetaService implements UserMetaService {
             metaKey,
             value
         );
+    }
+    
+    @Override
+    public void deleteUserMetaById(long id) {
+        userMetaRepository.delete(id);
+    }
+
+    @Override
+    public void deleteUserMetaByUserId(long userId) {
+        userMetaRepository.deleteByUserId(userId);
+    }
+
+    @Override
+    public void deleteUserMetaByUserIds(
+        Collection<Long> userIds
+    ) {
+        if (!userIds.isEmpty()) {
+            userMetaRepository.deleteByUserIdIn(userIds);
+        }
     }
 
     @Override
@@ -331,5 +353,19 @@ public class DefaultUserMetaService implements UserMetaService {
                     (o, n) -> n
                 )
             );
+    }
+
+    @Override
+    public List<UserMetaModel> getMetaListByUserIdAndMetaKeys(
+        long userId,
+        Collection<String> metaKeys
+    ) {
+        return newArrayList(
+            userMetaRepository.findByUserIdAndMetaKeyIn(
+                userId,
+                metaKeys
+            ),
+            entityToModelConverter::toModel
+        );
     }
 }

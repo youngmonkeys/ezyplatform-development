@@ -377,6 +377,49 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
+    public AdminMetaModel toModel(AdminMeta entity) {
+        if (entity == null) {
+            return null;
+        }
+        return AdminMetaModel.builder()
+            .id(entity.getId())
+            .adminId(entity.getAdminId())
+            .metaKey(entity.getMetaKey())
+            .metaValue(entity.getMetaValue())
+            .metaNumberValue(entity.getMetaNumberValue())
+            .metaTextValue(entity.getMetaTextValue())
+            .build();
+    }
+
+    public DataMetaModel toModel(DataMeta entity) {
+        if (entity == null) {
+            return null;
+        }
+        return DataMetaModel.builder()
+            .id(entity.getId())
+            .dataType(entity.getDataType())
+            .dataId(entity.getDataId())
+            .metaKey(entity.getMetaKey())
+            .metaValue(entity.getMetaValue())
+            .metaNumberValue(entity.getMetaNumberValue())
+            .metaTextValue(entity.getMetaTextValue())
+            .build();
+    }
+
+    public UserMetaModel toModel(UserMeta entity) {
+        if (entity == null) {
+            return null;
+        }
+        return UserMetaModel.builder()
+            .id(entity.getId())
+            .userId(entity.getUserId())
+            .metaKey(entity.getMetaKey())
+            .metaValue(entity.getMetaValue())
+            .metaNumberValue(entity.getMetaNumberValue())
+            .metaTextValue(entity.getMetaTextValue())
+            .build();
+    }
+
     public long toTimestamp(LocalDateTime localDateTime) {
         return LocalDateTimes.toTimestamp(localDateTime, zoneId);
     }

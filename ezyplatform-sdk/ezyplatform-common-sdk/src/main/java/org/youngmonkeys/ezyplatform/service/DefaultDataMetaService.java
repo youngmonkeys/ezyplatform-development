@@ -18,7 +18,9 @@ package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.DataMeta;
+import org.youngmonkeys.ezyplatform.model.DataMetaModel;
 import org.youngmonkeys.ezyplatform.repo.DataMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.DataMetaTransactionalRepository;
 
@@ -37,6 +39,7 @@ public class DefaultDataMetaService implements DataMetaService {
 
     private final DataMetaRepository dataMetaRepository;
     private final DataMetaTransactionalRepository dataMetaTransactionalRepository;
+    private final DefaultEntityToModelConverter entityToModelConverter;
 
     @Override
     public void saveDataMeta(
@@ -121,6 +124,35 @@ public class DefaultDataMetaService implements DataMetaService {
             metaKey,
             value
         );
+    }
+
+    @Override
+    public void deleteDataMetaById(long id) {
+        dataMetaRepository.delete(id);
+    }
+
+    @Override
+    public void deleteDataMetaByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    ) {
+        dataMetaRepository.deleteByDataTypeAndDataId(
+            dataType,
+            dataId
+        );
+    }
+
+    @Override
+    public void deleteDataMetaByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    ) {
+        if (!dataIds.isEmpty()) {
+            dataMetaRepository.deleteByDataTypeAndDataIdIn(
+                dataType,
+                dataIds
+            );
+        }
     }
 
     @Override
@@ -369,5 +401,21 @@ public class DefaultDataMetaService implements DataMetaService {
                     (o, n) -> n
                 )
             );
+    }
+
+    @Override
+    public List<DataMetaModel> getMetaListByDataTypeAndDataIdAndMetaKeys(
+        String dataType,
+        long dataId,
+        Collection<String> metaKeys
+    ) {
+        return newArrayList(
+            dataMetaRepository.findByDataTypeAndDataIdAndMetaKeyIn(
+                dataType,
+                dataId,
+                metaKeys
+            ),
+            entityToModelConverter::toModel
+        );
     }
 }

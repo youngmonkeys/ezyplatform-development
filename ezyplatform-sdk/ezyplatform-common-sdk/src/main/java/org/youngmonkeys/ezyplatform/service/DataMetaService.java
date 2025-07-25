@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
 import com.tvd12.reflections.util.Predicates;
+import org.youngmonkeys.ezyplatform.model.DataMetaModel;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -237,6 +238,18 @@ public interface DataMetaService {
             new BigDecimal(value)
         ).toBigInteger();
     }
+
+    void deleteDataMetaById(long id);
+
+    void deleteDataMetaByDataTypeAndDataId(
+        String dataType,
+        long dataId
+    );
+
+    void deleteDataMetaByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    );
 
     boolean containsDataMeta(
         String dataType,
@@ -493,4 +506,10 @@ public interface DataMetaService {
             BigInteger::new
         );
     }
+
+    List<DataMetaModel> getMetaListByDataTypeAndDataIdAndMetaKeys(
+        String dataType,
+        long dataId,
+        Collection<String> metaKeys
+    );
 }

@@ -28,6 +28,10 @@ import java.util.Optional;
 public interface UserMetaRepository
     extends EzyDatabaseRepository<Long, UserMeta> {
 
+    void deleteByUserId(long userId);
+
+    void deleteByUserIdIn(Collection<Long> userIds);
+
     List<UserMeta> findByUserId(long userId);
 
     Optional<UserMeta> findByMetaKeyAndMetaValue(
