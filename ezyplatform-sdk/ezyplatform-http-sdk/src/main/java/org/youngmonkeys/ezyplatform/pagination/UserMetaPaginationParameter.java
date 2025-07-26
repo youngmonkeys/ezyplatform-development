@@ -14,15 +14,9 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.pagination;
 
-import org.youngmonkeys.devtools.pagination.PaginationClassesGenerator;
-import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
+import org.youngmonkeys.ezyplatform.pagination.CommonPaginationParameter;
 
-public class HttpSdkPaginationClassesGenerator {
-
-    public static void main(String[] args) throws Exception {
-        new PaginationClassesGenerator(ContentTemplate.class)
-            .generate();
-    }
-}
+public interface UserMetaPaginationParameter
+    extends CommonPaginationParameter {}

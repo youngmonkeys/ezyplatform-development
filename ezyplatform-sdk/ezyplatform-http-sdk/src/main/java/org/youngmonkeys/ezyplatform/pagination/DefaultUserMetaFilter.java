@@ -1,66 +1,58 @@
 /*
- * Copyright 2022 youngmonkeys.org
- *
+ * Copyright 2025 youngmonkeys.org
+ * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * 
  *     https://youngmonkeys.org/licenses/ezyplatform-1.0.0.txt
- *
+ * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
 package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
+import lombok.Getter;
 
-public class DefaultUniqueDataFilter implements UniqueDataFilter {
-    public final String dataType;
-    public final String uniqueKey;
+@Getter
+public class DefaultUserMetaFilter implements UserMetaFilter {
+    public final Long userId;
 
-    protected DefaultUniqueDataFilter(Builder builder) {
-        this.dataType = builder.dataType;
-        this.uniqueKey = builder.uniqueKey;
+    public DefaultUserMetaFilter(Builder builder) {
+        this.userId = builder.userId;
     }
 
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
-        if (dataType != null) {
-            answer.and("e.dataType = :dataType");
-        }
-        if (uniqueKey != null) {
-            answer.and("e.uniqueKey = :uniqueKey");
+        if (userId != null) {
+            answer.and("e.userId = :userId");
         }
         return answer.build();
     }
 
     public static Builder builder() {
-        return new Builder();
+        return  new Builder();
     }
 
-    public static class Builder implements EzyBuilder<DefaultUniqueDataFilter> {
-        private String dataType;
-        private String uniqueKey;
+    public static class Builder implements EzyBuilder<DefaultUserMetaFilter> {
 
-        public Builder dataType(String dataType) {
-            this.dataType = dataType;
-            return this;
-        }
+        private Long userId;
 
-        public Builder uniqueKey(String uniqueKey) {
-            this.uniqueKey = uniqueKey;
+        public Builder userId(Long userId) {
+            this.userId = userId;
             return this;
         }
 
         @Override
-        public DefaultUniqueDataFilter build() {
-            return new DefaultUniqueDataFilter(this);
+        public DefaultUserMetaFilter build() {
+            return new DefaultUserMetaFilter(this);
         }
     }
 }
