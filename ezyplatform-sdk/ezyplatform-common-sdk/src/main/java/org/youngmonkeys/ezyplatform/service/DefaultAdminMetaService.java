@@ -331,6 +331,28 @@ public class DefaultAdminMetaService implements AdminMetaService {
                 )
             );
     }
+    
+    public Map<String, String> getAdminMetaTextValueMapByAdminIdAndMetaKeys(
+        long adminId,
+        Collection<String> metaKeys
+    ) {
+        if (metaKeys.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return adminMetaRepository.findByAdminIdAndMetaKeyIn(
+                adminId,
+                metaKeys
+            )
+            .stream()
+            .filter(it -> it.getMetaTextValue() != null)
+            .collect(
+                Collectors.toMap(
+                    AdminMeta::getMetaKey,
+                    AdminMeta::getMetaTextValue,
+                    (o, n) -> n
+                )
+            );
+    }
 
     @Override
     public Map<Long, String> getAdminMetaTextValueMapByAdminIds(

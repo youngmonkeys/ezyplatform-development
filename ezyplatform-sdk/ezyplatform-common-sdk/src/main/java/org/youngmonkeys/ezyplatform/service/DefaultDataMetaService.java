@@ -352,6 +352,30 @@ public class DefaultDataMetaService implements DataMetaService {
                 )
             );
     }
+    
+    public Map<String, String> getDataMetaTextValueMapByDataTypeAndDataIdAndMetaKeys(
+        String dataType,
+        long dataId,
+        Collection<String> metaKeys
+    ) {
+        if (metaKeys.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dataMetaRepository.findByDataTypeAndDataIdAndMetaKeyIn(
+                dataType,
+                dataId,
+                metaKeys
+            )
+            .stream()
+            .filter(it -> it.getMetaTextValue() != null)
+            .collect(
+                Collectors.toMap(
+                    DataMeta::getMetaKey,
+                    DataMeta::getMetaTextValue,
+                    (o, n) -> n
+                )
+            );
+    }
 
     @Override
     public Map<String, String> getDataMetaValueMapByDataIdAndMetaKeys(
