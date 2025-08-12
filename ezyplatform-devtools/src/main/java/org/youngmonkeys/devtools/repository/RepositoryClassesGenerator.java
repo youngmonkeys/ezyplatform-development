@@ -96,7 +96,7 @@ public class RepositoryClassesGenerator {
         entityClassName = entityClass.getSimpleName();
         entityVariableName = entityClassName
             .substring(0, 1)
-            .toUpperCase() + entityClassName.substring(1);
+            .toLowerCase() + entityClassName.substring(1);
         IdClass idClassAnnotation = entityClass.getDeclaredAnnotation(
             IdClass.class
         );
