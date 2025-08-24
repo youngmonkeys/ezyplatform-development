@@ -43,6 +43,11 @@ public interface DataMetaRepository
         long dataId
     );
 
+    List<DataMeta> findByDataTypeAndDataIdIn(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
     Optional<DataMeta> findByDataTypeAndMetaKeyAndMetaValue(
         String dataType,
         String metaKey,

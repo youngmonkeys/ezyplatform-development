@@ -26,10 +26,21 @@ import java.util.List;
 public interface UniqueDataRepository
     extends EzyDatabaseRepository<UniqueDataId, UniqueData> {
 
+    List<UniqueData> findByDataTypeAndDataIdIn(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
     List<UniqueData> findByDataTypeAndDataIdInAndUniqueKey(
         String dataType,
         Collection<Long> dataIds,
         String uniqueKey
+    );
+
+    List<UniqueData> findByDataTypeAndDataIdAndUniqueKeyIn(
+        String dataType,
+        long dataId,
+        Collection<String> uniqueKeys
     );
 
     List<UniqueData> findByDataTypeAndDataIdInAndUniqueKeyIn(

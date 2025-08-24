@@ -304,6 +304,29 @@ public class DefaultDataMetaService implements DataMetaService {
     }
 
     @Override
+    public Map<Long, Map<String, DataMetaModel>> getDataMetaValueMapsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    ) {
+        if (dataIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dataMetaRepository
+            .findByDataTypeAndDataIdIn(dataType, dataIds)
+            .stream()
+            .collect(
+                Collectors.groupingBy(
+                    DataMeta::getDataId,
+                    Collectors.toMap(
+                        DataMeta::getMetaKey,
+                        entityToModelConverter::toModel,
+                        (o, n) -> n
+                    )
+                )
+            );
+    }
+
+    @Override
     public Map<String, Long> getDataIdMapByMetaValues(
         String dataType,
         String metaKey,

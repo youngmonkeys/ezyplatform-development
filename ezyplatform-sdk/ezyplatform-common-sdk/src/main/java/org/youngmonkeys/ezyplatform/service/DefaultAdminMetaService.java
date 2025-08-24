@@ -264,6 +264,28 @@ public class DefaultAdminMetaService implements AdminMetaService {
     }
 
     @Override
+    public Map<Long, Map<String, AdminMetaModel>> getAdminMetaValueMapsByAdminIds(
+        Collection<Long> adminIds
+    ) {
+        if (adminIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return adminMetaRepository
+            .findByAdminIdIn(adminIds)
+            .stream()
+            .collect(
+                Collectors.groupingBy(
+                    AdminMeta::getAdminId,
+                    Collectors.toMap(
+                        AdminMeta::getMetaKey,
+                        entityToModelConverter::toModel,
+                        (o, n) -> n
+                    )
+                )
+            );
+    }
+
+    @Override
     public Map<String, Long> getAdminIdMapByMetaValues(
         String metaKey,
         Collection<String> metaValues

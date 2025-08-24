@@ -50,6 +50,17 @@ public interface UniqueDataService {
         String uniqueKey
     );
 
+    Map<String, UniqueDataModel> getUniqueDataMapByDataTypeAndDataIdAndUniqueKeys(
+        String dataType,
+        long dataId,
+        Collection<String> uniqueKeys
+    );
+
+    Map<Long, Map<String, UniqueDataModel>> getUniqueDataMapsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
     Map<Long, Map<String, UniqueDataModel>> getUniqueDataMapsByDataTypeAndDataIdsAndUniqueKeys(
         String dataType,
         Collection<Long> dataIds,
@@ -110,6 +121,59 @@ public interface UniqueDataService {
                 Collectors.toMap(
                     Map.Entry::getKey,
                     EzyEntry::getValue
+                )
+            );
+    }
+
+    default <T> Map<String, T> getUniqueDataValueMapByDataTypeAndDataIdAndUniqueKeys(
+        String dataType,
+        long dataId,
+        Collection<String> uniqueKeys,
+        Function<UniqueDataModel, T> converter
+    ) {
+        return getUniqueDataMapByDataTypeAndDataIdAndUniqueKeys(
+            dataType,
+            dataId,
+            uniqueKeys
+        )
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> converter.apply(e.getValue())
+                )
+            );
+    }
+
+    default <T> Map<Long, Map<String, T>> getUniqueDataValueMapsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        Function<UniqueDataModel, T> converter
+    ) {
+        return getUniqueDataMapsByDataTypeAndDataIds(dataType, dataIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e
+                        .getValue()
+                        .entrySet()
+                        .stream()
+                        .map(it ->
+                            EzyEntry.of(
+                                it.getKey(),
+                                converter.apply(it.getValue())
+                            )
+                        )
+                        .filter(it -> it.getValue() != null)
+                        .collect(
+                            Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                            )
+                        )
                 )
             );
     }

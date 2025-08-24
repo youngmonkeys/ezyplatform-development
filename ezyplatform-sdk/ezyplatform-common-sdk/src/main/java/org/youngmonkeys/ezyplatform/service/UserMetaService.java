@@ -333,6 +333,41 @@ public interface UserMetaService {
     Map<String, String> getUserMetaValues(long userId);
 
     Map<String, String> getUserMetaTextValues(long userId);
+    
+    Map<Long, Map<String, UserMetaModel>> getUserMetaValueMapsByUserIds(
+        Collection<Long> userIds
+    );
+
+    default  <T> Map<Long, Map<String, T>> getUserMetaValueMapsByUserIds(
+        Collection<Long> userIds,
+        Function<UserMetaModel, T> converter
+    ) {
+        return getUserMetaValueMapsByUserIds(userIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e
+                        .getValue()
+                        .entrySet()
+                        .stream()
+                        .map(it ->
+                            EzyEntry.of(
+                                it.getKey(),
+                                converter.apply(it.getValue())
+                            )
+                        )
+                        .filter(it -> it.getValue() != null)
+                        .collect(
+                            Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                            )
+                        )
+                )
+            );
+    }
 
     Map<String, Long> getUserIdMapByMetaValues(
         String metaKey,

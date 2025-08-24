@@ -389,6 +389,43 @@ public interface DataMetaService {
         long dataId
     );
 
+    Map<Long, Map<String, DataMetaModel>> getDataMetaValueMapsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
+    default  <T> Map<Long, Map<String, T>> getDataMetaValueMapsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        Function<DataMetaModel, T> converter
+    ) {
+        return getDataMetaValueMapsByDataTypeAndDataIds(dataType, dataIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e
+                        .getValue()
+                        .entrySet()
+                        .stream()
+                        .map(it ->
+                            EzyEntry.of(
+                                it.getKey(),
+                                converter.apply(it.getValue())
+                            )
+                        )
+                        .filter(it -> it.getValue() != null)
+                        .collect(
+                            Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                            )
+                        )
+                )
+            );
+    }
+
     Map<String, Long> getDataIdMapByMetaValues(
         String dataType,
         String metaKey,

@@ -335,6 +335,41 @@ public interface AdminMetaService {
 
     Map<String, String> getAdminMetaTextValues(long adminId);
 
+    Map<Long, Map<String, AdminMetaModel>> getAdminMetaValueMapsByAdminIds(
+        Collection<Long> adminIds
+    );
+
+    default  <T> Map<Long, Map<String, T>> getAdminMetaValueMapsByAdminIds(
+        Collection<Long> adminIds,
+        Function<AdminMetaModel, T> converter
+    ) {
+        return getAdminMetaValueMapsByAdminIds(adminIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e
+                        .getValue()
+                        .entrySet()
+                        .stream()
+                        .map(it ->
+                            EzyEntry.of(
+                                it.getKey(),
+                                converter.apply(it.getValue())
+                            )
+                        )
+                        .filter(it -> it.getValue() != null)
+                        .collect(
+                            Collectors.toMap(
+                                Map.Entry::getKey,
+                                Map.Entry::getValue
+                            )
+                        )
+                )
+            );
+    }
+
     Map<String, Long> getAdminIdMapByMetaValues(
         String metaKey,
         Collection<String> metaValues

@@ -117,6 +117,52 @@ public class DefaultUniqueDataService implements UniqueDataService {
     }
 
     @Override
+    public Map<String, UniqueDataModel> getUniqueDataMapByDataTypeAndDataIdAndUniqueKeys(
+        String dataType,
+        long dataId,
+        Collection<String> uniqueKeys
+    ) {
+        if (uniqueKeys.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return uniqueDataRepository
+            .findByDataTypeAndDataIdAndUniqueKeyIn(
+                dataType,
+                dataId,
+                uniqueKeys
+            )
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    UniqueData::getUniqueKey,
+                    entityToModelConverter::toModel
+                )
+            );
+    }
+
+    @Override
+    public Map<Long, Map<String, UniqueDataModel>> getUniqueDataMapsByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    ) {
+        if (dataIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return uniqueDataRepository
+            .findByDataTypeAndDataIdIn(dataType, dataIds)
+            .stream()
+            .collect(
+                Collectors.groupingBy(
+                    UniqueData::getDataId,
+                    Collectors.toMap(
+                        UniqueData::getUniqueKey,
+                        entityToModelConverter::toModel
+                    )
+                )
+            );
+    }
+
+    @Override
     public Map<Long, Map<String, UniqueDataModel>> getUniqueDataMapsByDataTypeAndDataIdsAndUniqueKeys(
         String dataType,
         Collection<Long> dataIds,
