@@ -33,10 +33,7 @@ import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @AllArgsConstructor
@@ -176,6 +173,37 @@ public class DefaultAdminService implements AdminService {
             }
         }
         return null;
+    }
+
+    @Override
+    public List<AdminModel> getAdminsByIds(Collection<Long> ids) {
+        return adminRepository.findListByIds(ids)
+            .stream()
+            .map(entityToModelConverter::toModel)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public AdminModel getAdminByEmail(String email) {
+        return entityToModelConverter.toModel(
+            adminRepository.findByField("email", email)
+        );
+    }
+
+    @Override
+    public AdminModel getAdminByPhone(String phone) {
+        return adminRepository.findByFieldOptional("phone", phone)
+            .map(entityToModelConverter::toModel)
+            .orElse(null);
+    }
+
+    @Override
+    public AdminModel getAdminByUsernameOrEmail(String usernameOrEmail) {
+        AdminModel admin = getAdminByUsername(usernameOrEmail);
+        if (admin == null) {
+            admin = getAdminByEmail(usernameOrEmail);
+        }
+        return admin;
     }
 
     @Override

@@ -136,7 +136,9 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public List<UserModel> getUserListByIds(Collection<Long> userIds) {
+    public List<UserModel> getUserListByIds(
+        Collection<Long> userIds
+    ) {
         if (userIds.isEmpty()) {
             return Collections.emptyList();
         }
