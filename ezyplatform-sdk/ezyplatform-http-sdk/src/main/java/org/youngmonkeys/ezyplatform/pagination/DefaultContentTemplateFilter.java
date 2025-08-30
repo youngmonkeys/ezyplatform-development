@@ -22,6 +22,8 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.util.Collection;
 
 public class DefaultContentTemplateFilter implements ContentTemplateFilter {
+    public final String ownerType;
+    public final Long ownerId;
     public final String templateType;
     public final String templateName;
     public final String contentType;
@@ -31,6 +33,8 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
     public final String likeKeyword;
 
     protected DefaultContentTemplateFilter(Builder builder) {
+        this.ownerType = builder.ownerType;
+        this.ownerId = builder.ownerId;
         this.templateType = builder.templateType;
         this.templateName = builder.templateName;
         this.contentType = builder.contentType;
@@ -52,6 +56,12 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
+        if (ownerType != null) {
+            answer.and("e.ownerType = :ownerType");
+        }
+        if (ownerId != null) {
+            answer.and("e.ownerId = :ownerId");
+        }
         if (templateType != null) {
             answer.and("e.templateType = :templateType");
         }
@@ -87,6 +97,8 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
     }
 
     public static class Builder implements EzyBuilder<DefaultContentTemplateFilter> {
+        protected String ownerType;
+        protected Long ownerId;
         protected String templateType;
         protected String templateName;
         protected String contentType;
@@ -94,6 +106,16 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
         protected String status;
         protected Collection<String> keywords;
         protected String likeKeyword;
+
+        public Builder ownerType(String ownerType) {
+            this.ownerType = ownerType;
+            return this;
+        }
+
+        public Builder ownerId(Long ownerId) {
+            this.ownerId = ownerId;
+            return this;
+        }
 
         public Builder templateType(String templateType) {
             this.templateType = templateType;

@@ -35,6 +35,12 @@ public class ContentTemplate {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "owner_type")
+    private String ownerType;
+
+    @Column(name = "owner_id")
+    private long ownerId;
+
     @Column(name = "template_type")
     private String templateType;
 
@@ -49,6 +55,9 @@ public class ContentTemplate {
 
     @Column(name = "content_type")
     private String contentType;
+
+    @Column(name = "creator_type")
+    private String creatorType;
 
     @Column(name = "creator_id")
     private long creatorId;

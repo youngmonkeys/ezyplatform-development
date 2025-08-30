@@ -27,6 +27,7 @@ import java.util.Set;
 @SuppressWarnings("LineLength")
 public final class CommonConstants {
 
+    public static final String ALL = "ALL";
     public static final String LATEST = "latest";
 
     public static final String TRUE_STRING = "true";
@@ -301,6 +302,7 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_ADDITIONAL_MESSAGE_KEYS = "additionalMessageKeys";
     public static final String VIEW_VARIABLE_ADDITIONAL_MESSAGE_MAP = "additionalMessageMap";
     public static final String VIEW_VARIABLE_ADDITIONAL_VALUE_MAP = "additionalValueMap";
+    public static final String VIEW_VARIABLE_ADDITIONAL_FRAGMENTS = "additionalFragments";
     public static final String VIEW_VARIABLE_ADDITIONAL_HEADS = "additionalHeads";
     public static final String VIEW_VARIABLE_ADDITIONAL_STYLE_FILES = "additionalStyleFiles";
     public static final String VIEW_VARIABLE_ADDITIONAL_STYLES = "additionalStyles";
@@ -309,6 +311,7 @@ public final class CommonConstants {
     public static final String VIEW_VARIABLE_ADDITIONAL_FOOTS = "additionalFoots";
     public static final String VIEW_VARIABLE_MODULE_SCRIPT_FILES = "moduleScriptFiles";
     public static final String VIEW_VARIABLE_FINAL_SCRIPT_FILES = "finalScriptFiles";
+    public static final String VIEW_VARIABLE_EZY_RESOURCE_VERSION = "ezyResourceVersion";
 
     public static final String PROPERTY_NAME_EZYPLATFORM_HOME = "ezyplatform.home";
 

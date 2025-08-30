@@ -18,12 +18,32 @@ package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.data.TitleContent;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
+import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 
 import java.util.Map;
 
 public interface ContentTemplateService {
 
-    ContentTemplateModel getTemplateById(long templateId);
+    long addTemplate(
+        String creatorType,
+        long creatorId,
+        SaveContentTemplateModel model
+    );
+
+    void updateTemplate(
+        long templateId,
+        SaveContentTemplateModel model
+    );
+
+    long saveTemplate(
+        String creatorType,
+        long creatorId,
+        SaveContentTemplateModel model
+    );
+
+    ContentTemplateModel getTemplateById(
+        long templateId
+    );
 
     ContentTemplateModel getTemplateByTypeAndName(
         String templateType,

@@ -27,10 +27,7 @@ import org.youngmonkeys.ezyplatform.time.ClockProxy;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
@@ -288,6 +285,19 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
+    public ContentTemplate toEntity(
+        String creatorType,
+        long creatorId,
+        SaveContentTemplateModel model
+    ) {
+        ContentTemplate entity = new ContentTemplate();
+        entity.setCreatorType(creatorType);
+        entity.setCreatorId(creatorId);
+        mergeToEntity(model, entity);
+        entity.setCreatedAt(entity.getUpdatedAt());
+        return entity;
+    }
+
     public Setting toSettingEntity(
         String name,
         DataType dataType,
@@ -465,6 +475,28 @@ public class DefaultModelToEntityConverter {
         entity.setDataId(model.getDataId());
         entity.setKeyword(model.getKeyword());
         entity.setPriority(model.getPriority());
+        entity.setUpdatedAt(clock.nowDateTime());
+    }
+
+    public void mergeToEntity(
+        SaveContentTemplateModel model,
+        ContentTemplate entity
+    ) {
+        String templateName = model.getTemplateName();
+        if (isBlank(templateName)) {
+            templateName = UUID.randomUUID().toString();
+        }
+        entity.setOwnerType(model.getOwnerType());
+        entity.setOwnerId(model.getOwnerId());
+        entity.setTemplateType(model.getTemplateType());
+        entity.setTemplateName(templateName);
+        entity.setTitleTemplate(model.getTitleTemplate());
+        entity.setContentTemplate(model.getContentTemplate());
+        String contentType = model.getContentType();
+        if (contentType != null) {
+            entity.setContentType(contentType);
+        }
+        entity.setStatus(model.getStatus());
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
