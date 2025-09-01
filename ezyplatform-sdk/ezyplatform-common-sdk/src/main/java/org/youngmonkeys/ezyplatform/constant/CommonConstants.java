@@ -73,7 +73,7 @@ public final class CommonConstants {
     public static final int MIN_LENGTH_PHONE = 6;
     public static final int MAX_LENGTH_PHONE = 20;
     public static final int MAX_LENGTH_EMAIL = 128;
-    public static final int MAX_LENGTH_DISPLAY_NAME = 64;
+    public static final int MAX_LENGTH_DISPLAY_NAME = 128;
     public static final int MIN_LENGTH_URL = 8;
     public static final int MAX_LENGTH_URL = 256;
     public static final int MAX_LENGTH_WEBSITE_TITLE = 60;
