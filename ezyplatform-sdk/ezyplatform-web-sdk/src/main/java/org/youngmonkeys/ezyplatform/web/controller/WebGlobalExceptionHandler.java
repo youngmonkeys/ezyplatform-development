@@ -63,7 +63,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         RequestArguments arguments,
         AdminInvalidAccessTokenException e
     ) {
-        logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
@@ -81,7 +81,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         RequestArguments arguments,
         AdminAccessTokenExpiredException e
     ) {
-        logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
@@ -99,7 +99,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         RequestArguments arguments,
         UserInvalidAccessTokenException e
     ) {
-        logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
@@ -117,7 +117,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         RequestArguments arguments,
         UserAccessTokenExpiredException e
     ) {
-        logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
@@ -131,7 +131,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
 
     @TryCatch(IncorrectPasswordException.class)
     public ResponseEntity handle(IncorrectPasswordException e) {
-        logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         return ResponseEntity.badRequest(
             Collections.singletonMap("password", "incorrect")
         );
@@ -210,7 +210,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         RequestArguments arguments,
         ResourceNotFoundException e
     ) {
-        logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
@@ -227,7 +227,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         RequestArguments arguments,
         HttpUnauthorizedException e
     ) {
-        logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
@@ -248,7 +248,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         RequestArguments arguments,
         HttpNotFoundException e
     ) {
-        logger.debug("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
         if (requestUriManager.isApiURI(method, uriTemplate)) {
