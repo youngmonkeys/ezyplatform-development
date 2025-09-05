@@ -26,6 +26,16 @@ import java.util.List;
 public interface UniqueDataRepository
     extends EzyDatabaseRepository<UniqueDataId, UniqueData> {
 
+    void deleteByDataTypeAndUniqueKey(
+        String dataType,
+        String uniqueKey
+    );
+
+    void deleteByDataTypeAndUniqueKeyIn(
+        String dataType,
+        Collection<String> uniqueKeys
+    );
+
     List<UniqueData> findByDataTypeAndDataIdIn(
         String dataType,
         Collection<Long> dataIds

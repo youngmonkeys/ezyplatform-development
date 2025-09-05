@@ -25,9 +25,12 @@ import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
+import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
+import org.youngmonkeys.ezyplatform.service.MediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 
 import javax.servlet.http.Part;
@@ -50,7 +53,29 @@ import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidUrl
 public class MediaValidator {
 
     private final TikaConfig tika;
+    private final MediaService mediaService;
     private final SettingService settingService;
+
+    public MediaModel validateMediaId(long mediaId) {
+        MediaModel media = mediaService.getMediaById(
+            mediaId
+        );
+        if (media == null) {
+            throw new ResourceNotFoundException("media");
+        }
+        return media;
+    }
+
+    public MediaModel validateUserMedia(
+        long mediaId,
+        long userId
+    ) {
+        MediaModel media = validateMediaId(mediaId);
+        if (media.getOwnerUserId() != userId) {
+            throw new ResourceNotFoundException("media");
+        }
+        return media;
+    }
 
     public void validateMediaName(String mediaName) {
         Map<String, String> errors = new HashMap<>();

@@ -228,6 +228,11 @@ public class DefaultModelToEntityConverter {
             remainingQuantity = BigInteger.ZERO;
         }
         entity.setRemainingQuantity(remainingQuantity);
+        BigInteger numberData = model.getNumberData();
+        if (numberData == null) {
+            numberData = BigInteger.ZERO;
+        }
+        entity.setNumberData(numberData);
         BigDecimal decimalData = model.getDecimalData();
         if (decimalData == null) {
             decimalData = BigDecimal.ZERO;

@@ -38,6 +38,16 @@ public interface UniqueDataService {
         List<UniqueDataKeyValueModel> models
     );
 
+    void deleteByDataTypeAndUniqueKey(
+        String dataType,
+        String uniqueKey
+    );
+
+    void deleteByDataTypeAndUniqueKeys(
+        String dataType,
+        Collection<String> uniqueKeys
+    );
+
     UniqueDataModel getUniqueDataByDataTypeAndDataIdAndUniqueKey(
         String dataType,
         long dataId,

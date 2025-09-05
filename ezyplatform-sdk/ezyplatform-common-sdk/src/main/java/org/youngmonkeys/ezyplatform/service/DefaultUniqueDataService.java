@@ -76,6 +76,31 @@ public class DefaultUniqueDataService implements UniqueDataService {
     }
 
     @Override
+    public void deleteByDataTypeAndUniqueKey(
+        String dataType,
+        String uniqueKey
+    ) {
+        uniqueDataRepository.deleteByDataTypeAndUniqueKey(
+            dataType,
+            uniqueKey
+        );
+    }
+
+    @Override
+    public void deleteByDataTypeAndUniqueKeys(
+        String dataType,
+        Collection<String> uniqueKeys
+    ) {
+        if (uniqueKeys.isEmpty()) {
+            return;
+        }
+        uniqueDataRepository.deleteByDataTypeAndUniqueKeyIn(
+            dataType,
+            uniqueKeys
+        );
+    }
+
+    @Override
     public UniqueDataModel getUniqueDataByDataTypeAndDataIdAndUniqueKey(
         String dataType,
         long dataId,

@@ -54,6 +54,9 @@ public class DataMapping {
     @Column(name = "remaining_quantity")
     private BigInteger remainingQuantity;
 
+    @Column(name = "number_data")
+    private BigInteger numberData;
+
     @Column(name = "decimal_data")
     private BigDecimal decimalData;
 

@@ -354,6 +354,7 @@ public class DefaultEntityToModelConverter {
             .displayOrder(entity.getDisplayOrder())
             .quantity(entity.getQuantity())
             .remainingQuantity(entity.getQuantity())
+            .numberData(entity.getNumberData())
             .decimalData(entity.getDecimalData())
             .textData(entity.getTextData())
             .metadata(entity.getMetadata())

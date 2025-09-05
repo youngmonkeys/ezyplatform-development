@@ -31,6 +31,7 @@ public class SaveDataMappingModel {
     private int displayOrder;
     private BigInteger quantity;
     private BigInteger remainingQuantity;
+    private BigInteger numberData;
     private BigDecimal decimalData;
     private String textData;
     private String metadata;

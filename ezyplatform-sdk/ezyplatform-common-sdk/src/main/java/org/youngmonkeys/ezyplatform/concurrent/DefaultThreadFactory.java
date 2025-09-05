@@ -45,7 +45,5 @@ public class DefaultThreadFactory extends EzyThreadFactory {
         public DefaultThreadFactory build() {
             return new DefaultThreadFactory(this);
         }
-
     }
-
 }
