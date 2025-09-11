@@ -36,15 +36,14 @@ public class VersionalLinkAttributeTagProcessor
     private final String originalAttributeName;
     private final EnvironmentManager environmentManager;
 
-    private static final String PREFIX = "ezy";
-
     public VersionalLinkAttributeTagProcessor(
+        String prefix,
         String originalAttributeName,
         EnvironmentManager environmentManager
     ) {
         super(
             TemplateMode.HTML,
-            PREFIX,
+            prefix,
             null,
             false,
             "v" + originalAttributeName,

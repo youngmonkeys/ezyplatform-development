@@ -16,7 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
-import com.tvd12.ezyfox.io.EzyStrings;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.Undefined;
@@ -24,6 +23,8 @@ import org.mozilla.javascript.Undefined;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
+
+import static org.youngmonkeys.ezyplatform.util.Strings.isBigDecimal;
 
 public final class JavascriptExecutors {
 
@@ -65,12 +66,12 @@ public final class JavascriptExecutors {
             return null;
         }
         String resultStr = result.toString();
-        if (EzyStrings.NULL.equals(resultStr)) {
-            return null;
+        if (isBigDecimal(resultStr)) {
+            return new BigDecimal(resultStr).setScale(
+                bigDecimalScale,
+                roundingMode
+            );
         }
-        return new BigDecimal(resultStr).setScale(
-            bigDecimalScale,
-            roundingMode
-        );
+        return null;
     }
 }

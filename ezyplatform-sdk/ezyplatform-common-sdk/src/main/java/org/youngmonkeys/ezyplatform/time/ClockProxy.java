@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.time;
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import com.tvd12.ezyfox.io.EzyDates;
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.util.LocalDateTimes;
 
 import java.time.Clock;
 import java.time.LocalDate;
@@ -40,8 +41,12 @@ public class ClockProxy {
         return EzyDates.millisToDateTime(clock.millis(), zoneId);
     }
 
+    public long toTimestamp(LocalDate date) {
+        return LocalDateTimes.toTimestamp(date, zoneId);
+    }
+
     public long toTimestamp(LocalDateTime dateTime) {
-        return EzyDates.toInstant(dateTime, zoneId).toEpochMilli();
+        return LocalDateTimes.toTimestamp(dateTime, zoneId);
     }
 
     public LocalDate toLocalDate(long millis) {

@@ -127,6 +127,24 @@ public class JavascriptExecutorsTest {
     }
 
     @Test
+    public void executeReturnNullValueTest() {
+        // given
+        String script = ";";
+
+        // when
+        BigDecimal result = JavascriptExecutors
+            .execute(
+                script,
+                Collections.emptyMap(),
+                2,
+                RoundingMode.UP
+            );
+
+        // then
+        Asserts.assertNull(result);
+    }
+
+    @Test
     public void executeReturnNullFuncTest() {
         // given
         String script = "function a() {return null;} a();";

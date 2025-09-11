@@ -814,4 +814,89 @@ public class StringsTest extends BaseTest {
         );
         Asserts.assertEquals(result10, "bar");
     }
+
+    @Test
+    public void extractVariableNameOrNullTest() {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" ${hello}  "),
+            "hello"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" ${hello  "),
+            "hello"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" ~{hello}  "),
+            "hello"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" ~{hello  "),
+            "hello"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" {{hello}}  "),
+            "hello"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" {{hello}  "),
+            "hello"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" {{hello  "),
+            "hello"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" {{h}"),
+            "h"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" {{h"),
+            "h"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull(" hello  "),
+            "hello"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull("h"),
+            "h"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull("$h"),
+            "$h"
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull("{h"),
+            "{h"
+        );
+        Asserts.assertNull(
+            extractVariableNameOrNull("   ")
+        );
+        Asserts.assertNull(
+            extractVariableNameOrNull("${}")
+        );
+        Asserts.assertNull(
+            extractVariableNameOrNull("${")
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull("$"),
+            "$"
+        );
+        Asserts.assertNull(
+            extractVariableNameOrNull("{{}}")
+        );
+        Asserts.assertNull(
+            extractVariableNameOrNull("{{}")
+        );
+        Asserts.assertNull(
+            extractVariableNameOrNull("{{")
+        );
+        Asserts.assertEquals(
+            extractVariableNameOrNull("{"),
+            "{"
+        );
+    }
 }

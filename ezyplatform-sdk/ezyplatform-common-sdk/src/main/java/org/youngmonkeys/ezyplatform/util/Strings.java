@@ -496,4 +496,69 @@ public final class Strings {
         }
         return index;
     }
+
+    @SuppressWarnings("MethodLength")
+    public static String extractVariableNameOrNull(
+        String text
+    ) {
+        if (isBlank(text)) {
+            return null;
+        }
+        String textTrim = text.trim();
+        String varName = textTrim;
+        int length = textTrim.length();
+        if (length > 1) {
+            char ch0 = textTrim.charAt(0);
+            char ch1 = textTrim.charAt(1);
+            if ((ch0 == '$' || ch0 == '~') && ch1 == '{') {
+                if (length > 2) {
+                    char chZ = textTrim.charAt(length - 1);
+                    if (chZ == '}') {
+                        if (length == 3) {
+                            varName = null;
+                        } else {
+                            varName = textTrim.substring(2, length - 1);
+                        }
+                    } else {
+                        varName = textTrim.substring(2);
+                    }
+                } else {
+                    varName = null;
+                }
+            } else if (ch0 == '{' && ch1 == '{') {
+                if (length > 4) {
+                    char chY = textTrim.charAt(length - 2);
+                    char chZ = textTrim.charAt(length - 1);
+                    if (chY == '}') {
+                        varName = textTrim.substring(2, length - 2);
+                    } else  {
+                        if (chZ == '}') {
+                            varName = textTrim.substring(2, length - 1);
+                        } else {
+                            varName = textTrim.substring(2);
+                        }
+                    }
+                } else {
+                    char chZ = textTrim.charAt(length - 1);
+                    if (chZ == '}') {
+                        if (length == 3) {
+                            varName = null;
+                        } else {
+                            char chY = textTrim.charAt(length - 2);
+                            if (chY == '}') {
+                                varName = null;
+                            } else {
+                                varName = textTrim.substring(2, length - 1);
+                            }
+                        }
+                    } else if (length > 2) {
+                        varName = textTrim.substring(2);
+                    } else {
+                        varName = null;
+                    }
+                }
+            }
+        }
+        return varName;
+    }
 }

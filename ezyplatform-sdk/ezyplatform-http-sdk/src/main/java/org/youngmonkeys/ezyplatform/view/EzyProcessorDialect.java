@@ -26,31 +26,36 @@ import org.youngmonkeys.ezyplatform.manager.EnvironmentManager;
 
 import java.util.Set;
 
+@Setter
 public class EzyProcessorDialect extends AbstractProcessorDialect {
 
-    @Setter
     @EzyAutoBind
     private EnvironmentManager environmentManager;
 
     private static final String DIALECT_NAME = "EzyPlatform Dialect";
+    private static final String PREFIX = "ezy";
+    private static final String ATTRIBUTE_NAME_HREF = "href";
+    private static final String ATTRIBUTE_NAME_SRC = "src";
 
     public EzyProcessorDialect() {
         super(
             DIALECT_NAME,
-            "score",
+            PREFIX,
             StandardDialect.PROCESSOR_PRECEDENCE
         );
     }
 
     @Override
-    public Set<IProcessor> getProcessors(final String dialectPrefix) {
+    public Set<IProcessor> getProcessors(String dialectPrefix) {
         return Sets.newHashSet(
             new VersionalLinkAttributeTagProcessor(
-                "href",
+                dialectPrefix,
+                ATTRIBUTE_NAME_HREF,
                 environmentManager
             ),
             new VersionalLinkAttributeTagProcessor(
-                "src",
+                dialectPrefix,
+                ATTRIBUTE_NAME_SRC,
                 environmentManager
             )
         );
