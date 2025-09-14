@@ -465,4 +465,32 @@ public class DefaultDataMetaService implements DataMetaService {
             entityToModelConverter::toModel
         );
     }
+
+    @Override
+    public Map<Long, Map<String, String>> getDataMetaValueMapsByDataTypeAndDataIdsAndMetaKeys(
+        String dataType,
+        Collection<Long> dataIds,
+        Collection<String> metaKeys
+    ) {
+        if (dataIds.isEmpty() || metaKeys.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dataMetaRepository.findByDataTypeAndDataIdInAndMetaKeyIn(
+                dataType,
+                dataIds,
+                metaKeys
+            )
+            .stream()
+            .filter(it -> it.getMetaValue() != null)
+            .collect(
+                Collectors.groupingBy(
+                    DataMeta::getDataId,
+                    Collectors.toMap(
+                        DataMeta::getMetaKey,
+                        DataMeta::getMetaValue,
+                        (o, n) -> n
+                    )
+                )
+            );
+    }
 }

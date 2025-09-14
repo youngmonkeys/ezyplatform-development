@@ -188,68 +188,45 @@ public final class Strings {
         if (isBlank(str)) {
             return false;
         }
-        int length = str.length();
-        for (int i = 0; i < length; ++i) {
-            if (i == 0 && str.charAt(i) == '-') {
-                if (str.length() == 1) {
-                    return false;
-                }
-                continue;
-            }
-            if (!Character.isDigit(str.charAt(i))) {
-                return false;
-            }
+        try {
+            new BigInteger(str);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
-        return true;
     }
 
     public static boolean isBigDecimal(String str) {
         if (isBlank(str)) {
             return false;
         }
-        int i = 0;
-        int length = str.length();
-        if (str.charAt(0) == '-') {
-            if (length == 1) {
-                return false;
-            }
-            i++;
-        }
-        boolean hasDecimalPoint = false;
-        boolean hasDigit = false;
-        for (; i < length; i++) {
-            char ch = str.charAt(i);
-            if (ch == '.') {
-                if (hasDecimalPoint) {
-                    return false;
-                }
-                hasDecimalPoint = true;
-                continue;
-            }
-            if (Character.isDigit(ch)) {
-                hasDigit = true;
-                continue;
-            }
+        try {
+            new BigDecimal(str);
+            return true;
+        } catch (Exception e) {
             return false;
         }
-        return hasDigit;
     }
 
     public static BigInteger toBigIntegerOrZero(String str) {
         try {
-            return isInteger(str)
-                ? new BigInteger(str)
-                : BigInteger.ZERO;
+            return new BigInteger(str);
         } catch (Exception e) {
             return BigInteger.ZERO;
         }
     }
 
+    public static BigDecimal toBigDecimalOrNull(String str) {
+        try {
+            return new BigDecimal(str);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static BigDecimal toBigDecimalOrZero(String str) {
         try {
-            return isBigDecimal(str)
-                ? new BigDecimal(str)
-                : BigDecimal.ZERO;
+            return new BigDecimal(str);
         } catch (Exception e) {
             return BigDecimal.ZERO;
         }

@@ -899,4 +899,38 @@ public class StringsTest extends BaseTest {
             "{"
         );
     }
+
+    @Test
+    public void isIntegerTest() {
+        // given
+        // when
+        // then
+        Asserts.assertTrue(isInteger("1"));
+        Asserts.assertTrue(isInteger("123"));
+        Asserts.assertTrue(isInteger("+1"));
+        Asserts.assertTrue(isInteger("-11"));
+        Asserts.assertFalse(isInteger("1.1"));
+        Asserts.assertTrue(isInteger(BigInteger.valueOf(Long.MAX_VALUE).toString()));
+        Asserts.assertTrue(isInteger(BigInteger.valueOf(Long.MIN_VALUE).toString()));
+        Asserts.assertFalse(isInteger("abc"));
+        Asserts.assertFalse(isInteger(""));
+    }
+
+    @Test
+    public void isBigDecimalTest() {
+        // given
+        // when
+        // then
+        Asserts.assertTrue(isBigDecimal("1"));
+        Asserts.assertTrue(isBigDecimal("123"));
+        Asserts.assertTrue(isBigDecimal("+1"));
+        Asserts.assertTrue(isBigDecimal("-11"));
+        Asserts.assertTrue(isBigDecimal("1.1"));
+        Asserts.assertTrue(isBigDecimal(BigInteger.valueOf(Long.MAX_VALUE).toString()));
+        Asserts.assertTrue(isBigDecimal(BigInteger.valueOf(Long.MIN_VALUE).toString()));
+        Asserts.assertTrue(isBigDecimal(BigDecimal.valueOf(Double.MAX_VALUE).toString()));
+        Asserts.assertTrue(isBigDecimal(BigDecimal.valueOf(Double.MIN_VALUE).toString()));
+        Asserts.assertFalse(isBigDecimal("abc"));
+        Asserts.assertFalse(isBigDecimal(""));
+    }
 }

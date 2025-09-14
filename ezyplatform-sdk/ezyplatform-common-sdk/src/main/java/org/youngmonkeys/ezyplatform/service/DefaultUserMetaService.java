@@ -25,13 +25,11 @@ import org.youngmonkeys.ezyplatform.repo.UserMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.UserMetaTransactionalRepository;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzySets.newHashSet;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @AllArgsConstructor
@@ -159,6 +157,20 @@ public class DefaultUserMetaService implements UserMetaService {
         )
             .map(UserMeta::getUserId)
             .orElse(0L);
+    }
+
+    @Override
+    public Set<Long> getUserIdsByMeta(
+        String metaKey,
+        String metaValue
+    ) {
+        return newHashSet(
+            userMetaRepository.findListByMetaKeyAndMetaValue(
+                metaKey,
+                metaValue
+            ),
+            UserMeta::getUserId
+        );
     }
 
     @Override

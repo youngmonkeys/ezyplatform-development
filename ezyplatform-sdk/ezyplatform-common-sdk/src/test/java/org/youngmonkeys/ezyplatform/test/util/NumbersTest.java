@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.test.util;
 
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.performance.Performance;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.util.Numbers;
 
@@ -26,6 +27,17 @@ import java.math.BigInteger;
 import static org.youngmonkeys.ezyplatform.util.Numbers.*;
 
 public class NumbersTest {
+
+    public static void main(String[] args) {
+        long time = Performance.create()
+            .test(() -> {
+                try {
+                    new BigDecimal("ahbff");
+                } catch (Exception e) {}
+            })
+            .getTime();
+        System.out.println(time);
+    }
 
     @Test
     public void toIntOrZeroTest() {

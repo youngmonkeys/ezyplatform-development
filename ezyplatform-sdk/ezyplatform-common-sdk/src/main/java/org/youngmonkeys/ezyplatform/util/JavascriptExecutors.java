@@ -24,7 +24,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 
-import static org.youngmonkeys.ezyplatform.util.Strings.isBigDecimal;
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigDecimalOrNull;
 
 public final class JavascriptExecutors {
 
@@ -66,12 +66,15 @@ public final class JavascriptExecutors {
             return null;
         }
         String resultStr = result.toString();
-        if (isBigDecimal(resultStr)) {
-            return new BigDecimal(resultStr).setScale(
-                bigDecimalScale,
-                roundingMode
-            );
+        BigDecimal resultBigDecimal = toBigDecimalOrNull(
+            resultStr
+        );
+        if (resultBigDecimal == null) {
+            return null;
         }
-        return null;
+        return resultBigDecimal.setScale(
+            bigDecimalScale,
+            roundingMode
+        );
     }
 }

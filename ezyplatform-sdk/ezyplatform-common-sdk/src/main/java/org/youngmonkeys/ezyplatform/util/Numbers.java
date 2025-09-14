@@ -19,8 +19,8 @@ package org.youngmonkeys.ezyplatform.util;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
 public final class Numbers {
 
@@ -178,9 +178,17 @@ public final class Numbers {
     }
 
     public static boolean isFloatingPointText(String input) {
-        String regex = "^[+-]?\\d+\\.\\d+$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(input);
-        return matcher.matches();
+        if (isBlank(input)) {
+            return false;
+        }
+        if (input.indexOf('.') < 0) {
+            return false;
+        }
+        try {
+            Double.parseDouble(input);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

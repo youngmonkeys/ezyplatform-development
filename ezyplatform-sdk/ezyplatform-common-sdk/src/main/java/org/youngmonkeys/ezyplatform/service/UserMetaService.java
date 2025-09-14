@@ -24,10 +24,7 @@ import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -239,6 +236,21 @@ public interface UserMetaService {
         return getUserIdByMeta(
             metaKey,
             Strings.from(metaValue)
+        );
+    }
+
+    Set<Long> getUserIdsByMeta(
+        String metaKey,
+        String metaValue
+    );
+
+    default Set<Long> getUserIdsByMeta(
+        String metaKey,
+        Object metaValue
+    ) {
+        return getUserIdsByMeta(
+            metaKey,
+            String.valueOf(metaValue)
         );
     }
 

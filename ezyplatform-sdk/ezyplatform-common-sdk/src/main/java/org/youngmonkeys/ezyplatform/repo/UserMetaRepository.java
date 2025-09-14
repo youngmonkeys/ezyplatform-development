@@ -76,6 +76,15 @@ public interface UserMetaRepository
         String metaValue
     );
 
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.metaKey = ?0 AND e.metaValue = ?1"
+    )
+    List<UserMeta> findListByMetaKeyAndMetaValue(
+        String metaKey,
+        String metaValue
+    );
+
     List<UserMeta> findByMetaKeyAndMetaValueIn(
         String metaKey,
         Collection<String> metaValues

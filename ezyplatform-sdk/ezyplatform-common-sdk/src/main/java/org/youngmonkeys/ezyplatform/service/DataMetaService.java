@@ -549,4 +549,10 @@ public interface DataMetaService {
         long dataId,
         Collection<String> metaKeys
     );
+
+    Map<Long, Map<String, String>> getDataMetaValueMapsByDataTypeAndDataIdsAndMetaKeys(
+        String dataType,
+        Collection<Long> dataIds,
+        Collection<String> metaKeys
+    );
 }

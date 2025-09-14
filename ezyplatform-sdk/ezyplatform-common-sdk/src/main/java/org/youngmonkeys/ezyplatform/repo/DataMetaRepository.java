@@ -102,4 +102,10 @@ public interface DataMetaRepository
         long dataId,
         Collection<String> metaKeys
     );
+
+    List<DataMeta> findByDataTypeAndDataIdInAndMetaKeyIn(
+        String dataType,
+        Collection<Long> dataIds,
+        Collection<String> metaKeys
+    );
 }
