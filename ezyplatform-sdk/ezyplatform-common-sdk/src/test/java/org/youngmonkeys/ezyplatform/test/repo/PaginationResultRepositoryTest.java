@@ -290,9 +290,8 @@ public class PaginationResultRepositoryTest {
             )
         ).thenReturn(idResults);
 
-        TestOffsetPaginationParameter paginationParameter = new TestOffsetPaginationParameter(
-            -1
-        );
+        TestOffsetPaginationParameter paginationParameter = new TestOffsetPaginationParameter();
+        paginationParameter.setOffset(-1);
 
         // when
         List<IdResult> actual = instance.findNextElements(
@@ -343,9 +342,8 @@ public class PaginationResultRepositoryTest {
             )
         ).thenReturn(idResults);
 
-        TestOffsetPaginationParameter paginationParameter = new TestOffsetPaginationParameter(
-            1
-        );
+        TestOffsetPaginationParameter paginationParameter = new TestOffsetPaginationParameter();
+        paginationParameter.setOffset(1);
 
         // when
         List<IdResult> actual = instance.findNextElements(
@@ -450,8 +448,13 @@ public class PaginationResultRepositoryTest {
 
     private static class TestOffsetPaginationParameter extends OffsetPaginationParameter {
 
-        public TestOffsetPaginationParameter(long offset) {
-            super(offset, "e.id DESC");
+        public TestOffsetPaginationParameter() {
+            super("e.id DESC");
+        }
+
+        @Override
+        public String sortOrder() {
+            return "ID__DESC";
         }
     }
 }

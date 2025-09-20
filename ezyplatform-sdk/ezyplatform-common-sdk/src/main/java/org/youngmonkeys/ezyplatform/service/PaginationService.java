@@ -61,22 +61,25 @@ public abstract class PaginationService<T, F, P> {
         int limit
     ) {
         P paginationParameter = doDeserializePageToken(pageToken);
-        if (paginationParameter == null) {
-            paginationParameter = defaultFirstPaginationParameter();
+        if (paginationParameter instanceof OffsetPaginationParameter) {
+            OffsetPaginationParameter offsetPaginationParameter =
+                (OffsetPaginationParameter) paginationParameter;
+            if (offsetPaginationParameter.getOffset() == null) {
+                offsetPaginationParameter.setOffset(0);
+            }
         }
-        P paginationParameterFinal = paginationParameter;
         int limitPlusOne = limit + 1;
         return Reactive.multiple()
             .registerRx(
                 "listPlusOne",
-                getNextItems(filter, paginationParameterFinal, limitPlusOne)
+                getNextItems(filter, paginationParameter, limitPlusOne)
             )
             .register(
                 "total",
                 () -> getTotalItems(filter)
             )
             .blockingGet(map ->
-                toNextPageModel(map, paginationParameterFinal, limit)
+                toNextPageModel(map, paginationParameter, limit)
             );
     }
 
@@ -105,30 +108,33 @@ public abstract class PaginationService<T, F, P> {
     ) {
         long tmpTotalItems = -1L;
         P paginationParameter = doDeserializePageToken(pageToken);
-        if (paginationParameter == null) {
-            tmpTotalItems = getTotalItems(filter);
-            paginationParameter = defaultLastPaginationParameter(
-                tmpTotalItems,
-                limit
-            );
+        if (paginationParameter instanceof OffsetPaginationParameter) {
+            OffsetPaginationParameter offsetPaginationParameter =
+                (OffsetPaginationParameter) paginationParameter;
+            if (offsetPaginationParameter.getOffset() == null) {
+                tmpTotalItems = getTotalItems(filter);
+                offsetPaginationParameter.setOffset(
+                    (int) (tmpTotalItems - limit)
+                );
+            }
         }
-        P paginationParameterFinal = paginationParameter;
         int limitPlusOne = limit + 1;
         final long totalItems = tmpTotalItems;
         return Reactive.multiple()
             .registerRx(
                 "listPlusOne",
-                getPreviousItems(filter, paginationParameterFinal, limitPlusOne)
+                getPreviousItems(filter, paginationParameter, limitPlusOne)
             )
             .register(
                 "total",
                 () -> totalItems >= 0 ? totalItems : getTotalItems(filter)
             )
             .blockingGet(map ->
-                toPreviousPageModel(map, paginationParameterFinal, limit)
+                toPreviousPageModel(map, paginationParameter, limit)
             );
     }
 
+    @SuppressWarnings("unchecked")
     private PaginationModel<T> toNextPageModel(
         RxValueMap map,
         P paginationParameter,
@@ -139,7 +145,7 @@ public abstract class PaginationService<T, F, P> {
         boolean hasNext = listPlusOne.size() > limit;
         boolean hasPrev = !isEmptyPaginationParameter(
             paginationParameter
-        ) && list.size() > 0;
+        ) && !list.isEmpty();
         T nextPageTokenItem = hasNext ? EzyLists.last(list) : null;
         T lastPageTokenItem =  hasPrev ? EzyLists.first(list) : null;
         PaginationModel.PageToken pageToken;
@@ -149,14 +155,14 @@ public abstract class PaginationService<T, F, P> {
             pageToken = PaginationModel.PageToken
                 .builder()
                 .next(
-                    doSerializeToOffsetPageToken(
-                        offsetPaginationParameter.nextOffset(limit),
+                    doSerializeToPageToken(
+                        (P) offsetPaginationParameter.nextOffset(limit),
                         nextPageTokenItem
                     )
                 )
                 .prev(
-                    doSerializeToOffsetPageToken(
-                        offsetPaginationParameter.previousOffset(limit),
+                    doSerializeToPageToken(
+                        (P) offsetPaginationParameter.previousOffset(limit),
                         lastPageTokenItem
                     )
                 )
@@ -183,7 +189,7 @@ public abstract class PaginationService<T, F, P> {
             .build();
     }
 
-    @SuppressWarnings("MethodLength")
+    @SuppressWarnings({"unchecked", "MethodLength"})
     private PaginationModel<T> toPreviousPageModel(
         RxValueMap map,
         P paginationParameter,
@@ -208,7 +214,7 @@ public abstract class PaginationService<T, F, P> {
             list = EzyLists.take(listPlusOne, limit);
             hasNext = !isEmptyPaginationParameter(
                 paginationParameter
-            ) && list.size() > 0;
+            ) && !list.isEmpty();
             hasPrev = listPlusOne.size() > limit;
         }
         T nextPageTokenItem = hasNext ? EzyLists.first(list) : null;
@@ -218,14 +224,14 @@ public abstract class PaginationService<T, F, P> {
             pageToken = PaginationModel.PageToken
                 .builder()
                 .next(
-                    doSerializeToOffsetPageToken(
-                        offsetPaginationParameter.nextOffset(limit),
+                    doSerializeToPageToken(
+                        (P) offsetPaginationParameter.nextOffset(limit),
                         nextPageTokenItem
                     )
                 )
                 .prev(
-                    doSerializeToOffsetPageToken(
-                        offsetPaginationParameter.previousOffset(limit),
+                    doSerializeToPageToken(
+                        (P) offsetPaginationParameter.previousOffset(limit),
                         lastPageTokenItem
                     )
                 )
@@ -305,15 +311,6 @@ public abstract class PaginationService<T, F, P> {
             : EzyBase64.encodeUtf(serializeToPageToken(paginationParameter, value));
     }
 
-    private String doSerializeToOffsetPageToken(
-        long offset,
-        T value
-    ) {
-        return value == null
-            ? null
-            : EzyBase64.encodeUtf(String.valueOf(offset));
-    }
-
     protected String serializeToPageToken(
         P paginationParameter,
         T value
@@ -332,17 +329,6 @@ public abstract class PaginationService<T, F, P> {
     }
 
     protected P defaultPaginationParameter() {
-        return null;
-    }
-
-    protected P defaultFirstPaginationParameter() {
-        return null;
-    }
-
-    protected P defaultLastPaginationParameter(
-        long totalItems,
-        int limit
-    ) {
         return null;
     }
 

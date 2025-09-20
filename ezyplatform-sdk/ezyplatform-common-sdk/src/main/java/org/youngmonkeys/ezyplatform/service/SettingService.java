@@ -271,6 +271,13 @@ public interface SettingService {
         return getTextValue(SETTING_NODE_NAME);
     }
 
+    default int getPaginationCountLimit() {
+        return getIntValue(
+            SETTING_NAME_PAGINATION_COUNT_LIMIT,
+            LIMIT_1_000_000_RECORDS
+        );
+    }
+
     default String getWebSiteName() {
         String siteTitle = getTextValue(
             SETTING_NAME_WEB_SITE_TITLE

@@ -17,10 +17,43 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
+import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
+import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
+import org.youngmonkeys.ezyplatform.result.SimpleContentTemplateResult;
+import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
+
+import java.util.List;
 
 public interface ContentTemplateRepository
     extends EzyDatabaseRepository<Long, ContentTemplate> {
+
+    @EzyQuery(
+        "SELECT DISTINCT e.contentType FROM ContentTemplate e " +
+            "ORDER BY e.contentType ASC"
+    )
+    List<ContentTypeResult> findAllContentTypes();
+
+    @EzyQuery(
+        "SELECT DISTINCT e.templateType AS templateType " +
+            "FROM ContentTemplate e " +
+            "ORDER BY e.templateType ASC"
+    )
+    List<TemplateTypeResult> findAllTemplateTypes();
+
+    @EzyQuery(
+        "SELECT" +
+            " e.id, e.templateName, e.titleTemplate," +
+            " e.creatorId, e.status, e.createdAt, e.updatedAt" +
+            " FROM ContentTemplate e" +
+            " WHERE e.templateType = ?0" +
+            " ORDER BY e.id DESC"
+    )
+    List<SimpleContentTemplateResult> findTemplatesByType(
+        String templateType,
+        Next next
+    );
 
     ContentTemplate findByTemplateTypeAndTemplateName(
         String templateType,
@@ -33,6 +66,8 @@ public interface ContentTemplateRepository
         String templateType,
         String templateName
     );
+
+    long countByTemplateType(String templateType);
 
     int countByTemplateTypeAndTemplateName(
         String templateType,

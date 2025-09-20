@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 youngmonkeys.org
+ * Copyright 2023 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.constant;
+package org.youngmonkeys.ezyplatform.result;
 
-public enum CommonContentType {
-    TEXT,
-    HTML,
-    MARKDOWN,
-    JSON,
-    JAVASCRIPT,
-    THYMELEAF;
+import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
+import lombok.Getter;
+import lombok.Setter;
 
-    public boolean equalsValue(String value) {
-        return value != null && toString().equals(value);
-    }
+@Getter
+@Setter
+@EzyQueryResult
+public class TemplateTypeResult {
+    private String templateType;
 }

@@ -16,6 +16,9 @@
 
 package org.youngmonkeys.ezyplatform.validator;
 
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
 import java.net.URI;
 import java.util.Collection;
 
@@ -69,6 +72,81 @@ public final class DefaultValidator {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static boolean isValidExternalUrl(String url) {
+        try {
+            URI uri = new URI(url);
+            String scheme = uri.getScheme();
+            String host = uri.getHost();
+            return scheme.equals(HTTPS)
+                && isNotBlank(host)
+                && !host.equals(LOCALHOST)
+                && isPublicHost(host)
+                && !host.matches(PATTERN_IP)
+                && uri.getUserInfo() == null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean isPublicHost(String host) {
+        try {
+            InetAddress[] addresses = InetAddress.getAllByName(host);
+            for (InetAddress address : addresses) {
+                if (isInternalNetworkAddress(address)) {
+                    return false;
+                }
+            }
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static boolean isInternalNetworkAddress(
+        InetAddress address
+    ) {
+        if (address.isAnyLocalAddress()
+            || address.isLoopbackAddress()
+            || address.isLinkLocalAddress()
+        ) {
+            return true;
+        }
+        if (address instanceof Inet4Address) {
+            byte[] b = address.getAddress();
+            int first = Byte.toUnsignedInt(b[0]);
+            int second = Byte.toUnsignedInt(b[1]);
+
+            // 10.0.0.0/8
+            if (first == 10) {
+                return true;
+            }
+
+            // 172.16.0.0/12
+            if (first == 172 && (second >= 16 && second <= 31)) {
+                return true;
+            }
+
+            // 192.168.0.0/16
+            if (first == 192 && second == 168) {
+                return true;
+            }
+
+            // 169.254.0.0/16 (link-local)
+            if (first == 169 && second == 254) {
+                return true;
+            }
+        }
+        if (address instanceof Inet6Address) {
+            if (address.isLoopbackAddress()) {
+                return true;
+            }
+            byte[] b = address.getAddress();
+            int firstByte = Byte.toUnsignedInt(b[0]);
+            return (firstByte & 0xfe) == 0xfc;
+        }
+        return false;
     }
 
     public static boolean isValidHttpUrl(String url) {

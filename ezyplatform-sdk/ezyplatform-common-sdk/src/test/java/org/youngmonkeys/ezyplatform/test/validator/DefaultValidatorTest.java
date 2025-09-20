@@ -20,6 +20,8 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.validator.DefaultValidator;
 
+import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidExternalUrl;
+
 public class DefaultValidatorTest {
 
     @Test
@@ -174,5 +176,33 @@ public class DefaultValidatorTest {
         Asserts.assertTrue(
             DefaultValidator.isValidMediaName("5fcbfdc3c0b00331df26b45e3745df99a18ca94ce8dd736cc6f6bc6d89ae8ff0")
         );
+    }
+
+    @Test
+    public void isValidExternalUrlTest() {
+        Asserts.assertTrue(isValidExternalUrl("https://allowed.com"));
+        Asserts.assertTrue(isValidExternalUrl("https://sub.allowed.com"));
+        Asserts.assertTrue(isValidExternalUrl("https://trusted-site.org"));
+        Asserts.assertTrue(isValidExternalUrl("https://deep.sub.trusted-site.org/path?query=1"));
+
+        // invalid scheme
+        Asserts.assertFalse(isValidExternalUrl("http://allowed.com"));
+        Asserts.assertFalse(isValidExternalUrl("ftp://allowed.com"));
+        Asserts.assertFalse(isValidExternalUrl("allowed.com"));
+        Asserts.assertFalse(isValidExternalUrl("https:///nohost"));
+
+        // malformed
+        Asserts.assertFalse(isValidExternalUrl("not a url"));
+        Asserts.assertFalse(isValidExternalUrl("https://"));
+
+        // userinfo present
+        Asserts.assertFalse(isValidExternalUrl("https://user:pass@allowed.com"));
+        Asserts.assertFalse(isValidExternalUrl("https://user@trusted-site.org"));
+
+        // case insensitivity and trailing dot
+        Asserts.assertTrue(isValidExternalUrl("https://ALLOWED.com"));
+        Asserts.assertTrue(isValidExternalUrl("https://allowed.com."));
+        Asserts.assertTrue(isValidExternalUrl("https://sub.ALLOWED.COM"));
+        Asserts.assertTrue(isValidExternalUrl("https://allowed.com"));
     }
 }

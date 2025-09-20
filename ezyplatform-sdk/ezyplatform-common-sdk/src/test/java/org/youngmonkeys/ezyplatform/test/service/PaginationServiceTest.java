@@ -35,7 +35,7 @@ public class PaginationServiceTest {
     @Test
     public void getFirstPageTest() {
         // given
-        InternalPagination sut = new InternalPagination();
+        InternalPaginationService sut = new InternalPaginationService();
 
         // when
         PaginationModel<Model> actual = sut.getFirstPage(2);
@@ -69,7 +69,7 @@ public class PaginationServiceTest {
     @Test
     public void getNextPageHasNextTest() {
         // given
-        InternalPagination sut = new InternalPagination();
+        InternalPaginationService sut = new InternalPaginationService();
         String pageToken = "Mg==";
 
         // when
@@ -104,7 +104,7 @@ public class PaginationServiceTest {
     @Test
     public void getNextPageHasNoNextTest() {
         // given
-        InternalPagination sut = new InternalPagination();
+        InternalPaginationService sut = new InternalPaginationService();
         String pageToken = "NA==";
 
         // when
@@ -138,7 +138,7 @@ public class PaginationServiceTest {
     @Test
     public void getLastPageTest() {
         // given
-        InternalPagination sut = new InternalPagination();
+        InternalPaginationService sut = new InternalPaginationService();
 
         // when
         PaginationModel<Model> actual = sut.getLastPage(2);
@@ -172,7 +172,7 @@ public class PaginationServiceTest {
     @Test
     public void getPreviousPageHasPreviousTest() {
         // given
-        InternalPagination sut = new InternalPagination();
+        InternalPaginationService sut = new InternalPaginationService();
         String pageToken = "NQ==";
 
         // when
@@ -207,7 +207,7 @@ public class PaginationServiceTest {
     @Test
     public void getPreviousPageHasNoPreviousTest() {
         // given
-        InternalPagination sut = new InternalPagination();
+        InternalPaginationService sut = new InternalPaginationService();
         String pageToken = "Mg==";
 
         // when
@@ -238,7 +238,7 @@ public class PaginationServiceTest {
         Asserts.assertEquals(actual, expected, false);
     }
 
-    private static class InternalPagination
+    private static class InternalPaginationService
         extends PaginationService<Model, Void, Integer> {
 
         private final List<Model> models = Arrays.asList(
@@ -257,7 +257,11 @@ public class PaginationServiceTest {
         }
 
         @Override
-        protected RxOperation getNextItemsExclusive(Void matchingValue, Integer paginationValue, int limit) {
+        protected RxOperation getNextItemsExclusive(
+            Void matchingValue,
+            Integer paginationValue,
+            int limit
+        ) {
             List<Model> answer = new ArrayList<>();
             for (Model model : models) {
                 if (model.index > paginationValue) {
@@ -271,7 +275,11 @@ public class PaginationServiceTest {
         }
 
         @Override
-        protected RxOperation getPreviousItemsExclusive(Void matchingValue, Integer paginationValue, int limit) {
+        protected RxOperation getPreviousItemsExclusive(
+            Void matchingValue,
+            Integer paginationValue,
+            int limit
+        ) {
             List<Model> answer = new ArrayList<>();
             for (int i = models.size() - 1 ; i >= 0 ; --i) {
                 if (models.get(i).index < paginationValue) {

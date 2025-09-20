@@ -17,13 +17,11 @@
 package org.youngmonkeys.ezyplatform.converter;
 
 import lombok.AllArgsConstructor;
-import org.youngmonkeys.ezyplatform.model.AdminNameModel;
-import org.youngmonkeys.ezyplatform.model.AvatarCoverImageIdsModel;
-import org.youngmonkeys.ezyplatform.model.UserNameModel;
-import org.youngmonkeys.ezyplatform.model.UuidNameModel;
+import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.result.AvatarCoverImageIdsResult;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.SimpleContentTemplateResult;
 import org.youngmonkeys.ezyplatform.util.LocalDateTimes;
 
 import java.time.LocalDateTime;
@@ -53,6 +51,23 @@ public class DefaultResultToModelConverter {
         return AvatarCoverImageIdsModel.builder()
             .avatarImageId(result.getAvatarImageId())
             .coverImageId(result.getCoverImageId())
+            .build();
+    }
+
+    public ContentTemplateModel toModel(
+        SimpleContentTemplateResult result
+    ) {
+        if (result == null) {
+            return null;
+        }
+        return ContentTemplateModel.builder()
+            .id(result.getId())
+            .name(result.getTemplateName())
+            .titleTemplate(result.getTitleTemplate())
+            .creatorId(result.getCreatorId())
+            .status(result.getStatus())
+            .createdAt(toTimestamp(result.getCreatedAt()))
+            .updatedAt(toTimestamp(result.getUpdatedAt()))
             .build();
     }
 

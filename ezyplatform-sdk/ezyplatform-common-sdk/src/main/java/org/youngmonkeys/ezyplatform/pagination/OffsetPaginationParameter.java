@@ -16,29 +16,47 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.tvd12.ezyfox.reflect.EzyClasses;
 import lombok.Getter;
+import lombok.Setter;
 import org.youngmonkeys.ezyplatform.data.PaginationParameter;
 
 import java.util.Collections;
 import java.util.Map;
 
 @Getter
-public class OffsetPaginationParameter implements PaginationParameter {
+public abstract class OffsetPaginationParameter
+    implements PaginationParameter {
 
-    private final transient int offset;
+    @Setter
+    private transient Integer offset;
+
+    @JsonIgnore
     private final transient String orderBy;
 
-    public OffsetPaginationParameter(long offset, String orderBy) {
-        this.offset = (int) offset;
+    public OffsetPaginationParameter(String orderBy) {
         this.orderBy = orderBy;
     }
 
-    public int nextOffset(int limit) {
-        return offset + limit;
+    public OffsetPaginationParameter(
+        Integer offset,
+        String orderBy
+    ) {
+        this.offset = offset;
+        this.orderBy = orderBy;
     }
 
-    public int previousOffset(int limit) {
-        return offset - limit;
+    public OffsetPaginationParameter nextOffset(int limit) {
+        OffsetPaginationParameter instance = newInstance();
+        instance.setOffset(offset + limit);
+        return instance;
+    }
+
+    public OffsetPaginationParameter previousOffset(int limit) {
+        OffsetPaginationParameter instance = newInstance();
+        instance.setOffset(offset - limit);
+        return instance;
     }
 
     @Override
@@ -49,5 +67,12 @@ public class OffsetPaginationParameter implements PaginationParameter {
     @Override
     public Map<String, Object> getParameters() {
         return Collections.emptyMap();
+    }
+
+    @JsonIgnore
+    public abstract String sortOrder();
+
+    public OffsetPaginationParameter newInstance() {
+        return EzyClasses.newInstance(getClass());
     }
 }

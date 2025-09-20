@@ -16,17 +16,26 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyStrings;
+import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.data.TitleContent;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
 import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 import org.youngmonkeys.ezyplatform.repo.ContentTemplateRepository;
+import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
+import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 
 @AllArgsConstructor
 public class DefaultContentTemplateService
@@ -35,6 +44,7 @@ public class DefaultContentTemplateService
     private final ContentTemplateRepository contentTemplateRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultModelToEntityConverter modelToEntityConverter;
+    private final DefaultResultToModelConverter resultToModelConverter;
 
     @Override
     public long addTemplate(
@@ -91,6 +101,11 @@ public class DefaultContentTemplateService
     }
 
     @Override
+    public void deleteTemplate(long templateId) {
+        contentTemplateRepository.delete(templateId);
+    }
+
+    @Override
     public ContentTemplateModel getTemplateById(
         long templateId
     ) {
@@ -110,6 +125,38 @@ public class DefaultContentTemplateService
                 templateName
             )
         );
+    }
+
+    @Override
+    public List<ContentTemplateModel> getTemplatesByType(
+        String templateType,
+        int limit
+    ) {
+        return newArrayList(
+            contentTemplateRepository.findTemplatesByType(
+                templateType,
+                Next.limit(limit)
+            ),
+            resultToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<String> getAllTemplateTypes() {
+        return newArrayList(
+            contentTemplateRepository.findAllTemplateTypes(),
+            TemplateTypeResult::getTemplateType
+        );
+    }
+
+    @Override
+    public List<String> getAllTemplateContentTypes() {
+        return contentTemplateRepository
+            .findAllContentTypes()
+            .stream()
+            .map(ContentTypeResult::getContentType)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -137,6 +184,13 @@ public class DefaultContentTemplateService
             template.getTitleTemplate(),
             template.getContentTemplate(),
             parameters
+        );
+    }
+
+    @Override
+    public long countTemplatesByType(String templateType) {
+        return contentTemplateRepository.countByTemplateType(
+            templateType
         );
     }
 

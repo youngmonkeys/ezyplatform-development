@@ -32,6 +32,7 @@ public class AdminMailModel {
     private final String title;
     private final String content;
     private final Map<String, Object> parameters;
+    private final Locale locale;
 
     protected AdminMailModel(Builder builder) {
         this.templateName = builder.templateName;
@@ -40,6 +41,7 @@ public class AdminMailModel {
         this.title = builder.title;
         this.content = builder.content;
         this.parameters = builder.parameters;
+        this.locale = builder.locale;
     }
 
     public String joinTo() {
@@ -57,6 +59,7 @@ public class AdminMailModel {
         private String title;
         private String content;
         private Map<String, Object> parameters;
+        private Locale locale;
 
         public Builder() {
             this.to = new ArrayList<>();
@@ -105,6 +108,11 @@ public class AdminMailModel {
                 this.parameters = new HashMap<>();
             }
             this.parameters.putAll(parameters);
+            return this;
+        }
+
+        public Builder locale(Locale locale) {
+            this.locale = locale;
             return this;
         }
 

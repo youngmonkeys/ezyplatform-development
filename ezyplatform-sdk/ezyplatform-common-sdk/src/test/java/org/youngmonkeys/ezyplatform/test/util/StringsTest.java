@@ -612,6 +612,61 @@ public class StringsTest extends BaseTest {
             ),
             "hello Mr Dzung 1\n2\n3\t4 x 5 6"
         );
+
+        String template = "<!--\n" +
+            " ~ Copyright 2023 youngmonkeys.org\n" +
+            " ~\n" +
+            " ~ Licensed under the ezyplatform, Version 1.0.0 (the \"License\");\n" +
+            " ~ you may not use this file except in compliance with the License.\n" +
+            " ~ You may obtain a copy of the License at\n" +
+            " ~\n" +
+            " ~     https://youngmonkeys.org/licenses/ezyplatform-1.0.0.txt\n" +
+            " ~\n" +
+            " ~ Unless required by applicable law or agreed to in writing, software\n" +
+            " ~ distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
+            " ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
+            " ~ See the License for the specific language governing permissions and\n" +
+            " ~ limitations under the License.\n" +
+            "-->\n" +
+            "\n" +
+            "<!DOCTYPE html> <html><body>\n" +
+            "<p>Hi ${username},</p>\n" +
+            "<p>Order#${orderId} has been newly created.</p>\n" +
+            "<p>You can access it <a href=\"${webUrl}/orders/${orderId}?userUuid=${userUuid}\">here</a> to view more details.</p>\n" +
+            "<p>Thank you!</p>\n" +
+            "</body> </html>\n";
+        String actual = fromTemplateAndParameters(
+            template,
+            EzyMapBuilder.mapBuilder()
+                .put("username", "tvd12")
+                .put("orderId", 123)
+                .put("webUrl", "http://tvd12.com")
+                .put("userUuid", "hello")
+                .toMap()
+        );
+        String expected = "<!--\n" +
+            " ~ Copyright 2023 youngmonkeys.org\n" +
+            " ~\n" +
+            " ~ Licensed under the ezyplatform, Version 1.0.0 (the \"License\");\n" +
+            " ~ you may not use this file except in compliance with the License.\n" +
+            " ~ You may obtain a copy of the License at\n" +
+            " ~\n" +
+            " ~ https://youngmonkeys.org/licenses/ezyplatform-1.0.0.txt\n" +
+            " ~\n" +
+            " ~ Unless required by applicable law or agreed to in writing, software\n" +
+            " ~ distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
+            " ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
+            " ~ See the License for the specific language governing permissions and\n" +
+            " ~ limitations under the License.\n" +
+            "-->\n" +
+            "\n" +
+            "<!DOCTYPE html> <html><body>\n" +
+            "<p>Hi tvd12,</p>\n" +
+            "<p>Order#123 has been newly created.</p>\n" +
+            "<p>You can access it <a href=\"http://tvd12.com/orders/123?userUuid=hello\">here</a> to view more details.</p>\n" +
+            "<p>Thank you!</p>\n" +
+            "</body> </html>\n";
+        Asserts.assertEquals(actual, expected);
     }
 
     @Test

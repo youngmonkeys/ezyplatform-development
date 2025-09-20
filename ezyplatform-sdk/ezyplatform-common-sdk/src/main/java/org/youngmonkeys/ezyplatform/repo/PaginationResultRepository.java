@@ -23,10 +23,13 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.EzyGenerics;
 import org.youngmonkeys.ezyplatform.data.PaginationParameter;
 import org.youngmonkeys.ezyplatform.data.StorageFilter;
+import org.youngmonkeys.ezyplatform.entity.Setting;
 import org.youngmonkeys.ezyplatform.pagination.CommonPaginationParameter;
 import org.youngmonkeys.ezyplatform.pagination.CommonStorageFilter;
 import org.youngmonkeys.ezyplatform.pagination.OffsetPaginationParameter;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,6 +63,19 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         );
     }
 
+    public List<R> findFirstElements(
+        F filter,
+        int offset,
+        int limit
+    ) {
+        return findNextElements(
+            filter,
+            null,
+            offset,
+            limit
+        );
+    }
+
     public List<R> findNextElements(
         F filter,
         P paginationParameter,
@@ -68,6 +84,21 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         return findElements(
             filter,
             paginationParameter,
+            limit,
+            true
+        );
+    }
+
+    public List<R> findNextElements(
+        F filter,
+        P paginationParameter,
+        int offset,
+        int limit
+    ) {
+        return findElements(
+            filter,
+            paginationParameter,
+            offset,
             limit,
             true
         );
@@ -110,19 +141,12 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         );
     }
 
-    @SuppressWarnings("unchecked")
     private List<R> findElements(
         F filter,
         P paginationParameter,
         int limit,
         boolean nextPage
     ) {
-        EzyQueryData query = makeQuery(
-            EzyQueryMethodType.FIND,
-            filter,
-            paginationParameter,
-            nextPage
-        );
         int actualOffset = 0;
         int actualLimit = limit;
         if (paginationParameter instanceof OffsetPaginationParameter) {
@@ -132,19 +156,42 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
             actualLimit = Math.max(actualLimit, 0);
             actualOffset = Math.max(offset, 0);
         }
+        return findElements(
+            filter,
+            paginationParameter,
+            actualOffset,
+            actualLimit,
+            nextPage
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<R> findElements(
+        F filter,
+        P paginationParameter,
+        int offset,
+        int limit,
+        boolean nextPage
+    ) {
+        EzyQueryData query = makeQuery(
+            EzyQueryMethodType.FIND,
+            filter,
+            paginationParameter,
+            nextPage
+        );
         return resultType != entityType
             ? fetchListByQueryString(
                 query.getQuery(),
                 query.getParameterMap(),
                 resultType,
-                actualOffset,
-                actualLimit
+                offset,
+                limit
             )
             : (List<R>) findListByQueryString(
                 query.getQuery(),
                 query.getParameterMap(),
-                actualOffset,
-                actualLimit
+                offset,
+                limit
             );
     }
 
@@ -443,6 +490,23 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
         return paginationParameter == null
             ? Collections.emptyMap()
             : Collections.singletonMap("parameter", paginationParameter);
+    }
+
+    @SuppressWarnings("unchecked")
+    public String findSettingValue(String settingName) {
+        EntityManager entityManager = databaseContext.createEntityManager();
+        try {
+            Query query = createQuery(
+                entityManager,
+                "SELECT e FROM Setting e WHERE e.name = ?0",
+                new Object[] { settingName }
+            );
+            query.setMaxResults(1);
+            List<Setting> results = query.getResultList();
+            return results.isEmpty() ? null : results.get(0).getValue();
+        } finally {
+            entityManager.close();
+        }
     }
 
     @SuppressWarnings("unchecked")

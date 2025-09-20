@@ -20,6 +20,7 @@ import org.youngmonkeys.ezyplatform.data.TitleContent;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
 import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 
+import java.util.List;
 import java.util.Map;
 
 public interface ContentTemplateService {
@@ -41,6 +42,8 @@ public interface ContentTemplateService {
         SaveContentTemplateModel model
     );
 
+    void deleteTemplate(long templateId);
+
     ContentTemplateModel getTemplateById(
         long templateId
     );
@@ -49,6 +52,15 @@ public interface ContentTemplateService {
         String templateType,
         String templateName
     );
+
+    List<ContentTemplateModel> getTemplatesByType(
+        String templateType,
+        int limit
+    );
+
+    List<String> getAllTemplateTypes();
+
+    List<String> getAllTemplateContentTypes();
 
     boolean containsTemplateByTypeAndName(
         String templateType,
@@ -60,4 +72,6 @@ public interface ContentTemplateService {
         String templateName,
         Map<String, Object> parameters
     );
+
+    long countTemplatesByType(String templateType);
 }

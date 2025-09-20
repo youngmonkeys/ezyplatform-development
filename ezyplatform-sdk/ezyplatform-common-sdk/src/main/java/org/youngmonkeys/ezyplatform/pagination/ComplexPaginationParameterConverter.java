@@ -22,7 +22,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.youngmonkeys.ezyplatform.model.PaginationModel;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -90,6 +89,7 @@ public abstract class ComplexPaginationParameterConverter<S, M> {
         );
     }
 
+    @SuppressWarnings("unchecked")
     public String serialize(
         S sortOrder,
         M model
@@ -97,9 +97,7 @@ public abstract class ComplexPaginationParameterConverter<S, M> {
         Function<M, Object> extractor = paginationParameterExtractorBySortOrder
             .get(sortOrder);
         if (extractor == null) {
-            throw new IllegalArgumentException(
-                "there is no extractor map to sort order: " + sortOrder
-            );
+            extractor = (Function<M, Object>) Function.identity();
         }
         return converter.serialize(
             new PaginationParameterWrapper<>(
@@ -137,34 +135,13 @@ public abstract class ComplexPaginationParameterConverter<S, M> {
         return defaultPageTokenBySortOrder.get(sortOrder);
     }
 
-    public PaginationModel.PageToken getDefaultPageTokenIfNull(
-        S sortOrder,
-        String nextPageToken,
-        String prevPageToken,
-        boolean lastPage
-    ) {
-        String actualNextPageToken = nextPageToken;
-        String actualPrevPageToken = prevPageToken;
-        if (nextPageToken == null && prevPageToken == null) {
-            if (lastPage) {
-                actualPrevPageToken = getDefaultPageToken(sortOrder);
-            } else {
-                actualNextPageToken = getDefaultPageToken(sortOrder);
-            }
-        }
-        return PaginationModel.PageToken.builder()
-            .next(actualNextPageToken)
-            .prev(actualPrevPageToken)
-            .build();
-    }
-
     protected abstract void mapPaginationParametersToTypes(
         Map<S, Class<?>> map
     );
 
-    protected abstract void addPaginationParameterExtractors(
+    protected void addPaginationParameterExtractors(
         Map<S, Function<M, Object>> map
-    );
+    ) {}
 
     @Getter
     @Setter

@@ -46,4 +46,15 @@ public class DataRecordCount {
 
     @Column(name = "last_counted_at")
     private LocalDateTime lastCountedAt;
+
+    @Column(name = "query_string")
+    private String queryString;
+
+    @Column(name = "query_type")
+    private String queryType;
+
+    private String parameters;
+
+    @Column(name = "parameters_type")
+    private String parameterType;
 }

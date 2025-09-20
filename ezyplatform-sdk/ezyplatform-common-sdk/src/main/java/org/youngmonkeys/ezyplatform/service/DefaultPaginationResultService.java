@@ -25,6 +25,11 @@ import org.youngmonkeys.ezyplatform.rx.RxSingle;
 
 import java.util.List;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1_000_000_RECORDS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_PAGINATION_COUNT_LIMIT;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toIntOrZero;
+
 /**
  * For pagination business.
  *
@@ -79,7 +84,36 @@ public abstract class DefaultPaginationResultService<T, F, P, I, E, R>
 
     @Override
     protected long getTotalItems(F filter) {
-        return repository.countElements(filter);
+        if (allowCountAllItems()) {
+            return repository.countElements(filter);
+        }
+        int countLimit = getCountLimit();
+        List<R> items = repository.findFirstElements(
+            filter,
+            countLimit,
+            1
+        );
+        return items.isEmpty()
+            ? repository.countElements(filter)
+            : countLimit;
+    }
+
+    protected boolean allowCountAllItems() {
+        return false;
+    }
+
+    protected int getCountLimit() {
+        String value = repository.findSettingValue(
+            SETTING_NAME_PAGINATION_COUNT_LIMIT
+        );
+        int limit = 0;
+        if (isNotBlank(value)) {
+            limit = toIntOrZero(value);
+        }
+        if (limit <= 0) {
+            limit = LIMIT_1_000_000_RECORDS;
+        }
+        return limit;
     }
 
     protected RxOperation convertEntities(List<R> entities) {

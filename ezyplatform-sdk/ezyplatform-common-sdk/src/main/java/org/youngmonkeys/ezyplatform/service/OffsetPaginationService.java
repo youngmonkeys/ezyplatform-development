@@ -16,11 +16,11 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import org.youngmonkeys.ezyplatform.pagination.CommonStorageFilter;
+import org.youngmonkeys.ezyplatform.pagination.ComplexPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.pagination.OffsetPaginationParameter;
 import org.youngmonkeys.ezyplatform.repo.PaginationRepository;
-
-import java.util.function.Function;
 
 /**
  * For pagination business.
@@ -39,14 +39,21 @@ public class OffsetPaginationService<
     E
     > extends DefaultPaginationService<T, F, P, I, E> {
 
-    private final Function<Long, P> paginationParameterCreator;
+    private final ComplexPaginationParameterConverter<String, P>
+        paginationParameterConverter;
 
     public OffsetPaginationService(
         PaginationRepository<F, P, I, E> repository,
-        Function<Long, P> paginationParameterCreator
+        ComplexPaginationParameterConverter<String, P>
+            paginationParameterConverter
     ) {
         super(repository);
-        this.paginationParameterCreator = paginationParameterCreator;
+        this.paginationParameterConverter = paginationParameterConverter;
+    }
+
+    @Override
+    protected boolean allowCountAllItems() {
+        return true;
     }
 
     @Override
@@ -54,28 +61,23 @@ public class OffsetPaginationService<
         P paginationParameter,
         T model
     ) {
-        return String.valueOf(paginationParameter.getOffset());
-    }
-
-    @Override
-    protected P deserializePageToken(String value) {
-        return paginationParameterCreator.apply(
-            Long.valueOf(value)
+        return paginationParameterConverter.serialize(
+            paginationParameter.sortOrder(),
+            paginationParameter
         );
     }
 
     @Override
-    protected P defaultFirstPaginationParameter() {
-        return paginationParameterCreator.apply(0L);
+    protected P deserializePageToken(String value) {
+        return paginationParameterConverter.deserialize(
+            value
+        );
     }
 
     @Override
-    protected P defaultLastPaginationParameter(
-        long totalItems,
-        int limit
-    ) {
-        return paginationParameterCreator.apply(
-            totalItems - limit
+    protected P defaultPaginationParameter() {
+        throw new EzyNotImplementedException(
+            "need to implement defaultPaginationParameter method"
         );
     }
 }

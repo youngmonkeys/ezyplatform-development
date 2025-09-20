@@ -45,19 +45,20 @@ public class DefaultLetterService implements LetterService {
     public long addLetter(AddLetterModel model) {
         Letter letter = modelToEntityConverter.toEntity(model);
         letterRepository.save(letter);
-        List<LetterReceiver> letterReceivers = modelToEntityConverter.toEntities(
-            letter.getId(),
-            model
-        );
-        if (letterReceivers.size() > 0) {
+        List<LetterReceiver> letterReceivers = modelToEntityConverter
+            .toEntities(letter.getId(), model);
+        if (!letterReceivers.isEmpty()) {
             letterReceiverRepository.save(letterReceivers);
         }
         return letter.getId();
     }
 
     @Override
-    public long addLetterReceiver(AddLetterReceiverModel model) {
-        LetterReceiver entity = modelToEntityConverter.toEntity(model);
+    public long addLetterReceiver(
+        AddLetterReceiverModel model
+    ) {
+        LetterReceiver entity = modelToEntityConverter
+            .toEntity(model);
         letterReceiverRepository.save(entity);
         return entity.getId();
     }

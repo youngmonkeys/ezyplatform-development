@@ -14,17 +14,15 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.constant;
+package org.youngmonkeys.ezyplatform.result;
 
-public enum CommonContentType {
-    TEXT,
-    HTML,
-    MARKDOWN,
-    JSON,
-    JAVASCRIPT,
-    THYMELEAF;
+import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
+import lombok.Getter;
+import lombok.Setter;
 
-    public boolean equalsValue(String value) {
-        return value != null && toString().equals(value);
-    }
+@Getter
+@Setter
+@EzyQueryResult
+public class ContentTypeResult {
+    private String contentType;
 }

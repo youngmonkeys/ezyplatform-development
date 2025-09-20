@@ -35,6 +35,9 @@ public final class CommonConstants {
     public static final String UNKNOWN = "UNKNOWN";
     public static final String UNKNOWN_LOWERCASE = "unknown";
 
+    public static final String HTTPS = "https";
+    public static final String LOCALHOST = "localhost";
+
     public static final String PARAMETER_TYPE_NAME_DATE = "Date";
     public static final String PARAMETER_TYPE_NAME_TIME = "Time";
     public static final String PARAMETER_TYPE_NAME_DATETIME = "DateTime";
@@ -63,6 +66,7 @@ public final class CommonConstants {
     public static final String PATTERN_ENUM_NAME = "[A-Z0-9_\\s]+";
     public static final String PATTERN_CONTRACT_ADDRESS = "[a-zA-Z0-9]{8,64}";
     public static final String PATTERN_WALLET_ADDRESS = "[a-zA-Z0-9]{8,64}";
+    public static final String PATTERN_IP = "^\\d{1,3}(\\.\\d{1,3}){3}$";
 
     public static final String PREFIX_HTTP_URL = "http://";
     public static final String PREFIX_HTTPS_URL = "https://";
@@ -100,6 +104,7 @@ public final class CommonConstants {
     public static final int LIMIT_500_RECORDS = 500;
     public static final int LIMIT_1500_RECORDS = 1500;
     public static final int LIMIT_3000_RECORDS = 3000;
+    public static final int LIMIT_1_000_000_RECORDS = 1_000_000;
 
     public static final int MIN_PAGE_SIZE = 1;
     public static final int MAX_PAGE_SIZE = 300;
@@ -140,6 +145,8 @@ public final class CommonConstants {
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY
         = "ezyplatform_dictionary";
+    public static final String SETTING_NAME_PAGINATION_COUNT_LIMIT =
+        "ezyplatform_pagination_count_limit";
     public static final String SETTING_NAME_ADMIN_DATE_FORMAT
         = "admin_date_format";
     public static final String SETTING_NAME_ADMIN_TIME_FORMAT

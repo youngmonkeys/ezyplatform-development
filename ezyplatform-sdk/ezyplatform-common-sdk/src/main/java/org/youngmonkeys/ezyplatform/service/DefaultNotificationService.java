@@ -42,22 +42,29 @@ public class DefaultNotificationService implements NotificationService {
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
-    public long addNotification(AddNotificationModel model) {
-        Notification notification = modelToEntityConverter.toEntity(model);
+    public long addNotification(
+        AddNotificationModel model
+    ) {
+        Notification notification = modelToEntityConverter
+            .toEntity(model);
         notificationRepository.save(notification);
-        List<NotificationReceiver> notificationReceivers = modelToEntityConverter.toEntities(
-            notification.getId(),
-            model
-        );
-        if (notificationReceivers.size() > 0) {
+        List<NotificationReceiver> notificationReceivers =
+            modelToEntityConverter.toEntities(
+                notification.getId(),
+                model
+            );
+        if (!notificationReceivers.isEmpty()) {
             notificationReceiverRepository.save(notificationReceivers);
         }
         return notification.getId();
     }
 
     @Override
-    public long addNotificationReceiver(AddNotificationReceiverModel model) {
-        NotificationReceiver entity = modelToEntityConverter.toEntity(model);
+    public long addNotificationReceiver(
+        AddNotificationReceiverModel model
+    ) {
+        NotificationReceiver entity = modelToEntityConverter
+            .toEntity(model);
         notificationReceiverRepository.save(entity);
         return entity.getId();
     }
