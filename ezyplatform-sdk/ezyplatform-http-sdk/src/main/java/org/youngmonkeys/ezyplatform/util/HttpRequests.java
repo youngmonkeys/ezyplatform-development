@@ -26,7 +26,9 @@ public final class HttpRequests {
 
     private HttpRequests() {}
 
-    public static String getLanguage(HttpServletRequest request) {
+    public static String getLanguage(
+        HttpServletRequest request
+    ) {
         return HttpServletRequests.getRequestValue(
             request,
             "lang"

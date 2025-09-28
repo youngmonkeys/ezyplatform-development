@@ -24,6 +24,7 @@ import org.youngmonkeys.ezyplatform.entity.UniqueDataId;
 import org.youngmonkeys.ezyplatform.model.UniqueDataKeyValueModel;
 import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
 import org.youngmonkeys.ezyplatform.repo.UniqueDataRepository;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -115,6 +116,21 @@ public class DefaultUniqueDataService implements UniqueDataService {
                 )
             )
         );
+    }
+
+    @Override
+    public long getDataIdByDataTypeAndUniqueKeyAndTextValue(
+        String dataType,
+        String uniqueKey,
+        String textValue
+    ) {
+        IdResult result = uniqueDataRepository
+            .findDataIdByDataTypeAndUniqueKeyAndTextValue(
+                dataType,
+                uniqueKey,
+                textValue
+            );
+        return result != null ? result.getId() : 0L;
     }
 
     @Override

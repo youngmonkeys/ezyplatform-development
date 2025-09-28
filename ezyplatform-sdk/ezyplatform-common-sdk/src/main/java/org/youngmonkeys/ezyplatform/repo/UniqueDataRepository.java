@@ -17,8 +17,10 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.UniqueData;
 import org.youngmonkeys.ezyplatform.entity.UniqueDataId;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +36,18 @@ public interface UniqueDataRepository
     void deleteByDataTypeAndUniqueKeyIn(
         String dataType,
         Collection<String> uniqueKeys
+    );
+
+    @EzyQuery(
+        "SELECT e.dataId FROM UniqueData e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.uniqueKey = ?1 " +
+            "AND textValue = ?2"
+    )
+    IdResult findDataIdByDataTypeAndUniqueKeyAndTextValue(
+        String dataType,
+        String uniqueKey,
+        String textValue
     );
 
     List<UniqueData> findByDataTypeAndDataIdIn(

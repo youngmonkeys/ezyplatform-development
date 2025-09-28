@@ -54,6 +54,12 @@ public interface UniqueDataService {
         String uniqueKey
     );
 
+    long getDataIdByDataTypeAndUniqueKeyAndTextValue(
+        String dataType,
+        String uniqueKey,
+        String textValue
+    );
+
     Map<Long, UniqueDataModel> getUniqueDataMapByDataTypeAndDataIdsAndUniqueKey(
         String dataType,
         Collection<Long> dataIds,

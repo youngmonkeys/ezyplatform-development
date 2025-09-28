@@ -70,6 +70,7 @@ public final class CommonConstants {
 
     public static final String PREFIX_HTTP_URL = "http://";
     public static final String PREFIX_HTTPS_URL = "https://";
+    public static final String PREFIX_BEARER_TOKEN = "Bearer ";
 
     public static final int MAX_LENGTH_UUID = 128;
     public static final int MIN_LENGTH_PASSWORD = 6;
@@ -111,12 +112,15 @@ public final class CommonConstants {
     public static final int WEB_MAX_PAGE_SIZE = 100;
 
     public static final String COOKIE_NAME_ACCESS_TOKEN = "accessToken";
+    public static final String COOKIE_NAME_ACCESS_TOKEN_LOWER_CASE = "accesstoken";
     public static final String COOKIE_NAME_ACCESS_TOKEN_EXPIRED_AT = "accessTokenExpiredAt";
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN = "adminAccessToken";
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT = "adminAccessTokenExpiredAt";
     public static final String COOKIE_NAME_ADMIN_SSO_CALL_BACK_URL = "adminSSOCallbackUrl";
     public static final String COOKIE_NAME_MARKET_ACCESS_TOKEN = "marketAccessToken";
     public static final String COOKIE_NAME_MARKET_ACCESS_TOKEN_EXPIRED_AT = "marketAccessTokenExpiredAt";
+
+    public static final String HEADER_NAME_AUTHORIZATION = "Authorization";
 
     public static final int COOKIE_ADMIN_SSO_CALL_BACK_URL_MAX_AGE = 5 * 60;
 
