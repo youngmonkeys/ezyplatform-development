@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.test.util;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
+import static org.youngmonkeys.ezyplatform.util.Randoms.randomEmailFromUrl;
 import static org.youngmonkeys.ezyplatform.util.Randoms.randomName;
 
 public class RandomsTest {
@@ -32,5 +33,21 @@ public class RandomsTest {
         // then
         Asserts.assertEquals(displayName.length(), 16);
         System.out.println(displayName);
+    }
+
+    @Test
+    public void randomEmailFromUrlTest() {
+        // given
+        // when
+        String actual1 = randomEmailFromUrl(
+            "http://localhost:8080"
+        );
+        String actual2 = randomEmailFromUrl(
+            "http://hello.com"
+        );
+
+        // then
+        Asserts.assertTrue(actual1.endsWith("localhost.com"));
+        Asserts.assertTrue(actual2.endsWith("hello.com"));
     }
 }

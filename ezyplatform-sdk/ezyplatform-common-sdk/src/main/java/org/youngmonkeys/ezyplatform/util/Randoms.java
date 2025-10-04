@@ -16,7 +16,9 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import java.net.URI;
 import java.security.SecureRandom;
+import java.util.UUID;
 
 public final class Randoms {
 
@@ -47,5 +49,20 @@ public final class Randoms {
             );
         }
         return sb.toString();
+    }
+
+    public static String randomEmailFromUrl(String url) {
+        String host = URI
+            .create(url)
+            .getHost();
+        return randomEmailFromHost(host);
+    }
+
+    public static String randomEmailFromHost(String host) {
+        String domain = host;
+        if (host.indexOf('.') < 0) {
+            domain += ".com";
+        }
+        return UUID.randomUUID() + "@" + domain;
     }
 }

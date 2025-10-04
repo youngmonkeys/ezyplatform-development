@@ -259,11 +259,11 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
                     .append(")");
             }
         }
-        String groupBy = makeGroupBy(filter, paginationParameter);
-        if (isNotBlank(groupBy)) {
-            queryString.append(" GROUP BY ").append(groupBy);
-        }
         if (methodType == EzyQueryMethodType.FIND) {
+            String groupBy = makeGroupBy(filter, paginationParameter);
+            if (isNotBlank(groupBy)) {
+                queryString.append(" GROUP BY ").append(groupBy);
+            }
             String orderBy = makeOrderBy(filter, paginationParameter, nextPage);
             if (isNotBlank(orderBy)) {
                 queryString.append(" ORDER BY ").append(orderBy);

@@ -45,10 +45,12 @@ public final class Uris {
     }
 
     public static boolean uriStartsWith(String uri, String prefix) {
-        if (uri.startsWith(prefix)) {
+        String compareUri = prefix.startsWith("/") ? prefix : "/" + prefix;
+        if (uri.equals(compareUri)) {
             return true;
         }
-        return uri.startsWith("/" + prefix);
+        String compareUriPrefix = compareUri + "/";
+        return uri.startsWith(compareUriPrefix);
     }
 
     public static String getSiteName(String siteUrl) {

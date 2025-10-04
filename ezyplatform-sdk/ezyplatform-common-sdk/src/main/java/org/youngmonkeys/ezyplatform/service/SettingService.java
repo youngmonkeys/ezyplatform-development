@@ -30,6 +30,7 @@ import java.util.function.Supplier;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.util.Randoms.randomEmailFromUrl;
 
 @SuppressWarnings("MethodCount")
 public interface SettingService {
@@ -400,5 +401,9 @@ public interface SettingService {
 
     default String resolveWebManagementUri(String uri) {
         return Uris.resolveUrl(getWebManagementUrl(), uri);
+    }
+
+    default String randomWebEmail() {
+        return randomEmailFromUrl(getWebUrl());
     }
 }

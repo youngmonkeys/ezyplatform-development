@@ -20,6 +20,8 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.util.Uris;
 
+import static org.youngmonkeys.ezyplatform.util.Uris.uriStartsWith;
+
 public class UrisTest {
 
     @Test
@@ -90,5 +92,18 @@ public class UrisTest {
             Uris.getFileExtensionInUrl(null)
         );
         Asserts.assertNull(Uris.getFileExtensionInUrl("abc"));
+    }
+
+    @Test
+    public void uriStartsWithTest() {
+        // given
+        // when
+        // then
+        Asserts.assertTrue(uriStartsWith("/hello", "/hello"));
+        Asserts.assertTrue(uriStartsWith("/hello", "hello"));
+        Asserts.assertTrue(uriStartsWith("/hello/world", "hello"));
+        Asserts.assertTrue(uriStartsWith("/hello/world", "/hello"));
+        Asserts.assertFalse(uriStartsWith("/hellos", "hello"));
+        Asserts.assertFalse(uriStartsWith("/hellos", "/hello"));
     }
 }
