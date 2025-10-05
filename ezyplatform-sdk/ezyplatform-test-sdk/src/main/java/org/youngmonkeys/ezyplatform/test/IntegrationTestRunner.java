@@ -35,8 +35,8 @@ import java.util.List;
     "config.properties",
     "platform.properties",
     "setup.properties",
-    "settings/platform.properties",
-    "settings/setup.properties"
+    "platform.properties",
+    "setup.properties"
 })
 public class IntegrationTestRunner {
 
