@@ -151,6 +151,8 @@ public final class CommonConstants {
         = "ezyplatform_dictionary";
     public static final String SETTING_NAME_PAGINATION_COUNT_LIMIT =
         "ezyplatform_pagination_count_limit";
+    public static final String SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME =
+        "ezyplatform_media_up_down_loader_name";
     public static final String SETTING_NAME_ADMIN_DATE_FORMAT
         = "admin_date_format";
     public static final String SETTING_NAME_ADMIN_TIME_FORMAT

@@ -37,6 +37,5 @@ public class SwaggerGeneratorTest {
         // then
         File swaggerFile = new File("swagger.yaml");
         Asserts.assertTrue(swaggerFile.exists());
-        Asserts.assertTrue(swaggerFile.delete());
     }
 }

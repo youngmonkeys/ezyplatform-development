@@ -18,6 +18,9 @@ package org.youngmonkeys.ezyplatform.util;
 
 import javax.servlet.http.Part;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 
 public final class ServletParts {
@@ -30,5 +33,22 @@ public final class ServletParts {
 
     public static boolean hasContent(Part part) {
         return part != null && isNotBlank(part.getSubmittedFileName());
+    }
+
+    public static String makeContentDisposition(
+        String dispositionType,
+        String filename
+    ) throws Exception {
+        String asciiFallback = filename
+            .replace("\"", "'");
+        String encoded = URLEncoder
+            .encode(filename, StandardCharsets.UTF_8.toString())
+            .replace("+", "%20");
+        return String.format(
+            "%s; filename=\"%s\"; filename*=UTF-8''%s",
+            dispositionType,
+            asciiFallback,
+            encoded
+        );
     }
 }

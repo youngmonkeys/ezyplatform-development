@@ -29,6 +29,7 @@ import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,11 +37,14 @@ import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzyLists.filter;
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.*;
 
@@ -48,6 +52,39 @@ import static com.tvd12.ezyfox.io.EzyStrings.*;
 public class SwaggerGenerator {
 
     private final String packageToScan;
+
+    private static final Class<?> NO_GENERICS_TYPE = null;
+
+    private static final Map<String, String> SWAGGER_TYPE_BY_JAVA_TYPE_NAME =
+        EzyMapBuilder.mapBuilder()
+            .put("float", "number")
+            .put("double", "number")
+            .put("long", "number")
+            .toMap();
+    private static final Map<String, String> SWAGGER_FORMAT_BY_JAVA_TYPE_NAME =
+        EzyMapBuilder.mapBuilder()
+            .put("float", "float")
+            .put("double", "number")
+            .put("integer", "int32")
+            .put("long", "int64")
+            .toMap();
+
+    public void generateToDefaultFile() throws IOException {
+        generateToFile(
+            "swagger.yaml"
+        );
+    }
+
+    public void generateToFile(String filePath) throws IOException {
+        File file = new File(filePath);
+        EzyFileUtil.createFileIfNotExists(file);
+        new EzySimpleFileWriter().write(
+            file,
+            generate(),
+            StandardCharsets.UTF_8.toString()
+        );
+        System.out.println("generated to: " + filePath);
+    }
 
     public String generate() throws IOException {
         SwaggerTemplate swaggerTemplate = new SwaggerTemplate();
@@ -70,12 +107,17 @@ public class SwaggerGenerator {
             controllerClasses,
             this::extractControllerClass
         );
+        Set<ApiMethod> generatedMethods = new HashSet<>();
         List<String> apis = new ArrayList<>();
         for (ApiClass apiClass : apiClasses) {
             for (String uri : apiClass.methodsByUri.keySet()) {
-                List<ApiMethod> apiMethods = apiClass.methodsByUri.get(uri);
+                List<ApiMethod> apiMethods = filter(
+                    apiClass.methodsByUri.get(uri),
+                    it -> !generatedMethods.contains(it)
+                );
                 for (int i = 0; i < apiMethods.size(); ++i) {
                     ApiMethod apiMethod = apiMethods.get(i);
+                    generatedMethods.add(apiMethod);
                     apis.add(
                         swaggerTemplate.createContent(
                             "api",
@@ -83,8 +125,8 @@ public class SwaggerGenerator {
                                 .mapBuilder()
                                 .put("uri", i == 0 ? uri : "")
                                 .put("method", apiMethod.type)
-                                .put("summary", createApiSummary(apiMethod))
-                                .put("description", apiMethod.name)
+                                .put("summary", toFriendlyText(apiMethod.name))
+                                .put("description", createApiDescription(apiMethod))
                                 .put(
                                     "parameters",
                                     createApiParameters(
@@ -127,26 +169,9 @@ public class SwaggerGenerator {
         );
     }
 
-    public void generateToDefaultFile() throws IOException {
-        generateToFile(
-            "swagger.yaml"
-        );
-    }
-
-    public void generateToFile(String filePath) throws IOException {
-        File file = new File(filePath);
-        EzyFileUtil.createFileIfNotExists(file);
-        new EzySimpleFileWriter().write(
-            file,
-            generate(),
-            StandardCharsets.UTF_8.toString()
-        );
-        System.out.println("generated to: " + filePath);
-    }
-
-    private String createApiSummary(ApiMethod apiMethod) {
+    private String createApiDescription(ApiMethod apiMethod) {
         List<String> lines = new ArrayList<>();
-        lines.add("- feature: " + apiMethod.feature);
+        lines.add("- feature: " + toFriendlyText(apiMethod.feature));
         lines.add("- api: " + (apiMethod.api ? "yes" : "no"));
         lines.add("- authenticated: " + (apiMethod.authenticated ? "yes" : "no"));
         return joinString(lines, 4);
@@ -174,20 +199,70 @@ public class SwaggerGenerator {
         ApiParameter apiParameter,
         SwaggerTemplate swaggerTemplate
     ) {
+        String javaType = mapJavaType(apiParameter.javaType);
+        String swaggerType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
+            .getOrDefault(javaType, javaType);
+        String swaggerFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
+            .get(javaType);
+        String properties = EMPTY_STRING;
+        if ("array".equals(javaType)) {
+            String javaGenericsType = "object";
+            Class<?> genericsType = apiParameter.javaGenericsType;
+            if (genericsType != null) {
+                javaGenericsType = mapJavaType(genericsType);
+            }
+            String swaggerGenericsType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
+                .getOrDefault(javaGenericsType, javaGenericsType);
+            String swaggerGenericsFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
+                .get(javaGenericsType);
+            properties = swaggerTemplate.createContent(
+                "response array data",
+                EzyMapBuilder.mapBuilder()
+                    .put("type", swaggerGenericsType)
+                    .put(
+                        "format",
+                        swaggerGenericsFormat != null
+                            ? "format: " + swaggerGenericsFormat
+                            : EMPTY_STRING
+                    )
+                    .put(
+                        "properties",
+                        "array".equals(swaggerGenericsType)
+                            ? swaggerTemplate.createContent(
+                                "response array data",
+                            EzyMapBuilder.mapBuilder()
+                                .put("type", "object")
+                                .put("format", EMPTY_STRING)
+                                .put("properties", EMPTY_STRING)
+                                .toMap(),
+                                7
+                            )
+                            : EMPTY_STRING
+                    )
+                    .toMap(),
+                6
+            );
+        }
         return swaggerTemplate.createContent(
             "parameter",
-            EzyMapBuilder
-                .mapBuilder()
+            EzyMapBuilder.mapBuilder()
                 .put("name", apiParameter.name)
                 .put("in", apiParameter.in)
-                .put("type", mapJavaType(apiParameter.javaType))
-                .put("required", "true")
+                .put("type", swaggerType)
+                .put(
+                    "format",
+                    swaggerFormat != null
+                        ? "format: " + swaggerFormat
+                        : EMPTY_STRING
+                )
+                .put("properties", properties)
                 .put(
                     "description",
                     apiParameter.defaultValue != null
                         ? "default value is " + apiParameter.defaultValue
                         : "parameter"
                 )
+                .put("required", "path".equals(apiParameter.in))
                 .toMap(),
             4
         );
@@ -198,20 +273,20 @@ public class SwaggerGenerator {
         SwaggerTemplate swaggerTemplate
     ) {
         if (apiMethod.requestBody == null) {
-            return "";
+            return EMPTY_STRING;
         }
         return swaggerTemplate.createContent(
             "request body",
-            EzyMapBuilder
-                .mapBuilder()
+            EzyMapBuilder.mapBuilder()
                 .put("content_type", "application/json")
                 .put("required", "true")
                 .put("type", "object")
+                .put("format", EMPTY_STRING)
                 .put(
                     "properties",
                     createProperties(
                         apiMethod.requestBody.fields,
-                        null,
+                        NO_GENERICS_TYPE,
                         8,
                         "set"
                     )
@@ -241,24 +316,50 @@ public class SwaggerGenerator {
                     "get"
                 );
             } else {
+                String javaGenericsType = mapJavaType(apiMethod.response.genericsType);
+                String swaggerGenericsType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
+                    .getOrDefault(javaGenericsType, javaGenericsType);
+                String swaggerGenericsFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
+                    .get(swaggerGenericsType);
+                EzyMapBuilder parameters = EzyMapBuilder
+                    .mapBuilder()
+                    .put("type", swaggerGenericsType)
+                    .put(
+                        "format",
+                        swaggerGenericsFormat != null
+                            ? "format: " + swaggerGenericsFormat
+                            : EMPTY_STRING
+                    );
+                if ("object".equals(javaGenericsType)) {
+                    parameters.put(
+                        "properties",
+                        createProperties(
+                            extractApiDataFields(
+                                apiMethod.response.genericsType,
+                                "get"
+                            ),
+                            apiMethod.response.genericsType,
+                            10,
+                            "get"
+                        )
+                    );
+                } else if ("array".equals(javaGenericsType)) {
+                    parameters.put(
+                        "properties",
+                        swaggerTemplate.createContent(
+                            "response array data",
+                            EzyMapBuilder.mapBuilder()
+                                .put("type", "object")
+                                .put("format", EMPTY_STRING)
+                                .put("properties", EMPTY_STRING)
+                                .toMap(),
+                            9
+                        )
+                    );
+                }
                 responseData = swaggerTemplate.createContent(
                     "response array data",
-                    EzyMapBuilder
-                        .mapBuilder()
-                        .put("type", "array")
-                        .put(
-                            "properties",
-                            createProperties(
-                                extractApiDataFields(
-                                    apiMethod.response.genericsType,
-                                    "get"
-                                ),
-                                apiMethod.response.genericsType,
-                                10,
-                                "get"
-                            )
-                        )
-                        .toMap(),
+                    parameters.toMap(),
                     8
                 );
             }
@@ -268,6 +369,7 @@ public class SwaggerGenerator {
                     .mapBuilder()
                     .put("content_type", "application/json")
                     .put("type", type)
+                    .put("format", EMPTY_STRING)
                     .put("response_data", responseData)
                     .toMap(),
                 6
@@ -302,13 +404,23 @@ public class SwaggerGenerator {
         int doubleSpaces,
         String methodPrefix
     ) {
+        if (fields.isEmpty()) {
+            return EMPTY_STRING;
+        }
         List<String> lines = new ArrayList<>();
         lines.add("properties:");
         for (ApiDataField field : fields) {
             lines.add(field.name + ":");
-            String type = mapJavaType(field.javaType);
-            lines.add("  type: " + type);
-            if ("array".equals(type)) {
+            String javaType = mapJavaType(field.javaType);
+            String swaggerType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
+                .getOrDefault(javaType, javaType);
+            lines.add("  type: " + swaggerType);
+            String swaggerFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
+                .get(swaggerType);
+            if (swaggerFormat != null) {
+                lines.add("  format: " + swaggerFormat);
+            }
+            if ("array".equals(javaType)) {
                 lines.add("  items:");
                 Class<?> genericsType = getGenericType(
                     field.javaGenericsType
@@ -329,26 +441,33 @@ public class SwaggerGenerator {
                 } else {
                     genericsTypeName = "object";
                 }
-                lines.add("    type: " + genericsTypeName);
+                String swaggerGenericsTypeName = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
+                    .getOrDefault(genericsTypeName, genericsTypeName);
+                lines.add("    type: " + swaggerGenericsTypeName);
+                String swaggerGenericsFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
+                    .get(swaggerGenericsTypeName);
+                if (swaggerGenericsFormat != null) {
+                    lines.add("    format: " + swaggerGenericsFormat);
+                }
                 if ("object".equals(genericsTypeName)) {
                     String line = "    " + createProperties(
                         extractApiDataFields(
                             genericsType,
                             methodPrefix
                         ),
-                        null,
+                        NO_GENERICS_TYPE,
                         doubleSpaces + 3,
                         methodPrefix
                     );
                     lines.add(line);
                 }
-            } else if ("object".equals(type)) {
+            } else if ("object".equals(javaType)) {
                 String line = "  " + createProperties(
                     extractApiDataFields(
                         field.javaType,
                         methodPrefix
                     ),
-                    null,
+                    NO_GENERICS_TYPE,
                     doubleSpaces + 2,
                     methodPrefix
                 );
@@ -500,23 +619,29 @@ public class SwaggerGenerator {
             String name = null;
             String defaultValue = null;
             String in = null;
-            PathVariable pathVariable = parameter.getAnnotation(PathVariable.class);
-            if (pathVariable != null) {
+            PathVariable pathVariableAnnotation = parameter.getAnnotation(
+                PathVariable.class
+            );
+            if (pathVariableAnnotation != null) {
                 in = "path";
-                name = pathVariable.value();
+                name = pathVariableAnnotation.value();
                 if (isBlank(name)) {
-                    name = pathVariables.get(pathVariableIndex);
+                    name = pathVariableIndex < pathVariables.size()
+                        ? pathVariables.get(pathVariableIndex)
+                        : "unknown";
                 }
                 ++pathVariableIndex;
             }
-            RequestParam requestParam = parameter.getAnnotation(RequestParam.class);
-            if (requestParam != null) {
+            RequestParam requestParamAnnotation = parameter.getAnnotation(
+                RequestParam.class
+            );
+            if (requestParamAnnotation != null) {
                 in = "query";
-                name = requestParam.value();
+                name = requestParamAnnotation.value();
                 if (isBlank(name)) {
                     name = parameter.getName();
                 }
-                defaultValue = requestParam.defaultValue();
+                defaultValue = requestParamAnnotation.defaultValue();
             }
             if (in != null) {
                 answer.add(
@@ -524,6 +649,7 @@ public class SwaggerGenerator {
                         in,
                         name,
                         parameter.getType(),
+                        getGenericType(parameter.getParameterizedType()),
                         defaultValue
                     )
                 );
@@ -620,6 +746,7 @@ public class SwaggerGenerator {
     }
 
     @AllArgsConstructor
+    @EqualsAndHashCode(of = {"type", "uri"})
     public static class ApiMethod {
         private final String name;
         private final String type;
@@ -645,6 +772,7 @@ public class SwaggerGenerator {
     }
 
     @AllArgsConstructor
+    @EqualsAndHashCode(of = "name")
     private static class ApiDataField {
         private final String name;
         private final Class<?> javaType;
@@ -656,6 +784,7 @@ public class SwaggerGenerator {
         private String in;
         private final String name;
         private final Class<?> javaType;
+        private final Class<?> javaGenericsType;
         private final String defaultValue;
     }
 
@@ -742,6 +871,10 @@ public class SwaggerGenerator {
         String type;
         if (javaType.isEnum()) {
             type = "string";
+        } else if (javaType == BigInteger.class) {
+            type = "integer";
+        } else if (javaType == BigDecimal.class) {
+            type = "double";
         } else if (EzyTypes.NON_ARRAY_TYPES.contains(javaType)) {
             if (javaType == boolean.class
                 || javaType == Boolean.class
@@ -758,7 +891,7 @@ public class SwaggerGenerator {
             } else if (javaType == long.class
                 || javaType == Long.class
             ) {
-                type = "integer";
+                type = "long";
             } else if (javaType == float.class
                 || javaType == Float.class
             ) {
@@ -778,5 +911,25 @@ public class SwaggerGenerator {
             type = "object";
         }
         return type;
+    }
+
+    private String toFriendlyText(String s) {
+        if (isBlank(s)) {
+            return s;
+        }
+        String withSpaces = s
+            .replaceAll("[^\\p{L}\\p{Nd}]+", " ")
+            .replaceAll("([\\p{Ll}\\p{Nd}])(\\p{Lu})", "$1 $2")
+            .replaceAll("(\\p{Lu}+)(\\p{Lu}\\p{Ll})", "$1 $2")
+            .replaceAll("(\\p{L})(\\p{Nd})", "$1 $2")
+            .replaceAll("(\\p{Nd})(\\p{L})", "$1 $2")
+            .trim()
+            .replaceAll("\\s+", " ");
+        String lower = Arrays.stream(withSpaces.split("\\s+"))
+            .map(String::toLowerCase)
+            .collect(Collectors.joining(" "));
+        return lower.isEmpty()
+            ? lower
+            : Character.toUpperCase(lower.charAt(0)) + lower.substring(1);
     }
 }

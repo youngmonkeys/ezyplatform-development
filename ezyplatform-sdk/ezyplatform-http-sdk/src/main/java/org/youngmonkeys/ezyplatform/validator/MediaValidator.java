@@ -43,6 +43,7 @@ import java.util.Set;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.ezyhttp.core.constant.ContentType.getExtensionOfMimeType;
+import static org.apache.tika.metadata.TikaCoreProperties.RESOURCE_NAME_KEY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.entity.MediaType.AVATAR;
 import static org.youngmonkeys.ezyplatform.entity.MediaType.ofMimeTypeName;
@@ -114,9 +115,11 @@ public class MediaValidator {
             try (TikaInputStream tikaInputStream =
                      TikaInputStream.get(filePart.getInputStream())
             ) {
+                Metadata metadata = new Metadata();
+                metadata.set(RESOURCE_NAME_KEY, fileName);
                 mediaType = tika.getDetector().detect(
                     tikaInputStream,
-                    new Metadata()
+                    metadata
                 );
             }
             mimeType = mediaType.toString();

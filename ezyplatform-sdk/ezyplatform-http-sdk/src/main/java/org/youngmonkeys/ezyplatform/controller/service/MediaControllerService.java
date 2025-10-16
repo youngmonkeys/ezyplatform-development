@@ -42,6 +42,10 @@ import org.youngmonkeys.ezyplatform.event.*;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.io.FolderProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
+import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
+import org.youngmonkeys.ezyplatform.media.MediaUpDownloader;
+import org.youngmonkeys.ezyplatform.media.MediaUpDownloaderManager;
+import org.youngmonkeys.ezyplatform.media.MediaUploadArguments;
 import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.pagination.DefaultMediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
@@ -78,6 +82,7 @@ public class MediaControllerService extends EzyLoggable {
     private final HttpClient httpClient;
     private final EventHandlerManager eventHandlerManager;
     private final FileSystemManager fileSystemManager;
+    private final MediaUpDownloaderManager mediaUpDownloaderManager;
     private final ResourceDownloadManager resourceDownloadManager;
     private final MediaService mediaService;
     private final PaginationMediaService paginationMediaService;
@@ -99,6 +104,7 @@ public class MediaControllerService extends EzyLoggable {
         HttpClient httpClient,
         EventHandlerManager eventHandlerManager,
         FileSystemManager fileSystemManager,
+        MediaUpDownloaderManager mediaUpDownloaderManager,
         ResourceDownloadManager resourceDownloadManager,
         MediaService mediaService,
         PaginationMediaService paginationMediaService,
@@ -121,6 +127,7 @@ public class MediaControllerService extends EzyLoggable {
         this.mediaValidator = mediaValidator;
         this.eventHandlerManager = eventHandlerManager;
         this.fileSystemManager = fileSystemManager;
+        this.mediaUpDownloaderManager = mediaUpDownloaderManager;
         this.resourceDownloadManager = resourceDownloadManager;
         this.requestToModelConverter = requestToModelConverter;
         this.modelToResponseConverter = modelToResponseConverter;
@@ -140,7 +147,26 @@ public class MediaControllerService extends EzyLoggable {
         boolean avatar,
         boolean notPublic
     ) throws Exception {
+        String mediaUploaderName = settingService
+            .getMediaUpDownloaderName();
+        MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
+            .getMediaUpDownloaderByName(mediaUploaderName);
         FileUploader fileUploader = fileUploaderWrapper.get();
+        if (mediaUpDownloader != null) {
+            mediaUpDownloader.upload(
+                MediaUploadArguments.builder()
+                    .tika(tika.get())
+                    .fileUploader(fileUploader)
+                    .request(request)
+                    .response(response)
+                    .uploadFrom(uploadFrom)
+                    .ownerId(ownerId)
+                    .avatar(avatar)
+                    .notPublic(notPublic)
+                    .build()
+            );
+            return;
+        }
         if (fileUploader == null) {
             throw new HttpNotAcceptableException(
                 singletonMap("fileUpload", "disabled")
@@ -365,6 +391,21 @@ public class MediaControllerService extends EzyLoggable {
         boolean exposePrivateMedia,
         Predicate<MediaModel> validMediaCondition
     ) throws Exception {
+        String mediaUploaderName = settingService
+            .getMediaUpDownloaderName();
+        MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
+            .getMediaUpDownloaderByName(mediaUploaderName);
+        if (mediaUpDownloader != null) {
+            mediaUpDownloader.download(
+                MediaDownloadArguments.builder()
+                    .requestArguments(requestArguments)
+                    .name(name)
+                    .exposePrivateMedia(exposePrivateMedia)
+                    .validMediaCondition(validMediaCondition)
+                    .build()
+            );
+            return;
+        }
         mediaValidator.validateMediaName(name);
         MediaModel media = mediaService.getMediaByName(name);
         if (media == null

@@ -91,4 +91,8 @@ public class MediaModel {
     public String getMeUrlOrDefault(String defaultUrl) {
         return toMeMediaUrlOrDefault(name, url, defaultUrl);
     }
+
+    public String getOriginalName() {
+        return isBlank(originalName) ? name : originalName;
+    }
 }

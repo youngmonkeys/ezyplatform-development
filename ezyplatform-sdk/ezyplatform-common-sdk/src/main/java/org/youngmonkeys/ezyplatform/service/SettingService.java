@@ -379,6 +379,10 @@ public interface SettingService {
         );
     }
 
+    default String getMediaUpDownloaderName() {
+        return getTextValue(SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME);
+    }
+
     default boolean isAllowSendStatisticsData() {
         return getBooleanValue(
             SETTING_NAME_ALLOW_SEND_STATISTICS_DATA,

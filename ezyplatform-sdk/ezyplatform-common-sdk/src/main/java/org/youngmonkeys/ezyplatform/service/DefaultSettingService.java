@@ -295,7 +295,7 @@ public abstract class DefaultSettingService
                 encryptionKeysFileLastModified.set(
                     encryptionKeysFile.lastModified()
                 );
-                return lines.size() > 0 ? lines.get(0) : null;
+                return !lines.isEmpty() ? lines.get(0) : null;
             } catch (IOException e) {
                 logger.warn("read encryption key file error", e);
             }

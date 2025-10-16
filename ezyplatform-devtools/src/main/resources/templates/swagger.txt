@@ -23,6 +23,7 @@ paths:
     ${parameters}
     responses:
       ${responses}
+
 # request body
 requestBody:
   required: ${required}
@@ -30,6 +31,7 @@ requestBody:
     ${content_type}:
       schema:
         type: ${type}
+        ${format}
         ${properties}
 
 # parameter
@@ -39,6 +41,8 @@ requestBody:
   required: ${required}
   schema:
     type: ${type}
+    ${format}
+    ${properties}
 
 # response
 '${code}':
@@ -51,9 +55,11 @@ content:
 ${content_type}:
   schema:
     type: ${type}
+    ${format}
     ${response_data}
 
 # response array data
 items:
   type: ${type}
+  ${format}
   ${properties}

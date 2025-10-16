@@ -18,10 +18,15 @@ package org.youngmonkeys.devtools.test.controller;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
-import com.tvd12.ezyhttp.server.core.annotation.Controller;
-import com.tvd12.ezyhttp.server.core.annotation.DoGet;
+import com.tvd12.ezyhttp.server.core.annotation.*;
 import com.tvd12.ezyhttp.server.core.view.View;
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.devtools.test.request.MyBodyRequest;
+import org.youngmonkeys.devtools.test.request.MyRequest;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Controller("/")
 @AllArgsConstructor
@@ -33,5 +38,19 @@ public class ViewController {
     @DoGet("/home")
     public View home() {
         return View.of("home");
+    }
+
+    @Api
+    @DoPost("/hello/{world}/foo/{bar}")
+    public List<List<Long>> helloWorldFooBarPost(
+        @PathVariable String world,
+        @PathVariable String bar,
+        @RequestParam List<String> ids,
+        @RequestParam List<List<String>> values,
+        @RequestParam Map<String, String> param1,
+        @RequestParam MyRequest param2,
+        @RequestBody MyBodyRequest request
+    ) {
+        return Collections.emptyList();
     }
 }
