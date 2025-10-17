@@ -208,13 +208,6 @@ public class RepositoryClassesGenerator {
         String className,
         String template
     ) throws IOException {
-        String moduleName = toDisplayName(projectName)
-            .replace(" ", "");
-        String content = generateContent(
-            moduleType,
-            template,
-            moduleName
-        );
         String moduleNameFull = projectName + "-" + moduleNameSuffix;
         Path folderPath = baseFolderPath.resolve(moduleNameFull);
         if (!Files.exists(folderPath)) {
@@ -248,6 +241,13 @@ public class RepositoryClassesGenerator {
         if (!Files.exists(filePath)) {
             Files.createFile(filePath);
         }
+        String moduleName = toDisplayName(projectName)
+            .replace(" ", "");
+        String content = generateContent(
+            moduleType,
+            template,
+            moduleName
+        );
         Files.write(filePath, content.getBytes(StandardCharsets.UTF_8));
     }
 

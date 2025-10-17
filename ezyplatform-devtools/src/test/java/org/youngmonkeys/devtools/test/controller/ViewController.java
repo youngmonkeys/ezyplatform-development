@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.devtools.test.request.MyBodyRequest;
 import org.youngmonkeys.devtools.test.request.MyRequest;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,14 @@ public class ViewController {
     @DoPost("/hello/world/foo/bar/five")
     public long helloWorldFooBarFivePost(
         @RequestBody int request
+    ) {
+        return 0;
+    }
+
+    @Api
+    @DoPost("/hello/world/foo/bar/six")
+    public long helloWorldFooBarSixPost(
+        @RequestParam("time") LocalDateTime time
     ) {
         return 0;
     }

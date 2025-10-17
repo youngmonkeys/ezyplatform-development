@@ -49,6 +49,7 @@ public class UnitTestClassGenerator {
         System.out.println(generateContent());
     }
 
+    @SuppressWarnings("MethodLength")
     public String generateContent() {
         imports.addAll(
             Arrays.asList(

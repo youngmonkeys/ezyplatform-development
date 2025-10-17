@@ -166,6 +166,7 @@ public class PaginationClassesGenerator {
         }
     }
 
+    @SuppressWarnings("MethodLength")
     public void generate() throws Exception {
         // sdk
         generatePaginationClass(
@@ -293,16 +294,6 @@ public class PaginationClassesGenerator {
         String className,
         String template
     ) throws IOException {
-        String moduleName = toDisplayName(projectName)
-            .replace(" ", "");
-        String content = template
-            .replace("${basePackageName}", basePackageName)
-            .replace("${entityClassName}", entityClassName)
-            .replace("${entityVariableName}", entityVariableName)
-            .replace("${tableName}", tableName)
-            .replace("${moduleType}", moduleType)
-            .replace("${moduleTypeLowercase}", moduleType.toLowerCase())
-            .replace("${moduleName}", moduleName);
         String moduleNameFull = projectName + "-" + moduleNameSuffix;
         Path folderPath = baseFolderPath.resolve(moduleNameFull);
         if (!Files.exists(folderPath)) {
@@ -336,6 +327,16 @@ public class PaginationClassesGenerator {
         if (!Files.exists(filePath)) {
             Files.createFile(filePath);
         }
+        String moduleName = toDisplayName(projectName)
+            .replace(" ", "");
+        String content = template
+            .replace("${basePackageName}", basePackageName)
+            .replace("${entityClassName}", entityClassName)
+            .replace("${entityVariableName}", entityVariableName)
+            .replace("${tableName}", tableName)
+            .replace("${moduleType}", moduleType)
+            .replace("${moduleTypeLowercase}", moduleType.toLowerCase())
+            .replace("${moduleName}", moduleName);
         Files.write(filePath, content.getBytes(StandardCharsets.UTF_8));
     }
 }

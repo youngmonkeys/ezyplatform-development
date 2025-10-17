@@ -39,6 +39,8 @@ import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,6 +49,7 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 
+@SuppressWarnings("MethodCount")
 @AllArgsConstructor
 public class SwaggerGenerator {
 
@@ -104,7 +107,11 @@ public class SwaggerGenerator {
         System.out.println("generated to: " + filePath);
     }
 
-    public String generate() throws IOException {
+    private Map<Class<?>, String> getTypeByJavaClass() {
+        return Collections.emptyMap();
+    }
+
+    public String generate() {
         EzyReflection reflection = new EzyReflectionProxy(
             packageToScan
         );
@@ -235,7 +242,7 @@ public class SwaggerGenerator {
                 THREE
             )
         );
-       return lines;
+        return lines;
     }
 
     private List<String> createApiDescription(ApiMethod apiMethod) {
@@ -452,6 +459,7 @@ public class SwaggerGenerator {
         return lines;
     }
 
+    @SuppressWarnings("MethodLength")
     private List<String> createFieldProperties(
         ApiDataField field,
         String methodPrefix,
@@ -607,10 +615,10 @@ public class SwaggerGenerator {
             .getMethods(controllerClass)
             .stream()
             .filter(it ->
-                it.isAnnotationPresent(DoDelete.class) ||
-                    it.isAnnotationPresent(DoGet.class) ||
-                    it.isAnnotationPresent(DoPost.class) ||
-                    it.isAnnotationPresent(DoPut.class)
+                it.isAnnotationPresent(DoDelete.class)
+                    || it.isAnnotationPresent(DoGet.class)
+                    || it.isAnnotationPresent(DoPost.class)
+                    || it.isAnnotationPresent(DoPut.class)
             )
             .map(it -> extractControllerMethod(
                     it,
@@ -691,6 +699,7 @@ public class SwaggerGenerator {
         );
     }
 
+    @SuppressWarnings("MethodLength")
     private List<ApiParameter> extractParameters(
         String uri,
         Method method
@@ -822,7 +831,7 @@ public class SwaggerGenerator {
                 it -> (it.getName().startsWith(methodPrefix)
                     || it.getName().startsWith("is"))
                     && (isSetter
-                    ? it.getParameterCount() > 0
+                    ? it.getParameterCount() == 1
                     : it.getParameterCount() == 0
                 )
             )
@@ -839,6 +848,7 @@ public class SwaggerGenerator {
                         : it.getGenericReturnType()
                 )
             )
+            .distinct()
             .sorted(Comparator.comparing(a -> a.name))
             .collect(Collectors.toList());
     }
@@ -926,11 +936,17 @@ public class SwaggerGenerator {
         return String.join("\n", lines);
     }
 
+    @SuppressWarnings("MethodLength")
     private String mapJavaType(Class<?> javaType) {
-        String type;
         if (javaType == null) {
-            type = "object";
-        } else if (javaType == void.class) {
+            return "object";
+        }
+        Map<Class<?>, String> typeByJavaClass = getTypeByJavaClass();
+        String type = typeByJavaClass.get(javaType);
+        if (type != null) {
+            return type;
+        }
+        if (javaType == void.class) {
             type = "void";
         } else if (javaType == Redirect.class) {
             type = "redirect";
@@ -938,6 +954,10 @@ public class SwaggerGenerator {
             type = "response_entity";
         } else if (javaType == View.class) {
             type = "view";
+        } else if (javaType == LocalDateTime.class) {
+            type = "string";
+        } else if (javaType == LocalDate.class) {
+            type = "string";
         } else if (javaType.isEnum()) {
             type = "string";
         } else if (javaType == BigInteger.class) {
