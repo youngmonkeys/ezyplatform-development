@@ -1,3 +1,5 @@
+# unused just for review
+
 # file
 openapi: ${open_api_version}
 info:
@@ -27,22 +29,14 @@ paths:
 # request body
 requestBody:
   required: ${required}
-  content:
-    ${content_type}:
-      schema:
-        type: ${type}
-        ${format}
-        ${properties}
+  ${content}
 
 # parameter
 - name: ${name}
   in: ${in}
   description: ${description}
   required: ${required}
-  schema:
-    type: ${type}
-    ${format}
-    ${properties}
+  ${schema}
 
 # response
 '${code}':
@@ -50,15 +44,18 @@ requestBody:
     ${description}
   ${content}
 
-# response content
+# content
 content:
-${content_type}:
-  schema:
-    type: ${type}
-    ${format}
-    ${response_data}
+${content_type}
+  ${schema}
 
-# response array data
+# schema
+schema:
+  type: ${type}
+  ${format}
+  ${properties}
+
+# array data
 items:
   type: ${type}
   ${format}

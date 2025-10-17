@@ -19,9 +19,42 @@ package org.youngmonkeys.devtools.test.request;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class MyBodyRequest {
     private String key;
     private String value;
+    private List<Data1> data1List;
+    private List<List<String>> lists;
+
+    @Getter
+    @Setter
+    private static class Data1 {
+        private String hello;
+        private String world;
+        private Data1 data1;
+        private Data2 data2;
+        private List<Data2> data2List;
+    }
+
+    @Getter
+    @Setter
+    private static class Data2 {
+        private String foo;
+        private String bar;
+        private Data1 data1;
+        private Data3 data3;
+        private List<Data3> data3List;
+    }
+
+    @Getter
+    @Setter
+    private static class Data3 {
+        private String cat;
+        private String dog;
+        private Data1 data1;
+        private List<Data1> data1List;
+    }
 }

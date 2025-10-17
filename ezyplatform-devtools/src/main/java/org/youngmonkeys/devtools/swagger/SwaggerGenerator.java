@@ -17,11 +17,11 @@
 package org.youngmonkeys.devtools.swagger;
 
 import com.tvd12.ezyfox.annotation.EzyFeature;
+import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.file.EzySimpleFileWriter;
+import com.tvd12.ezyfox.io.EzyCollections;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.reflect.*;
-import com.tvd12.ezyfox.stream.EzyAnywayInputStreamLoader;
-import com.tvd12.ezyfox.stream.EzyInputStreams;
 import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
@@ -33,7 +33,6 @@ import lombok.EqualsAndHashCode;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -41,30 +40,49 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.filter;
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
-import static com.tvd12.ezyfox.io.EzyStrings.*;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 
 @AllArgsConstructor
 public class SwaggerGenerator {
 
     private final String packageToScan;
 
-    private static final Class<?> NO_GENERICS_TYPE = null;
+    private static final int ONE = 1;
+    private static final int TWO = 2;
+    private static final int THREE = 3;
 
+    private static final String PREFIX_SET = "set";
+    private static final String PREFIX_GET = "get";
+
+    private static final Class<?> NO_GENERICS_TYPE = null;
+    private static final List<ApiDataField> NO_FIELDS = null;
+
+    private static final Set<String> NO_CONTENT_JAVA_TYPES =
+        Sets.newHashSet(
+            "redirect",
+            "response_entity",
+            "void"
+        );
+    private static final Map<String, String> CONTENT_TYPE_BY_JAVA_TYPE_NAME =
+        EzyMapBuilder.mapBuilder()
+            .put("view", "text/html")
+            .toMap();
     private static final Map<String, String> SWAGGER_TYPE_BY_JAVA_TYPE_NAME =
         EzyMapBuilder.mapBuilder()
-            .put("float", "number")
             .put("double", "number")
+            .put("float", "number")
             .put("long", "number")
+            .put("view", "string")
             .toMap();
     private static final Map<String, String> SWAGGER_FORMAT_BY_JAVA_TYPE_NAME =
         EzyMapBuilder.mapBuilder()
-            .put("float", "float")
             .put("double", "number")
+            .put("float", "float")
             .put("integer", "int32")
             .put("long", "int64")
             .toMap();
@@ -87,22 +105,64 @@ public class SwaggerGenerator {
     }
 
     public String generate() throws IOException {
-        SwaggerTemplate swaggerTemplate = new SwaggerTemplate();
-        String servers = swaggerTemplate.createContent(
-            "server",
-            EzyMapBuilder
-                .mapBuilder()
-                .put("url", "http://localhost:8080")
-                .put("description", "localhost")
-                .toMap(),
-            1
-        );
         EzyReflection reflection = new EzyReflectionProxy(
             packageToScan
         );
         Set<Class<?>> controllerClasses = reflection.getAnnotatedClasses(
             Controller.class
         );
+        return generate(controllerClasses);
+    }
+
+    public String generate(
+        Collection<Class<?>> controllerClasses
+    ) {
+        List<String> lines = new ArrayList<>();
+        lines.add("openapi: 3.0.2");
+        lines.add("info:");
+        lines.add(appendDoubleSpacesToLine("title: EzyPlatform APIs", ONE));
+        lines.add(appendDoubleSpacesToLine("version: 1.0.0", ONE));
+        lines.add("servers:");
+        lines.addAll(appendDoubleSpacesToLines(createServers(), ONE));
+        lines.add("paths:");
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createApis(controllerClasses),
+                ONE
+            )
+        );
+        return joinLine(lines);
+    }
+
+    private List<String> createServers() {
+        return getServers()
+            .stream()
+            .flatMap(it -> createServer(it).stream())
+            .collect(Collectors.toList());
+    }
+
+    private List<String> createServer(
+        Map<String, Object> server
+    ) {
+        return Arrays.asList(
+            "- url: " + server.get("url"),
+            "  description: " + server.get("description")
+        );
+    }
+
+    protected List<Map<String, Object>> getServers() {
+        return Collections.singletonList(
+            EzyMapBuilder
+                .mapBuilder()
+                .put("url", "http://localhost:8080")
+                .put("description", "localhost")
+                .toMap()
+        );
+    }
+
+    private List<String> createApis(
+        Collection<Class<?>> controllerClasses
+    ) {
         List<ApiClass> apiClasses = newArrayList(
             controllerClasses,
             this::extractControllerClass
@@ -118,363 +178,403 @@ public class SwaggerGenerator {
                 for (int i = 0; i < apiMethods.size(); ++i) {
                     ApiMethod apiMethod = apiMethods.get(i);
                     generatedMethods.add(apiMethod);
-                    apis.add(
-                        swaggerTemplate.createContent(
-                            "api",
-                            EzyMapBuilder
-                                .mapBuilder()
-                                .put("uri", i == 0 ? uri : "")
-                                .put("method", apiMethod.type)
-                                .put("summary", toFriendlyText(apiMethod.name))
-                                .put("description", createApiDescription(apiMethod))
-                                .put(
-                                    "parameters",
-                                    createApiParameters(
-                                        apiMethod.parameters,
-                                        swaggerTemplate
-                                    )
-                                )
-                                .put(
-                                    "request_body",
-                                    createApiRequestBody(
-                                        apiMethod,
-                                        swaggerTemplate
-                                    )
-                                )
-                                .put(
-                                    "responses",
-                                    createApiResponseBody(
-                                        apiMethod,
-                                        swaggerTemplate
-                                    )
-                                )
-                                .toMap(),
-                            1
-                        )
-                    );
+                    if (i == 0) {
+                        apis.add("'" + uri + "':");
+                    }
+                    apis.addAll(createApi(apiMethod));
                 }
             }
         }
-        return swaggerTemplate.createContent(
-            "file",
-            EzyMapBuilder
-                .mapBuilder()
-                .put("open_api_version", "3.0.2")
-                .put("title", "APIs")
-                .put("version", "1.0.0")
-                .put("servers", servers)
-                .put("apis", joinString(apis, 1))
-                .toMap(),
-            0
-        );
+        return apis;
     }
 
-    private String createApiDescription(ApiMethod apiMethod) {
+    private List<String> createApi(ApiMethod apiMethod) {
+        List<String> lines = new ArrayList<>();
+        lines.add(
+            appendDoubleSpacesToLine(
+                apiMethod.type + ":",
+                ONE
+            )
+        );
+        lines.add(appendDoubleSpacesToLine("summary: >", TWO));
+        lines.add(
+            appendDoubleSpacesToLine(
+                toFriendlyText(apiMethod.name),
+                THREE
+            )
+        );
+        lines.add(appendDoubleSpacesToLine("description: >", TWO));
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createApiDescription(apiMethod),
+                THREE
+            )
+        );
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createApiRequestBody(
+                    apiMethod
+                ),
+                TWO
+            )
+        );
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createApiParameters(
+                    apiMethod.parameters
+                ),
+                TWO
+            )
+        );
+        lines.add(appendDoubleSpacesToLine("responses:", TWO));
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createApiResponseBody(
+                    apiMethod
+                ),
+                THREE
+            )
+        );
+       return lines;
+    }
+
+    private List<String> createApiDescription(ApiMethod apiMethod) {
         List<String> lines = new ArrayList<>();
         lines.add("- feature: " + toFriendlyText(apiMethod.feature));
         lines.add("- api: " + (apiMethod.api ? "yes" : "no"));
         lines.add("- authenticated: " + (apiMethod.authenticated ? "yes" : "no"));
-        return joinString(lines, 4);
+        return lines;
     }
 
-    private String createApiParameters(
-        List<ApiParameter> apiParameters,
-        SwaggerTemplate swaggerTemplate
+    private List<String> createApiRequestBody(
+        ApiMethod apiMethod
+    ) {
+        ApiDataType requestBody = apiMethod.requestBody;
+        if (requestBody == null) {
+            return Collections.emptyList();
+        }
+        List<String> lines = new ArrayList<>();
+        lines.add("requestBody: ");
+        lines.add(appendDoubleSpacesToLine("required: true", ONE));
+        lines.add(appendDoubleSpacesToLine("content:", ONE));
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                convertApiDataToContent(
+                    requestBody,
+                    PREFIX_SET
+                ),
+                TWO
+            )
+        );
+        return lines;
+    }
+
+    private List<String> createApiParameters(
+        List<ApiParameter> apiParameters
     ) {
         if (apiParameters.isEmpty()) {
-            return EMPTY_STRING;
+            return Collections.emptyList();
         }
         List<String> lines = new ArrayList<>();
         lines.add("parameters:");
+        List<String> parameters = apiParameters
+            .stream()
+            .flatMap(it -> createApiParameter(it).stream())
+            .collect(Collectors.toList());
+        lines.addAll(appendDoubleSpacesToLines(parameters, ONE));
+        return lines;
+    }
+
+    private List<String> createApiParameter(
+        ApiParameter apiParameter
+    ) {
+        List<String> lines = new ArrayList<>();
+        lines.add("- name: " + apiParameter.name);
+        lines.add("  in: " + apiParameter.in);
+        String description = apiParameter.defaultValue != null
+            ? "default value is " + apiParameter.defaultValue
+            : "parameter";
+        lines.add("  description: " + description);
+        lines.add("  required: " + "path".equals(apiParameter.in));
         lines.addAll(
-            apiParameters
-                .stream()
-                .map(it -> createApiParameter(it, swaggerTemplate))
-                .collect(Collectors.toList())
+            appendDoubleSpacesToLines(
+                convertApiDataTypeToSchema(
+                    apiParameter.apiDataType,
+                    PREFIX_SET
+                ),
+                ONE
+            )
         );
-        return joinString(lines, 4);
+        return lines;
     }
 
-    private String createApiParameter(
-        ApiParameter apiParameter,
-        SwaggerTemplate swaggerTemplate
+    private List<String> createApiResponseBody(
+        ApiMethod apiMethod
     ) {
-        String javaType = mapJavaType(apiParameter.javaType);
-        String swaggerType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
-            .getOrDefault(javaType, javaType);
-        String swaggerFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
-            .get(javaType);
-        String properties = EMPTY_STRING;
-        if ("array".equals(javaType)) {
-            String javaGenericsType = "object";
-            Class<?> genericsType = apiParameter.javaGenericsType;
-            if (genericsType != null) {
-                javaGenericsType = mapJavaType(genericsType);
-            }
-            String swaggerGenericsType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
-                .getOrDefault(javaGenericsType, javaGenericsType);
-            String swaggerGenericsFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
-                .get(javaGenericsType);
-            properties = swaggerTemplate.createContent(
-                "response array data",
-                EzyMapBuilder.mapBuilder()
-                    .put("type", swaggerGenericsType)
-                    .put(
-                        "format",
-                        swaggerGenericsFormat != null
-                            ? "format: " + swaggerGenericsFormat
-                            : EMPTY_STRING
-                    )
-                    .put(
-                        "properties",
-                        "array".equals(swaggerGenericsType)
-                            ? swaggerTemplate.createContent(
-                                "response array data",
-                            EzyMapBuilder.mapBuilder()
-                                .put("type", "object")
-                                .put("format", EMPTY_STRING)
-                                .put("properties", EMPTY_STRING)
-                                .toMap(),
-                                7
-                            )
-                            : EMPTY_STRING
-                    )
-                    .toMap(),
-                6
-            );
-        }
-        return swaggerTemplate.createContent(
-            "parameter",
-            EzyMapBuilder.mapBuilder()
-                .put("name", apiParameter.name)
-                .put("in", apiParameter.in)
-                .put("type", swaggerType)
-                .put(
-                    "format",
-                    swaggerFormat != null
-                        ? "format: " + swaggerFormat
-                        : EMPTY_STRING
-                )
-                .put("properties", properties)
-                .put(
-                    "description",
-                    apiParameter.defaultValue != null
-                        ? "default value is " + apiParameter.defaultValue
-                        : "parameter"
-                )
-                .put("required", "path".equals(apiParameter.in))
-                .toMap(),
-            4
-        );
-    }
-
-    private String createApiRequestBody(
-        ApiMethod apiMethod,
-        SwaggerTemplate swaggerTemplate
-    ) {
-        if (apiMethod.requestBody == null) {
-            return EMPTY_STRING;
-        }
-        return swaggerTemplate.createContent(
-            "request body",
-            EzyMapBuilder.mapBuilder()
-                .put("content_type", "application/json")
-                .put("required", "true")
-                .put("type", "object")
-                .put("format", EMPTY_STRING)
-                .put(
-                    "properties",
-                    createProperties(
-                        apiMethod.requestBody.fields,
-                        NO_GENERICS_TYPE,
-                        8,
-                        "set"
-                    )
-                )
-                .toMap(),
-            3
-        );
-    }
-
-    private String createApiResponseBody(
-        ApiMethod apiMethod,
-        SwaggerTemplate swaggerTemplate
-    ) {
-        String responseContent;
-        if (apiMethod.response.fields == null) {
-            responseContent = EMPTY_STRING;
-        } else {
-            String type = Collection.class.isAssignableFrom(
-                apiMethod.response.type
-            ) ? "array" : "object";
-            String responseData;
-            if ("object".equals(type)) {
-                responseData = createProperties(
-                    apiMethod.response.fields,
-                    apiMethod.response.genericsType,
-                    9,
-                    "get"
-                );
-            } else {
-                String javaGenericsType = mapJavaType(apiMethod.response.genericsType);
-                String swaggerGenericsType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
-                    .getOrDefault(javaGenericsType, javaGenericsType);
-                String swaggerGenericsFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
-                    .get(swaggerGenericsType);
-                EzyMapBuilder parameters = EzyMapBuilder
-                    .mapBuilder()
-                    .put("type", swaggerGenericsType)
-                    .put(
-                        "format",
-                        swaggerGenericsFormat != null
-                            ? "format: " + swaggerGenericsFormat
-                            : EMPTY_STRING
-                    );
-                if ("object".equals(javaGenericsType)) {
-                    parameters.put(
-                        "properties",
-                        createProperties(
-                            extractApiDataFields(
-                                apiMethod.response.genericsType,
-                                "get"
-                            ),
-                            apiMethod.response.genericsType,
-                            10,
-                            "get"
-                        )
-                    );
-                } else if ("array".equals(javaGenericsType)) {
-                    parameters.put(
-                        "properties",
-                        swaggerTemplate.createContent(
-                            "response array data",
-                            EzyMapBuilder.mapBuilder()
-                                .put("type", "object")
-                                .put("format", EMPTY_STRING)
-                                .put("properties", EMPTY_STRING)
-                                .toMap(),
-                            9
-                        )
-                    );
-                }
-                responseData = swaggerTemplate.createContent(
-                    "response array data",
-                    parameters.toMap(),
-                    8
-                );
-            }
-            responseContent = swaggerTemplate.createContent(
-                "response content",
-                EzyMapBuilder
-                    .mapBuilder()
-                    .put("content_type", "application/json")
-                    .put("type", type)
-                    .put("format", EMPTY_STRING)
-                    .put("response_data", responseData)
-                    .toMap(),
-                6
-            );
-        }
         String code = "200";
         String description = "success";
-        if (apiMethod.response.type == Redirect.class) {
+        ApiDataType response = apiMethod.response;
+        if (response.type == Redirect.class) {
             code = "302";
             description = "redirect";
-        } else if (apiMethod.response.type == ResponseEntity.class) {
+        } else if (response.type == ResponseEntity.class) {
             code = "204";
             description = "no content";
-        } else if (apiMethod.response.type == View.class) {
+        } else if (response.type == View.class) {
             description = "return a view";
         }
-        return swaggerTemplate.createContent(
-            "response",
-            EzyMapBuilder
-                .mapBuilder()
-                .put("code", code)
-                .put("description", description)
-                .put("content", responseContent)
-                .toMap(),
-            4
-        );
+        List<String> lines = new ArrayList<>();
+        lines.add("'" + code + "':");
+        lines.add(appendDoubleSpacesToLine("description: >", ONE));
+        lines.add(appendDoubleSpacesToLine(description, TWO));
+        String javaType = response.javaType;
+        if (!NO_CONTENT_JAVA_TYPES.contains(javaType)) {
+            lines.add(appendDoubleSpacesToLine("content:", ONE));
+            lines.addAll(
+                appendDoubleSpacesToLines(
+                    convertApiDataToContent(response, PREFIX_GET),
+                    TWO
+                )
+            );
+        }
+        return lines;
     }
 
-    private String createProperties(
-        List<ApiDataField> fields,
-        Class<?> parentGenericTypes,
-        int doubleSpaces,
+    private List<String> convertApiDataToContent(
+        ApiDataType apiDataType,
         String methodPrefix
     ) {
-        if (fields.isEmpty()) {
-            return EMPTY_STRING;
+        List<String> lines = new ArrayList<>();
+        String contentType = CONTENT_TYPE_BY_JAVA_TYPE_NAME
+            .getOrDefault(
+                apiDataType.javaType,
+                "application/json"
+            );
+        lines.add(contentType + ":");
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                convertApiDataTypeToSchema(
+                    apiDataType,
+                    methodPrefix
+                ),
+                ONE
+            )
+        );
+        return lines;
+    }
+
+    private List<String> convertApiDataTypeToSchema(
+        ApiDataType apiDataType,
+        String methodPrefix
+    ) {
+        List<String> lines = new ArrayList<>();
+        lines.add("schema:");
+        String javaType = apiDataType.javaType;
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createTypeFormat(javaType),
+                ONE
+            )
+        );
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createProperties(
+                    apiDataType,
+                    methodPrefix,
+                    new HashMap<>()
+                ),
+                ONE
+            )
+        );
+        return lines;
+    }
+
+    private List<String> createTypeFormat(
+        String javaType
+    ) {
+        List<String> lines = new ArrayList<>();
+        String swaggerType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
+            .getOrDefault(javaType, javaType);
+        lines.add("type: " + swaggerType);
+        String swaggerFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
+            .get(javaType);
+        if (swaggerFormat != null) {
+            lines.add("format: " + swaggerFormat);
+        }
+        return lines;
+    }
+
+    private List<String> createProperties(
+        ApiDataType apiDataType,
+        String methodPrefix,
+        Map<Class<?>, Set<Class<?>>> dependenciesByType
+    ) {
+        String javaType = apiDataType.javaType;
+        if ("object".equals(javaType)) {
+            return createObjectProperties(
+                apiDataType.fields,
+                methodPrefix,
+                dependenciesByType
+            );
+        } else if ("array".equals(javaType)) {
+            return createItems(
+                apiDataType.genericsType,
+                methodPrefix,
+                dependenciesByType
+            );
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private List<String> createObjectProperties(
+        List<ApiDataField> fields,
+        String methodPrefix,
+        Map<Class<?>, Set<Class<?>>> dependenciesByType
+    ) {
+        if (EzyCollections.isEmpty(fields)) {
+            return Collections.emptyList();
         }
         List<String> lines = new ArrayList<>();
         lines.add("properties:");
         for (ApiDataField field : fields) {
-            lines.add(field.name + ":");
-            String javaType = mapJavaType(field.javaType);
-            String swaggerType = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
-                .getOrDefault(javaType, javaType);
-            lines.add("  type: " + swaggerType);
-            String swaggerFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
-                .get(swaggerType);
-            if (swaggerFormat != null) {
-                lines.add("  format: " + swaggerFormat);
-            }
-            if ("array".equals(javaType)) {
-                lines.add("  items:");
-                Class<?> genericsType = getGenericType(
-                    field.javaGenericsType
-                );
-                if (genericsType == null) {
-                    genericsType = parentGenericTypes;
-                }
-                if (genericsType == null) {
-                    genericsType = field.javaType.getComponentType();
-                }
-                String genericsTypeName;
-                if (genericsType == null) {
-                    genericsTypeName = "unknown";
-                } else if (EzyTypes.NON_ARRAY_TYPES.contains(genericsType)) {
-                    genericsTypeName = genericsType.getSimpleName().toLowerCase();
-                } else if (Collection.class.isAssignableFrom(genericsType)) {
-                    genericsTypeName = "array";
-                } else {
-                    genericsTypeName = "object";
-                }
-                String swaggerGenericsTypeName = SWAGGER_TYPE_BY_JAVA_TYPE_NAME
-                    .getOrDefault(genericsTypeName, genericsTypeName);
-                lines.add("    type: " + swaggerGenericsTypeName);
-                String swaggerGenericsFormat = SWAGGER_FORMAT_BY_JAVA_TYPE_NAME
-                    .get(swaggerGenericsTypeName);
-                if (swaggerGenericsFormat != null) {
-                    lines.add("    format: " + swaggerGenericsFormat);
-                }
-                if ("object".equals(genericsTypeName)) {
-                    String line = "    " + createProperties(
-                        extractApiDataFields(
-                            genericsType,
-                            methodPrefix
-                        ),
-                        NO_GENERICS_TYPE,
-                        doubleSpaces + 3,
-                        methodPrefix
-                    );
-                    lines.add(line);
-                }
-            } else if ("object".equals(javaType)) {
-                String line = "  " + createProperties(
-                    extractApiDataFields(
-                        field.javaType,
-                        methodPrefix
+            lines.addAll(
+                appendDoubleSpacesToLines(
+                    createFieldProperties(
+                        field,
+                        methodPrefix,
+                        dependenciesByType
                     ),
-                    NO_GENERICS_TYPE,
-                    doubleSpaces + 2,
-                    methodPrefix
-                );
-                lines.add(line);
-            }
+                    ONE
+                )
+            );
         }
-        return joinString(lines, doubleSpaces);
+        return lines;
+    }
+
+    private List<String> createFieldProperties(
+        ApiDataField field,
+        String methodPrefix,
+        Map<Class<?>, Set<Class<?>>> dependenciesByType
+    ) {
+        List<String> lines = new ArrayList<>();
+        lines.add(field.name + ":");
+        String fieldJavaType = mapJavaType(field.javaType);
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createTypeFormat(fieldJavaType),
+                ONE
+            )
+        );
+        if ("array".equals(fieldJavaType)) {
+            Class<?> fieldGenericsType = getGenericType(
+                field.javaGenericsType
+            );
+            if (fieldGenericsType == null) {
+                fieldGenericsType = field.javaType.getComponentType();
+            }
+            Set<Class<?>> dependencies = dependenciesByType
+                .computeIfAbsent(fieldGenericsType, k -> new HashSet<>());
+            if (dependencies.contains(fieldGenericsType)) {
+                lines.add(appendDoubleSpacesToLine("items:", ONE));
+                lines.add(appendDoubleSpacesToLine("type: object", TWO));
+                return lines;
+            }
+            dependencies.add(fieldGenericsType);
+            lines.addAll(
+                appendDoubleSpacesToLines(
+                    createItems(
+                        fieldGenericsType,
+                        methodPrefix,
+                        dependenciesByType
+                    ),
+                    ONE
+                )
+            );
+        } else if ("object".equals(fieldJavaType)) {
+            Set<Class<?>> dependencies = dependenciesByType
+                .computeIfAbsent(field.javaType, k -> new HashSet<>());
+            if (dependencies.contains(field.javaType)) {
+                return lines;
+            }
+            dependencies.add(field.javaType);
+            lines.addAll(
+                appendDoubleSpacesToLines(
+                    createProperties(
+                        new ApiDataType(
+                            fieldJavaType,
+                            field.javaType,
+                            NO_GENERICS_TYPE,
+                            extractApiDataFields(
+                                field.javaType,
+                                methodPrefix
+                            )
+                        ),
+                        methodPrefix,
+                        dependenciesByType
+                    ),
+                    ONE
+                )
+            );
+        }
+        return lines;
+    }
+
+    private List<String> createItems(
+        Class<?> genericsType,
+        String methodPrefix,
+        Map<Class<?>, Set<Class<?>>> dependenciesByType
+    ) {
+        List<String> lines = new ArrayList<>();
+        lines.add("items:");
+        String genericsTypeName;
+        if (genericsType == null) {
+            genericsTypeName = "object";
+        } else if (EzyTypes.NON_ARRAY_TYPES.contains(genericsType)) {
+            genericsTypeName = genericsType.getSimpleName().toLowerCase();
+        } else if (Collection.class.isAssignableFrom(genericsType)) {
+            genericsTypeName = "array";
+        } else {
+            genericsTypeName = "object";
+        }
+        lines.addAll(
+            appendDoubleSpacesToLines(
+                createTypeFormat(genericsTypeName),
+                ONE
+            )
+        );
+        if ("object".equals(genericsTypeName)) {
+            lines.addAll(
+                appendDoubleSpacesToLines(
+                    createProperties(
+                        new ApiDataType(
+                            genericsTypeName,
+                            genericsType,
+                            NO_GENERICS_TYPE,
+                            extractApiDataFields(
+                                genericsType,
+                                methodPrefix
+                            )
+                        ),
+                        methodPrefix,
+                        dependenciesByType
+                    ),
+                    ONE
+                )
+            );
+        } else if ("array".equals(genericsTypeName)) {
+            lines.addAll(
+                appendDoubleSpacesToLines(
+                    createItems(
+                        NO_GENERICS_TYPE,
+                        methodPrefix,
+                        dependenciesByType
+                    ),
+                    ONE
+                )
+            );
+        }
+        return lines;
     }
 
     private ApiClass extractControllerClass(
@@ -648,9 +748,12 @@ public class SwaggerGenerator {
                     new ApiParameter(
                         in,
                         name,
-                        parameter.getType(),
-                        getGenericType(parameter.getParameterizedType()),
-                        defaultValue
+                        defaultValue,
+                        createApiDataType(
+                            parameter.getType(),
+                            getGenericType(parameter.getParameterizedType()),
+                            PREFIX_SET
+                        )
                     )
                 );
             }
@@ -658,22 +761,51 @@ public class SwaggerGenerator {
         return answer;
     }
 
-    private ApiRequestBody extractRequestBody(Method method) {
-        Class<?> requestBodyParamType = null;
+    private ApiDataType extractRequestBody(Method method) {
+        Parameter requestBodyParam = null;
         for (Parameter parameter : method.getParameters()) {
             if (parameter.isAnnotationPresent(RequestBody.class)) {
-                requestBodyParamType = parameter.getType();
+                requestBodyParam = parameter;
                 break;
             }
         }
-        if (requestBodyParamType == null) {
+        if (requestBodyParam == null) {
             return null;
         }
-        List<ApiDataField> fields = extractApiDataFields(
-            requestBodyParamType,
-            "set"
+        return createApiDataType(
+            requestBodyParam.getType(),
+            requestBodyParam.getParameterizedType(),
+            PREFIX_SET
         );
-        return new ApiRequestBody(fields);
+    }
+
+    private ApiDataType extractResponse(Method method) {
+        return createApiDataType(
+            method.getReturnType(),
+            method.getGenericReturnType(),
+            PREFIX_GET
+        );
+    }
+
+    private ApiDataType createApiDataType(
+        Class<?> type,
+        Type genericsParameterizedType,
+        String methodPrefix
+    ) {
+        String javaType = mapJavaType(type);
+        List<ApiDataField> fields = NO_FIELDS;
+        if ("object".equals(javaType)) {
+            fields = extractApiDataFields(
+                type,
+                methodPrefix
+            );
+        }
+        return new ApiDataType(
+            javaType,
+            type,
+            getGenericType(genericsParameterizedType),
+            fields
+        );
     }
 
     private List<ApiDataField> extractApiDataFields(
@@ -683,7 +815,7 @@ public class SwaggerGenerator {
         if (clazz == null) {
             return Collections.emptyList();
         }
-        boolean isSetter = "set".equals(methodPrefix);
+        boolean isSetter = PREFIX_SET.equals(methodPrefix);
         return EzyMethods.getPublicMethods(clazz)
             .stream()
             .filter(
@@ -711,26 +843,6 @@ public class SwaggerGenerator {
             .collect(Collectors.toList());
     }
 
-    private ApiResponse extractResponse(Method method) {
-        List<ApiDataField> fields = null;
-        Class<?> responseBodyType = method.getReturnType();
-        if (responseBodyType != void.class
-            && responseBodyType != Redirect.class
-            && responseBodyType != ResponseEntity.class
-            && responseBodyType != View.class
-        ) {
-            fields = extractApiDataFields(
-                responseBodyType,
-                "get"
-            );
-        }
-        return new ApiResponse(
-            method.getReturnType(),
-            getGenericType(method.getGenericReturnType()),
-            fields
-        );
-    }
-
     private Class<?> getGenericType(Type type) {
         try {
             return EzyGenerics.getOneGenericClassArgument(type);
@@ -755,17 +867,13 @@ public class SwaggerGenerator {
         private final boolean api;
         private final boolean authenticated;
         private final List<ApiParameter> parameters;
-        private final ApiRequestBody requestBody;
-        private final ApiResponse response;
+        private final ApiDataType requestBody;
+        private final ApiDataType response;
     }
 
     @AllArgsConstructor
-    private static class ApiRequestBody {
-        private final List<ApiDataField> fields;
-    }
-
-    @AllArgsConstructor
-    private static class ApiResponse {
+    private static class ApiDataType {
+        private final String javaType;
         private final Class<?> type;
         private final Class<?> genericsType;
         private final List<ApiDataField> fields;
@@ -783,82 +891,29 @@ public class SwaggerGenerator {
     private static class ApiParameter {
         private String in;
         private final String name;
-        private final Class<?> javaType;
-        private final Class<?> javaGenericsType;
         private final String defaultValue;
+        private final ApiDataType apiDataType;
     }
 
-    private class SwaggerTemplate {
-
-        private final Map<String, List<String>> templateByName;
-
-        SwaggerTemplate() throws IOException {
-            InputStream inputStream = new EzyAnywayInputStreamLoader()
-                .load("templates/swagger.txt");
-            List<String> lines = EzyInputStreams.toLines(inputStream);
-            templateByName = new HashMap<>();
-            String currentTemplateName;
-            List<String> currentTemplateLines = new ArrayList<>();
-            for (String line : lines) {
-                if (isBlank(line)) {
-                    continue;
-                }
-                if (line.startsWith("#")) {
-                    currentTemplateName = line.substring(1).trim();
-                    currentTemplateLines = new ArrayList<>();
-                    templateByName.put(currentTemplateName, currentTemplateLines);
-                    continue;
-                }
-                currentTemplateLines.add(line);
-            }
-        }
-
-        private String createContent(
-            String templateName,
-            Map<String, Object> parameters,
-            int doubleSpaces
-        ) {
-            List<String> lines = newArrayList(
-                templateByName.get(templateName),
-                it -> setLineParameters(it, parameters)
-            );
-            return joinString(lines, doubleSpaces);
-        }
-
-        private String setLineParameters(
-            String line,
-            Map<String, Object> parameters
-        ) {
-            String answer = line;
-            for (Entry<String, Object> e : parameters.entrySet()) {
-                answer = answer.replace(
-                    "${" + e.getKey() + "}",
-                    e.getValue().toString()
-                );
-            }
-            return answer;
-        }
+    private String appendDoubleSpacesToLine(
+        String line,
+        int doubleSpaces
+    ) {
+        String spacesString = createSpaces(doubleSpaces);
+        return spacesString + line;
     }
 
-    private String joinString(
+    private List<String> appendDoubleSpacesToLines(
         List<String> lines,
         int doubleSpaces
     ) {
-        List<String> notEmptyLines = lines
+        String spacesString = createSpaces(doubleSpaces);
+        return lines
             .stream()
             .filter(EzyStrings::isNotBlank)
             .filter(it -> !it.trim().equals("'':"))
+            .map(it -> spacesString + it)
             .collect(Collectors.toList());
-        if (doubleSpaces == 0) {
-            return String.join("\n", notEmptyLines);
-        }
-        String spacesString = createSpaces(doubleSpaces);
-        List<String> answer = new ArrayList<>();
-        answer.add(notEmptyLines.get(0));
-        for (int i = 1; i < notEmptyLines.size(); ++i) {
-            answer.add(spacesString + notEmptyLines.get(i));
-        }
-        return String.join("\n", answer);
     }
 
     private String createSpaces(int doubleSpaces) {
@@ -867,9 +922,23 @@ public class SwaggerGenerator {
         );
     }
 
+    private String joinLine(Collection<String> lines) {
+        return String.join("\n", lines);
+    }
+
     private String mapJavaType(Class<?> javaType) {
         String type;
-        if (javaType.isEnum()) {
+        if (javaType == null) {
+            type = "object";
+        } else if (javaType == void.class) {
+            type = "void";
+        } else if (javaType == Redirect.class) {
+            type = "redirect";
+        } else if (javaType == ResponseEntity.class) {
+            type = "response_entity";
+        } else if (javaType == View.class) {
+            type = "view";
+        } else if (javaType.isEnum()) {
             type = "string";
         } else if (javaType == BigInteger.class) {
             type = "integer";

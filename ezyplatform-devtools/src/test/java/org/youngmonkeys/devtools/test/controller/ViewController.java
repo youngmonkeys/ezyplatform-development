@@ -19,6 +19,7 @@ package org.youngmonkeys.devtools.test.controller;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyhttp.server.core.annotation.*;
+import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.devtools.test.request.MyBodyRequest;
@@ -52,5 +53,43 @@ public class ViewController {
         @RequestBody MyBodyRequest request
     ) {
         return Collections.emptyList();
+    }
+
+    @Api
+    @DoPost("/hello/world/foo/bar/one")
+    public List<List<Long>> helloWorldFooBarOnePost(
+        @RequestBody List<MyBodyRequest> request
+    ) {
+        return Collections.emptyList();
+    }
+
+    @Api
+    @DoPost("/hello/world/foo/bar/two")
+    public List<List<Long>> helloWorldFooBarTwoPost(
+        @RequestBody List<Long> request
+    ) {
+        return Collections.emptyList();
+    }
+
+    @Api
+    @DoPost("/hello/world/foo/bar/three")
+    public List<List<Long>> helloWorldFooBarThreePost(
+        @RequestBody List<List<Long>> request
+    ) {
+        return Collections.emptyList();
+    }
+
+    @Api
+    @DoPost("/hello/world/foo/bar/four")
+    public Redirect helloWorldFooBarFourPost() {
+        return Redirect.to("");
+    }
+
+    @Api
+    @DoPost("/hello/world/foo/bar/five")
+    public long helloWorldFooBarFivePost(
+        @RequestBody int request
+    ) {
+        return 0;
     }
 }
