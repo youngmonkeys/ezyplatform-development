@@ -600,9 +600,12 @@ public class SwaggerGenerator {
         EzyFeature featureAnnotation = controllerClass.getAnnotation(
             EzyFeature.class
         );
-        String uri = controllerAnnotation.uri();
-        if (isBlank(uri)) {
-            uri = controllerAnnotation.value();
+        String uri = null;
+        if (controllerAnnotation != null) {
+            uri = controllerAnnotation.uri();
+            if (isBlank(uri)) {
+                uri = controllerAnnotation.value();
+            }
         }
         if (isBlank(uri)) {
             uri = "/";
