@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.repo.DataMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.DataMetaTransactionalRepository;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -153,6 +154,72 @@ public class DefaultDataMetaService implements DataMetaService {
                 dataIds
             );
         }
+    }
+
+    @Override
+    public void deleteByDataTypeAndDataIdAndMetaKeyAndMetaValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue
+    ) {
+        dataMetaRepository.deleteByDataTypeAndDataIdAndMetaKeyAndMetaValue(
+            dataType,
+            dataId,
+            metaKey,
+            metaValue
+        );
+    }
+
+    @Override
+    public void deleteByDataTypeAndDataIdsAndMetaKeyAndMetaValue(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        String metaValue
+    ) {
+        if (dataIds.isEmpty()) {
+            return;
+        }
+        dataMetaRepository.deleteByDataTypeAndDataIdInAndMetaKeyAndMetaValue(
+            dataType,
+            dataIds,
+            metaKey,
+            metaValue
+        );
+    }
+
+    @Override
+    public void deleteByDataTypeAndDataIdAndMetaKeyAndMetaNumberValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        BigInteger metaNumberValue
+    ) {
+        dataMetaRepository.deleteByDataTypeAndDataIdAndMetaKeyAndMetaNumberValue(
+            dataType,
+            dataId,
+            metaKey,
+            metaNumberValue
+        );
+    }
+
+    @Override
+    public void deleteByDataTypeAndDataIdsAndMetaKeyAndMetaNumberValue(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        BigInteger metaNumberValue
+    ) {
+        if (dataIds.isEmpty()) {
+            return;
+        }
+        dataMetaRepository.deleteByDataTypeAndDataIdInAndMetaKeyAndMetaNumberValue(
+            dataType,
+            dataIds,
+            metaKey,
+            metaNumberValue
+        );
     }
 
     @Override

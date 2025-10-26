@@ -21,6 +21,7 @@ import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.DataMeta;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,34 @@ public interface DataMetaRepository
     void deleteByDataTypeAndDataIdIn(
         String dataType,
         Collection<Long> dataIds
+    );
+
+    void deleteByDataTypeAndDataIdAndMetaKeyAndMetaValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue
+    );
+
+    void deleteByDataTypeAndDataIdInAndMetaKeyAndMetaValue(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        String metaValue
+    );
+
+    void deleteByDataTypeAndDataIdAndMetaKeyAndMetaNumberValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        BigInteger metaNumberValue
+    );
+
+    void deleteByDataTypeAndDataIdInAndMetaKeyAndMetaNumberValue(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        BigInteger metaNumberValue
     );
 
     List<DataMeta> findByDataTypeAndDataId(

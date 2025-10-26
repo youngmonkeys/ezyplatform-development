@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 
 @SuppressWarnings("MethodCount")
 public interface DataMetaService {
@@ -106,6 +107,25 @@ public interface DataMetaService {
 
     default void saveDataMetaIfAbsent(
         String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        String metaValue
+    ) {
+        dataIds
+            .parallelStream()
+            .filter(Objects::nonNull)
+            .forEach(dataId ->
+                saveDataMetaIfAbsent(
+                    dataType,
+                    dataId,
+                    metaKey,
+                    metaValue
+                )
+            );
+    }
+
+    default void saveDataMetaIfAbsent(
+        String dataType,
         long dataId,
         String metaKey,
         List<String> metaValues
@@ -167,7 +187,7 @@ public interface DataMetaService {
             dataId,
             metaKey,
             metaValue,
-            null
+            NULL_STRING
         );
     }
 
@@ -249,6 +269,34 @@ public interface DataMetaService {
     void deleteDataMetaByDataTypeAndDataIds(
         String dataType,
         Collection<Long> dataIds
+    );
+
+    void deleteByDataTypeAndDataIdAndMetaKeyAndMetaValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue
+    );
+
+    void deleteByDataTypeAndDataIdsAndMetaKeyAndMetaValue(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        String metaValue
+    );
+
+    void deleteByDataTypeAndDataIdAndMetaKeyAndMetaNumberValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        BigInteger metaNumberValue
+    );
+
+    void deleteByDataTypeAndDataIdsAndMetaKeyAndMetaNumberValue(
+        String dataType,
+        Collection<Long> dataIds,
+        String metaKey,
+        BigInteger metaNumberValue
     );
 
     boolean containsDataMeta(

@@ -29,7 +29,10 @@ public final class CommonConstants {
 
     public static final String ALL = "ALL";
     public static final String LATEST = "latest";
+    public static final int ZERO = 0;
+    public static final long ZERO_LONG = 0L;
 
+    public static final String NULL_STRING = null;
     public static final String TRUE_STRING = "true";
     public static final String FALSE_STRING = "false";
     public static final String UNKNOWN = "UNKNOWN";
