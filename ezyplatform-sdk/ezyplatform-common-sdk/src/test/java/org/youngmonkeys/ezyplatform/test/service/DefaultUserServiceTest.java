@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.youngmonkeys.devtools.InstanceRandom;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
@@ -42,6 +43,7 @@ public class DefaultUserServiceTest {
     private UserRepository userRepository;
     private UserAccessTokenRepository userAccessTokenRepository;
     private DefaultEntityToModelConverter defaultEntityToModelConverter;
+    private DefaultModelToEntityConverter defaultModelToEntityConverter;
     private DefaultResultToModelConverter defaultResultToModelConverter;
     private DefaultUserService instance;
 
@@ -62,6 +64,7 @@ public class DefaultUserServiceTest {
             userRepository,
             userAccessTokenRepository,
             defaultEntityToModelConverter,
+            defaultModelToEntityConverter,
             defaultResultToModelConverter
         );
     }

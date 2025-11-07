@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
@@ -301,6 +302,59 @@ public class DefaultModelToEntityConverter {
         mergeToEntity(model, entity);
         entity.setCreatedAt(entity.getUpdatedAt());
         return entity;
+    }
+
+    public UserAccessToken toUserAccessTokenEntity(
+        long userId,
+        String token,
+        long tokenExpiredTimeInDay,
+        AccessTokenStatus status
+    ) {
+        LocalDateTime now = clock.nowDateTime();
+        LocalDateTime expiredAt = now.plusDays(tokenExpiredTimeInDay);
+        return toUserAccessTokenEntity(
+            userId,
+            token,
+            status,
+            now,
+            expiredAt
+        );
+    }
+
+    public UserAccessToken toUserAccessTokenEntity(
+        long userId,
+        String token,
+        long tokenExpiredTime,
+        TimeUnit tokenExpiredTimeUnit,
+        AccessTokenStatus status
+    ) {
+        LocalDateTime now = clock.nowDateTime();
+        LocalDateTime expiredAt = now.plusSeconds(
+            tokenExpiredTimeUnit.toSeconds(tokenExpiredTime)
+        );
+        return toUserAccessTokenEntity(
+            userId,
+            token,
+            status,
+            now,
+            expiredAt
+        );
+    }
+
+    public UserAccessToken toUserAccessTokenEntity(
+        long userId,
+        String token,
+        AccessTokenStatus status,
+        LocalDateTime now,
+        LocalDateTime expiredAt
+    ) {
+        UserAccessToken userAccessToken = new UserAccessToken();
+        userAccessToken.setId(token);
+        userAccessToken.setUserId(userId);
+        userAccessToken.setStatus(status);
+        userAccessToken.setCreatedAt(now);
+        userAccessToken.setExpiredAt(expiredAt);
+        return userAccessToken;
     }
 
     public Setting toSettingEntity(

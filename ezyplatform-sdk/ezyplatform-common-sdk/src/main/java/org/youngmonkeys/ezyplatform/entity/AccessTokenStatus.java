@@ -20,6 +20,12 @@ public enum AccessTokenStatus {
     ACTIVATED,
     ACTIVATED_2FA,
     INACTIVATED,
+    EXPIRED,
+    REVOKED,
+    INVALID,
+    PENDING,
+    BLACKLISTED,
+    REFRESHING,
     BLOCKED,
     DELETED,
     WAITING_2FA;

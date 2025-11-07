@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.service;
 
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
 import org.youngmonkeys.ezyplatform.entity.User;
@@ -40,6 +41,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -55,7 +57,29 @@ public class DefaultUserService implements UserService {
     private final UserRepository userRepository;
     private final UserAccessTokenRepository accessTokenRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+    private final DefaultModelToEntityConverter modelToEntityConverter;
     private final DefaultResultToModelConverter resultToModelConverter;
+
+    public UserAccessTokenModel newUserAccessToken(
+        long userId,
+        long tokenExpiredTime,
+        TimeUnit tokenExpiredTimeUnit,
+        AccessTokenStatus status
+    ) {
+        String token = accessTokenService.generateAccessToken(
+            userId
+        );
+        UserAccessToken accessToken = modelToEntityConverter
+            .toUserAccessTokenEntity(
+                userId,
+                token,
+                tokenExpiredTime,
+                tokenExpiredTimeUnit,
+                status
+            );
+        accessTokenRepository.save(accessToken);
+        return entityToModelConverter.toModel(accessToken);
+    }
 
     public void updateUserEmail(
         long userId,

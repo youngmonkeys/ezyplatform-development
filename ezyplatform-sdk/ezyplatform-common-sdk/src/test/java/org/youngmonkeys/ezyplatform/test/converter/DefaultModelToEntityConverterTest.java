@@ -22,8 +22,10 @@ import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
+import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
 import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
 import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
+import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 import org.youngmonkeys.ezyplatform.model.AddLetterModel;
 import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
@@ -31,6 +33,7 @@ import org.youngmonkeys.ezyplatform.time.ClockProxy;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.*;
 
@@ -147,5 +150,34 @@ public class DefaultModelToEntityConverterTest {
 
         // then
         Asserts.assertEmpty(actual);
+    }
+
+    @Test
+    public void toUserAccessTokenEntityTest() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        when(clock.nowDateTime()).thenReturn(now);
+
+        long userId = RandomUtil.randomLong();
+        String accessToken = RandomUtil.randomShortAlphabetString();
+        long tokenExpiredTime = RandomUtil.randomSmallInt();
+
+        // when
+        UserAccessToken actual = sut.toUserAccessTokenEntity(
+            userId,
+            accessToken,
+            tokenExpiredTime,
+            TimeUnit.MINUTES,
+            AccessTokenStatus.ACTIVATED
+        );
+
+        // then
+        UserAccessToken userAccessToken = new UserAccessToken();
+        userAccessToken.setId(accessToken);
+        userAccessToken.setUserId(userId);
+        userAccessToken.setStatus(AccessTokenStatus.ACTIVATED);
+        userAccessToken.setCreatedAt(now);
+        userAccessToken.setExpiredAt(now.plusSeconds(tokenExpiredTime * 60));
+        Asserts.assertEquals(actual, userAccessToken);
     }
 }
