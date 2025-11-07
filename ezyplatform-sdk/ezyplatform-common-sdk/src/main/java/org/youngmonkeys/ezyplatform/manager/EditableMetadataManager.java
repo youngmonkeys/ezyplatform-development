@@ -16,10 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.manager;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -27,6 +24,8 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 public class EditableMetadataManager {
 
     protected final Map<String, String> metadataTypeByName
+        = new HashMap<>();
+    protected final Map<String, Object> defaultValueByName
         = new HashMap<>();
 
     public void addMetadataNameAndType(
@@ -42,8 +41,29 @@ public class EditableMetadataManager {
         this.metadataTypeByName.putAll(typeByName);
     }
 
+    public void setMetadataDefaultValue(
+        String name,
+        Object defaultValue
+    ) {
+        this.defaultValueByName.put(name, defaultValue);
+    }
+
+    public void setMetadataDefaultValues(
+        Map<String, String> defaultValues
+    ) {
+        this.defaultValueByName.putAll(defaultValues);
+    }
+
+    public String getMetadataTypeByName(String name) {
+        return metadataTypeByName.get(name);
+    }
+
+    public Object getMetadataDefaultValueByName(String name) {
+        return defaultValueByName.get(name);
+    }
+
     public Set<String> getMetadataNames() {
-        return metadataTypeByName.keySet();
+        return new HashSet<>(metadataTypeByName.keySet());
     }
 
     public List<String> getMetadataTypeMessageKeys() {
@@ -62,6 +82,10 @@ public class EditableMetadataManager {
     }
 
     public Map<String, String> getMetadataNameTypeMap() {
-        return metadataTypeByName;
+        return new HashMap<>(metadataTypeByName);
+    }
+
+    public Map<String, Object> getDefaultMetadataValueMap() {
+        return new HashMap<>(defaultValueByName);
     }
 }
