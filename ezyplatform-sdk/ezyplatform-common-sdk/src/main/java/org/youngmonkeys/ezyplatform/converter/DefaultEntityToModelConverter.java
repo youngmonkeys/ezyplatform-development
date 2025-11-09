@@ -421,6 +421,35 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
+    public AccessTokenMetaModel toModel(AccessTokenMeta entity) {
+        if (entity == null) {
+            return null;
+        }
+        return AccessTokenMetaModel.builder()
+            .id(entity.getId())
+            .target(entity.getTarget())
+            .accessToken(entity.getAccessToken())
+            .accessTokenFull(entity.getAccessTokenFull())
+            .parentId(entity.getParentId())
+            .tokenType(entity.getTokenType())
+            .algorithm(entity.getAlgorithm())
+            .scope(entity.getScope())
+            .issuer(entity.getIssuer())
+            .tenantId(entity.getTenantId())
+            .clientId(entity.getClientId())
+            .deviceId(entity.getDeviceId())
+            .clientSecret(entity.getClientSecret())
+            .grantType(entity.getGrantType())
+            .kid(entity.getKid())
+            .jwksUri(entity.getJwksUri())
+            .publicKey(entity.getPublicKey())
+            .privateKey(entity.getPrivateKey())
+            .audience(entity.getAudience())
+            .notBefore(toTimestamp(entity.getNotBefore()))
+            .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .build();
+    }
+
     public long toTimestamp(LocalDateTime localDateTime) {
         return LocalDateTimes.toTimestamp(localDateTime, zoneId);
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,21 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.repo;
 
-import com.tvd12.ezyfox.tool.EzySameObjectScriptCreator;
+import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.AccessTokenMeta;
-import org.youngmonkeys.ezyplatform.model.SaveAccessTokenMetaModel;
 
-public class ConvertScriptGenerator {
+public interface AccessTokenMetaRepository
+    extends EzyDatabaseRepository<Long, AccessTokenMeta> {
 
-    public static void main(String[] args) {
-        String script = new EzySameObjectScriptCreator()
-            .originClass(SaveAccessTokenMetaModel.class)
-            .originObjectName("model")
-            .targetClass(AccessTokenMeta.class)
-            .targetObjectName("entity")
-            .generateFuncScript();
-        System.out.println(script);
-    }
+    void deleteByTargetAndAccessToken(
+        String target,
+        String accessToken
+    );
+
+    AccessTokenMeta findByTargetAndAccessToken(
+        String target,
+        String accessToken
+    );
 }

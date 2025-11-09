@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.constant;
 
 public final class CommonTableNames {
 
+    public static final String TABLE_NAME_ACCESS_TOKEN_META = "ezy_access_token_meta";
     public static final String TABLE_NAME_ADMIN = "ezy_admins";
     public static final String TABLE_NAME_ADMIN_ACCESS_TOKEN = "ezy_admin_access_tokens";
     public static final String TABLE_NAME_ADMIN_ACTIVITY_HISTORY = "ezy_admin_activity_histories";
@@ -25,8 +26,8 @@ public final class CommonTableNames {
     public static final String TABLE_NAME_ADMIN_ROLE = "ezy_admin_roles";
     public static final String TABLE_NAME_ADMIN_ROLE_NAME = "ezy_admin_role_names";
     public static final String TABLE_NAME_CONTENT_TEMPLATE = "ezy_content_templates";
-    public static final String TABLE_NAME_DATA_INDEX = "ezy_data_indices";
     public static final String TABLE_NAME_DATA_I18N = "ezy_data_i18n";
+    public static final String TABLE_NAME_DATA_INDEX = "ezy_data_indices";
     public static final String TABLE_NAME_DATA_MAPPING = "ezy_data_mappings";
     public static final String TABLE_NAME_DATA_META = "ezy_data_meta";
     public static final String TABLE_NAME_DATA_RECORD_COUNT = "ezy_data_record_counts";

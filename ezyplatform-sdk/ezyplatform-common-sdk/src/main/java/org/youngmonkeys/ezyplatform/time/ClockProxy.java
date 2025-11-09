@@ -53,11 +53,23 @@ public class ClockProxy {
         return toLocalDateTime(millis).toLocalDate();
     }
 
+    public LocalDate toLocalDateOrNull(long millis) {
+        return millis <= 0
+            ? null
+            : toLocalDateTime(millis).toLocalDate();
+    }
+
     public LocalDateTime toLocalDateTime(long millis) {
         return EzyDates.millisToDateTime(
             millis,
             zoneId
         );
+    }
+
+    public LocalDateTime toLocalDateTimeOrNull(long millis) {
+        return millis <= 0
+            ? null
+            : EzyDates.millisToDateTime(millis, zoneId);
     }
 
     public LocalDateTime nowDateTimeIfNull(
