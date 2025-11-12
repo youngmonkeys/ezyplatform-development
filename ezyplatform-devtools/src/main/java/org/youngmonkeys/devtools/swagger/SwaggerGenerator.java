@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.devtools.swagger;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tvd12.ezyfox.annotation.EzyFeature;
 import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.file.EzySimpleFileWriter;
@@ -33,6 +35,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.Type;
@@ -46,6 +49,7 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.filter;
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 
@@ -820,6 +824,7 @@ public class SwaggerGenerator {
         );
     }
 
+    @SuppressWarnings("MethodLength")
     private List<ApiDataField> extractApiDataFields(
         Class<?> clazz,
         String methodPrefix
@@ -827,6 +832,10 @@ public class SwaggerGenerator {
         if (clazz == null) {
             return Collections.emptyList();
         }
+        Map<String, Field> fieldByName = newHashMap(
+            EzyFields.getFields(clazz),
+            Field::getName
+        );
         boolean isSetter = PREFIX_SET.equals(methodPrefix);
         return EzyMethods.getPublicMethods(clazz)
             .stream()
@@ -851,6 +860,32 @@ public class SwaggerGenerator {
                         : it.getGenericReturnType()
                 )
             )
+            .filter(it -> {
+                Field field = fieldByName.get(it.name);
+                if (field == null) {
+                    return true;
+                }
+                return !field.isAnnotationPresent(JsonIgnore.class);
+            })
+            .map(it -> {
+                Field field = fieldByName.get(it.name);
+                if (field != null) {
+                    JsonProperty jsonProperty = field.getDeclaredAnnotation(
+                        JsonProperty.class
+                    );
+                    if (jsonProperty != null) {
+                        String name = jsonProperty.value();
+                        if (isNotBlank(name)) {
+                            return new ApiDataField(
+                                name,
+                                it.javaType,
+                                it.javaGenericsType
+                            );
+                        }
+                    }
+                }
+                return it;
+            })
             .distinct()
             .sorted(Comparator.comparing(a -> a.name))
             .collect(Collectors.toList());
