@@ -111,7 +111,7 @@ public final class CommonConstants {
     public static final int LIMIT_1_000_000_RECORDS = 1_000_000;
 
     public static final int MIN_PAGE_SIZE = 1;
-    public static final int MAX_PAGE_SIZE = 300;
+    public static final int MAX_PAGE_SIZE = 500;
     public static final int WEB_MAX_PAGE_SIZE = 100;
 
     public static final String COOKIE_NAME_ACCESS_TOKEN = "accessToken";
@@ -120,6 +120,8 @@ public final class CommonConstants {
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN = "adminAccessToken";
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT = "adminAccessTokenExpiredAt";
     public static final String COOKIE_NAME_ADMIN_SSO_CALL_BACK_URL = "adminSSOCallbackUrl";
+    public static final String COOKIE_NAME_SHARED_ADMIN_ACCESS_TOKEN = "sharedAdminAccessToken";
+    public static final String COOKIE_NAME_SHARED_ADMIN_ACCESS_TOKEN_EXPIRED_AT = "sharedAdminAccessTokenExpiredAt";
     public static final String COOKIE_NAME_MARKET_ACCESS_TOKEN = "marketAccessToken";
     public static final String COOKIE_NAME_MARKET_ACCESS_TOKEN_EXPIRED_AT = "marketAccessTokenExpiredAt";
 

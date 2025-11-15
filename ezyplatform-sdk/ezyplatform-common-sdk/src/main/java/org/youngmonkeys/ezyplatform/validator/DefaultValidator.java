@@ -246,7 +246,7 @@ public final class DefaultValidator {
     }
 
     public static boolean isValidCollectionSize(Collection<?> collection) {
-        return collection.size() >= MIN_PAGE_SIZE
+        return !collection.isEmpty()
             && collection.size() <= MAX_PAGE_SIZE;
     }
 
@@ -255,6 +255,6 @@ public final class DefaultValidator {
     }
 
     public static boolean containsVariable(String text) {
-        return getKeysFromVariableName(text).size() > 0;
+        return !getKeysFromVariableName(text).isEmpty();
     }
 }

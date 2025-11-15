@@ -36,6 +36,8 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
 @AllArgsConstructor
 public class DefaultAdminService implements AdminService {
 
@@ -231,8 +233,8 @@ public class DefaultAdminService implements AdminService {
         String accessToken,
         boolean verifyStatus
     ) {
-        if (accessToken == null) {
-            throw new AdminInvalidAccessTokenException("null");
+        if (isBlank(accessToken)) {
+            throw new AdminInvalidAccessTokenException(accessToken);
         }
         long adminId = accessTokenService.extractAdminId(accessToken);
         if (adminId <= 0L) {

@@ -45,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.util.Next.limit;
 import static org.youngmonkeys.ezyplatform.util.StringConverters.trimOrNull;
 
@@ -387,8 +388,8 @@ public class DefaultUserService implements UserService {
         String accessToken,
         boolean verifyStatus
     ) {
-        if (accessToken == null) {
-            throw new UserInvalidAccessTokenException(null);
+        if (isBlank(accessToken)) {
+            throw new UserInvalidAccessTokenException(accessToken);
         }
         long userId = accessTokenService.extractUserId(accessToken);
         if (userId <= 0L) {
