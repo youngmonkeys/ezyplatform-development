@@ -271,7 +271,6 @@ public final class CommonConstants {
     public static final String DEFAULT_WEB_SITE_LOGO_URL = "/images/logo.png";
     public static final String DEFAULT_ADMIN_URL = "http://localhost:9090";
     public static final String DEFAULT_WEB_URL = "http://localhost:8080";
-    public static final String DEFAULT_WEB_MANAGEMENT_URL = "http://localhost:18080";
     public static final String DEFAULT_WEBSOCKET_URL = "ws://localhost:2208/ws";
     public static final String DEFAULT_HIDDEN_PASSWORD = "************";
     public static final long DEFAULT_TOKEN_EXPIRED_IN_DAY = 7;

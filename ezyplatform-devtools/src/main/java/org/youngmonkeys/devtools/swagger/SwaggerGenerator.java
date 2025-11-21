@@ -180,20 +180,31 @@ public class SwaggerGenerator {
         );
         Set<ApiMethod> generatedMethods = new HashSet<>();
         List<String> apis = new ArrayList<>();
+        Map<String, List<ApiMethod>> apiMethodsByUri = new HashMap<>();
         for (ApiClass apiClass : apiClasses) {
             for (String uri : apiClass.methodsByUri.keySet()) {
                 List<ApiMethod> apiMethods = filter(
                     apiClass.methodsByUri.get(uri),
                     it -> !generatedMethods.contains(it)
                 );
-                for (int i = 0; i < apiMethods.size(); ++i) {
-                    ApiMethod apiMethod = apiMethods.get(i);
-                    generatedMethods.add(apiMethod);
-                    if (i == 0) {
-                        apis.add("'" + uri + "':");
-                    }
-                    apis.addAll(createApi(apiMethod));
+                for (ApiMethod apiMethod : apiMethods) {
+                    apiMethodsByUri.computeIfAbsent(
+                        apiMethod.uri,
+                        (k) -> new ArrayList<>()
+                    ).add(apiMethod);
                 }
+            }
+        }
+        for (Map.Entry<String, List<ApiMethod>> e : apiMethodsByUri.entrySet()) {
+            String uri = e.getKey();
+            List<ApiMethod> apiMethods = e.getValue();
+            for (int i = 0; i < apiMethods.size(); ++i) {
+                ApiMethod apiMethod = apiMethods.get(i);
+                generatedMethods.add(apiMethod);
+                if (i == 0) {
+                    apis.add("'" + uri + "':");
+                }
+                apis.addAll(createApi(apiMethod));
             }
         }
         return apis;

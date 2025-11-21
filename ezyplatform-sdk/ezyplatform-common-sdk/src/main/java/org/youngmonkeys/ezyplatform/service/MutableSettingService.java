@@ -52,18 +52,29 @@ public abstract class MutableSettingService
         this.modelToEntityConverter = modelToEntityConverter;
     }
 
-    public void setLastUpdateTime(String settingName) {
-        setLastUpdateTime(settingName, System.currentTimeMillis());
+    public void setLastUpdateTime(
+        String settingName
+    ) {
+        setLastUpdateTime(
+            settingName,
+            System.currentTimeMillis()
+        );
     }
 
-    public void setLastUpdateTime(String settingName, long time) {
+    public void setLastUpdateTime(
+        String settingName,
+        long time
+    ) {
         setLongValue(
             settingName + LAST_UPDATE_TIME_SUFFIX,
             time
         );
     }
 
-    public void setBooleanValue(String settingName, Boolean value) {
+    public void setBooleanValue(
+        String settingName,
+        Boolean value
+    ) {
         saveSetting(
             settingName,
             DataType.BOOLEAN,
@@ -71,7 +82,10 @@ public abstract class MutableSettingService
         );
     }
 
-    public void setIntValue(String settingName, Integer value) {
+    public void setIntValue(
+        String settingName,
+        Integer value
+    ) {
         saveSetting(
             settingName,
             DataType.INTEGER,
@@ -79,7 +93,10 @@ public abstract class MutableSettingService
         );
     }
 
-    public void setLongValue(String settingName, Long value) {
+    public void setLongValue(
+        String settingName,
+        Long value
+    ) {
         saveSetting(
             settingName,
             DataType.LONG,
@@ -87,7 +104,10 @@ public abstract class MutableSettingService
         );
     }
 
-    public void setTextValue(String settingName, String value) {
+    public void setTextValue(
+        String settingName,
+        String value
+    ) {
         saveSetting(
             settingName,
             DataType.STRING,
@@ -95,7 +115,10 @@ public abstract class MutableSettingService
         );
     }
 
-    public void setUrlValue(String settingName, String url) {
+    public void setUrlValue(
+        String settingName,
+        String url
+    ) {
         saveSetting(
             settingName,
             DataType.URL,
@@ -122,6 +145,17 @@ public abstract class MutableSettingService
             settingName,
             DataType.JSON,
             value
+        );
+    }
+
+    public void setPasswordValue(
+        String settingName,
+        String value
+    ) {
+        saveSetting(
+            settingName,
+            DataType.PASSWORD,
+            encryptValue(value)
         );
     }
 

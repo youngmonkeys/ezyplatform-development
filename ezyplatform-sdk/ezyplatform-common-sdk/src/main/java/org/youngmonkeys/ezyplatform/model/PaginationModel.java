@@ -20,8 +20,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -54,8 +56,24 @@ public class PaginationModel<T> {
     public <R> PaginationModel<R> map(
         Function<T, R> mapper
     ) {
+        return newItems(newArrayList(items, mapper));
+    }
+
+    public <R> PaginationModel<R> mapIndex(
+        BiFunction<T, Integer, R> mapper
+    ) {
+        List<R> newItems = new ArrayList<>();
+        for (int i = 0; i < items.size(); ++i) {
+            newItems.add(mapper.apply(items.get(i), i));
+        }
+        return newItems(newItems);
+    }
+
+    public <R> PaginationModel<R> newItems(
+        List<R> items
+    ) {
         return PaginationModel.<R>builder()
-            .items(newArrayList(items, mapper))
+            .items(items)
             .pageToken(pageToken)
             .continuation(continuation)
             .count(count)

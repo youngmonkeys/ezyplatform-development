@@ -364,7 +364,7 @@ public interface SettingService {
     default String getWebManagementUrl() {
         return getTextValue(
             SETTING_NAME_WEB_MANAGEMENT_URL,
-            DEFAULT_WEB_MANAGEMENT_URL
+            DEFAULT_WEB_URL
         );
     }
 
