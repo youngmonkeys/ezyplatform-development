@@ -157,6 +157,17 @@ public class DefaultDataMetaService implements DataMetaService {
     }
 
     @Override
+    public void deleteByDataTypeAndMetaKey(
+        String dataType,
+        String metaKey
+    ) {
+        dataMetaRepository.deleteByDataTypeAndMetaKey(
+            dataType,
+            metaKey
+        );
+    }
+
+    @Override
     public void deleteByDataTypeAndDataIdAndMetaKeyAndMetaValue(
         String dataType,
         long dataId,

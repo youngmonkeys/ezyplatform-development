@@ -233,13 +233,10 @@ public final class CommonConstants {
     public static final String SETTING_NAME_WEB_MANAGEMENT_URL = "web_management_url";
     public static final String SETTING_NAME_WEBSOCKET_URL = "websocket_url";
     public static final String SETTING_NAME_ENABLE_SUFFIX = "_enable";
-    public static final String SETTING_NAME_ADMIN_ENABLE = "admin_enable";
-    public static final String SETTING_NAME_SOCKET_ENABLE = "socket_enable";
     public static final String SETTING_NAME_SOCKET_AUTO_RELOAD_SSL_ENABLE =
         "socket_auto_reload_ssl_enable";
     public static final String SETTING_NAME_SOCKET_AUTO_RELOAD_SLEEP_TIME =
         "socket_auto_reload_sleep_time";
-    public static final String SETTING_NAME_WEB_ENABLE = "web_enable";
     public static final String SETTING_NAME_WEB_LANGUAGES = "web_languages";
     public static final String SETTING_NAME_ALLOW_SEND_STATISTICS_DATA =
         "allow_send_statistics_data";
@@ -264,9 +261,6 @@ public final class CommonConstants {
     public static final String DEFAULT_DATETIME_FORMAT = "YYYY-MM-DD HH:mm:ss";
     public static final String DEFAULT_DATE_MINUTE_FORMAT = "YYYY-MM-DD HH:mm";
     public static final int DEFAULT_CACHE_SETTINGS_PERIOD = 5;
-    public static final boolean DEFAULT_ADMIN_ENABLE = true;
-    public static final boolean DEFAULT_SOCKET_ENABLE = true;
-    public static final boolean DEFAULT_WEB_ENABLE = true;
     public static final String DEFAULT_WEB_SITE_ICON_URL = "/images/favicon.ico";
     public static final String DEFAULT_WEB_SITE_LOGO_URL = "/images/logo.png";
     public static final String DEFAULT_ADMIN_URL = "http://localhost:9090";
@@ -336,6 +330,8 @@ public final class CommonConstants {
 
     public static final String FILE_EXTENSION_ZIP = "zip";
     public static final String FILE_EXTENSION_SQL = "sql";
+
+    public static final String NOT_FOUND_URI = "/not-found";
 
     public static final LocalDateTime MIN_SQL_DATETIME
         = LocalDateTime.of(1900, 1, 1, 0, 0, 0);

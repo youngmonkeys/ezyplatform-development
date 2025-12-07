@@ -16,9 +16,14 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import com.tvd12.ezyfox.util.Next;
+
 import java.net.URI;
 import java.security.SecureRandom;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 public final class Randoms {
 
@@ -64,5 +69,18 @@ public final class Randoms {
             domain += ".com";
         }
         return UUID.randomUUID() + "@" + domain;
+    }
+
+    public static Next randomSkipLimit(
+        long total,
+        long limit
+    ) {
+        long skip = ZERO_LONG;
+        if (limit < total) {
+            skip = ThreadLocalRandom
+                .current()
+                .nextLong(ZERO_LONG, total - limit + 1);
+        }
+        return Next.skipLimit(skip, limit);
     }
 }

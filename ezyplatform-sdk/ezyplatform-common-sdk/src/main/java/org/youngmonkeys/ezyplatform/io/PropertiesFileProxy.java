@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.youngmonkeys.ezyplatform.io.FolderProxy.createNewFile;
 import static org.youngmonkeys.ezyplatform.util.Strings.startsWithIgnoreSpaces;
@@ -71,10 +72,12 @@ public final class PropertiesFileProxy {
     ) {
         createNewFile(propertiesFile);
         List<String> commentLines;
-        try {
-            commentLines = Files.lines(
-                    propertiesFile.toPath()
-                )
+        try (
+            Stream<String> stream = Files.lines(
+                propertiesFile.toPath()
+            )
+        ) {
+            commentLines = stream
                 .filter(line -> startsWithIgnoreSpaces(line, "#"))
                 .collect(Collectors.toList());
         } catch (IOException e) {

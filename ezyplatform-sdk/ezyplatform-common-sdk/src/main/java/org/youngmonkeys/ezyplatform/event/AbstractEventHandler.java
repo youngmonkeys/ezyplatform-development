@@ -48,7 +48,9 @@ public abstract class AbstractEventHandler<D, R>
         return null;
     }
 
-    protected void processException(Exception e) {}
+    protected void processException(Exception e) {
+        logger.info("process event failed", e);
+    }
 
     @Override
     public String getEventName() {

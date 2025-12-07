@@ -21,6 +21,7 @@ import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.model.MediaModel.toMeMediaUrlOrDefault;
 import static org.youngmonkeys.ezyplatform.model.MediaModel.toMediaUrlOrDefault;
 
@@ -32,6 +33,10 @@ public class MediaNameModel {
     private String originalName;
     private MediaType type;
     private String url;
+    private String title;
+    private String caption;
+    private String alternativeText;
+    private String description;
 
     public static MediaNameModel fromMediaModel(
         MediaModel model
@@ -45,13 +50,17 @@ public class MediaNameModel {
             .originalName(model.getOriginalName())
             .type(model.getType())
             .url(model.getUrl())
+            .title(model.getTitle())
+            .caption(model.getCaption())
+            .alternativeText(model.getAlternativeText())
+            .description(model.getDescription())
             .build();
     }
 
     public static String getMediaNameOrNull(
         MediaNameModel media
     ) {
-        return getMediaNameOrDefault(media, null);
+        return getMediaNameOrDefault(media, NULL_STRING);
     }
 
     public static String getMediaNameOrDefault(
@@ -66,7 +75,7 @@ public class MediaNameModel {
     public static String getMediaUrlOrNull(
         MediaNameModel media
     ) {
-        return getMediaUrlOrDefault(media, null);
+        return getMediaUrlOrDefault(media, NULL_STRING);
     }
 
     public static String getMediaUrlOrDefault(
@@ -80,7 +89,7 @@ public class MediaNameModel {
 
     @JsonIgnore
     public String getUrlOrNull() {
-        return getUrlOrDefault(null);
+        return getUrlOrDefault(NULL_STRING);
     }
 
     public String getUrlOrDefault(String defaultUrl) {

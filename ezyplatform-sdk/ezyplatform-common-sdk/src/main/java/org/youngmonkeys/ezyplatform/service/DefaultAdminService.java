@@ -36,6 +36,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
 @AllArgsConstructor
@@ -56,8 +57,11 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public Optional<AdminModel> getAdminByIdOptional(long adminId) {
-        return adminRepository.findByIdOptional(adminId)
+    public Optional<AdminModel> getAdminByIdOptional(
+        long adminId
+    ) {
+        return adminRepository
+            .findByIdOptional(adminId)
             .map(entityToModelConverter::toModel);
     }
 
@@ -69,8 +73,11 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public Optional<AdminModel> getAdminByUuidOptional(String uuid) {
-        return adminRepository.findByFieldOptional("uuid", uuid)
+    public Optional<AdminModel> getAdminByUuidOptional(
+        String uuid
+    ) {
+        return adminRepository
+            .findByFieldOptional("uuid", uuid)
             .map(entityToModelConverter::toModel);
     }
 
@@ -82,8 +89,11 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public Optional<AdminModel> getAdminByUsernameOptional(String username) {
-        return adminRepository.findByFieldOptional("username", username)
+    public Optional<AdminModel> getAdminByUsernameOptional(
+        String username
+    ) {
+        return adminRepository
+            .findByFieldOptional("username", username)
             .map(entityToModelConverter::toModel);
     }
 
@@ -178,11 +188,41 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public List<AdminModel> getAdminsByIds(Collection<Long> ids) {
-        return adminRepository.findListByIds(ids)
+    public List<AdminModel> getAdminsByIds(
+        Collection<Long> ids
+    ) {
+        if (ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return adminRepository
+            .findListByIds(ids)
             .stream()
             .map(entityToModelConverter::toModel)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AdminModel> getAdminsByUuids(
+        Collection<String> uuids
+    ) {
+        if (uuids.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return adminRepository
+            .findByUuidIn(uuids)
+            .stream()
+            .map(entityToModelConverter::toModel)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, AdminModel> getAdminMapByUuids(
+        Collection<String> uuids
+    ) {
+        return newHashMap(
+            getAdminsByUuids(uuids),
+            AdminModel::getUuid
+        );
     }
 
     @Override
@@ -194,13 +234,16 @@ public class DefaultAdminService implements AdminService {
 
     @Override
     public AdminModel getAdminByPhone(String phone) {
-        return adminRepository.findByFieldOptional("phone", phone)
+        return adminRepository
+            .findByFieldOptional("phone", phone)
             .map(entityToModelConverter::toModel)
             .orElse(null);
     }
 
     @Override
-    public AdminModel getAdminByUsernameOrEmail(String usernameOrEmail) {
+    public AdminModel getAdminByUsernameOrEmail(
+        String usernameOrEmail
+    ) {
         AdminModel admin = getAdminByUsername(usernameOrEmail);
         if (admin == null) {
             admin = getAdminByEmail(usernameOrEmail);

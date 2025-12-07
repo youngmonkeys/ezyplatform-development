@@ -216,7 +216,7 @@ public final class FolderProxy {
             .setFile(rootFolder);
         Queue<FileItemMutable> queue = new LinkedList<>();
         queue.offer(root);
-        while (queue.size() > 0) {
+        while (!queue.isEmpty()) {
             FileItemMutable parent = queue.poll();
             if (parent.getLevel() >= maxLevel) {
                 continue;
@@ -235,7 +235,9 @@ public final class FolderProxy {
                     .setParent(parent)
                     .setRelativePath(
                         file.getAbsolutePath()
-                            .substring(rootFolder.getAbsolutePath().length() + 1)
+                            .substring(
+                                rootFolder.getAbsolutePath().length() + 1
+                            )
                     );
                 parent.addChild(fileItem);
                 if (file.isDirectory()) {

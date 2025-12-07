@@ -28,6 +28,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Iterator;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+
 public final class ImageProxy {
 
     private static final Logger LOGGER = LoggerFactory
@@ -60,8 +62,8 @@ public final class ImageProxy {
                 try {
                     reader.setInput(inputStream);
                     return new ImageSize(
-                        reader.getWidth(0),
-                        reader.getHeight(0),
+                        reader.getWidth(ZERO),
+                        reader.getHeight(ZERO),
                         imageFile.length()
                     );
                 } finally {
@@ -77,8 +79,8 @@ public final class ImageProxy {
             );
         }
         return new ImageSize(
-            0,
-            0,
+            ZERO,
+            ZERO,
             imageFile.length()
         );
     }

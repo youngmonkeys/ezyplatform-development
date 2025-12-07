@@ -76,13 +76,25 @@ public interface AdminService {
         );
     }
 
-    List<AdminModel> getAdminsByIds(Collection<Long> ids);
+    List<AdminModel> getAdminsByIds(
+        Collection<Long> ids
+    );
+
+    List<AdminModel> getAdminsByUuids(
+        Collection<String> uuids
+    );
+
+    Map<String, AdminModel> getAdminMapByUuids(
+        Collection<String> uuids
+    );
 
     AdminModel getAdminByEmail(String email);
 
     AdminModel getAdminByPhone(String phone);
 
-    AdminModel getAdminByUsernameOrEmail(String usernameOrEmail);
+    AdminModel getAdminByUsernameOrEmail(
+        String usernameOrEmail
+    );
 
     long validateAdminAccessToken(String accessToken);
 

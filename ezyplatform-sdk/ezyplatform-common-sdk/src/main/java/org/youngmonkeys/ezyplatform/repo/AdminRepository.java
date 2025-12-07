@@ -51,6 +51,8 @@ public interface AdminRepository extends EzyDatabaseRepository<Long, Admin> {
         long id
     );
 
+    List<Admin> findByUuidIn(Collection<String> uuids);
+
     @EzyQuery(
         "SELECT e.id, e.username, e.displayName " +
             "FROM Admin e " +

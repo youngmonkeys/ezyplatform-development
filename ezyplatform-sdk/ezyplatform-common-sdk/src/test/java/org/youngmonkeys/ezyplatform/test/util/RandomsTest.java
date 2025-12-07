@@ -16,11 +16,12 @@
 
 package org.youngmonkeys.ezyplatform.test.util;
 
+import com.tvd12.ezyfox.collect.Sets;
+import com.tvd12.ezyfox.util.Next;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
-import static org.youngmonkeys.ezyplatform.util.Randoms.randomEmailFromUrl;
-import static org.youngmonkeys.ezyplatform.util.Randoms.randomName;
+import static org.youngmonkeys.ezyplatform.util.Randoms.*;
 
 public class RandomsTest {
 
@@ -49,5 +50,30 @@ public class RandomsTest {
         // then
         Asserts.assertTrue(actual1.endsWith("localhost.com"));
         Asserts.assertTrue(actual2.endsWith("hello.com"));
+    }
+
+    @Test
+    public void randomSkipLimitTest() {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            randomSkipLimit(3, 3),
+            Next.skipLimit(0, 3)
+        );
+        Asserts.assertEquals(
+            randomSkipLimit(2, 3),
+            Next.skipLimit(0, 3)
+        );
+        Asserts.assertTrue(
+            Sets.newHashSet(
+                0L,
+                1L
+            ).contains(randomSkipLimit(3, 2).getSkip())
+        );
+        Asserts.assertEquals(
+            randomSkipLimit(3, 2).getLimit(),
+            2L
+        );
     }
 }

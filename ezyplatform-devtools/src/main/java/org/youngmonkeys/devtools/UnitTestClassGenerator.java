@@ -17,39 +17,58 @@
 package org.youngmonkeys.devtools;
 
 import com.tvd12.ezyfox.reflect.EzyClass;
+import com.tvd12.ezyfox.reflect.EzyField;
+import com.tvd12.ezyfox.reflect.EzyFields;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzySets.newHashSet;
 import static com.tvd12.ezyfox.reflect.EzyClasses.getVariableName;
 
 public class UnitTestClassGenerator {
 
     private final String classSimpleName;
-    private final Constructor<?> constructor;
+    private final List<EzyField> components;
+    private boolean hasConstructor;
     private final List<String> imports = new ArrayList<>();
     private final List<String> content = new ArrayList<>();
 
     public UnitTestClassGenerator(Class<?> javaClass) {
         EzyClass clazz = new EzyClass(javaClass);
         this.classSimpleName = javaClass.getSimpleName();
-        this.constructor = clazz
+        Constructor<?> constructor = clazz
             .getDeclaredConstructors()
             .stream()
             .max(Comparator.comparingInt(Constructor::getParameterCount))
             .orElse(null);
-
+        if (constructor != null && constructor.getParameterCount() > 0) {
+            hasConstructor = true;
+            components = Stream
+                .of(constructor.getParameterTypes())
+                .map(it ->
+                    EzyField.builder()
+                        .clazz(it)
+                        .fieldName(getVariableName(it))
+                        .build()
+                )
+                .collect(Collectors.toList());
+        } else {
+            components = newArrayList(
+                EzyFields.getFields(javaClass),
+                EzyField::new
+            );
+        }
     }
 
     public void printContent() {
         System.out.println(generateContent());
     }
 
-    @SuppressWarnings("MethodLength")
+    @SuppressWarnings({"unchecked", "MethodLength"})
     public String generateContent() {
         imports.addAll(
             Arrays.asList(
@@ -58,9 +77,10 @@ public class UnitTestClassGenerator {
             )
         );
         imports.add(InstanceRandom.class.getName() + ";");
-        Class<?>[] componentClasses = constructor == null
-            ? new Class[0]
-            : constructor.getParameterTypes();
+        Set<Class<?>> componentClasses = newHashSet(
+            components,
+            EzyField::getType
+        );
         for (Class<?> componentClass : componentClasses) {
             imports.add(componentClass.getName() + ";");
         }
@@ -75,11 +95,11 @@ public class UnitTestClassGenerator {
 
         // setup
         content.add("public class " + classSimpleName + "Test {");
-        for (Class<?> componentClass : componentClasses) {
+        for (EzyField component : components) {
             content.add(
                 tabs(1) + "private " +
-                componentClass.getSimpleName() + " " +
-                getVariableName(componentClass) + ";"
+                component.getType().getSimpleName() + " " +
+                component.getName() + ";"
             );
         }
         content.add(tabs(1) + "private " + classSimpleName + " instance;");
@@ -91,19 +111,14 @@ public class UnitTestClassGenerator {
         content.add("");
         content.add(tabs(1) + "@BeforeMethod");
         content.add(tabs(1) + "public void setup() {");
-        for (Class<?> componentClass : componentClasses) {
+        for (EzyField component : components) {
             content.add(
-                tabs(2) + getVariableName(componentClass) +
-                    " = mock(" + componentClass.getSimpleName() +
+                tabs(2) + component.getName() +
+                    " = mock(" + component.getType().getSimpleName() +
                     ".class);"
             );
         }
-        if (componentClasses.length == 0) {
-            content.add(
-                tabs(2) + "instance = new " +
-                    classSimpleName + "();"
-            );
-        } else {
+        if (hasConstructor) {
             content.add(
                 tabs(2) + "instance = new " +
                     classSimpleName + "("
@@ -116,19 +131,33 @@ public class UnitTestClassGenerator {
             }
             content.add(String.join(",\n", params));
             content.add(tabs(2) + ");");
+        } else {
+            content.add(
+                tabs(2) + "instance = new " +
+                    classSimpleName + "();"
+            );
+            List<String> setters = new ArrayList<>();
+            for (EzyField component : components) {
+                setters.add(
+                    tabs(2) + "instance." +
+                        component.getSetterMethod() +
+                        "(" + component.getName() + ");"
+                );
+            }
+            content.add(String.join("\n", setters));
         }
         content.add(tabs(1) + "}");
 
         // verify all
-        if (componentClasses.length > 0) {
+        if (!components.isEmpty()) {
             content.add("");
             content.add(tabs(1) + "@AfterMethod");
             content.add(tabs(1) + "public void verifyAll() {");
             content.add(tabs(2) + "verifyNoMoreInteractions(");
             List<String> params = new ArrayList<>();
-            for (Class<?> componentClass : componentClasses) {
+            for (EzyField field : components) {
                 params.add(
-                    tabs(3) + getVariableName(componentClass)
+                    tabs(3) + field.getName()
                 );
             }
             content.add(String.join(",\n", params));
