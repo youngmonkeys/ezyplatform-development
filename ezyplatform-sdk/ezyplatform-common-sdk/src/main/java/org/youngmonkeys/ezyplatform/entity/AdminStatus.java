@@ -20,5 +20,6 @@ public enum AdminStatus {
     ACTIVATED,
     INACTIVATED,
     ARCHIVED,
-    BLOCKED
+    BLOCKED,
+    DELETED
 }

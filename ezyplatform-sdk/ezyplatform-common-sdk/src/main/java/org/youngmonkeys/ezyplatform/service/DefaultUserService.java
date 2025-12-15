@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
@@ -113,10 +114,12 @@ public class DefaultUserService implements UserService {
     }
 
     public List<String> getAllUserStatuses() {
-        return newArrayList(
-            userRepository.findAllUserStatuses(),
-            StatusResult::getStatus
-        );
+        return userRepository
+            .findAllUserStatuses()
+            .stream()
+            .map(StatusResult::getStatus)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
     }
 
     @Override

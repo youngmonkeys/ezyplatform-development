@@ -26,6 +26,7 @@ public class DefaultAdminFilter implements AdminFilter {
     public final Collection<Long> ids;
     public final AdminStatus status;
     public final Collection<AdminStatus> statuses;
+    public final AdminStatus exclusiveStatus;
     public final String uniqueKeyword;
     public final String likeKeyword;
     public final Long roleId;
@@ -41,6 +42,7 @@ public class DefaultAdminFilter implements AdminFilter {
         this.ids = builder.ids;
         this.status = builder.status;
         this.statuses = builder.statuses;
+        this.exclusiveStatus = builder.exclusiveStatus;
         this.uniqueKeyword = builder.uniqueKeyword;
         this.likeKeyword = builder.likeKeyword;
         this.roleId = builder.roleId;
@@ -106,7 +108,10 @@ public class DefaultAdminFilter implements AdminFilter {
             answer.and("e.status = :status");
         }
         if (statuses != null) {
-            answer.and("e.status in :statuses");
+            answer.and("e.status IN :statuses");
+        }
+        if (exclusiveStatus != null) {
+            answer.and("e.status <> :exclusiveStatus");
         }
         if (roleId != null) {
             answer.and("l.roleId = :roleId");
@@ -160,6 +165,7 @@ public class DefaultAdminFilter implements AdminFilter {
         private Collection<Long> ids;
         private AdminStatus status;
         private Collection<AdminStatus> statuses;
+        private AdminStatus exclusiveStatus;
         private String uniqueKeyword;
         private String likeKeyword;
         private Long roleId;
@@ -183,6 +189,11 @@ public class DefaultAdminFilter implements AdminFilter {
 
         public T statuses(Collection<AdminStatus> statuses) {
             this.statuses = statuses;
+            return (T) this;
+        }
+
+        public T exclusiveStatus(AdminStatus exclusiveStatus) {
+            this.exclusiveStatus = exclusiveStatus;
             return (T) this;
         }
 

@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.manager;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -24,9 +25,9 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 public class EditableMetadataManager {
 
     protected final Map<String, String> metadataTypeByName
-        = new HashMap<>();
+        = new ConcurrentHashMap<>();
     protected final Map<String, Object> defaultValueByName
-        = new HashMap<>();
+        = new ConcurrentHashMap<>();
 
     public void addMetadataNameAndType(
         String name,
