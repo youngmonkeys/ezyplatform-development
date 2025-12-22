@@ -98,6 +98,7 @@ public final class CommonConstants {
     public static final int MAX_MEDIA_CAPTION_LENGTH = 300;
     public static final int MAX_MEDIA_ALT_TEXT_LENGTH = 300;
     public static final int MAX_MEDIA_DESCRIPTION_LENGTH = 3500;
+    public static final int MAX_META_VALUE_LENGTH = 300;
 
     public static final int LIMIT_30_RECORDS = 30;
     public static final int LIMIT_50_RECORDS = 50;

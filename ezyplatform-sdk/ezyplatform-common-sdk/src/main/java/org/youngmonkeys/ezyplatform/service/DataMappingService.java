@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+
 public interface DataMappingService {
 
     void saveDataMapping(
@@ -101,10 +103,32 @@ public interface DataMappingService {
         long fromDataId
     );
 
+    default long getMappingToDataIdByNameAndFromDataId(
+        String mappingName,
+        long fromDataId
+    ) {
+        DataMappingModel mapping = getMappingToDataByNameAndFromDataId(
+            mappingName,
+            fromDataId
+        );
+        return mapping != null ? mapping.getToDataId() : ZERO_LONG;
+    }
+
     DataMappingModel getMappingFromDataByNameAndToDataId(
         String mappingName,
         long toDataId
     );
+
+    default long getMappingFromDataIdByNameAndToDataId(
+        String mappingName,
+        long toDataId
+    ) {
+        DataMappingModel mapping = getMappingFromDataByNameAndToDataId(
+            mappingName,
+            toDataId
+        );
+        return mapping != null ? mapping.getFromDataId() : ZERO_LONG;
+    }
 
     Set<Long> getMappingToDataIdsByNameAndFromDataId(
         String mappingName,

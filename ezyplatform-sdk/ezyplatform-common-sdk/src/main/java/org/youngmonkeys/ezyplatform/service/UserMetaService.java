@@ -453,6 +453,27 @@ public interface UserMetaService {
             );
     }
 
+    default Map<String, String> getLatestMetaTextValueMapByUserIdAndMetaKeys(
+        long userId,
+        Collection<String> metaKeys
+    ) {
+        return metaKeys
+            .parallelStream()
+            .map(it ->
+                EzyEntry.of(
+                    it,
+                    getLatestMetaTextValueByUserIdAndMetaKey(userId, it)
+                )
+            )
+            .filter(it -> it.getValue() != null)
+            .collect(
+                Collectors.toMap(
+                    EzyEntry::getKey,
+                    EzyEntry::getValue
+                )
+            );
+    }
+
     Map<Long, String> getUserMetaTextValueMapByUserIds(
         Collection<Long> userIds,
         String metaKey

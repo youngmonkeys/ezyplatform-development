@@ -92,6 +92,9 @@ public final class Strings {
     }
 
     public static String substring(String str, int from, int to) {
+        if (str == null) {
+            return null;
+        }
         return str.substring(
             Math.max(from, 0),
             Math.min(to, str.length())
@@ -537,5 +540,27 @@ public final class Strings {
             }
         }
         return varName;
+    }
+
+    public static String toMetaValue(String value) {
+        return substring(value, ZERO, MAX_META_VALUE_LENGTH);
+    }
+
+    public static String toMetaValueOrNull(String value) {
+        if (value == null
+            || value.length() > MAX_META_VALUE_LENGTH
+        ) {
+            return null;
+        }
+        return value;
+    }
+
+    public static String toMetaValueOrEmpty(String value) {
+        if (value == null
+            || value.length() > MAX_META_VALUE_LENGTH
+        ) {
+            return EMPTY_STRING;
+        }
+        return value;
     }
 }

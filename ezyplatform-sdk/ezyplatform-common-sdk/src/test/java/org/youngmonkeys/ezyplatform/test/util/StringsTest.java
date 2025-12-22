@@ -135,6 +135,11 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void substringNullTest() {
+        Asserts.assertNull(substring(null, 0, 1));
+    }
+
+    @Test
     public void endsWithTest() {
         Asserts.assertTrue(
             endsWith("hello", 3, "hel")
@@ -987,5 +992,47 @@ public class StringsTest extends BaseTest {
         Asserts.assertTrue(isBigDecimal(BigDecimal.valueOf(Double.MIN_VALUE).toString()));
         Asserts.assertFalse(isBigDecimal("abc"));
         Asserts.assertFalse(isBigDecimal(""));
+    }
+
+    @Test
+    public void toMetaValueTest() {
+        // given
+        String metaValue = RandomUtil.randomShortAlphabetString();
+
+        // when
+        String actual = toMetaValue(metaValue);
+
+        // then
+        Asserts.assertEquals(actual, metaValue);
+    }
+
+    @Test
+    public void toMetaValueOrNullTest() {
+        // given
+        String metaValue1 = RandomUtil.randomShortAlphabetString();
+        String metaValue2 = RandomUtil.randomAlphabetString(301);
+
+        // when
+        String actual1 = toMetaValueOrNull(metaValue1);
+        String actual2 = toMetaValueOrNull(metaValue2);
+
+        // then
+        Asserts.assertEquals(actual1, metaValue1);
+        Asserts.assertNull(actual2);
+    }
+
+    @Test
+    public void toMetaValueOrEmptyTest() {
+        // given
+        String metaValue1 = RandomUtil.randomShortAlphabetString();
+        String metaValue2 = RandomUtil.randomAlphabetString(301);
+
+        // when
+        String actual1 = toMetaValueOrEmpty(metaValue1);
+        String actual2 = toMetaValueOrEmpty(metaValue2);
+
+        // then
+        Asserts.assertEquals(actual1, metaValue1);
+        Asserts.assertEquals(actual2, EMPTY_STRING);
     }
 }

@@ -23,6 +23,7 @@ import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
@@ -37,6 +38,7 @@ public class UserMetaTransactionalRepository
         String metaValue,
         String metaTextValue
     ) {
+        BigInteger metaNumberValue = toBigIntegerOrZero(metaValue);
         EntityManager entityManager = databaseContext.createEntityManager();
         try {
             EntityTransaction transaction = entityManager.getTransaction();
@@ -58,7 +60,7 @@ public class UserMetaTransactionalRepository
                     entity.setMetaKey(metaKey);
                 }
                 entity.setMetaValue(metaValue);
-                entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+                entity.setMetaNumberValue(metaNumberValue);
                 entity.setMetaTextValue(metaTextValue);
                 entityManager.merge(entity);
                 transaction.commit();
@@ -77,6 +79,7 @@ public class UserMetaTransactionalRepository
         String metaKey,
         String metaValue
     ) {
+        BigInteger metaNumberValue = toBigIntegerOrZero(metaValue);
         EntityManager entityManager = databaseContext.createEntityManager();
         try {
             EntityTransaction transaction = entityManager.getTransaction();
@@ -99,7 +102,7 @@ public class UserMetaTransactionalRepository
                     entity.setUserId(userId);
                     entity.setMetaKey(metaKey);
                     entity.setMetaValue(metaValue);
-                    entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+                    entity.setMetaNumberValue(metaNumberValue);
                     entityManager.merge(entity);
                 }
                 transaction.commit();

@@ -37,6 +37,10 @@ public class Scheduler extends EzyLoggable {
 
     private static final int DEFAULT_PERIOD_IN_MILLIS = 5;
 
+    public Scheduler() {
+        this(Runtime.getRuntime().availableProcessors());
+    }
+
     public Scheduler(int maxExecutionThread) {
         this(maxExecutionThread, false);
     }

@@ -178,7 +178,7 @@ public interface AdminMetaService {
             );
     }
 
-    default void saveAdminMetaTexValueUniqueKeys(
+    default void saveAdminMetaTextValueUniqueKeys(
         long adminId,
         Map<String, Object> valueMap
     ) {
@@ -431,6 +431,27 @@ public interface AdminMetaService {
                 EzyEntry.of(
                     it,
                     getLatestMetaValueByAdminIdAndMetaKey(adminId, it)
+                )
+            )
+            .filter(it -> it.getValue() != null)
+            .collect(
+                Collectors.toMap(
+                    EzyEntry::getKey,
+                    EzyEntry::getValue
+                )
+            );
+    }
+    
+    default Map<String, String> getLatestMetaTextValueMapByAdminIdAndMetaKeys(
+        long adminId,
+        Collection<String> metaKeys
+    ) {
+        return metaKeys
+            .parallelStream()
+            .map(it ->
+                EzyEntry.of(
+                    it,
+                    getLatestMetaTextValueByAdminIdAndMetaKey(adminId, it)
                 )
             )
             .filter(it -> it.getValue() != null)

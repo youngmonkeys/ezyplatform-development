@@ -562,6 +562,32 @@ public interface DataMetaService {
                 )
             );
     }
+    
+    default Map<String, String> getLatestMetaTextValueMapByDataIdAndMetaKeys(
+        String dataType,
+        long dataId,
+        Collection<String> metaKeys
+    ) {
+        return metaKeys
+            .parallelStream()
+            .map(it ->
+                EzyEntry.of(
+                    it,
+                    getLatestMetaTextValueByDataIdAndMetaKey(
+                        dataType,
+                        dataId,
+                        it
+                    )
+                )
+            )
+            .filter(it -> it.getValue() != null)
+            .collect(
+                Collectors.toMap(
+                    EzyEntry::getKey,
+                    EzyEntry::getValue
+                )
+            );
+    }
 
     Map<Long, String> getDataMetaTextValueMapByDataIds(
         String dataType,

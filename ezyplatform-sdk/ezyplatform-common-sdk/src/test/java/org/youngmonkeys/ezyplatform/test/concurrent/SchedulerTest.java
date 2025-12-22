@@ -37,7 +37,7 @@ public class SchedulerTest {
     public void scheduleOneTest() {
         // given
         Runnable command = mock(Runnable.class);
-        Scheduler scheduler = new Scheduler(1);
+        Scheduler scheduler = new Scheduler();
 
         // when
         scheduler.scheduleOneTime(command, 3, TimeUnit.MILLISECONDS);
