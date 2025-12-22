@@ -80,7 +80,7 @@ public class DefaultData18nService implements Data18nService {
         String dataType,
         Collection<Long> dataIds
     ) {
-        if (dataIds.size() > 0) {
+        if (!dataIds.isEmpty()) {
             dataI18nRepository.deleteByDataTypeAndDataIdIn(
                 dataType,
                 dataIds
