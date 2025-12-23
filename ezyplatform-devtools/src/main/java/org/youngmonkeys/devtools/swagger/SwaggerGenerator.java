@@ -183,10 +183,7 @@ public class SwaggerGenerator {
         Map<String, List<ApiMethod>> apiMethodsByUri = new HashMap<>();
         for (ApiClass apiClass : apiClasses) {
             for (String uri : apiClass.methodsByUri.keySet()) {
-                List<ApiMethod> apiMethods = filter(
-                    apiClass.methodsByUri.get(uri),
-                    it -> !generatedMethods.contains(it)
-                );
+                List<ApiMethod> apiMethods = apiClass.methodsByUri.get(uri);
                 for (ApiMethod apiMethod : apiMethods) {
                     apiMethodsByUri.computeIfAbsent(
                         apiMethod.uri,
@@ -200,6 +197,9 @@ public class SwaggerGenerator {
             List<ApiMethod> apiMethods = e.getValue();
             for (int i = 0; i < apiMethods.size(); ++i) {
                 ApiMethod apiMethod = apiMethods.get(i);
+                if (generatedMethods.contains(apiMethod)) {
+                    continue;
+                }
                 generatedMethods.add(apiMethod);
                 if (i == 0) {
                     apis.add("'" + uri + "':");
