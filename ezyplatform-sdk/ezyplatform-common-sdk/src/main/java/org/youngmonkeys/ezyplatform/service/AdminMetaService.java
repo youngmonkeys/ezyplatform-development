@@ -34,6 +34,8 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
 @SuppressWarnings("MethodCount")
 public interface AdminMetaService {
@@ -150,7 +152,7 @@ public interface AdminMetaService {
             adminId,
             metaKey,
             metaValue,
-            null
+            NULL_STRING
         );
     }
 
@@ -194,6 +196,25 @@ public interface AdminMetaService {
                     Strings.from(e.getValue())
                 )
             );
+    }
+
+    default void saveAdminMetaValueAndTextValueUniqueKeys(
+        long adminId,
+        Map<String, Object> valueMap
+    ) {
+        valueMap
+            .entrySet()
+            .parallelStream()
+            .filter(e -> e.getValue() != null)
+            .forEach(e -> {
+                String value = e.getValue().toString();
+                saveAdminMetaUniqueKey(
+                    adminId,
+                    e.getKey(),
+                    toMetaValue(value),
+                    value
+                );
+            });
     }
 
     BigDecimal increaseAdminMetaValue(

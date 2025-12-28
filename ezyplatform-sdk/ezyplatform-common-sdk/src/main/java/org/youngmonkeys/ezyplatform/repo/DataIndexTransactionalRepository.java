@@ -49,6 +49,7 @@ public class DataIndexTransactionalRepository
                 DataIndex entity = first(entities);
                 if (entity != null) {
                     dataIndex.setId(entity.getId());
+                    dataIndex.setCreatedAt(entity.getCreatedAt());
                 }
                 entityManager.merge(dataIndex);
                 transaction.commit();
@@ -83,6 +84,7 @@ public class DataIndexTransactionalRepository
                     DataIndex entity = first(entities);
                     if (entity != null) {
                         dataIndex.setId(entity.getId());
+                        dataIndex.setCreatedAt(entity.getCreatedAt());
                     }
                     entityManager.merge(dataIndex);
                 }

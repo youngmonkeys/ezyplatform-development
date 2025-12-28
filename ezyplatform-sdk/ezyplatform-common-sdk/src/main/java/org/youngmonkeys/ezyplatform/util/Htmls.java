@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.Set;
 
+import static java.lang.Character.isWhitespace;
 import static org.youngmonkeys.ezyplatform.util.Strings.endsWith;
 import static org.youngmonkeys.ezyplatform.util.Strings.substringLast;
 
@@ -85,7 +86,7 @@ public final class Htmls {
                 }
                 for (; i < contentLength; ++i) {
                     ch = content.charAt(i);
-                    if (ch != ' ' && ch != '\t' && ch != '\n') {
+                    if (!isWhitespace(ch)) {
                         break;
                     }
                 }
@@ -134,7 +135,7 @@ public final class Htmls {
             StringBuilder before = new StringBuilder();
             for (; i < contentLength; ++i) {
                 ch = content.charAt(i);
-                if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '/') {
+                if (!isWhitespace(ch) && ch != '/') {
                     break;
                 } else {
                     before.append(ch);
@@ -143,7 +144,7 @@ public final class Htmls {
             StringBuilder tagNameBuilder = new StringBuilder();
             for (; i < contentLength; ++i) {
                 ch = content.charAt(i);
-                if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '>') {
+                if (!isWhitespace(ch) && ch != '>') {
                     tagNameBuilder.append(ch);
                 } else {
                     --i;
@@ -241,19 +242,14 @@ public final class Htmls {
                 if (ch == '/') {
                     isOpenTag = false;
                 }
-                if (ch != ' ' && ch != '\t' && ch != '\n' && ch != '/') {
+                if (!isWhitespace(ch) && ch != '/') {
                     break;
                 }
             }
             StringBuilder tagNameBuilder = new StringBuilder();
             for (; i < contentLength; ++i) {
                 ch = content.charAt(i);
-                if (ch != ' '
-                    && ch != '\t'
-                    && ch != '\n'
-                    && ch != '/'
-                    && ch != '>'
-                ) {
+                if (!isWhitespace(ch) && ch != '/' && ch != '>') {
                     tagNameBuilder.append(ch);
                 } else {
                     break;
@@ -350,9 +346,7 @@ public final class Htmls {
                     }
                 } else if (startAttribute
                     && !startAttributeDoubleQuotes
-                    && ch != ' '
-                    && ch != '\t'
-                    && ch != '\n'
+                    && !isWhitespace(ch)
                 ) {
                     throw new InvalidHtmlContentException(
                         tagName,

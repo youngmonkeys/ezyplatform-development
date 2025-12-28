@@ -29,22 +29,27 @@ import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 
 @AllArgsConstructor
 public class DefaultUserKeywordService
-        extends EzyLoggable
-        implements UserKeywordService {
+    extends EzyLoggable
+    implements UserKeywordService {
 
     private final UserKeywordRepository userKeywordRepository;
-    private final UserKeywordTransactionalRepository userKeywordTransactionalRepository;
+    private final UserKeywordTransactionalRepository
+        userKeywordTransactionalRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
-    public void addUserKeyword(AddUserKeywordModel model) {
+    public void addUserKeyword(
+        AddUserKeywordModel model
+    ) {
         userKeywordTransactionalRepository.saveUserKeyword(
             modelToEntityConverter.toEntity(model)
         );
     }
 
     @Override
-    public void addUserKeywords(Collection<AddUserKeywordModel> userKeywords) {
+    public void addUserKeywords(
+        Collection<AddUserKeywordModel> userKeywords
+    ) {
         userKeywordTransactionalRepository.saveUserKeywords(
             newArrayList(
                 userKeywords,
@@ -54,19 +59,26 @@ public class DefaultUserKeywordService
     }
 
     @Override
-    public void deleteUserKeywordsByUserId(long userId) {
+    public void deleteUserKeywordsByUserId(
+        long userId
+    ) {
         userKeywordRepository.deleteByUserId(userId);
     }
 
     @Override
-    public void deleteUserKeywordsByUserIds(Collection<Long> userIds) {
-        if (userIds.size() > 0) {
+    public void deleteUserKeywordsByUserIds(
+        Collection<Long> userIds
+    ) {
+        if (!userIds.isEmpty()) {
             userKeywordRepository.deleteByUserIdIn(userIds);
         }
     }
 
     @Override
-    public boolean containsUserKeyword(long userId, String keyword) {
+    public boolean containsUserKeyword(
+        long userId,
+        String keyword
+    ) {
         return userKeywordRepository.findByUserIdAndKeyword(
             userId,
             keyword

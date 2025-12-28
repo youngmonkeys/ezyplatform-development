@@ -31,6 +31,8 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
 @SuppressWarnings("MethodCount")
 public interface UserMetaService {
@@ -146,7 +148,7 @@ public interface UserMetaService {
             userId,
             metaKey,
             metaValue,
-            null
+            NULL_STRING
         );
     }
 
@@ -190,6 +192,25 @@ public interface UserMetaService {
                     Strings.from(e.getValue())
                 )
             );
+    }
+
+    default void saveUserMetaValueAndTextValueUniqueKeys(
+        long userId,
+        Map<String, Object> valueMap
+    ) {
+        valueMap
+            .entrySet()
+            .parallelStream()
+            .filter(e -> e.getValue() != null)
+            .forEach(e -> {
+                String value = e.getValue().toString();
+                saveUserMetaUniqueKey(
+                    userId,
+                    e.getKey(),
+                    toMetaValue(value),
+                    value
+                );
+            });
     }
 
     BigDecimal increaseUserMetaValue(

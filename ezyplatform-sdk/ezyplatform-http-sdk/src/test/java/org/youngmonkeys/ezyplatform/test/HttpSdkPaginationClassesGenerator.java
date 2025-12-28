@@ -17,12 +17,12 @@
 package org.youngmonkeys.ezyplatform.test;
 
 import org.youngmonkeys.devtools.pagination.PaginationClassesGenerator;
-import org.youngmonkeys.ezyplatform.entity.UniqueData;
+import org.youngmonkeys.ezyplatform.entity.UserKeyword;
 
 public class HttpSdkPaginationClassesGenerator {
 
     public static void main(String[] args) throws Exception {
-        new PaginationClassesGenerator(UniqueData.class)
+        new PaginationClassesGenerator(UserKeyword.class)
             .generate();
     }
 }

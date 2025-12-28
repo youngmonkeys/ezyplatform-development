@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import static com.tvd12.ezyfox.io.EzyStrings.*;
+import static java.lang.Character.isWhitespace;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 
 public final class Strings {
@@ -78,7 +79,7 @@ public final class Strings {
     public static boolean containInvalidSpaces(String str) {
         for (int i = 0; i < str.length(); ++i) {
             char ch = str.charAt(i);
-            if (ch == '\n' || ch == '\t') {
+            if (ch != ' ' && isWhitespace(ch)) {
                 return true;
             }
             if (ch == ' '
@@ -170,7 +171,7 @@ public final class Strings {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < str.length(); ++i) {
             char ch = str.charAt(i);
-            if (ch == '-' || ch == ' ' || ch == '\t' || ch == '\n' || ch == '–') {
+            if (ch == '-' || isWhitespace(ch) || ch == '–') {
                 int builderLength = builder.length();
                 char prevCh = builderLength > 0
                     ? builder.charAt(builderLength - 1)

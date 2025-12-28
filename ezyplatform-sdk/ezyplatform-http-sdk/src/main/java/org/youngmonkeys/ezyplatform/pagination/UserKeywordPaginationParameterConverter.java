@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,18 @@
 
 package org.youngmonkeys.ezyplatform.pagination;
 
-import org.youngmonkeys.ezyplatform.model.DataIndexModel;
+import org.youngmonkeys.ezyplatform.model.UserKeywordModel;
 
 import java.util.Map;
 import java.util.function.Function;
 
-public class DataIndexPaginationParameterConverter
+public class UserKeywordPaginationParameterConverter
     extends ComplexPaginationParameterConverter<
         String,
-        DataIndexModel
+        UserKeywordModel
     > {
 
-    public DataIndexPaginationParameterConverter(
+    public UserKeywordPaginationParameterConverter(
         PaginationParameterConverter converter
     ) {
         super(converter);
@@ -38,31 +38,31 @@ public class DataIndexPaginationParameterConverter
         Map<String, Class<?>> map
     ) {
         map.put(
-            DataIndexPaginationSortOrder.PRIORITY_ASC_ID_ASC.toString(),
-            PriorityAscIdAscDataIndexPaginationParameter.class
+            UserKeywordPaginationSortOrder.PRIORITY_ASC_ID_ASC.toString(),
+            PriorityAscIdAscUserKeywordPaginationParameter.class
         );
         map.put(
-            DataIndexPaginationSortOrder.PRIORITY_DESC_ID_DESC.toString(),
-            PriorityDescIdDescDataIndexPaginationParameter.class
+            UserKeywordPaginationSortOrder.PRIORITY_DESC_ID_DESC.toString(),
+            PriorityDescIdDescUserKeywordPaginationParameter.class
         );
     }
 
     @Override
     protected void addPaginationParameterExtractors(
-        Map<String, Function<DataIndexModel, Object>> map
+        Map<String, Function<UserKeywordModel, Object>> map
     ) {
         map.put(
-            DataIndexPaginationSortOrder.PRIORITY_ASC_ID_ASC.toString(),
-            it -> new PriorityAscIdAscDataIndexPaginationParameter(
-                it.getPriority(),
-                it.getId()
+            UserKeywordPaginationSortOrder.PRIORITY_ASC_ID_ASC.toString(),
+            model -> new PriorityAscIdAscUserKeywordPaginationParameter(
+                model.getPriority(),
+                model.getId()
             )
         );
         map.put(
-            DataIndexPaginationSortOrder.PRIORITY_DESC_ID_DESC.toString(),
-            it -> new PriorityDescIdDescDataIndexPaginationParameter(
-                it.getPriority(),
-                it.getId()
+            UserKeywordPaginationSortOrder.PRIORITY_DESC_ID_DESC.toString(),
+            model -> new PriorityDescIdDescUserKeywordPaginationParameter(
+                model.getPriority(),
+                model.getId()
             )
         );
     }

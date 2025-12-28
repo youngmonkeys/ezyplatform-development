@@ -151,6 +151,35 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
+    public UserKeywordModel toModel(UserKeyword entity) {
+        if (entity == null) {
+            return null;
+        }
+        return UserKeywordModel.builder()
+            .id(entity.getId())
+            .userId(entity.getUserId())
+            .keyword(entity.getKeyword())
+            .priority(entity.getPriority())
+            .createdAt(toTimestamp(entity.getCreatedAt()))
+            .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .build();
+    }
+
+    public DataIndexModel toModel(DataIndex entity) {
+        if (entity == null) {
+            return null;
+        }
+        return DataIndexModel.builder()
+            .id(entity.getId())
+            .dataType(entity.getDataType())
+            .dataId(entity.getDataId())
+            .keyword(entity.getKeyword())
+            .priority(entity.getPriority())
+            .createdAt(toTimestamp(entity.getCreatedAt()))
+            .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .build();
+    }
+
     public SimpleNotificationModel toModel(Notification entity) {
         if (entity == null) {
             return null;

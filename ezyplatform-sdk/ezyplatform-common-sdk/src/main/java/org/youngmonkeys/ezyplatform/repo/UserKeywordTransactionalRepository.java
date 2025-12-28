@@ -29,7 +29,7 @@ public class UserKeywordTransactionalRepository
     extends EzyJpaRepository<Long, UserKeyword> {
 
     @SuppressWarnings("unchecked")
-    public void saveUserKeyword(UserKeyword dataIndex) {
+    public void saveUserKeyword(UserKeyword userKeyword) {
         EntityManager entityManager = databaseContext.createEntityManager();
         try {
             EntityTransaction transaction = entityManager.getTransaction();
@@ -40,15 +40,16 @@ public class UserKeywordTransactionalRepository
                         "WHERE e.userId = ?0 " +
                         "AND e.keyword = ?1"
                 )
-                    .setParameter(0, dataIndex.getUserId())
-                    .setParameter(1, dataIndex.getKeyword())
+                    .setParameter(0, userKeyword.getUserId())
+                    .setParameter(1, userKeyword.getKeyword())
                     .setMaxResults(1)
                     .getResultList();
                 UserKeyword entity = first(entities);
                 if (entity != null) {
-                    dataIndex.setId(entity.getId());
+                    userKeyword.setId(entity.getId());
+                    userKeyword.setCreatedAt(entity.getCreatedAt());
                 }
-                entityManager.merge(dataIndex);
+                entityManager.merge(userKeyword);
                 transaction.commit();
             } catch (Exception e) {
                 transaction.rollback();
@@ -79,6 +80,7 @@ public class UserKeywordTransactionalRepository
                     UserKeyword entity = first(entities);
                     if (entity != null) {
                         userKeyword.setId(entity.getId());
+                        userKeyword.setCreatedAt(entity.getCreatedAt());
                     }
                     entityManager.merge(userKeyword);
                 }

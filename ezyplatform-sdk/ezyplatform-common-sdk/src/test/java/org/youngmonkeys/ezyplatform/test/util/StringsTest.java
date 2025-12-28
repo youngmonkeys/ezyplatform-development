@@ -101,6 +101,7 @@ public class StringsTest extends BaseTest {
         // then
         assert containInvalidSpaces("a\tb");
         assert containInvalidSpaces("a\nb");
+        assert containInvalidSpaces("a\r\nb");
         assert containInvalidSpaces("a  b");
         assert containInvalidSpaces("a b  ");
         assert containInvalidSpaces("  a b");

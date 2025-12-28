@@ -14,20 +14,18 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.repo;
+package org.youngmonkeys.ezyplatform.model;
 
-import org.youngmonkeys.ezyplatform.entity.DataIndex;
-import org.youngmonkeys.ezyplatform.pagination.DataIndexFilter;
-import org.youngmonkeys.ezyplatform.pagination.DataIndexPaginationParameter;
+import lombok.Builder;
+import lombok.Getter;
 
-public class PaginationDataIndexRepository extends CommonPaginationRepository<
-    DataIndexFilter,
-    DataIndexPaginationParameter,
-    Long,
-    DataIndex> {
-
-    @Override
-    protected Class<DataIndex> getEntityType() {
-        return DataIndex.class;
-    }
+@Getter
+@Builder
+public class UserKeywordModel {
+    private long id;
+    private long userId;
+    private String keyword;
+    private int priority;
+    private long createdAt;
+    private long updatedAt;
 }

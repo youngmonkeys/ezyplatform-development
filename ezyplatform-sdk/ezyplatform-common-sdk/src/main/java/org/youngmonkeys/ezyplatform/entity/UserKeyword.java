@@ -45,6 +45,9 @@ public class UserKeyword {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
     public UserKeywordUniqueKey uniqueKey() {
         return new UserKeywordUniqueKey(userId, keyword);
     }

@@ -24,6 +24,8 @@ import org.youngmonkeys.ezyplatform.pagination.DefaultUserFilter;
 import org.youngmonkeys.ezyplatform.pagination.UserPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.service.PaginationUserService;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModelBySortOrder;
 import static org.youngmonkeys.ezyplatform.util.StringConverters.trimOrNull;
 
@@ -46,7 +48,7 @@ public class UserControllerService {
             keyword,
             allowSearchUserByLikeOperator,
             filterBuilder,
-            null,
+            NULL_STRING,
             nextPageToken,
             prevPageToken,
             lastPage,
@@ -92,7 +94,7 @@ public class UserControllerService {
                 lastPage,
                 limit
             );
-            if (pagination.getCount() == 0) {
+            if (pagination.getCount() == ZERO) {
                 KeywordsModel keywords = KeywordsModel.extract(
                     keyword,
                     allowSearchUserByLikeOperator
@@ -101,7 +103,7 @@ public class UserControllerService {
                     paginationUserService,
                     userPaginationParameterConverter,
                     filterBuilder
-                        .uniqueKeyword(null)
+                        .uniqueKeyword(NULL_STRING)
                         .likeKeyword(keywords.getLikeKeyword())
                         .keywords(keywords.getKeywords())
                         .build(),

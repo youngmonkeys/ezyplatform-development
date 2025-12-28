@@ -161,7 +161,9 @@ public class DefaultModelToEntityConverter {
         entity.setUserId(model.getUserId());
         entity.setKeyword(model.getKeyword());
         entity.setPriority(model.getPriority());
-        entity.setCreatedAt(clock.nowDateTime());
+        LocalDateTime now = clock.nowDateTime();
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
         return entity;
     }
 

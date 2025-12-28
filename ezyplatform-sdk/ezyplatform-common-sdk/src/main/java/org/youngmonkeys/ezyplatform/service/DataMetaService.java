@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
 @SuppressWarnings("MethodCount")
 public interface DataMetaService {
@@ -236,6 +237,27 @@ public interface DataMetaService {
                     Strings.from(e.getValue())
                 )
             );
+    }
+
+    default void saveDataMetaValueAndTextValueUniqueKeys(
+        String dataType,
+        long dataId,
+        Map<String, Object> valueMap
+    ) {
+        valueMap
+            .entrySet()
+            .parallelStream()
+            .filter(e -> e.getValue() != null)
+            .forEach(e -> {
+                String value = e.getValue().toString();
+                saveDataMetaUniqueKey(
+                    dataType,
+                    dataId,
+                    e.getKey(),
+                    toMetaValue(value),
+                    value
+                );
+            });
     }
 
     BigDecimal increaseDataMetaValue(

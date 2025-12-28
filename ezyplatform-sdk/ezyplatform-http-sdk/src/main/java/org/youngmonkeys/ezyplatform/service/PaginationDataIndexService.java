@@ -16,36 +16,40 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.DataIndex;
-import org.youngmonkeys.ezyplatform.pagination.DataIdDescDataIndexPaginationParameter;
+import org.youngmonkeys.ezyplatform.model.DataIndexModel;
 import org.youngmonkeys.ezyplatform.pagination.DataIndexFilter;
 import org.youngmonkeys.ezyplatform.pagination.DataIndexPaginationParameter;
 import org.youngmonkeys.ezyplatform.pagination.DataIndexPaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.pagination.PriorityDescIdDescDataIndexPaginationParameter;
 import org.youngmonkeys.ezyplatform.repo.PaginationDataIndexRepository;
-import org.youngmonkeys.ezyplatform.result.IdResult;
 
-public class PaginationDataIndexService extends CommonPaginationResultService<
-    Long,
+public class PaginationDataIndexService extends CommonPaginationService<
+    DataIndexModel,
     DataIndexFilter,
     DataIndexPaginationParameter,
     Long,
-    DataIndex,
-    IdResult> {
+    DataIndex> {
+
+    private final DefaultEntityToModelConverter entityToModelConverter;
 
     public PaginationDataIndexService(
         PaginationDataIndexRepository repository,
+        DefaultEntityToModelConverter entityToModelConverter,
         DataIndexPaginationParameterConverter paginationParameterConverter
     ) {
         super(repository, paginationParameterConverter);
+        this.entityToModelConverter = entityToModelConverter;
     }
 
     @Override
-    protected Long convertEntity(IdResult entity) {
-        return entity.getId();
+    protected DataIndexModel convertEntity(DataIndex entity) {
+        return entityToModelConverter.toModel(entity);
     }
 
     @Override
     protected DataIndexPaginationParameter defaultPaginationParameter() {
-        return new DataIdDescDataIndexPaginationParameter();
+        return new PriorityDescIdDescDataIndexPaginationParameter();
     }
 }

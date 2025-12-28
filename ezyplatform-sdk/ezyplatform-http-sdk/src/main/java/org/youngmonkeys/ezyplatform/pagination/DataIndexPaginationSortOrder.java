@@ -17,5 +17,6 @@
 package org.youngmonkeys.ezyplatform.pagination;
 
 public enum DataIndexPaginationSortOrder {
-    DATA_ID_DESC
+    PRIORITY_ASC_ID_ASC,
+    PRIORITY_DESC_ID_DESC
 }

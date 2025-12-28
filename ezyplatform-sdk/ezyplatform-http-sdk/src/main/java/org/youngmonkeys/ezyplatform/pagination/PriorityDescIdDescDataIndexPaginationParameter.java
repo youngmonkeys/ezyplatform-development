@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
 package org.youngmonkeys.ezyplatform.pagination;
 
@@ -21,34 +21,45 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makeOrderByDesc;
+import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makePaginationConditionDesc;
+import static org.youngmonkeys.ezyplatform.util.Values.isAllNull;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataIdDescDataIndexPaginationParameter
+public class PriorityDescIdDescDataIndexPaginationParameter
     implements DataIndexPaginationParameter {
 
-    public Long dataId;
+    public Integer priority;
+    public Long id;
 
     @Override
     public String paginationCondition(boolean nextPage) {
-        if (dataId == null) {
-            return null;
-        }
-        return nextPage
-            ? "e.dataId < :dataId"
-            : "e.dataId > :dataId";
+        return isEmpty()
+            ? null
+            : makePaginationConditionDesc(
+                nextPage,
+                "priority",
+                "id"
+            );
     }
 
     @Override
     public String orderBy(boolean nextPage) {
-        return nextPage
-            ? "e.dataId DESC"
-            : "e.dataId ASC";
+        return makeOrderByDesc(nextPage, "priority", "id");
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return isAllNull(priority, id);
     }
 
     @Override
     public String sortOrder() {
-        return DataIndexPaginationSortOrder.DATA_ID_DESC.toString();
+        return DataIndexPaginationSortOrder
+            .PRIORITY_DESC_ID_DESC
+            .toString();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,19 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
-import org.youngmonkeys.ezyplatform.entity.DataIndex;
-import org.youngmonkeys.ezyplatform.pagination.DataIndexFilter;
-import org.youngmonkeys.ezyplatform.pagination.DataIndexPaginationParameter;
+import org.youngmonkeys.ezyplatform.entity.UserKeyword;
+import org.youngmonkeys.ezyplatform.pagination.UserKeywordFilter;
+import org.youngmonkeys.ezyplatform.pagination.UserKeywordPaginationParameter;
+import org.youngmonkeys.ezyplatform.repo.CommonPaginationRepository;
 
-public class PaginationDataIndexRepository extends CommonPaginationRepository<
-    DataIndexFilter,
-    DataIndexPaginationParameter,
+public class PaginationUserKeywordRepository extends CommonPaginationRepository<
+    UserKeywordFilter,
+    UserKeywordPaginationParameter,
     Long,
-    DataIndex> {
+    UserKeyword> {
 
     @Override
-    protected Class<DataIndex> getEntityType() {
-        return DataIndex.class;
+    protected Class<UserKeyword> getEntityType() {
+        return UserKeyword.class;
     }
 }
