@@ -71,6 +71,9 @@ public class DefaultEntityToModelConverter {
     }
 
     public MediaModel toModel(Media entity) {
+        if (entity == null) {
+            return null;
+        }
         return MediaModel.builder()
             .id(entity.getId())
             .name(entity.getName())

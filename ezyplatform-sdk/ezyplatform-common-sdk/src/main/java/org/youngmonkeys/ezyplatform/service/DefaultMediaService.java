@@ -40,7 +40,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 @AllArgsConstructor
@@ -58,33 +58,49 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public MediaModel addMedia(AddMediaModel model, UploadFrom uploadFrom) {
-        Media entity = modelToEntityConverter.toEntity(model, uploadFrom);
+    public MediaModel addMedia(
+        AddMediaModel model,
+        UploadFrom uploadFrom
+    ) {
+        Media entity = modelToEntityConverter.toEntity(
+            model,
+            uploadFrom
+        );
         mediaRepository.save(entity);
         long mediaId = entity.getId();
         if (model.isSaveDuration()) {
-            saveMediaDurationInMinutes(mediaId, model.getDurationInMinutes());
+            saveMediaDurationInMinutes(
+                mediaId,
+                model.getDurationInMinutes()
+            );
         }
         return entityToModelConverter.toModel(entity);
     }
 
     @Override
     public void updateMedia(UpdateMediaModel model) {
-        updateMedia(false, 0L, model);
+        updateMedia(Boolean.FALSE, ZERO_LONG, model);
     }
 
     @Override
     public void updateMedia(long userId, UpdateMediaModel model) {
-        updateMedia(true, userId, model);
+        updateMedia(Boolean.TRUE, userId, model);
     }
 
     @Override
-    public void updateMedia(boolean byUser, long userId, UpdateMediaModel model) {
-        Media entity = model.getMediaId() > 0
+    public void updateMedia(
+        boolean byUser,
+        long userId,
+        UpdateMediaModel model
+    ) {
+        Media entity = model.getMediaId() > ZERO_LONG
             ? mediaRepository.findById(model.getMediaId())
             : mediaRepository.findByField("name", model.getMediaName());
         if (entity == null || (byUser && entity.getOwnerUserId() != userId)) {
-            throw new MediaNotFoundException(model.getMediaId(), model.getMediaName());
+            throw new MediaNotFoundException(
+                model.getMediaId(),
+                model.getMediaName()
+            );
         }
         modelToEntityConverter.mergeToEntity(model, entity);
         mediaRepository.save(entity);
@@ -95,7 +111,10 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public void saveMediaDurationInMinutes(long mediaId, BigDecimal duration) {
+    public void saveMediaDurationInMinutes(
+        long mediaId,
+        BigDecimal duration
+    ) {
         uniqueDataService.saveDataMeta(
             UniqueDataModel.builder()
                 .dataType(TABLE_NAME_MEDIA)
@@ -113,12 +132,12 @@ public class DefaultMediaService implements MediaService {
 
     @Override
     public MediaModel removeMedia(long mediaId) {
-        return removeMedia(false, 0L, mediaId, null);
+        return removeMedia(Boolean.FALSE, ZERO_LONG, mediaId, NULL_STRING);
     }
 
     @Override
     public MediaModel removeMedia(long userId, String mediaName) {
-        return removeMedia(true, userId, 0L, mediaName);
+        return removeMedia(Boolean.TRUE, userId, ZERO_LONG, mediaName);
     }
 
     @Override
@@ -128,7 +147,7 @@ public class DefaultMediaService implements MediaService {
         long mediaId,
         String mediaName
     ) {
-        Media entity = mediaId > 0
+        Media entity = mediaId > ZERO_LONG
             ? mediaRepository.findById(mediaId)
             : mediaRepository.findByField("name", mediaName);
         if (entity == null || (byUser && entity.getOwnerUserId() != userId)) {
@@ -145,19 +164,16 @@ public class DefaultMediaService implements MediaService {
 
     @Override
     public MediaModel getMediaById(long mediaId) {
-        if (mediaId <= 0) {
-            return null;
-        }
-        return mediaRepository.findByIdOptional(mediaId)
-            .map(entityToModelConverter::toModel)
-            .orElse(null);
+        return entityToModelConverter.toModel(
+            mediaRepository.findById(mediaId)
+        );
     }
 
     @Override
     public MediaModel getMediaByName(String mediaName) {
-        return mediaRepository.findByFieldOptional("name", mediaName)
-            .map(entityToModelConverter::toModel)
-            .orElse(null);
+        return entityToModelConverter.toModel(
+            mediaRepository.findByNameOrOriginalName(mediaName)
+        );
     }
 
     @Override
@@ -187,7 +203,7 @@ public class DefaultMediaService implements MediaService {
             mediaType,
             mediaName
         );
-        if (fileLength >= 0) {
+        if (fileLength >= ZERO_LONG) {
             return fileLength;
         }
         throw new ResourceNotFoundException("media");
@@ -213,7 +229,7 @@ public class DefaultMediaService implements MediaService {
         if (mediaFile.exists()) {
             return mediaFile.length();
         }
-        return 0L;
+        return ZERO_LONG;
     }
 
 
@@ -236,9 +252,6 @@ public class DefaultMediaService implements MediaService {
     public ImageSize getMediaImageSize(
         long mediaId
     ) {
-        if (mediaId <= 0) {
-            throw new ResourceNotFoundException("media");
-        }
         Media media = mediaRepository.findById(mediaId);
         if (media == null) {
             throw new ResourceNotFoundException("media");

@@ -160,10 +160,8 @@ public class DefaultModelToEntityConverter {
         UserKeyword entity = new UserKeyword();
         entity.setUserId(model.getUserId());
         entity.setKeyword(model.getKeyword());
-        entity.setPriority(model.getPriority());
-        LocalDateTime now = clock.nowDateTime();
-        entity.setCreatedAt(now);
-        entity.setUpdatedAt(now);
+        mergeToEntity(model, entity);
+        entity.setCreatedAt(entity.getUpdatedAt());
         return entity;
     }
 
@@ -200,7 +198,10 @@ public class DefaultModelToEntityConverter {
         SaveDataKeywordModel model
     ) {
         DataIndex entity = new DataIndex();
-        mergeToEntity(dataType, model, entity);
+        entity.setDataType(dataType);
+        entity.setDataId(model.getDataId());
+        entity.setKeyword(model.getKeyword());
+        mergeToEntity(model, entity);
         entity.setCreatedAt(entity.getUpdatedAt());
         return entity;
     }
@@ -538,13 +539,17 @@ public class DefaultModelToEntityConverter {
     }
 
     public void mergeToEntity(
-        String dataType,
         SaveDataKeywordModel model,
         DataIndex entity
     ) {
-        entity.setDataType(dataType);
-        entity.setDataId(model.getDataId());
-        entity.setKeyword(model.getKeyword());
+        entity.setPriority(model.getPriority());
+        entity.setUpdatedAt(clock.nowDateTime());
+    }
+
+    public void mergeToEntity(
+        AddUserKeywordModel model,
+        UserKeyword entity
+    ) {
         entity.setPriority(model.getPriority());
         entity.setUpdatedAt(clock.nowDateTime());
     }

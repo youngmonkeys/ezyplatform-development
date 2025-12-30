@@ -62,6 +62,20 @@ public interface ContentTemplateService {
 
     List<String> getAllTemplateContentTypes();
 
+    ContentTemplateModel getTemplateByOwnerTypeAndOwnerIdAndTemplateTypeAndTemplateName(
+        String ownerType,
+        long ownerId,
+        String templateType,
+        String templateName
+    );
+
+    ContentTemplateModel getTemplateByCreatorTypeAndCreatorIdAndTemplateTypeAndTemplateName(
+        String creatorType,
+        long creatorId,
+        String templateType,
+        String templateName
+    );
+
     boolean containsTemplateByTypeAndName(
         String templateType,
         String templateName

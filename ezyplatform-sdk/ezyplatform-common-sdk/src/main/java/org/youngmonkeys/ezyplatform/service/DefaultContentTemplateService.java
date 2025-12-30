@@ -160,6 +160,42 @@ public class DefaultContentTemplateService
     }
 
     @Override
+    public ContentTemplateModel getTemplateByOwnerTypeAndOwnerIdAndTemplateTypeAndTemplateName(
+        String ownerType,
+        long ownerId,
+        String templateType,
+        String templateName
+    ) {
+        return entityToModelConverter.toModel(
+            contentTemplateRepository
+                .findByOwnerTypeAndOwnerIdAndTemplateTypeAndTemplateName(
+                    ownerType,
+                    ownerId,
+                    templateType,
+                    templateName
+                )
+        );
+    }
+
+    @Override
+    public ContentTemplateModel getTemplateByCreatorTypeAndCreatorIdAndTemplateTypeAndTemplateName(
+        String creatorType,
+        long creatorId,
+        String templateType,
+        String templateName
+    ) {
+        return entityToModelConverter.toModel(
+            contentTemplateRepository
+                .findByCreatorTypeAndCreatorIdAndTemplateTypeAndTemplateName(
+                    creatorType,
+                    creatorId,
+                    templateType,
+                    templateName
+                )
+        );
+    }
+
+    @Override
     public boolean containsTemplateByTypeAndName(
         String templateType,
         String templateName

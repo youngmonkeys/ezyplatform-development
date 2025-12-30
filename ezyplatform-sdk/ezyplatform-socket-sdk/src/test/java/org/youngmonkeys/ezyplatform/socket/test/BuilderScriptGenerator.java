@@ -14,24 +14,15 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.repo;
+package org.youngmonkeys.ezyplatform.socket.test;
 
-import com.tvd12.ezydata.database.EzyDatabaseRepository;
-import com.tvd12.ezyfox.database.annotation.EzyQuery;
-import org.youngmonkeys.ezyplatform.entity.Media;
+import com.tvd12.ezyfox.tool.EzyBuilderCreator;
+import org.youngmonkeys.ezyplatform.socket.data.SocketUserData;
 
-public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
+public class BuilderScriptGenerator {
 
-    @EzyQuery(
-        "UPDATE Media e SET e.ownerUserId = ?1 WHERE e.id = ?0"
-    )
-    void updateOwnerUserId(long mediaId, long userId);
-
-    @EzyQuery(
-        "SELECT e FROM Media e " +
-            "WHERE e.name = ?0 OR e.originalName = ?0"
-    )
-    Media findByNameOrOriginalName(
-        String name
-    );
+    public static void main(String[] args) throws Exception {
+        EzyBuilderCreator creator = new EzyBuilderCreator();
+        System.out.println(creator.create(SocketUserData.class));
+    }
 }

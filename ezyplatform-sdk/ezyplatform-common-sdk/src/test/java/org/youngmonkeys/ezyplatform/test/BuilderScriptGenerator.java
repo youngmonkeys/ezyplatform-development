@@ -22,6 +22,10 @@ import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
 public class BuilderScriptGenerator {
     public static void main(String[] args) throws Exception {
         EzyBuilderCreator creator = new EzyBuilderCreator();
-        System.out.println(creator.create(AddNotificationModel.class));
+        System.out.println(
+            creator
+                .create(AddNotificationModel.class)
+                .replace("\t", "    ")
+        );
     }
 }

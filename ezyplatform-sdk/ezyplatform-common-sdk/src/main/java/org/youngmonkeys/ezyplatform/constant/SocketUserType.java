@@ -16,8 +16,36 @@
 
 package org.youngmonkeys.ezyplatform.constant;
 
+import com.tvd12.ezyfox.util.EzyEnums;
+
+import java.util.Map;
+
 public enum SocketUserType implements ISocketUserType {
     ADMIN,
     ANONYMOUS,
-    USER
+    USER;
+
+    private static final Map<String, SocketUserType> MAP_BY_NAME =
+        EzyEnums.enumMap(
+            SocketUserType.class,
+            SocketUserType::toString
+        );
+
+    public static SocketUserType of(String value) {
+        return MAP_BY_NAME.get(value);
+    }
+
+    public static SocketUserType of(
+        String value,
+        SocketUserType defaultType
+    ) {
+        return MAP_BY_NAME.getOrDefault(
+            value,
+            defaultType
+        );
+    }
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

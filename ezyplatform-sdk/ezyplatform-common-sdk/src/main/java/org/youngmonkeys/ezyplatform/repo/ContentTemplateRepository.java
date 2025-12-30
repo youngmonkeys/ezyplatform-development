@@ -67,6 +67,13 @@ public interface ContentTemplateRepository
         String templateName
     );
 
+    ContentTemplate findByCreatorTypeAndCreatorIdAndTemplateTypeAndTemplateName(
+        String creatorType,
+        long creatorId,
+        String templateType,
+        String templateName
+    );
+
     long countByTemplateType(String templateType);
 
     int countByTemplateTypeAndTemplateName(

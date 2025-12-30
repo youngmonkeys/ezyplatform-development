@@ -75,6 +75,8 @@ import java.util.function.Predicate;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static java.util.Collections.singletonMap;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModel;
 
 public class MediaControllerService extends EzyLoggable {
@@ -320,7 +322,7 @@ public class MediaControllerService extends EzyLoggable {
         long ownerUserId
     ) {
         if (isBlank(mediaUrl)) {
-            return 0L;
+            return ZERO_LONG;
         }
         try {
             File outFolder = fileSystemManager.getMediaFolderPath(
@@ -354,14 +356,14 @@ public class MediaControllerService extends EzyLoggable {
                     .originalFileName(result.getOriginalFileName())
                     .mediaType(mediaType)
                     .mimeType(tikaMediaType.toString())
-                    .ownerId(ownerAdminId > 0 ? ownerAdminId : ownerUserId)
+                    .ownerId(ownerAdminId > ZERO_LONG ? ownerAdminId : ownerUserId)
                     .build(),
                 from
             );
             return media.getId();
         } catch (Exception e) {
             logger.info("can not download media from url: {}", mediaUrl, e);
-            return 0L;
+            return ZERO_LONG;
         }
     }
 
@@ -369,7 +371,7 @@ public class MediaControllerService extends EzyLoggable {
         RequestArguments requestArguments,
         String name
     ) throws Exception {
-        getMedia(requestArguments, name, true);
+        getMedia(requestArguments, name, Boolean.TRUE);
     }
 
     public void getMedia(
@@ -381,7 +383,7 @@ public class MediaControllerService extends EzyLoggable {
             requestArguments,
             name,
             exposePrivateMedia,
-            media -> true
+            media -> Boolean.TRUE
         );
     }
 
@@ -419,14 +421,15 @@ public class MediaControllerService extends EzyLoggable {
         }
         notifyMediaEvent(new MediaDownloadEvent(media));
         MediaType mediaType = media.getType();
+        String mediaName = media.getName();
         File resourcePath = fileSystemManager.getMediaFilePath(
             mediaType.getFolder(),
-            name
+            mediaName
         );
         if (!resourcePath.exists()) {
-            throw new MediaNotFoundException(name);
+            throw new MediaNotFoundException(mediaName);
         }
-        String extension = FolderProxy.getFileExtension(name);
+        String extension = FolderProxy.getFileExtension(mediaName);
         ResourceRequestHandler handler = new ResourceRequestHandler(
             resourcePath.toString(),
             resourcePath.toString(),
@@ -439,7 +442,7 @@ public class MediaControllerService extends EzyLoggable {
 
     public MediaDetailsModel getMediaDetails(
         long mediaId
-    ) throws IOException {
+    ) {
         MediaModel media = mediaService.getMediaById(mediaId);
         if (media == null) {
             throw new MediaNotFoundException(mediaId);
@@ -450,7 +453,7 @@ public class MediaControllerService extends EzyLoggable {
     public MediaDetailsModel getMediaDetails(
         long ownerId,
         String mediaName
-    ) throws IOException {
+    ) {
         MediaModel media = mediaService.getMediaByName(mediaName);
         if (media == null || media.getOwnerUserId() != ownerId) {
             throw new MediaNotFoundException(mediaName);
@@ -460,9 +463,9 @@ public class MediaControllerService extends EzyLoggable {
 
     public MediaDetailsModel getMediaDetails(
         MediaModel media
-    ) throws IOException {
-        int width = 0;
-        int height = 0;
+    ) {
+        int width = ZERO;
+        int height = ZERO;
         long size;
         MediaType mediaType = media.getType();
         if (mediaType == MediaType.IMAGE
@@ -493,7 +496,7 @@ public class MediaControllerService extends EzyLoggable {
                 mediaType,
                 media.getName()
             );
-            if (size < 0) {
+            if (size < ZERO) {
                 File mediaFilePath = eventHandlerManager.handleEvent(
                     new GetMediaFilePathEvent(media)
                 );
@@ -504,8 +507,8 @@ public class MediaControllerService extends EzyLoggable {
                 }
             }
         }
-        if (size < 0) {
-            size = 0;
+        if (size < ZERO) {
+            size = ZERO;
         }
         return MediaDetailsModel.from(media)
             .width(width)

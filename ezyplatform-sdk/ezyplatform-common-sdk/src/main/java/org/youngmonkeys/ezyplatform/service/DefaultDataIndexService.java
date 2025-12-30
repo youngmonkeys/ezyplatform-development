@@ -19,13 +19,11 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
+import org.youngmonkeys.ezyplatform.entity.DataIndex;
 import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
 import org.youngmonkeys.ezyplatform.repo.DataIndexRepository;
-import org.youngmonkeys.ezyplatform.repo.DataIndexTransactionalRepository;
 
 import java.util.Collection;
-
-import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 
 @AllArgsConstructor
 public class DefaultDataIndexService
@@ -33,14 +31,36 @@ public class DefaultDataIndexService
         implements DataIndexService {
 
     private final DataIndexRepository dataIndexRepository;
-    private final DataIndexTransactionalRepository dataIndexTransactionalRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
-    public void saveKeyword(String dataType, SaveDataKeywordModel model) {
-        dataIndexTransactionalRepository.saveDataIndex(
-            modelToEntityConverter.toEntity(dataType, model)
-        );
+    public void saveKeyword(
+        String dataType,
+        SaveDataKeywordModel model
+    ) {
+        long dataId = model.getDataId();
+        String keyword = model.getKeyword();
+        DataIndex entity = dataIndexRepository
+            .findByDataTypeAndDataIdAndKeyword(
+                dataType,
+                dataId,
+                keyword
+            );
+        if (entity == null) {
+            entity = modelToEntityConverter.toEntity(dataType, model);
+        } else {
+            modelToEntityConverter.mergeToEntity(model, entity);
+        }
+        try {
+            dataIndexRepository.save(entity);
+        } catch (Exception e) {
+            logger.info(
+                "save keyword: {} of data type: {} and id: {} failed",
+                keyword,
+                dataType,
+                dataId
+            );
+        }
     }
 
     @Override
@@ -48,15 +68,9 @@ public class DefaultDataIndexService
         String dataType,
         Collection<SaveDataKeywordModel> dataKeywords
     ) {
-        dataIndexTransactionalRepository.saveDataIndices(
-            newArrayList(
-                dataKeywords,
-                it -> modelToEntityConverter.toEntity(
-                    dataType,
-                    it
-                )
-            )
-        );
+        for (SaveDataKeywordModel model : dataKeywords) {
+            saveKeyword(dataType, model);
+        }
     }
 
     @Override
