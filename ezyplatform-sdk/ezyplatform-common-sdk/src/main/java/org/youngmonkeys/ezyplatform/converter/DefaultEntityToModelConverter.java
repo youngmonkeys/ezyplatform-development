@@ -91,6 +91,7 @@ public class DefaultEntityToModelConverter {
             .alternativeText(entity.getAlternativeText())
             .description(entity.getDescription())
             .publicMedia(entity.isPublicMedia())
+            .status(entity.getStatus())
             .createdAt(toTimestamp(entity.getCreatedAt()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
             .build();

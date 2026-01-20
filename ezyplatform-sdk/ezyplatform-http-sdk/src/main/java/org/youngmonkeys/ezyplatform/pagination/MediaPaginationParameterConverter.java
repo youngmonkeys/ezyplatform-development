@@ -38,8 +38,20 @@ public class MediaPaginationParameterConverter
         Map<String, Class<?>> map
     ) {
         map.put(
+            MediaPaginationSortOrder.ID_ASC.toString(),
+            IdAscMediaPaginationParameter.class
+        );
+        map.put(
             MediaPaginationSortOrder.ID_DESC.toString(),
             IdDescMediaPaginationParameter.class
+        );
+        map.put(
+            MediaPaginationSortOrder.FILE_SIZE_ASC_ID_ASC.toString(),
+            FileSizeAscIdAscMediaPaginationParameter.class
+        );
+        map.put(
+            MediaPaginationSortOrder.FILE_SIZE_DESC_ID_DESC.toString(),
+            FileSizeDescIdDescMediaPaginationParameter.class
         );
     }
 
@@ -48,8 +60,28 @@ public class MediaPaginationParameterConverter
         Map<String, Function<MediaModel, Object>> map
     ) {
         map.put(
+            MediaPaginationSortOrder.ID_ASC.toString(),
+            model -> new IdAscMediaPaginationParameter(
+                model.getId()
+            )
+        );
+        map.put(
             MediaPaginationSortOrder.ID_DESC.toString(),
             model -> new IdDescMediaPaginationParameter(
+                model.getId()
+            )
+        );
+        map.put(
+            MediaPaginationSortOrder.FILE_SIZE_ASC_ID_ASC.toString(),
+            model -> new FileSizeAscIdAscMediaPaginationParameter(
+                model.getFileSize(),
+                model.getId()
+            )
+        );
+        map.put(
+            MediaPaginationSortOrder.FILE_SIZE_DESC_ID_DESC.toString(),
+            model -> new FileSizeDescIdDescMediaPaginationParameter(
+                model.getFileSize(),
                 model.getId()
             )
         );

@@ -21,6 +21,7 @@ import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.entity.Media;
+import org.youngmonkeys.ezyplatform.entity.MediaStatus;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
@@ -88,7 +89,10 @@ public class DefaultMediaService implements MediaService {
         modelToEntityConverter.mergeToEntity(model, entity);
         mediaRepository.save(entity);
         if (model.isUpdateDuration()) {
-            saveMediaDurationInMinutes(mediaId, model.getDurationInMinutes());
+            saveMediaDurationInMinutes(
+                mediaId,
+                model.getDurationInMinutes()
+            );
         }
     }
 
@@ -96,7 +100,9 @@ public class DefaultMediaService implements MediaService {
     public MediaModel replaceMedia(
         ReplaceMediaModel model
     ) {
-        Media entity = getMediaEntityByIdOrThrow(model.getMediaId());
+        Media entity = getMediaEntityByIdOrThrow(
+            model.getMediaId()
+        );
         modelToEntityConverter.mergeToEntity(model, entity);
         mediaRepository.save(entity);
         return entityToModelConverter.toModel(entity);
@@ -112,28 +118,46 @@ public class DefaultMediaService implements MediaService {
                 .dataType(TABLE_NAME_MEDIA)
                 .dataId(mediaId)
                 .uniqueKey(META_KEY_DURATION_IN_MINUTES)
-                .decimalValue(duration != null ? duration : BigDecimal.ZERO)
+                .decimalValue(
+                    duration != null ? duration : BigDecimal.ZERO
+                )
                 .build()
         );
     }
 
     @Override
-    public void updateMediaOwner(long mediaId, long ownerUserId) {
-        mediaRepository.updateOwnerUserId(mediaId, ownerUserId);
+    public void updateMediaOwner(
+        long mediaId,
+        long ownerUserId
+    ) {
+        mediaRepository.updateOwnerUserId(
+            mediaId,
+            ownerUserId
+        );
     }
 
     @Override
     public MediaModel removeMedia(long mediaId) {
         Media entity = getMediaEntityByIdOrThrow(mediaId);
-        mediaRepository.delete(entity.getId());
+        removeMediaEntity(entity);
         return entityToModelConverter.toModel(entity);
     }
 
     @Override
     public MediaModel removeMedia(String mediaName) {
         Media entity = getMediaEntityByNameOrThrow(mediaName);
-        mediaRepository.delete(entity.getId());
+        removeMediaEntity(entity);
         return entityToModelConverter.toModel(entity);
+    }
+
+    private void removeMediaEntity(Media entity) {
+        if (MediaStatus.REMOVED.equalsValue(entity.getStatus())) {
+            mediaRepository.delete(entity.getId());
+        } else {
+            entity.setStatus(MediaStatus.REMOVED.toString());
+            modelToEntityConverter.mergeUpdatedAtToEntity(entity);
+            mediaRepository.save(entity);
+        }
     }
 
     @Override

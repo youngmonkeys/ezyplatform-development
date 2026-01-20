@@ -44,6 +44,7 @@ public class MediaModel {
     private String description;
     private long fileSize;
     private boolean publicMedia;
+    private String status;
     private long createdAt;
     private long updatedAt;
 

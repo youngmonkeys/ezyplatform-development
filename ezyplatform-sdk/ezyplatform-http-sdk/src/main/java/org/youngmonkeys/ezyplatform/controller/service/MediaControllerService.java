@@ -36,6 +36,7 @@ import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
+import org.youngmonkeys.ezyplatform.entity.MediaStatus;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.event.*;
@@ -84,7 +85,9 @@ public class MediaControllerService extends EzyLoggable {
     private final HttpClient httpClient;
     private final EventHandlerManager eventHandlerManager;
     private final FileSystemManager fileSystemManager;
+    private final EzyInputStreamLoader inputStreamLoader;
     private final MediaUpDownloaderManager mediaUpDownloaderManager;
+    private final ObjectMapper objectMapper;
     private final ResourceDownloadManager resourceDownloadManager;
     private final MediaService mediaService;
     private final PaginationMediaService paginationMediaService;
@@ -95,8 +98,6 @@ public class MediaControllerService extends EzyLoggable {
     private final HttpModelToResponseConverter modelToResponseConverter;
     private final HttpRequestToModelConverter requestToModelConverter;
     private final EzyLazyInitializer<FileUploader> fileUploaderWrapper;
-    private final EzyInputStreamLoader inputStreamLoader;
-    private final ObjectMapper objectMapper;
 
     private final EzyLazyInitializer<TikaConfig> tika =
         new EzyLazyInitializer<>(() ->
@@ -107,8 +108,11 @@ public class MediaControllerService extends EzyLoggable {
         HttpClient httpClient,
         EventHandlerManager eventHandlerManager,
         FileSystemManager fileSystemManager,
+        EzyInputStreamLoader inputStreamLoader,
         MediaUpDownloaderManager mediaUpDownloaderManager,
+        ObjectMapper objectMapper,
         ResourceDownloadManager resourceDownloadManager,
+        EzySingletonFactory singletonFactory,
         MediaService mediaService,
         PaginationMediaService paginationMediaService,
         SettingService settingService,
@@ -116,10 +120,7 @@ public class MediaControllerService extends EzyLoggable {
         MediaValidator mediaValidator,
         MediaPaginationParameterConverter mediaPaginationParameterConverter,
         HttpModelToResponseConverter modelToResponseConverter,
-        HttpRequestToModelConverter requestToModelConverter,
-        EzySingletonFactory singletonFactory,
-        EzyInputStreamLoader inputStreamLoader,
-        ObjectMapper objectMapper
+        HttpRequestToModelConverter requestToModelConverter
     ) {
         this.httpClient = httpClient;
         this.mediaService = mediaService;
@@ -440,7 +441,9 @@ public class MediaControllerService extends EzyLoggable {
         boolean deleteFile
     ) {
         MediaModel media = mediaService.removeMedia(mediaId);
-        if (deleteFile) {
+        if (deleteFile
+            && MediaStatus.REMOVED.equalsValue(media.getStatus())
+        ) {
             File file = fileSystemManager.getMediaFilePath(
                 media.getType().getFolder(),
                 media.getName()
@@ -457,7 +460,9 @@ public class MediaControllerService extends EzyLoggable {
         boolean deleteFile
     ) {
         MediaModel media = mediaService.removeMedia(mediaName);
-        if (deleteFile) {
+        if (deleteFile
+            && MediaStatus.REMOVED.equalsValue(media.getStatus())
+        ) {
             String containerFolder = media.getType().getFolder();
             File filePath = fileSystemManager.getMediaFilePath(
                 containerFolder,

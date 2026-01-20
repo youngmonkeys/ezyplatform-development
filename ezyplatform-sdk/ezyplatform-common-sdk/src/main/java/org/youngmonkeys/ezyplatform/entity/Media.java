@@ -73,6 +73,8 @@ public class Media {
     @Column(name = "public_media")
     private boolean publicMedia = true;
 
+    private String status = MediaStatus.ADDED.toString();
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

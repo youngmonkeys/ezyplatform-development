@@ -61,6 +61,7 @@ public class DefaultModelToEntityConverter {
         entity.setDescription(EMPTY_STRING);
         entity.setFileSize(model.getFileSize());
         entity.setPublicMedia(!model.isNotPublic());
+        entity.setStatus(MediaStatus.ADDED.toString());
         LocalDateTime now = clock.nowDateTime();
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
@@ -607,6 +608,12 @@ public class DefaultModelToEntityConverter {
         entity.setNotBefore(
             clock.toLocalDateTimeOrNull(model.getNotBefore())
         );
+        entity.setUpdatedAt(clock.nowDateTime());
+    }
+
+    public void mergeUpdatedAtToEntity(
+        Media entity
+    ) {
         entity.setUpdatedAt(clock.nowDateTime());
     }
 

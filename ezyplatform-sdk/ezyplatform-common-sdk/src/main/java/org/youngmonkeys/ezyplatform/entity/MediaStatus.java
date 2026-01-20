@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 youngmonkeys.org
+ * Copyright 2022 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,17 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.pagination;
+package org.youngmonkeys.ezyplatform.entity;
 
-public enum MediaPaginationSortOrder {
-    ID_ASC,
-    ID_DESC,
-    FILE_SIZE_ASC_ID_ASC,
-    FILE_SIZE_DESC_ID_DESC
+import lombok.Getter;
+
+@Getter
+public enum MediaStatus {
+
+    ADDED,
+    REMOVED;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

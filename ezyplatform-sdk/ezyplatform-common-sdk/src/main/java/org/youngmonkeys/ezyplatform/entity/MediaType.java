@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.entity;
 
 import com.tvd12.ezyfox.util.EzyEnums;
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import lombok.Getter;
 
 import java.util.Map;
@@ -38,7 +39,11 @@ public enum MediaType {
     private final String folder;
 
     private static final Map<String, MediaType> MAP_BY_NAME =
-        EzyEnums.enumMap(MediaType.class, it -> it.name);
+        EzyMapBuilder
+            .mapBuilder()
+            .putAll(EzyEnums.enumMap(MediaType.class, it -> it.name))
+            .putAll(EzyEnums.enumMap(MediaType.class, Enum::toString))
+            .toMap();
 
     private static final Map<String, MediaType> MAP_BY_MIME_TYPE_NAME =
         EzyEnums.enumMap(MediaType.class, it -> it.name);
