@@ -28,6 +28,7 @@ import java.util.Locale;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PARAMETER_NAME_LANG;
 
 @Setter
 public class WebViewLanguageDecorator implements ViewDecorator {
@@ -49,6 +50,7 @@ public class WebViewLanguageDecorator implements ViewDecorator {
             }
             lang = webLanguageService.getDefaultLanguageCode();
             if (isNotBlank(lang)) {
+                request.setAttribute(PARAMETER_NAME_LANG, lang);
                 view.setLocale(new Locale(lang));
                 view.setVariable("ezyDefaultLang", lang);
             }

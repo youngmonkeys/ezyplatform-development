@@ -162,7 +162,7 @@ public abstract class MutableSettingService
     @Override
     public void saveSetting(
         String name,
-        DataType dataType,
+        String dataType,
         Object value
     ) {
         Setting entity = settingRepository

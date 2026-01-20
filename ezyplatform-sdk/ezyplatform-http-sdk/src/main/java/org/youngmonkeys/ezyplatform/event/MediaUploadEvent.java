@@ -16,15 +16,16 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
-import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 
 @Getter
-@AllArgsConstructor
+@Builder
 public class MediaUploadEvent {
-    private UploadFrom uploadFrom;
-    private long ownerId;
+    private String uploadFrom;
+    private long ownerAdminId;
+    private long ownerUserId;
+    private long mediaId;
     private FileMetadata fileMetadata;
 }

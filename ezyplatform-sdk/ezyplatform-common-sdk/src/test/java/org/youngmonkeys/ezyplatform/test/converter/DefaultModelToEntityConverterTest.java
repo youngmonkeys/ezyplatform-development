@@ -168,14 +168,14 @@ public class DefaultModelToEntityConverterTest {
             accessToken,
             tokenExpiredTime,
             TimeUnit.MINUTES,
-            AccessTokenStatus.ACTIVATED
+            AccessTokenStatus.ACTIVATED.toString()
         );
 
         // then
         UserAccessToken userAccessToken = new UserAccessToken();
         userAccessToken.setId(accessToken);
         userAccessToken.setUserId(userId);
-        userAccessToken.setStatus(AccessTokenStatus.ACTIVATED);
+        userAccessToken.setStatus(AccessTokenStatus.ACTIVATED.toString());
         userAccessToken.setCreatedAt(now);
         userAccessToken.setExpiredAt(now.plusSeconds(tokenExpiredTime * 60));
         Asserts.assertEquals(actual, userAccessToken);

@@ -26,5 +26,6 @@ public class UpdateMediaRequest {
     private String title;
     private String caption;
     private String description;
+    private long fileSize;
     private boolean notPublic;
 }

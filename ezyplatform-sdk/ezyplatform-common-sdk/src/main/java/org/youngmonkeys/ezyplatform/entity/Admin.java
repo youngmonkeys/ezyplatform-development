@@ -58,8 +58,7 @@ public class Admin {
     @Column(name = "cover_image_id")
     private long coverImageId;
 
-    @Enumerated(EnumType.STRING)
-    private AdminStatus status;
+    private String status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

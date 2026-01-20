@@ -36,6 +36,13 @@ public interface UserMetaRepository
         Collection<Long> userIds
     );
 
+    void deleteByMetaKey(String metaKey);
+
+    void deleteByUserIdInAndMetaKeyIn(
+        Collection<Long> userIds,
+        Collection<String> metaKeys
+    );
+
     List<UserMeta> findByUserId(
         long userId
     );

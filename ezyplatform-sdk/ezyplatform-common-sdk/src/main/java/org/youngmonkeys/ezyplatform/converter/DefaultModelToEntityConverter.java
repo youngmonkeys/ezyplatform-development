@@ -33,9 +33,8 @@ import java.util.concurrent.TimeUnit;
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH;
-import static org.youngmonkeys.ezyplatform.util.Strings.toBigDecimalOrZero;
-import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.util.Strings.*;
 
 @AllArgsConstructor
 @SuppressWarnings("MethodCount")
@@ -44,19 +43,14 @@ public class DefaultModelToEntityConverter {
     protected final ClockProxy clock;
     protected final ObjectMapper objectMapper;
 
-    public Media toEntity(AddMediaModel model) {
-        return toEntity(model, UploadFrom.ADMIN);
-    }
-
-    public Media toEntity(AddMediaModel model, UploadFrom uploadFrom) {
-        LocalDateTime now = clock.nowDateTime();
+    public Media toEntity(
+        AddMediaModel model,
+        String uploadFrom
+    ) {
         Media entity = new Media();
-        if (uploadFrom == UploadFrom.ADMIN) {
-            entity.setOwnerAdminId(model.getOwnerId());
-        } else {
-            entity.setOwnerUserId(model.getOwnerId());
-        }
         entity.setUploadFrom(uploadFrom);
+        entity.setOwnerAdminId(model.getOwnerAdminId());
+        entity.setOwnerUserId(model.getOwnerUserId());
         entity.setName(model.getFileName());
         entity.setUrl(model.getUrl());
         entity.setOriginalName(model.getOriginalFileName());
@@ -65,7 +59,9 @@ public class DefaultModelToEntityConverter {
         entity.setAlternativeText(EMPTY_STRING);
         entity.setCaption(EMPTY_STRING);
         entity.setDescription(EMPTY_STRING);
+        entity.setFileSize(model.getFileSize());
         entity.setPublicMedia(!model.isNotPublic());
+        LocalDateTime now = clock.nowDateTime();
         entity.setCreatedAt(now);
         entity.setUpdatedAt(now);
         return entity;
@@ -171,7 +167,7 @@ public class DefaultModelToEntityConverter {
             && parameters.length() > MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH
         ) {
             parameters = parameters.substring(
-                0,
+                ZERO,
                 MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH
             );
         }
@@ -321,7 +317,7 @@ public class DefaultModelToEntityConverter {
         long userId,
         String token,
         long tokenExpiredTimeInDay,
-        AccessTokenStatus status
+        String status
     ) {
         LocalDateTime now = clock.nowDateTime();
         LocalDateTime expiredAt = now.plusDays(tokenExpiredTimeInDay);
@@ -339,7 +335,7 @@ public class DefaultModelToEntityConverter {
         String token,
         long tokenExpiredTime,
         TimeUnit tokenExpiredTimeUnit,
-        AccessTokenStatus status
+        String status
     ) {
         LocalDateTime now = clock.nowDateTime();
         LocalDateTime expiredAt = now.plusSeconds(
@@ -357,7 +353,7 @@ public class DefaultModelToEntityConverter {
     public UserAccessToken toUserAccessTokenEntity(
         long userId,
         String token,
-        AccessTokenStatus status,
+        String status,
         LocalDateTime now,
         LocalDateTime expiredAt
     ) {
@@ -372,7 +368,7 @@ public class DefaultModelToEntityConverter {
 
     public Setting toSettingEntity(
         String name,
-        DataType dataType,
+        String dataType,
         Object value
     ) {
         Setting entity = new Setting();
@@ -397,7 +393,7 @@ public class DefaultModelToEntityConverter {
         LocalDateTime now = clock.nowDateTime();
         List<NotificationReceiver> entities = new ArrayList<>();
         for (long toAdminId : model.getToAdminIds()) {
-            if (toAdminId <= 0) {
+            if (toAdminId <= ZERO_LONG) {
                 continue;
             }
             NotificationReceiver entity = toEntity(
@@ -409,7 +405,7 @@ public class DefaultModelToEntityConverter {
             entities.add(entity);
         }
         for (long toUserId : model.getToUserIds()) {
-            if (toUserId <= 0) {
+            if (toUserId <= ZERO_LONG) {
                 continue;
             }
             NotificationReceiver entity = toEntity(
@@ -430,7 +426,7 @@ public class DefaultModelToEntityConverter {
         LocalDateTime now = clock.nowDateTime();
         List<LetterReceiver> entities = new ArrayList<>();
         for (long toAdminId : model.getToAdminIds()) {
-            if (toAdminId <= 0) {
+            if (toAdminId <= ZERO_LONG) {
                 continue;
             }
             LetterReceiver entity = toEntity(
@@ -442,7 +438,7 @@ public class DefaultModelToEntityConverter {
             entities.add(entity);
         }
         for (long toUserId : model.getToUserIds()) {
-            if (toUserId <= 0) {
+            if (toUserId <= ZERO_LONG) {
                 continue;
             }
             LetterReceiver entity = toEntity(
@@ -511,16 +507,28 @@ public class DefaultModelToEntityConverter {
         Media entity
     ) {
         if (model.isUpdateType()) {
-            entity.setType(model.getType());
+            entity.setType(from(model.getType()));
         }
         entity.setAlternativeText(model.getAlternativeText());
         entity.setTitle(model.getTitle());
         entity.setCaption(model.getCaption());
         entity.setDescription(model.getDescription());
+        entity.setFileSize(model.getFileSize());
         entity.setPublicMedia(!model.isNotPublic());
         if (model.isUpdateUrl()) {
             entity.setUrl(model.getUrl());
         }
+        entity.setUpdatedAt(clock.nowDateTime());
+    }
+
+    public void mergeToEntity(
+        ReplaceMediaModel model,
+        Media entity
+    ) {
+        entity.setOriginalName(model.getOriginalFileName());
+        entity.setType(model.getMediaType());
+        entity.setMimeType(model.getMimeType());
+        entity.setFileSize(model.getFileSize());
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
@@ -604,13 +612,13 @@ public class DefaultModelToEntityConverter {
 
     public void mergeToSettingEntity(
         String name,
-        DataType dataType,
+        String dataType,
         Object value,
         Setting entity
     ) {
         String valueString = EMPTY_STRING;
         if (value != null) {
-            if (dataType == DataType.JSON) {
+            if (DataType.JSON.equalsValue(dataType)) {
                 valueString = valueToJson(value);
             } else {
                 valueString = String.valueOf(value);

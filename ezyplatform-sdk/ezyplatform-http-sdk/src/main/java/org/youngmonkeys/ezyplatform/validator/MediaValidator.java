@@ -25,6 +25,7 @@ import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
+import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
@@ -67,6 +68,50 @@ public class MediaValidator {
         return media;
     }
 
+    public void validateOwnerAdminMedia(
+        long adminId,
+        long mediaId
+    ) {
+        long ownerId = mediaService
+            .getOwnerAdminIdByMediaId(mediaId);
+        if (ownerId != adminId) {
+            throw new MediaNotFoundException(mediaId);
+        }
+    }
+
+    public void validateOwnerAdminMedia(
+        long adminId,
+        String mediaName
+    ) {
+        long ownerId = mediaService
+            .getOwnerAdminIdByMediaName(mediaName);
+        if (ownerId != adminId) {
+            throw new MediaNotFoundException(mediaName);
+        }
+    }
+
+    public void validateOwnerUserMedia(
+        long userId,
+        long mediaId
+    ) {
+        long ownerId = mediaService
+            .getOwnerUserIdByMediaId(mediaId);
+        if (ownerId != userId) {
+            throw new MediaNotFoundException(mediaId);
+        }
+    }
+
+    public void validateOwnerUserMedia(
+        long userId,
+        String mediaName
+    ) {
+        long ownerId = mediaService
+            .getOwnerUserIdByMediaName(mediaName);
+        if (ownerId != userId) {
+            throw new MediaNotFoundException(mediaName);
+        }
+    }
+
     public MediaModel validateUserMedia(
         long mediaId,
         long userId
@@ -88,11 +133,23 @@ public class MediaValidator {
         }
     }
 
+    public MediaModel validateMediaNameAndGet(
+        String mediaName
+    ) {
+        MediaModel media = mediaService.getMediaByName(
+            mediaName
+        );
+        if (media == null) {
+            throw new ResourceNotFoundException("media");
+        }
+        return media;
+    }
+
     public FileMetadata validateFilePart(
         Part filePart,
         boolean avatar
     ) throws IOException {
-        long fileSize = 0L;
+        long fileSize = ZERO_LONG;
         String extension = null;
         String mimeType = null;
         org.apache.tika.mime.MediaType mediaType = null;
@@ -129,9 +186,6 @@ public class MediaValidator {
                 && !acceptedMediaMimeTypes.contains("*")) {
                 errors.put("fileType", "invalid");
             }
-            if (avatar && !DEFAULT_ACCEPTED_IMAGE_TYPES.contains(mediaType.toString())) {
-                errors.put("fileType", "invalid");
-            }
         }
         if (!errors.isEmpty()) {
             throw new HttpBadRequestException(errors);
@@ -166,7 +220,7 @@ public class MediaValidator {
         }
         BigDecimal durationInMinutes = request.getDurationInMinutes();
         if (durationInMinutes != null
-            && durationInMinutes.compareTo(BigDecimal.ZERO) < 0
+            && durationInMinutes.compareTo(BigDecimal.ZERO) < ZERO
         ) {
             errors.put("durationInMinutes", "invalid");
         }
@@ -243,7 +297,7 @@ public class MediaValidator {
         if (request.isUpdateDuration()) {
             BigDecimal durationInMinutes = request.getDurationInMinutes();
             if (durationInMinutes != null
-                && durationInMinutes.compareTo(BigDecimal.ZERO) < 0
+                && durationInMinutes.compareTo(BigDecimal.ZERO) < ZERO
             ) {
                 errors.put("durationInMinutes", "invalid");
             }

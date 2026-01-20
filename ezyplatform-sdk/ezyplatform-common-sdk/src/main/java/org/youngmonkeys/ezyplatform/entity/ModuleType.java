@@ -57,6 +57,10 @@ public enum ModuleType {
         this.containerFolder = containerFolder;
     }
 
+    public static ModuleType of(String name) {
+        return name == null ? null : MAP.get(name);
+    }
+
     public String getTargetFolder() {
         return getTargetFolderPath().toString();
     }
@@ -65,7 +69,7 @@ public enum ModuleType {
         return Paths.get(parentFolder, containerFolder);
     }
 
-    public static ModuleType of(String name) {
-        return name == null ? null : MAP.get(name);
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
     }
 }

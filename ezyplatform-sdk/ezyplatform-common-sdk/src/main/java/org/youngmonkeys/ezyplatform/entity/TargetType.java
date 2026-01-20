@@ -39,4 +39,8 @@ public enum TargetType {
     public static TargetType of(String name) {
         return name == null ? null : MAP.get(name);
     }
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

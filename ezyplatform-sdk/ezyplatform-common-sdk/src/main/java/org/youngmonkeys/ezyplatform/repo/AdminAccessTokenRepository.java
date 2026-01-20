@@ -21,4 +21,11 @@ import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
 
 public interface AdminAccessTokenRepository
     extends EzyDatabaseRepository<String, AdminAccessToken> {
+
+    void deleteByAdminId(long adminId);
+
+    AdminAccessToken findByAdminIdAndTokenType(
+        long adminId,
+        String tokenType
+    );
 }

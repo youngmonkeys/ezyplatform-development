@@ -18,7 +18,6 @@ package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
 
 import java.time.LocalDateTime;
 
@@ -29,7 +28,8 @@ public class AdminAccessTokenModel
     private long adminId;
     private String accessToken;
     private long renewalCount;
-    private AccessTokenStatus status;
+    private String tokenType;
+    private String status;
     private LocalDateTime createdAt;
     private LocalDateTime expiredAt;
     private long createdAtTimestamp;

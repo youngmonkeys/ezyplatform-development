@@ -19,5 +19,9 @@ package org.youngmonkeys.ezyplatform.entity;
 public enum ContentTemplateType {
     MAIL,
     LETTER,
-    NOTIFICATION
+    NOTIFICATION;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

@@ -18,8 +18,6 @@ package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.MediaType;
-import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 
 
 @Getter
@@ -32,8 +30,8 @@ public class MediaDetailsModel {
     private String name;
     private String originalName;
     private String url;
-    private UploadFrom uploadFrom;
-    private MediaType type;
+    private String uploadFrom;
+    private String type;
     private String mimeType;
     private long ownerUserId;
     private long ownerAdminId;
@@ -43,15 +41,18 @@ public class MediaDetailsModel {
     private String description;
     private boolean publicMedia;
     private long createdAt;
+    private long updatedAt;
 
-    public static MediaDetailsModelBuilder from(MediaModel info) {
+    public static MediaDetailsModelBuilder fromMediaModel(
+        MediaModel info
+    ) {
         return builder()
             .id(info.getId())
             .name(info.getName())
             .originalName(info.getOriginalName())
             .url(info.getUrl())
             .uploadFrom(info.getUploadFrom())
-            .type(info.getType())
+            .type(info.getTypeText())
             .mimeType(info.getMimeType())
             .ownerUserId(info.getOwnerUserId())
             .ownerAdminId(info.getOwnerAdminId())
@@ -60,6 +61,7 @@ public class MediaDetailsModel {
             .alternativeText(info.getAlternativeText())
             .description(info.getDescription())
             .publicMedia(info.isPublicMedia())
-            .createdAt(info.getCreatedAt());
+            .createdAt(info.getCreatedAt())
+            .updatedAt(info.getUpdatedAt());
     }
 }

@@ -24,6 +24,9 @@ import com.tvd12.ezyfox.security.EzySHA256;
 
 import java.util.UUID;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+
 public final class AccessTokens {
 
     private AccessTokens() {}
@@ -75,7 +78,19 @@ public final class AccessTokens {
                 );
             return EzyLongs.bin2long(sourceIdBytes);
         } catch (Exception e) {
-            return 0;
+            return ZERO_LONG;
         }
+    }
+
+    public static String extractBearerToken(String text) {
+        if (isBlank(text)) {
+            return NULL_STRING;
+        }
+        int index = text.indexOf(PREFIX_BEARER_TOKEN);
+        String accessToken = text;
+        if (index >= 0) {
+            accessToken = text.substring(PREFIX_BEARER_TOKEN.length());
+        }
+        return accessToken;
     }
 }

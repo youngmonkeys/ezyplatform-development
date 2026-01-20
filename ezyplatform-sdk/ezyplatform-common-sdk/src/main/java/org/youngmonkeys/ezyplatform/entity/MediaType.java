@@ -21,6 +21,7 @@ import lombok.Getter;
 
 import java.util.Map;
 
+@Getter
 public enum MediaType {
     AUDIO("audio", "audio", "audios"),
     AVATAR("avatar", "avatar", "avatars"),
@@ -30,13 +31,10 @@ public enum MediaType {
     IMAGE("image", "image", "images"),
     VIDEO("video", "video", "videos");
 
-    @Getter
     private final String name;
 
-    @Getter
     private final String mimeTypeName;
 
-    @Getter
     private final String folder;
 
     private static final Map<String, MediaType> MAP_BY_NAME =
@@ -59,5 +57,9 @@ public enum MediaType {
     public static MediaType ofMimeTypeName(String name) {
         MediaType answer = name == null ? null : MAP_BY_MIME_TYPE_NAME.get(name);
         return answer == null ? FILE : answer;
+    }
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
     }
 }

@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 public class DefaultAdminService implements AdminService {
@@ -170,8 +171,14 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public AdminModel getAdminByAccessToken(String accessToken) {
-        long adminId = validateAdminAccessToken(accessToken);
+    public AdminModel getAdminByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    ) {
+        long adminId = validateAdminAccessToken(
+            accessToken,
+            tokenTypes
+        );
         return getAdminById(adminId);
     }
 
@@ -252,9 +259,13 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public long validateAdminAccessToken(String accessToken) {
+    public long validateAdminAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    ) {
         return getAccessTokenEntityOrThrowByAccessToken(
             accessToken,
+            tokenTypes,
             Boolean.TRUE
         ).getAdminId();
     }
@@ -262,11 +273,13 @@ public class DefaultAdminService implements AdminService {
     @Override
     public AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
         String accessToken,
+        Set<String> tokenTypes,
         boolean verifyStatus
     ) {
         return entityToModelConverter.toModel(
             getAccessTokenEntityOrThrowByAccessToken(
                 accessToken,
+                tokenTypes,
                 verifyStatus
             )
         );
@@ -274,13 +287,14 @@ public class DefaultAdminService implements AdminService {
 
     protected AdminAccessToken getAccessTokenEntityOrThrowByAccessToken(
         String accessToken,
+        Set<String> tokenTypes,
         boolean verifyStatus
     ) {
         if (isBlank(accessToken)) {
             throw new AdminInvalidAccessTokenException(accessToken);
         }
         long adminId = accessTokenService.extractAdminId(accessToken);
-        if (adminId <= 0L) {
+        if (adminId <= ZERO_LONG) {
             throw new AdminInvalidAccessTokenException(accessToken);
         }
         AdminAccessToken entity = accessTokenRepository.findById(
@@ -289,15 +303,22 @@ public class DefaultAdminService implements AdminService {
         if (entity == null) {
             throw new AdminInvalidAccessTokenException(accessToken);
         }
+        String tokenType = entity.getTokenType();
+        if (!tokenTypes.isEmpty()
+            && isBlank(tokenType)
+            || !tokenTypes.contains(tokenType)
+        ) {
+            throw new AdminInvalidAccessTokenException(accessToken);
+        }
         if (adminId != entity.getAdminId()) {
             throw new AdminInvalidAccessTokenException(accessToken);
         }
-        AccessTokenStatus status = entity.getStatus();
+        String status = entity.getStatus();
         if (verifyStatus
-            && status != AccessTokenStatus.ACTIVATED
-            && status != AccessTokenStatus.ACTIVATED_2FA
+            && !AccessTokenStatus.ACTIVATED.equalsValue(status)
+            && !AccessTokenStatus.ACTIVATED_2FA.equalsValue(status)
         ) {
-            if (status == AccessTokenStatus.WAITING_2FA) {
+            if (AccessTokenStatus.WAITING_2FA.equalsValue(status)) {
                 throw new AdminWaiting2FaAccessTokenException(
                     accessToken
                 );

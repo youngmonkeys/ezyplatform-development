@@ -22,18 +22,20 @@ import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.UNKNOWN_LOWERCASE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 
 public class HttpRequestToModelConverter {
 
     public AddMediaModel toModel(
-        long ownerId,
+        long ownerAdminId,
+        long ownerUserId,
         String mediaName,
         AddMediaFromUrlRequest request,
         boolean notPublic
     ) {
         return AddMediaModel.builder()
-            .ownerId(ownerId)
+            .ownerAdminId(ownerAdminId)
+            .ownerUserId(ownerUserId)
             .url(request.getUrl())
             .fileName(mediaName)
             .originalFileName(request.getOriginalName())
@@ -42,6 +44,7 @@ public class HttpRequestToModelConverter {
             .notPublic(notPublic)
             .saveDuration(request.isSaveDuration())
             .durationInMinutes(request.getDurationInMinutes())
+            .fileSize(request.getFileSize())
             .build();
     }
 
@@ -49,14 +52,14 @@ public class HttpRequestToModelConverter {
         long mediaId,
         UpdateMediaRequest request
     ) {
-        return toModel(mediaId, null, request);
+        return toModel(mediaId, NULL_STRING, request);
     }
 
     public UpdateMediaModel toModel(
         String mediaName,
         UpdateMediaRequest request
     ) {
-        return toModel(0L, mediaName, request);
+        return toModel(ZERO_LONG, mediaName, request);
     }
 
     public UpdateMediaModel toModel(
@@ -71,6 +74,7 @@ public class HttpRequestToModelConverter {
             .title(request.getTitle())
             .caption(request.getCaption())
             .description(request.getDescription())
+            .fileSize(request.getFileSize())
             .notPublic(request.isNotPublic())
             .build();
     }
@@ -87,6 +91,7 @@ public class HttpRequestToModelConverter {
             .title(request.getTitle())
             .caption(request.getCaption())
             .description(request.getDescription())
+            .fileSize(request.getFileSize())
             .notPublic(request.isNotPublic())
             .updateUrl(true)
             .url(request.getUrl())

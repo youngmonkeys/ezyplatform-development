@@ -14,18 +14,13 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.entity;
 
-import com.tvd12.ezyfox.tool.EzyBuilderCreator;
-import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+public enum UploadAction {
+    ADD,
+    REPLACE;
 
-public class BuilderScriptGenerator {
-    public static void main(String[] args) throws Exception {
-        EzyBuilderCreator creator = new EzyBuilderCreator();
-        System.out.println(
-            creator
-                .create(AddMediaModel.class)
-                .replace("\t", "    ")
-        );
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
     }
 }

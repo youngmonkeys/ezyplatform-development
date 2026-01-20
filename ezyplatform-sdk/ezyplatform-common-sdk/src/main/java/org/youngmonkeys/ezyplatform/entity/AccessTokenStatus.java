@@ -16,6 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
+import com.tvd12.ezyfox.util.EzyEnums;
+
+import java.util.Map;
+
 public enum AccessTokenStatus {
     ACTIVATED,
     ACTIVATED_2FA,
@@ -30,6 +34,9 @@ public enum AccessTokenStatus {
     DELETED,
     WAITING_2FA;
 
+    private static final Map<String, AccessTokenStatus> MAP_BY_NAME =
+        EzyEnums.enumMap(AccessTokenStatus.class, AccessTokenStatus::toString);
+
     public static AccessTokenStatus of(String value) {
         return of(value, INACTIVATED);
     }
@@ -38,10 +45,10 @@ public enum AccessTokenStatus {
         String value,
         AccessTokenStatus defaultStatus
     ) {
-        try {
-            return AccessTokenStatus.valueOf(value);
-        } catch (Exception e) {
-            return defaultStatus;
-        }
+        return MAP_BY_NAME.getOrDefault(value, defaultStatus);
+    }
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
     }
 }

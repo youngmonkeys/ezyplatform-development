@@ -16,12 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.entity.AccessTokenType;
 import org.youngmonkeys.ezyplatform.model.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
 
@@ -63,7 +61,19 @@ public interface AdminService {
 
     Long getAdminIdByUuid(String uuid);
 
-    AdminModel getAdminByAccessToken(String accessToken);
+    default AdminModel getAdminByAccessToken(
+        String accessToken
+    ) {
+        return getAdminByAccessToken(
+            accessToken,
+            AccessTokenType.ACCESS_TOKEN_SINGLE_SET
+        );
+    }
+
+    AdminModel getAdminByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    );
 
     Long getAdminIdByAccessToken(String accessToken);
 
@@ -96,12 +106,47 @@ public interface AdminService {
         String usernameOrEmail
     );
 
-    long validateAdminAccessToken(String accessToken);
+    default long validateAdminAccessToken(
+        String accessToken
+    ) {
+        return validateAdminAccessToken(
+            accessToken,
+            AccessTokenType.ACCESS_TOKEN_SINGLE_SET
+        );
+    }
+
+    long validateAdminAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    );
+
+    default AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
+        String accessToken,
+        boolean verifyStatus
+    ) {
+        return getAdminAccessTokenOrThrowByAccessToken(
+            accessToken,
+            AccessTokenType.ACCESS_TOKEN_SINGLE_SET,
+            verifyStatus
+        );
+    }
 
     AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
         String accessToken,
+        Set<String> tokenTypes,
         boolean verifyStatus
     );
+
+    default AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    ) {
+        return getAdminAccessTokenOrThrowByAccessToken(
+            accessToken,
+            tokenTypes,
+            Boolean.FALSE
+        );
+    }
 
     default AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
         String accessToken

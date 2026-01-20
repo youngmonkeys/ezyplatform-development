@@ -16,9 +16,21 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
+import java.util.Collections;
+import java.util.Set;
+
 public enum AccessTokenType {
     ACCESS_TOKEN,
     REFRESH_TOKEN,
     ID_TOKEN,
-    JWT_TOKEN
+    JWT_TOKEN,
+    WEB_MANAGEMENT_TOKEN,
+    SOCKET_TOKEN;
+
+    public static final Set<String> ACCESS_TOKEN_SINGLE_SET =
+        Collections.singleton(ACCESS_TOKEN.toString());
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

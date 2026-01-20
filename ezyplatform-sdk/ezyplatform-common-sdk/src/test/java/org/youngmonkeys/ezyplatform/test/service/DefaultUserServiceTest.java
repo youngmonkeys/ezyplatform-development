@@ -26,6 +26,7 @@ import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
+import org.youngmonkeys.ezyplatform.entity.AccessTokenType;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 import org.youngmonkeys.ezyplatform.repo.UserAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRepository;
@@ -94,7 +95,8 @@ public class DefaultUserServiceTest {
             .randomObject(UserAccessToken.class);
         userAccessToken.setUserId(userId);
         userAccessToken.setId(accessToken);
-        userAccessToken.setStatus(AccessTokenStatus.ACTIVATED);
+        userAccessToken.setTokenType(AccessTokenType.ACCESS_TOKEN.toString());
+        userAccessToken.setStatus(AccessTokenStatus.ACTIVATED.toString());
         userAccessToken.setExpiredAt(now.plusDays(1));
         when(
             userAccessTokenRepository.findById(accessToken)

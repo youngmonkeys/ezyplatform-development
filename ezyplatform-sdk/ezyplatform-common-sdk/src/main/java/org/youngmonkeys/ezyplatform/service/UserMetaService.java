@@ -238,6 +238,13 @@ public interface UserMetaService {
     void deleteUserMetaByUserIds(
         Collection<Long> userIds
     );
+    
+    void deleteUserMetaByMetaKey(String metaKey);
+
+    void deleteUserMetaByUserIdInAndMetaKeyIn(
+        Collection<Long> userIds,
+        Collection<String> metaKeys
+    );
 
     boolean containsUserMeta(
         long userId,

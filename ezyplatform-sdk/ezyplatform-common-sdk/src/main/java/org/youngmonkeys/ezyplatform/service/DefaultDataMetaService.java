@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
+@SuppressWarnings("MethodCount")
 @AllArgsConstructor
 public class DefaultDataMetaService implements DataMetaService {
 
@@ -165,6 +166,32 @@ public class DefaultDataMetaService implements DataMetaService {
             dataType,
             metaKey
         );
+    }
+
+    @Override
+    public void deleteByDataTypeMetaKey(
+        String dataType,
+        String metaKey
+    ) {
+        dataMetaRepository.deleteByDataTypeAndMetaKey(
+            dataType,
+            metaKey
+        );
+    }
+
+    @Override
+    public void deleteByDataTypeAndDataIdInAndMetaKeyIn(
+        String dataType,
+        Collection<Long> productIds,
+        Collection<String> metaKeys
+    ) {
+        if (!productIds.isEmpty() && !metaKeys.isEmpty()) {
+            dataMetaRepository.deleteByDataTypeAndDataIdInAndMetaKeyIn(
+                dataType,
+                productIds,
+                metaKeys
+            );
+        }
     }
 
     @Override

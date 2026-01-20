@@ -30,5 +30,6 @@ public class AddMediaFromUrlRequest {
     private String url;
     private boolean saveDuration;
     private BigDecimal durationInMinutes;
+    private long fileSize;
     private boolean notPublic;
 }

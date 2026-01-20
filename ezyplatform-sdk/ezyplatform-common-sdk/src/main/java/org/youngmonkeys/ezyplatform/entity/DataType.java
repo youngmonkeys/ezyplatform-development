@@ -18,27 +18,25 @@ package org.youngmonkeys.ezyplatform.entity;
 
 import lombok.Getter;
 
+@Getter
 public enum DataType {
-    ARRAY("Array"),
-    BOOLEAN("Boolean"),
-    FLOAT("Float"),
-    DATE("Date"),
-    DATETIME("Date Time"),
-    EMAIL("Email"),
-    IMAGE("Image"),
-    INTEGER("Integer"),
-    LONG("Long"),
-    MEDIA("Media"),
-    STRING("String"),
-    JSON("Json"),
-    FILE_SIZE("File size"),
-    PASSWORD("Password"),
-    URL("URL");
+    ARRAY,
+    BOOLEAN,
+    FLOAT,
+    DATE,
+    DATETIME,
+    EMAIL,
+    IMAGE,
+    INTEGER,
+    LONG,
+    MEDIA,
+    STRING,
+    JSON,
+    FILE_SIZE,
+    PASSWORD,
+    URL;
 
-    @Getter
-    private final String name;
-
-    DataType(String name) {
-        this.name = name;
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
     }
 }

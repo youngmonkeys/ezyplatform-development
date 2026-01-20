@@ -242,6 +242,13 @@ public interface AdminMetaService {
     void deleteAdminMetaByAdminIds(
         Collection<Long> adminIds
     );
+    
+    void deleteAdminMetaByMetaKey(String metaKey);
+
+    void deleteAdminMetaByAdminIdInAndMetaKeyIn(
+        Collection<Long> adminIds,
+        Collection<String> metaKeys
+    );
 
     boolean containsAdminMeta(
         long adminId,

@@ -19,5 +19,9 @@ package org.youngmonkeys.ezyplatform.constant;
 public enum CommonUserType implements ISocketUserType {
     ADMIN,
     ANONYMOUS,
-    USER
+    USER;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

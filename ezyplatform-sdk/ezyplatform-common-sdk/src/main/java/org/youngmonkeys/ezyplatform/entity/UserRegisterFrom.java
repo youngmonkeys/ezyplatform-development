@@ -19,5 +19,9 @@ package org.youngmonkeys.ezyplatform.entity;
 public enum UserRegisterFrom {
     NORMAL,
     OAUTH2,
-    SSO
+    SSO;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

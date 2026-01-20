@@ -16,11 +16,11 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
-import com.tvd12.ezyhttp.server.core.util.HttpServletRequests;
-
 import javax.servlet.http.HttpServletRequest;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyhttp.server.core.util.HttpServletRequests.getRequestValue;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PARAMETER_NAME_LANG;
 
 public final class HttpRequests {
 
@@ -29,9 +29,9 @@ public final class HttpRequests {
     public static String getLanguage(
         HttpServletRequest request
     ) {
-        return HttpServletRequests.getRequestValue(
+        return getRequestValue(
             request,
-            "lang"
+            PARAMETER_NAME_LANG
         );
     }
 

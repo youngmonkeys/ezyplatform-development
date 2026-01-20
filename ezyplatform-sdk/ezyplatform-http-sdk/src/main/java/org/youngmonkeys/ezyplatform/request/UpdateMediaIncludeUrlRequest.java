@@ -30,6 +30,7 @@ public class UpdateMediaIncludeUrlRequest {
     private String title;
     private String caption;
     private String description;
+    private long fileSize;
     private String url;
     private boolean notPublic;
     private boolean updateDuration;

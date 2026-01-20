@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.Media;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 
 public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
 
@@ -33,5 +34,37 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
     )
     Media findByNameOrOriginalName(
         String name
+    );
+
+    @EzyQuery(
+        "SELECT e.ownerAdminId FROM Media e " +
+            "WHERE e.id = ?0"
+    )
+    IdResult findOwnerAdminIdById(
+        long mediaId
+    );
+
+    @EzyQuery(
+        "SELECT e.ownerAdminId FROM Media e " +
+            "WHERE e.name = ?0 OR e.originalName = ?0"
+    )
+    IdResult findOwnerAdminIdByNameOrOriginalName(
+        String mediaName
+    );
+
+    @EzyQuery(
+        "SELECT e.ownerUserId FROM Media e " +
+            "WHERE e.id = ?0"
+    )
+    IdResult findOwnerUserIdById(
+        long mediaId
+    );
+
+    @EzyQuery(
+        "SELECT e.ownerUserId FROM Media e " +
+            "WHERE e.name = ?0 OR e.originalName = ?0"
+    )
+    IdResult findOwnerUserIdByNameOrOriginalName(
+        String mediaName
     );
 }

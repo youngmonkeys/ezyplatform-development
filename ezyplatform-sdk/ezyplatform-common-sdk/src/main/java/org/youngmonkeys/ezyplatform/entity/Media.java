@@ -44,12 +44,10 @@ public class Media {
     private String originalName;
 
     @Column(name = "upload_from")
-    @Enumerated(EnumType.STRING)
-    private UploadFrom uploadFrom;
+    private String uploadFrom;
 
     @Column(name = "media_type")
-    @Enumerated(EnumType.STRING)
-    private MediaType type;
+    private String type;
 
     @Column(name = "mime_type")
     private String mimeType;
@@ -68,6 +66,9 @@ public class Media {
     private String alternativeText = EMPTY_STRING;
 
     private String description = EMPTY_STRING;
+
+    @Column(name = "file_size")
+    private long fileSize;
 
     @Column(name = "public_media")
     private boolean publicMedia = true;

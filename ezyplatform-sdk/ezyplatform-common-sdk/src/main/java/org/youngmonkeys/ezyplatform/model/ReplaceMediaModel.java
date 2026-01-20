@@ -14,18 +14,17 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.model;
 
-import com.tvd12.ezyfox.tool.EzyBuilderCreator;
-import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import lombok.Builder;
+import lombok.Getter;
 
-public class BuilderScriptGenerator {
-    public static void main(String[] args) throws Exception {
-        EzyBuilderCreator creator = new EzyBuilderCreator();
-        System.out.println(
-            creator
-                .create(AddMediaModel.class)
-                .replace("\t", "    ")
-        );
-    }
+@Getter
+@Builder
+public class ReplaceMediaModel {
+    private long mediaId;
+    private String originalFileName;
+    private String mediaType;
+    private String mimeType;
+    private long fileSize;
 }

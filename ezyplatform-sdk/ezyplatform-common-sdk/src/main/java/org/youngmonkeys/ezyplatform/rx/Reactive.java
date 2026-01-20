@@ -31,7 +31,7 @@ public final class Reactive {
     private static ExecutorService executorService;
     private static final int DEFAULT_TIMEOUT_SECONDS = 15;
     private static final int NUMBER_OF_THREADS =
-        Runtime.getRuntime().availableProcessors() * 4;
+        Runtime.getRuntime().availableProcessors();
     private static final AtomicInteger NUMBER_OF_BUSY_THREADS =
         new AtomicInteger();
 
@@ -459,7 +459,7 @@ public final class Reactive {
         }
 
         private void convertRxMapValues(ResultValueMap rootValueMap) {
-            Stack<Object> stack = new Stack<>();
+            Deque<Object> stack = new ArrayDeque<>();
             ResultValueMap resultMap = rootValueMap;
             while (true) {
                 int rxMapCount = 0;

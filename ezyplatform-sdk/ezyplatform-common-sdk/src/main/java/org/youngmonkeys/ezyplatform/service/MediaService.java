@@ -31,29 +31,33 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 
 @SuppressWarnings("MethodCount")
 public interface MediaService {
 
-    MediaModel addMedia(AddMediaModel model);
+    default MediaModel addMedia(
+        AddMediaModel model
+    ) {
+        return addMedia(
+            UploadFrom.ADMIN.toString(),
+            model
+        );
+    }
 
     MediaModel addMedia(
-        AddMediaModel model,
-        UploadFrom uploadFrom
-    );
-
-    void updateMedia(UpdateMediaModel model);
-
-    void updateMedia(
-        long userId,
-        UpdateMediaModel model
+        String uploadFrom,
+        AddMediaModel model
     );
 
     void updateMedia(
-        boolean byUser,
-        long userId,
         UpdateMediaModel model
+    );
+
+    MediaModel replaceMedia(
+        ReplaceMediaModel model
     );
 
     void updateMediaOwner(
@@ -70,7 +74,7 @@ public interface MediaService {
             duration != null
                 ? duration.divide(
                     BigDecimal.valueOf(60),
-                2,
+                    2,
                     RoundingMode.HALF_UP
                 )
                 : BigDecimal.ZERO
@@ -84,17 +88,7 @@ public interface MediaService {
 
     MediaModel removeMedia(long mediaId);
 
-    MediaModel removeMedia(
-        long userId,
-        String mediaName
-    );
-
-    MediaModel removeMedia(
-        boolean byUser,
-        long userId,
-        long mediaId,
-        String mediaName
-    );
+    MediaModel removeMedia(String mediaName);
 
     MediaModel getMediaById(long mediaId);
 
@@ -187,7 +181,7 @@ public interface MediaService {
     );
 
     default String generateMediaFileName() {
-        return generateMediaFileName("", null);
+        return generateMediaFileName(EMPTY_STRING, NULL_STRING);
     }
 
     default String generateMediaFileName(
@@ -232,4 +226,12 @@ public interface MediaService {
     Map<Long, BigDecimal> getMediaDurationInMinutesByIds(
         Collection<Long> mediaIds
     );
+
+    long getOwnerAdminIdByMediaId(long mediaId);
+
+    long getOwnerAdminIdByMediaName(String mediaName);
+
+    long getOwnerUserIdByMediaId(long mediaId);
+
+    long getOwnerUserIdByMediaName(String mediaName);
 }

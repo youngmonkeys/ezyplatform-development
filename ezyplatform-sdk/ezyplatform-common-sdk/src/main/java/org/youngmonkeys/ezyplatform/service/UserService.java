@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.entity.AccessTokenType;
 import org.youngmonkeys.ezyplatform.entity.UserStatus;
 import org.youngmonkeys.ezyplatform.model.UserAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
@@ -25,6 +26,7 @@ import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
@@ -42,7 +44,19 @@ public interface UserService {
 
     UserModel getUserByPhone(String phone);
 
-    UserModel getUserByAccessToken(String accessToken);
+    default UserModel getUserByAccessToken(
+        String accessToken
+    ) {
+        return getUserByAccessToken(
+            accessToken,
+            AccessTokenType.ACCESS_TOKEN_SINGLE_SET
+        );
+    }
+
+    UserModel getUserByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    );
 
     List<UserModel> getUserListByIds(
         Collection<Long> userIds
@@ -78,14 +92,38 @@ public interface UserService {
 
     Long getUserIdByAccessToken(String accessToken);
 
-    long validateUserAccessToken(String accessToken);
+    default long validateUserAccessToken(
+        String accessToken
+    ) {
+        return validateUserAccessToken(
+            accessToken,
+            AccessTokenType.ACCESS_TOKEN_SINGLE_SET
+        );
+    }
+
+    long validateUserAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    );
 
     UserAccessTokenModel getUserAccessTokenByAccessToken(
         String accessToken
     );
 
+    default UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
+        String accessToken,
+        boolean verifyStatus
+    ) {
+        return getUserAccessTokenOrThrowByAccessToken(
+            accessToken,
+            AccessTokenType.ACCESS_TOKEN_SINGLE_SET,
+            verifyStatus
+        );
+    }
+
     UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
         String accessToken,
+        Set<String> tokenTypes,
         boolean verifyStatus
     );
 

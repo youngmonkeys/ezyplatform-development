@@ -38,16 +38,14 @@ import org.youngmonkeys.ezyplatform.result.*;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.util.Next.limit;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.util.StringConverters.trimOrNull;
 
 @SuppressWarnings("MethodCount")
@@ -77,7 +75,7 @@ public class DefaultUserService implements UserService {
                 token,
                 tokenExpiredTime,
                 tokenExpiredTimeUnit,
-                status
+                status.toString()
             );
         accessTokenRepository.save(accessToken);
         return entityToModelConverter.toModel(accessToken);
@@ -158,8 +156,13 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public UserModel getUserByAccessToken(String accessToken) {
-        long userId = validateUserAccessToken(accessToken);
+    public UserModel getUserByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    ) {
+        long userId = validateUserAccessToken(
+            accessToken
+        );
         return getUserById(userId);
     }
 
@@ -356,9 +359,13 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public long validateUserAccessToken(String accessToken) {
+    public long validateUserAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    ) {
         return getAccessTokenEntityOrThrowByAccessToken(
             accessToken,
+            tokenTypes,
             Boolean.TRUE
         ).getUserId();
     }
@@ -377,11 +384,13 @@ public class DefaultUserService implements UserService {
     @Override
     public UserAccessTokenModel getUserAccessTokenOrThrowByAccessToken(
         String accessToken,
+        Set<String> tokenTypes,
         boolean verifyStatus
     ) {
         return entityToModelConverter.toModel(
             getAccessTokenEntityOrThrowByAccessToken(
                 accessToken,
+                tokenTypes,
                 verifyStatus
             )
         );
@@ -389,13 +398,14 @@ public class DefaultUserService implements UserService {
 
     protected UserAccessToken getAccessTokenEntityOrThrowByAccessToken(
         String accessToken,
+        Set<String> tokenTypes,
         boolean verifyStatus
     ) {
         if (isBlank(accessToken)) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
         long userId = accessTokenService.extractUserId(accessToken);
-        if (userId <= 0L) {
+        if (userId <= ZERO_LONG) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
         UserAccessToken entity = accessTokenRepository.findById(
@@ -404,15 +414,22 @@ public class DefaultUserService implements UserService {
         if (entity == null) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
+        String tokenType = entity.getTokenType();
+        if (!tokenTypes.isEmpty()
+            && isBlank(tokenType)
+            || !tokenTypes.contains(tokenType)
+        ) {
+            throw new UserInvalidAccessTokenException(accessToken);
+        }
         if (userId != entity.getUserId()) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
-        AccessTokenStatus status = entity.getStatus();
+        String status = entity.getStatus();
         if (verifyStatus
-            && status != AccessTokenStatus.ACTIVATED
-            && status != AccessTokenStatus.ACTIVATED_2FA
+            && !AccessTokenStatus.ACTIVATED.equalsValue(status)
+            && !AccessTokenStatus.ACTIVATED_2FA.equalsValue(status)
         ) {
-            if (status == AccessTokenStatus.WAITING_2FA) {
+            if (AccessTokenStatus.WAITING_2FA.equalsValue(status)) {
                 throw new UserWaiting2FaAccessTokenException(
                     accessToken
                 );

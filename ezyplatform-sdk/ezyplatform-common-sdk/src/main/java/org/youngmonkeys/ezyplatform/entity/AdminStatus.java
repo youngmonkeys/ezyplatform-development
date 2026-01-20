@@ -21,5 +21,9 @@ public enum AdminStatus {
     INACTIVATED,
     ARCHIVED,
     BLOCKED,
-    DELETED
+    DELETED;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

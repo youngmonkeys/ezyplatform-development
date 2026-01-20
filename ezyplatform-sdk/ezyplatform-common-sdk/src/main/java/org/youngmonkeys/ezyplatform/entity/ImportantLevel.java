@@ -18,5 +18,9 @@ package org.youngmonkeys.ezyplatform.entity;
 
 public enum ImportantLevel {
     IMPORTANT,
-    NORMAL
+    NORMAL;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

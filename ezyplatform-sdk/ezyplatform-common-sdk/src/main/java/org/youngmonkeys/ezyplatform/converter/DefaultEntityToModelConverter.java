@@ -74,12 +74,14 @@ public class DefaultEntityToModelConverter {
         if (entity == null) {
             return null;
         }
+        String type = entity.getType();
         return MediaModel.builder()
             .id(entity.getId())
             .name(entity.getName())
             .url(entity.getUrl())
             .originalName(entity.getOriginalName())
-            .type(entity.getType())
+            .type(MediaType.ofName(type))
+            .typeText(type)
             .mimeType(entity.getMimeType())
             .uploadFrom(entity.getUploadFrom())
             .ownerUserId(entity.getOwnerUserId())

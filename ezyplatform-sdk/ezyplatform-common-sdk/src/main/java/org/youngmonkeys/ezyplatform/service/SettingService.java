@@ -90,6 +90,14 @@ public interface SettingService {
         DataType dataType,
         Object value
     ) {
+        saveSetting(name, dataType.toString(), value);
+    }
+
+    default void saveSetting(
+        String name,
+        String dataType,
+        Object value
+    ) {
         throw new EzyNotImplementedException(
             "saveSetting has not implemented yet"
         );
@@ -376,6 +384,12 @@ public interface SettingService {
         return getLongValue(
             SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY,
             DEFAULT_TOKEN_EXPIRED_IN_DAY
+        );
+    }
+
+    default boolean isUserAccessTokenHttpOnly() {
+        return getBooleanValue(
+            SETTING_NAME_USER_ACCESS_TOKEN_HTTP_ONLY
         );
     }
 

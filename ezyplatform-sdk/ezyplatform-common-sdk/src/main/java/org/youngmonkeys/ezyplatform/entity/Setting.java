@@ -39,8 +39,7 @@ public class Setting {
     private String name;
 
     @Column(name = "data_type")
-    @Enumerated(EnumType.STRING)
-    private DataType dataType;
+    private String dataType;
 
     @Column(name = "setting_value")
     private String value;

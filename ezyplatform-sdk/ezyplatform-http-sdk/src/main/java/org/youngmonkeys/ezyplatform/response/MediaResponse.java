@@ -18,8 +18,6 @@ package org.youngmonkeys.ezyplatform.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.MediaType;
-import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 
 @Getter
 @Builder
@@ -28,8 +26,8 @@ public class MediaResponse {
     private String name;
     private String url;
     private String originalName;
-    private UploadFrom uploadFrom;
-    private MediaType type;
+    private String uploadFrom;
+    private String type;
     private String mimeType;
     private String title;
     private String caption;

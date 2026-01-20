@@ -18,5 +18,9 @@ package org.youngmonkeys.ezyplatform.entity;
 
 public enum UploadFrom {
     ADMIN,
-    USER
+    USER;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

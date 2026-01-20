@@ -134,6 +134,22 @@ public class DefaultAdminMetaService implements AdminMetaService {
             adminMetaRepository.deleteByAdminIdIn(adminIds);
         }
     }
+    
+    public void deleteAdminMetaByMetaKey(String metaKey) {
+        adminMetaRepository.deleteByMetaKey(metaKey);
+    }
+
+    public void deleteAdminMetaByAdminIdInAndMetaKeyIn(
+        Collection<Long> adminIds,
+        Collection<String> metaKeys
+    ) {
+        if (!adminIds.isEmpty() && !metaKeys.isEmpty()) {
+            adminMetaRepository.deleteByAdminIdInAndMetaKeyIn(
+                adminIds,
+                metaKeys
+            );
+        }
+    }
 
     @Override
     public boolean containsAdminMeta(

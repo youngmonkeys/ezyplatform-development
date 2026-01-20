@@ -44,6 +44,12 @@ public interface DataMetaRepository
         String metaKey
     );
 
+    void deleteByDataTypeAndDataIdInAndMetaKeyIn(
+        String dataType,
+        Collection<Long> postIds,
+        Collection<String> metaKeys
+    );
+
     void deleteByDataTypeAndDataIdAndMetaKeyAndMetaValue(
         String dataType,
         long dataId,

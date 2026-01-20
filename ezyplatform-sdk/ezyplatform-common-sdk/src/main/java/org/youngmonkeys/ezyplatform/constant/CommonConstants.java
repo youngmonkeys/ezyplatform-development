@@ -32,6 +32,9 @@ public final class CommonConstants {
     public static final int ZERO = 0;
     public static final long ZERO_LONG = 0L;
 
+    public static final Integer NULL_INTEGER = null;
+    public static final Long NULL_LONG = null;
+    public static final Object NULL_OBJECT = null;
     public static final String NULL_STRING = null;
     public static final String TRUE_STRING = "true";
     public static final String FALSE_STRING = "false";
@@ -40,6 +43,8 @@ public final class CommonConstants {
 
     public static final String HTTPS = "https";
     public static final String LOCALHOST = "localhost";
+
+    public static final String PARAMETER_NAME_LANG = "lang";
 
     public static final String PARAMETER_TYPE_NAME_DATE = "Date";
     public static final String PARAMETER_TYPE_NAME_TIME = "Time";
@@ -116,10 +121,17 @@ public final class CommonConstants {
     public static final int WEB_MAX_PAGE_SIZE = 100;
 
     public static final String COOKIE_NAME_ACCESS_TOKEN = "accessToken";
-    public static final String COOKIE_NAME_ACCESS_TOKEN_LOWER_CASE = "accesstoken";
     public static final String COOKIE_NAME_ACCESS_TOKEN_EXPIRED_AT = "accessTokenExpiredAt";
+    public static final String COOKIE_NAME_SOCKET_ACCESS_TOKEN = "socketAccessToken";
+    public static final String COOKIE_NAME_SOCKET_ACCESS_TOKEN_EXPIRED_AT = "socketAccessTokenExpiredAt";
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN = "adminAccessToken";
     public static final String COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT = "adminAccessTokenExpiredAt";
+    public static final String COOKIE_NAME_ADMIN_SOCKET_ACCESS_TOKEN = "adminSocketAccessToken";
+    public static final String COOKIE_NAME_ADMIN_SOCKET_ACCESS_TOKEN_EXPIRED_AT =
+        "adminSocketAccessTokenExpiredAt";
+    public static final String COOKIE_NAME_ADMIN_WEB_MANAGEMENT_ACCESS_TOKEN = "adminWebManagementAccessToken";
+    public static final String COOKIE_NAME_ADMIN_WEB_MANAGEMENT_ACCESS_TOKEN_EXPIRED_AT =
+        "adminWebManagementAccessTokenExpiredAt";
     public static final String COOKIE_NAME_ADMIN_SSO_CALL_BACK_URL = "adminSSOCallbackUrl";
     public static final String COOKIE_NAME_SHARED_ADMIN_ACCESS_TOKEN = "sharedAdminAccessToken";
     public static final String COOKIE_NAME_SHARED_ADMIN_ACCESS_TOKEN_EXPIRED_AT = "sharedAdminAccessTokenExpiredAt";
@@ -183,6 +195,8 @@ public final class CommonConstants {
         = "admin_auto_pass_management_uris";
     public static final String SETTING_NAME_ADMIN_ACCESS_TOKEN_ENCRYPTION_KEY
         = "admin_access_token_encryption_key";
+    public static final String SETTING_NAME_ADMIN_ACCESS_TOKEN_HTTP_ONLY
+        = "admin_access_token_http_only";
     public static final String SETTING_NAME_ADMIN_RESET_PASSWORD_TOKEN_EXPIRED_IN_DAY
         = "admin_reset_password_token_expired_in_day";
     public static final String SETTING_NAME_ADMIN_SSO_ALLOWED_ORIGINS =
@@ -197,6 +211,8 @@ public final class CommonConstants {
         = "user_login_failure_block_durations";
     public static final String SETTING_NAME_USER_ACCESS_TOKEN_ENCRYPTION_KEY
         = "user_access_token_encryption_key";
+    public static final String SETTING_NAME_USER_ACCESS_TOKEN_HTTP_ONLY
+        = "user_access_token_http_only";
     public static final String SETTING_NAME_WEB_DATE_FORMAT
         = "web_date_format";
     public static final String SETTING_NAME_WEB_TIME_FORMAT

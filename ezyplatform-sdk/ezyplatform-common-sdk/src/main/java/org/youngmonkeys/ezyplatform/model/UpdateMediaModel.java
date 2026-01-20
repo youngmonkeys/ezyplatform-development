@@ -33,6 +33,7 @@ public class UpdateMediaModel {
     private String title;
     private String caption;
     private String description;
+    private long fileSize;
     private boolean notPublic;
     private boolean updateUrl;
     private String url;

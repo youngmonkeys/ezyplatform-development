@@ -132,6 +132,22 @@ public class DefaultUserMetaService implements UserMetaService {
             userMetaRepository.deleteByUserIdIn(userIds);
         }
     }
+    
+    public void deleteUserMetaByMetaKey(String metaKey) {
+        userMetaRepository.deleteByMetaKey(metaKey);
+    }
+
+    public void deleteUserMetaByUserIdInAndMetaKeyIn(
+        Collection<Long> userIds,
+        Collection<String> metaKeys
+    ) {
+        if (!userIds.isEmpty() && !metaKeys.isEmpty()) {
+            userMetaRepository.deleteByUserIdInAndMetaKeyIn(
+                userIds,
+                metaKeys
+            );
+        }
+    }
 
     @Override
     public boolean containsUserMeta(

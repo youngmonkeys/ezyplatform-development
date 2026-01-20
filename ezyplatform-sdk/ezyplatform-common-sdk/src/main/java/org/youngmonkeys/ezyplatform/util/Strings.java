@@ -214,7 +214,9 @@ public final class Strings {
 
     public static BigInteger toBigIntegerOrZero(String str) {
         try {
-            return new BigInteger(str);
+            return isBlank(str)
+                ? BigInteger.ZERO
+                : new BigInteger(str);
         } catch (Exception e) {
             return BigInteger.ZERO;
         }
@@ -222,7 +224,7 @@ public final class Strings {
 
     public static BigDecimal toBigDecimalOrNull(String str) {
         try {
-            return new BigDecimal(str);
+            return isBlank(str) ? null : new BigDecimal(str);
         } catch (Exception e) {
             return null;
         }
@@ -230,7 +232,9 @@ public final class Strings {
 
     public static BigDecimal toBigDecimalOrZero(String str) {
         try {
-            return new BigDecimal(str);
+            return isBlank(str)
+                ? BigDecimal.ZERO
+                : new BigDecimal(str);
         } catch (Exception e) {
             return BigDecimal.ZERO;
         }

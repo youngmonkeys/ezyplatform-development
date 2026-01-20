@@ -19,4 +19,8 @@ package org.youngmonkeys.ezyplatform.entity;
 public enum ConfidenceLevel {
     RESTRICTED,
     NORMAL;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

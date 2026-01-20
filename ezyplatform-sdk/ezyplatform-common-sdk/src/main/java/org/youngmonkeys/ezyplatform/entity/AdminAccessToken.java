@@ -18,7 +18,10 @@ package org.youngmonkeys.ezyplatform.entity;
 
 import lombok.*;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_ADMIN_ACCESS_TOKEN;
@@ -40,8 +43,10 @@ public class AdminAccessToken {
     @Column(name = "renewal_count")
     private long renewalCount;
 
-    @Enumerated(EnumType.STRING)
-    private AccessTokenStatus status;
+    @Column(name = "token_type")
+    private String tokenType;
+
+    private String status;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

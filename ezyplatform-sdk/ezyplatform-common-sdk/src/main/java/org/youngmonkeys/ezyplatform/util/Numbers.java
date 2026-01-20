@@ -21,6 +21,8 @@ import java.math.BigInteger;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 public final class Numbers {
 
@@ -61,22 +63,26 @@ public final class Numbers {
     }
 
     public static int toIntValue(BigInteger value) {
-        return value != null ? value.intValue() : 0;
+        return value != null ? value.intValue() : ZERO;
     }
 
     public static int toIntOrZero(String value) {
         try {
-            return value != null ? Integer.parseInt(value) : 0;
+            return isBlank(value)
+                ? ZERO
+                : Integer.parseInt(value);
         } catch (Exception e) {
-            return 0;
+            return ZERO;
         }
     }
 
     public static long toLongOrZero(String value) {
         try {
-            return value != null ? Long.parseLong(value) : 0L;
+            return isBlank(value)
+                ? ZERO_LONG
+                : Long.parseLong(value);
         } catch (Exception e) {
-            return 0L;
+            return ZERO_LONG;
         }
     }
 

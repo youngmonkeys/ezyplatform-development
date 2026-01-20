@@ -21,5 +21,9 @@ public enum NotificationStatus {
     SENT,
     RECEIVED,
     UNREAD,
-    READ
+    READ;
+
+    public boolean equalsValue(String value) {
+        return value != null && this.toString().equals(value);
+    }
 }

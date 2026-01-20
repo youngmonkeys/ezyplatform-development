@@ -20,9 +20,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
-import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.util.Strings.from;
 
 @Getter
 @Builder
@@ -31,8 +32,9 @@ public class MediaModel {
     private String name;
     private String url;
     private String originalName;
-    private UploadFrom uploadFrom;
+    private String uploadFrom;
     private MediaType type;
+    private String typeText;
     private String mimeType;
     private long ownerUserId;
     private long ownerAdminId;
@@ -40,14 +42,21 @@ public class MediaModel {
     private String caption;
     private String alternativeText;
     private String description;
+    private long fileSize;
     private boolean publicMedia;
     private long createdAt;
     private long updatedAt;
 
+    public String getTypeText() {
+        return isBlank(typeText)
+            ? from(type)
+            : typeText;
+    }
+
     public static String getMediaUrlOrNull(
         MediaModel media
     ) {
-        return getMediaUrlOrDefault(media, null);
+        return getMediaUrlOrDefault(media, NULL_STRING);
     }
 
     public static String getMediaUrlOrDefault(
@@ -81,7 +90,7 @@ public class MediaModel {
 
     @JsonIgnore
     public String getUrlOrNull() {
-        return getUrlOrDefault(null);
+        return getUrlOrDefault(NULL_STRING);
     }
 
     public String getUrlOrDefault(String defaultUrl) {

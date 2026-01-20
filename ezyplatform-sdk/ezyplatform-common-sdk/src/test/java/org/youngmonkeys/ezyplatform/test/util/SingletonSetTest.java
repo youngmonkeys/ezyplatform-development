@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.test.util;
 
-import com.tvd12.ezyfox.tool.EzyBuilderCreator;
-import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import java.util.Collections;
+import java.util.Set;
 
-public class BuilderScriptGenerator {
-    public static void main(String[] args) throws Exception {
-        EzyBuilderCreator creator = new EzyBuilderCreator();
-        System.out.println(
-            creator
-                .create(AddMediaModel.class)
-                .replace("\t", "    ")
-        );
+public class SingletonSetTest {
+
+    public void test() {
+        Set<String> set = Collections.singleton("a");
+        set.clear();
+        set.add("b");
+        set.remove("c");
     }
 }

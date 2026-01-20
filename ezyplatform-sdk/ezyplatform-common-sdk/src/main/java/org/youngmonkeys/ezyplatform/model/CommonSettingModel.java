@@ -16,8 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
-import org.youngmonkeys.ezyplatform.entity.DataType;
-
 public interface CommonSettingModel {
 
     long getId();
@@ -26,7 +24,7 @@ public interface CommonSettingModel {
 
     String getValue();
 
-    DataType getDataType();
+    String getDataType();
 
     long getCreatedAt();
 

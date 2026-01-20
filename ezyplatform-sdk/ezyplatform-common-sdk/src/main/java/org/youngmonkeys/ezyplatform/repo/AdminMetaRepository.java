@@ -36,6 +36,13 @@ public interface AdminMetaRepository
         Collection<Long> adminIds
     );
 
+    void deleteByMetaKey(String metaKey);
+
+    void deleteByAdminIdInAndMetaKeyIn(
+        Collection<Long> adminIds,
+        Collection<String> metaKeys
+    );
+
     List<AdminMeta> findByAdminId(
         long adminId
     );

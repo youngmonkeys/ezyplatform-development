@@ -27,4 +27,9 @@ public interface UserAccessTokenRepository
     void deleteByUserId(long userId);
 
     void deleteByUserIdIn(Collection<Long> userIds);
+
+    UserAccessToken findByUserIdAndTokenType(
+        long userId,
+        String tokenType
+    );
 }

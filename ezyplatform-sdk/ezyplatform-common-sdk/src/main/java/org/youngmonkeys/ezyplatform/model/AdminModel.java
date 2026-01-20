@@ -18,7 +18,6 @@ package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.AdminStatus;
 
 @Getter
 @Builder
@@ -33,7 +32,7 @@ public class AdminModel implements NamedModel {
     private String url;
     private long avatarImageId;
     private long coverImageId;
-    private AdminStatus status;
+    private String status;
     private long createdAt;
     private long updatedAt;
 }
