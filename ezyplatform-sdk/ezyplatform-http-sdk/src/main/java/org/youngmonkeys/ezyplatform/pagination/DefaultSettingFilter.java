@@ -18,10 +18,9 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import org.youngmonkeys.ezyplatform.entity.DataType;
 
 public class DefaultSettingFilter implements SettingFilter {
-    public final DataType dataType;
+    public final String dataType;
     public final String likeKeyword;
 
     protected DefaultSettingFilter(Builder<?> builder) {
@@ -45,10 +44,10 @@ public class DefaultSettingFilter implements SettingFilter {
     @SuppressWarnings("unchecked")
     public static class Builder<T extends Builder<T>>
         implements EzyBuilder<DefaultSettingFilter> {
-        private DataType dataType;
+        private String dataType;
         private String likeKeyword;
 
-        public T dataType(DataType dataType) {
+        public T dataType(String dataType) {
             this.dataType = dataType;
             return (T) this;
         }

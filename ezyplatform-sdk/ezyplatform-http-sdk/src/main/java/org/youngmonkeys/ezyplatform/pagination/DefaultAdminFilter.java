@@ -18,15 +18,13 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import org.youngmonkeys.ezyplatform.entity.AdminStatus;
-
 import java.util.Collection;
 
 public class DefaultAdminFilter implements AdminFilter {
     public final Collection<Long> ids;
-    public final AdminStatus status;
-    public final Collection<AdminStatus> statuses;
-    public final AdminStatus exclusiveStatus;
+    public final String status;
+    public final Collection<String> statuses;
+    public final String exclusiveStatus;
     public final String uniqueKeyword;
     public final String likeKeyword;
     public final Long roleId;
@@ -163,9 +161,9 @@ public class DefaultAdminFilter implements AdminFilter {
     public static class Builder<T extends Builder<T>>
         implements EzyBuilder<DefaultAdminFilter> {
         private Collection<Long> ids;
-        private AdminStatus status;
-        private Collection<AdminStatus> statuses;
-        private AdminStatus exclusiveStatus;
+        private String status;
+        private Collection<String> statuses;
+        private String exclusiveStatus;
         private String uniqueKeyword;
         private String likeKeyword;
         private Long roleId;
@@ -182,17 +180,17 @@ public class DefaultAdminFilter implements AdminFilter {
             return (T) this;
         }
 
-        public T status(AdminStatus status) {
+        public T status(String status) {
             this.status = status;
             return (T) this;
         }
 
-        public T statuses(Collection<AdminStatus> statuses) {
+        public T statuses(Collection<String> statuses) {
             this.statuses = statuses;
             return (T) this;
         }
 
-        public T exclusiveStatus(AdminStatus exclusiveStatus) {
+        public T exclusiveStatus(String exclusiveStatus) {
             this.exclusiveStatus = exclusiveStatus;
             return (T) this;
         }

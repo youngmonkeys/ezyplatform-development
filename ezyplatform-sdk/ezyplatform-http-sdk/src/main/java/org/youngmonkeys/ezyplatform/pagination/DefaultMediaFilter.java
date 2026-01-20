@@ -18,30 +18,25 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
-import org.youngmonkeys.ezyplatform.entity.MediaStatus;
-import org.youngmonkeys.ezyplatform.entity.MediaType;
-
 import java.util.Collection;
 
 public class DefaultMediaFilter implements MediaFilter {
-    public final MediaType type;
     public final String uploadFrom;
-    public final MediaType mediaType;
-    public final Collection<MediaType> mediaTypes;
+    public final String type;
+    public final Collection<String> types;
     public final Long ownerAdminId;
     public final Long ownerUserId;
     public final String prefixKeyword;
     public final String likeKeyword;
-    public final MediaStatus status;
-    public final Collection<MediaStatus> statuses;
-    public final MediaStatus exclusiveStatus;
+    public final String status;
+    public final Collection<String> statuses;
+    public final String exclusiveStatus;
     public final Boolean publicMedia;
 
     protected DefaultMediaFilter(Builder<?> builder) {
         this.type = builder.type;
         this.uploadFrom = builder.uploadFrom;
-        this.mediaType = builder.mediaType;
-        this.mediaTypes = builder.mediaTypes;
+        this.types = builder.types;
         this.ownerAdminId = builder.ownerAdminId;
         this.ownerUserId = builder.ownerUserId;
         this.prefixKeyword = builder.prefixKeyword;
@@ -55,29 +50,23 @@ public class DefaultMediaFilter implements MediaFilter {
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
-        if (type != null) {
-            answer.and("e.type = :type");
-        }
-        if (uploadFrom != null) {
-            answer.and("e.uploadFrom = :uploadFrom");
-        }
-        if (mediaType != null) {
-            answer.and("e.type = :mediaType");
-        }
-        if (mediaTypes != null) {
-            answer.and("e.type IN :mediaTypes");
-        }
         if (ownerAdminId != null) {
             answer.and("e.ownerAdminId = :ownerAdminId");
         }
         if (ownerUserId != null) {
             answer.and("e.ownerUserId = :ownerUserId");
         }
-        if (prefixKeyword != null) {
-            answer.and("e.originalName LIKE CONCAT(:prefixKeyword,'%')");
+        if (uploadFrom != null) {
+            answer.and("e.uploadFrom = :uploadFrom");
         }
-        if (likeKeyword != null) {
-            answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
+        if (type != null) {
+            answer.and("e.type = :type");
+        }
+        if (types != null) {
+            answer.and("e.type IN :types");
+        }
+        if (publicMedia != null) {
+            answer.and("e.publicMedia = :publicMedia");
         }
         if (status != null) {
             answer.and("e.status = :status");
@@ -88,8 +77,11 @@ public class DefaultMediaFilter implements MediaFilter {
         if (exclusiveStatus != null) {
             answer.and("e.status <> :exclusiveStatus");
         }
-        if (publicMedia != null) {
-            answer.and("e.publicMedia = :publicMedia");
+        if (prefixKeyword != null) {
+            answer.and("e.originalName LIKE CONCAT(:prefixKeyword,'%')");
+        }
+        if (likeKeyword != null) {
+            answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
         }
         return answer.build();
     }
@@ -101,20 +93,19 @@ public class DefaultMediaFilter implements MediaFilter {
     @SuppressWarnings("unchecked")
     public static class Builder<T extends Builder<T>>
         implements EzyBuilder<DefaultMediaFilter> {
-        private MediaType type;
+        private String type;
         private String uploadFrom;
-        private MediaType mediaType;
-        private Collection<MediaType> mediaTypes;
+        private Collection<String> types;
         private Long ownerAdminId;
         private Long ownerUserId;
         private String prefixKeyword;
         private String likeKeyword;
-        private MediaStatus status;
-        private Collection<MediaStatus> statuses;
-        private MediaStatus exclusiveStatus;
+        private String status;
+        private Collection<String> statuses;
+        private String exclusiveStatus;
         private Boolean publicMedia;
 
-        public T type(MediaType type) {
+        public T type(String type) {
             this.type = type;
             return (T) this;
         }
@@ -124,13 +115,8 @@ public class DefaultMediaFilter implements MediaFilter {
             return (T) this;
         }
 
-        public T mediaType(MediaType mediaType) {
-            this.mediaType = mediaType;
-            return (T) this;
-        }
-
-        public T mediaTypes(Collection<MediaType> mediaTypes) {
-            this.mediaTypes = mediaTypes;
+        public T types(Collection<String> types) {
+            this.types = types;
             return (T) this;
         }
 
@@ -154,17 +140,17 @@ public class DefaultMediaFilter implements MediaFilter {
             return (T) this;
         }
 
-        public T status(MediaStatus status) {
+        public T status(String status) {
             this.status = status;
             return (T) this;
         }
 
-        public T statuses(Collection<MediaStatus> statuses) {
+        public T statuses(Collection<String> statuses) {
             this.statuses = statuses;
             return (T) this;
         }
 
-        public T exclusiveStatus(MediaStatus exclusiveStatus) {
+        public T exclusiveStatus(String exclusiveStatus) {
             this.exclusiveStatus = exclusiveStatus;
             return (T) this;
         }
