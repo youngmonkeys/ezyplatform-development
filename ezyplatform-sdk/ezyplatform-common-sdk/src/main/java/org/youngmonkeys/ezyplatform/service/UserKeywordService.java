@@ -19,7 +19,10 @@ package org.youngmonkeys.ezyplatform.service;
 import org.youngmonkeys.ezyplatform.model.AddUserKeywordModel;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_FETCH_ROUND;
 
 public interface UserKeywordService {
 
@@ -50,7 +53,10 @@ public interface UserKeywordService {
         Collection<Long> userIds
     );
 
-    default void addUserKeyword(long userId, String keyword) {
+    default void addUserKeyword(
+        long userId,
+        String keyword
+    ) {
         addUserKeyword(
             AddUserKeywordModel.builder()
                 .userId(userId)
@@ -60,7 +66,29 @@ public interface UserKeywordService {
         );
     }
 
-    void addUserKeyword(AddUserKeywordModel model);
+    void addUserKeyword(
+        AddUserKeywordModel model
+    );
 
-    boolean containsUserKeyword(long userId, String keyword);
+    boolean containsUserKeyword(
+        long userId,
+        String keyword
+    );
+
+    List<Long> getUserIdsByKeywords(
+        Collection<String> keywords,
+        int limit,
+        int maxFetchRound
+    );
+
+    default List<Long> getUserIdsByKeywords(
+        Collection<String> keywords,
+        int limit
+    ) {
+        return getUserIdsByKeywords(
+            keywords,
+            limit,
+            MAX_FETCH_ROUND
+        );
+    }
 }

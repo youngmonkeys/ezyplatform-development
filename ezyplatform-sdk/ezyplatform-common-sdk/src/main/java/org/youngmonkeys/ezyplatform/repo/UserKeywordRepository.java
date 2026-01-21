@@ -17,9 +17,13 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
+import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.UserKeyword;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface UserKeywordRepository
     extends EzyDatabaseRepository<Long, UserKeyword> {
@@ -31,5 +35,17 @@ public interface UserKeywordRepository
     UserKeyword findByUserIdAndKeyword(
         long userId,
         String keyword
+    );
+
+    @EzyQuery(
+        "SELECT e.userId FROM UserKeyword e " +
+        "WHERE e.keyword IN ?0 " +
+        "AND e.userId NOT IN ?1 " +
+        "ORDER BY e.priority DESC, e.id DESC"
+    )
+    List<IdResult> findUserIdsByKeywordInAndUserIdNotInOrderByPriorityDescIdDesc(
+        Collection<String> keywords,
+        Collection<Long> exclusiveUserIds,
+        Next next
     );
 }

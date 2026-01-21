@@ -62,9 +62,10 @@ public class DefaultUserService implements UserService {
 
     public UserAccessTokenModel newUserAccessToken(
         long userId,
+        String tokenType,
         long tokenExpiredTime,
         TimeUnit tokenExpiredTimeUnit,
-        AccessTokenStatus status
+        String status
     ) {
         String token = accessTokenService.generateAccessToken(
             userId
@@ -73,9 +74,10 @@ public class DefaultUserService implements UserService {
             .toUserAccessTokenEntity(
                 userId,
                 token,
+                tokenType,
                 tokenExpiredTime,
                 tokenExpiredTimeUnit,
-                status.toString()
+                status
             );
         accessTokenRepository.save(accessToken);
         return entityToModelConverter.toModel(accessToken);

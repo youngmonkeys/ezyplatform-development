@@ -17,9 +17,13 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
+import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.DataIndex;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface DataIndexRepository
     extends EzyDatabaseRepository<Long, DataIndex> {
@@ -38,5 +42,19 @@ public interface DataIndexRepository
         String dataType,
         long dataId,
         String keyword
+    );
+
+    @EzyQuery(
+        "SELECT e.dataId FROM DataIndex e " +
+        "WHERE e.dataType = ?0 " +
+        "AND e.keyword IN ?1 " +
+        "AND e.dataId NOT IN ?2 " +
+        "ORDER BY e.priority DESC, e.id DESC"
+    )
+    List<IdResult> findDataIdsByDataTypeAndKeywordInAndDataIdNotInOrderByPriorityDescIdDesc(
+        String dataType,
+        Collection<String> keywords,
+        Collection<Long> exclusiveDataIds,
+        Next next
     );
 }

@@ -317,6 +317,7 @@ public class DefaultModelToEntityConverter {
     public UserAccessToken toUserAccessTokenEntity(
         long userId,
         String token,
+        String tokenType,
         long tokenExpiredTimeInDay,
         String status
     ) {
@@ -325,6 +326,7 @@ public class DefaultModelToEntityConverter {
         return toUserAccessTokenEntity(
             userId,
             token,
+            tokenType,
             status,
             now,
             expiredAt
@@ -334,6 +336,7 @@ public class DefaultModelToEntityConverter {
     public UserAccessToken toUserAccessTokenEntity(
         long userId,
         String token,
+        String tokenType,
         long tokenExpiredTime,
         TimeUnit tokenExpiredTimeUnit,
         String status
@@ -345,6 +348,7 @@ public class DefaultModelToEntityConverter {
         return toUserAccessTokenEntity(
             userId,
             token,
+            tokenType,
             status,
             now,
             expiredAt
@@ -354,6 +358,7 @@ public class DefaultModelToEntityConverter {
     public UserAccessToken toUserAccessTokenEntity(
         long userId,
         String token,
+        String tokenType,
         String status,
         LocalDateTime now,
         LocalDateTime expiredAt
@@ -361,6 +366,7 @@ public class DefaultModelToEntityConverter {
         UserAccessToken userAccessToken = new UserAccessToken();
         userAccessToken.setId(token);
         userAccessToken.setUserId(userId);
+        userAccessToken.setTokenType(tokenType);
         userAccessToken.setStatus(status);
         userAccessToken.setCreatedAt(now);
         userAccessToken.setExpiredAt(expiredAt);

@@ -19,7 +19,10 @@ package org.youngmonkeys.ezyplatform.service;
 import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_FETCH_ROUND;
 
 public interface DataIndexService {
 
@@ -80,4 +83,24 @@ public interface DataIndexService {
         long dataId,
         String keyword
     );
+    
+    List<Long> getDataIdsByTypeAndKeywords(
+        String dataType,
+        Collection<String> keywords,
+        int limit,
+        int maxFetchRound
+    );
+
+    default List<Long> getDataIdsByTypeAndKeywords(
+        String dataType,
+        Collection<String> keywords,
+        int limit
+    ) {
+        return getDataIdsByTypeAndKeywords(
+            dataType,
+            keywords,
+            limit,
+            MAX_FETCH_ROUND
+        );
+    }
 }

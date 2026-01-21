@@ -160,12 +160,14 @@ public class DefaultModelToEntityConverterTest {
 
         long userId = RandomUtil.randomLong();
         String accessToken = RandomUtil.randomShortAlphabetString();
+        String tokenType = RandomUtil.randomShortAlphabetString();
         long tokenExpiredTime = RandomUtil.randomSmallInt();
 
         // when
         UserAccessToken actual = sut.toUserAccessTokenEntity(
             userId,
             accessToken,
+            tokenType,
             tokenExpiredTime,
             TimeUnit.MINUTES,
             AccessTokenStatus.ACTIVATED.toString()
@@ -175,6 +177,7 @@ public class DefaultModelToEntityConverterTest {
         UserAccessToken userAccessToken = new UserAccessToken();
         userAccessToken.setId(accessToken);
         userAccessToken.setUserId(userId);
+        userAccessToken.setTokenType(tokenType);
         userAccessToken.setStatus(AccessTokenStatus.ACTIVATED.toString());
         userAccessToken.setCreatedAt(now);
         userAccessToken.setExpiredAt(now.plusSeconds(tokenExpiredTime * 60));
