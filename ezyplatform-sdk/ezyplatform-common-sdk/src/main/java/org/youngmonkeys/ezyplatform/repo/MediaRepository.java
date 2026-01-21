@@ -20,8 +20,25 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.Media;
 import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
+import org.youngmonkeys.ezyplatform.result.TypeResult;
+
+import java.util.List;
 
 public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
+
+    @EzyQuery(
+        "SELECT DISTINCT e.type FROM Media e " +
+            "ORDER BY e.type ASC"
+    )
+    List<TypeResult> findAllMediaTypes();
+
+    @EzyQuery(
+        "SELECT DISTINCT e.status " +
+        "FROM Media e " +
+        "ORDER BY e.status ASC"
+    )
+    List<StatusResult> findAllMediaStatuses();
 
     @EzyQuery(
         "UPDATE Media e SET e.ownerUserId = ?1 WHERE e.id = ?0"

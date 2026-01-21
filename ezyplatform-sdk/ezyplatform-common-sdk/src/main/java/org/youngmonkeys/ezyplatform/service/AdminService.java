@@ -106,6 +106,8 @@ public interface AdminService {
         String usernameOrEmail
     );
 
+    List<String> getAllAdminStatuses();
+
     default long validateAdminAccessToken(
         String accessToken
     ) {

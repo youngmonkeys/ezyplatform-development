@@ -112,6 +112,10 @@ public interface MediaService {
 
     boolean containsMedia(long mediaId);
 
+    List<String> getAllMediaTypes();
+
+    List<String> getAllMediaStatuses();
+
     default List<MediaModel> getMediaListByIds(
         Collection<Long> mediaIds
     ) {

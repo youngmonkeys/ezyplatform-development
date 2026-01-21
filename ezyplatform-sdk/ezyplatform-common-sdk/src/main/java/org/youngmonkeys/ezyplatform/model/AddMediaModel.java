@@ -36,7 +36,7 @@ public class AddMediaModel {
     private final boolean saveDuration;
     private final BigDecimal durationInMinutes;
 
-    protected AddMediaModel(Builder builder) {
+    protected AddMediaModel(AddMediaModelBuilder builder) {
         this.ownerAdminId = builder.ownerAdminId;
         this.ownerUserId = builder.ownerUserId;
         this.url = builder.url;
@@ -50,11 +50,12 @@ public class AddMediaModel {
         this.durationInMinutes = builder.durationInMinutes;
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static AddMediaModelBuilder builder() {
+        return new AddMediaModelBuilder();
     }
 
-    public static class Builder implements EzyBuilder<AddMediaModel> {
+    public static class AddMediaModelBuilder
+        implements EzyBuilder<AddMediaModel> {
         protected long ownerAdminId;
         protected long ownerUserId;
         protected String url;
@@ -67,61 +68,61 @@ public class AddMediaModel {
         protected boolean saveDuration;
         protected BigDecimal durationInMinutes;
 
-        public Builder ownerAdminId(long ownerAdminId) {
+        public AddMediaModelBuilder ownerAdminId(long ownerAdminId) {
             this.ownerAdminId = ownerAdminId;
             return this;
         }
 
-        public Builder ownerUserId(long ownerUserId) {
+        public AddMediaModelBuilder ownerUserId(long ownerUserId) {
             this.ownerUserId = ownerUserId;
             return this;
         }
 
-        public Builder url(String url) {
+        public AddMediaModelBuilder url(String url) {
             this.url = url;
             return this;
         }
 
-        public Builder fileName(String fileName) {
+        public AddMediaModelBuilder fileName(String fileName) {
             this.fileName = fileName;
             return this;
         }
 
-        public Builder originalFileName(String originalFileName) {
+        public AddMediaModelBuilder originalFileName(String originalFileName) {
             this.originalFileName = originalFileName;
             return this;
         }
 
-        public Builder mediaType(String mediaType) {
+        public AddMediaModelBuilder mediaType(String mediaType) {
             this.mediaType = mediaType;
             return this;
         }
 
-        public Builder mediaType(MediaType mediaType) {
+        public AddMediaModelBuilder mediaType(MediaType mediaType) {
             return mediaType(mediaType.toString());
         }
 
-        public Builder mimeType(String mimeType) {
+        public AddMediaModelBuilder mimeType(String mimeType) {
             this.mimeType = mimeType;
             return this;
         }
 
-        public Builder fileSize(long fileSize) {
+        public AddMediaModelBuilder fileSize(long fileSize) {
             this.fileSize = fileSize;
             return this;
         }
 
-        public Builder notPublic(boolean notPublic) {
+        public AddMediaModelBuilder notPublic(boolean notPublic) {
             this.notPublic = notPublic;
             return this;
         }
 
-        public Builder saveDuration(boolean saveDuration) {
+        public AddMediaModelBuilder saveDuration(boolean saveDuration) {
             this.saveDuration = saveDuration;
             return this;
         }
 
-        public Builder durationInMinutes(BigDecimal durationInMinutes) {
+        public AddMediaModelBuilder durationInMinutes(BigDecimal durationInMinutes) {
             this.durationInMinutes = durationInMinutes;
             return this;
         }

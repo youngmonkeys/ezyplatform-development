@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
@@ -30,16 +31,18 @@ import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.*;
 import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
+import org.youngmonkeys.ezyplatform.result.TypeResult;
 
 import java.io.File;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 @AllArgsConstructor
@@ -152,6 +155,7 @@ public class DefaultMediaService implements MediaService {
 
     private void removeMediaEntity(Media entity) {
         if (MediaStatus.REMOVED.equalsValue(entity.getStatus())) {
+            entity.setStatus(DELETED);
             mediaRepository.delete(entity.getId());
         } else {
             entity.setStatus(MediaStatus.REMOVED.toString());
@@ -163,6 +167,26 @@ public class DefaultMediaService implements MediaService {
     @Override
     public boolean containsMedia(long mediaId) {
         return mediaRepository.containsById(mediaId);
+    }
+
+    @Override
+    public List<String> getAllMediaTypes() {
+        return mediaRepository
+            .findAllMediaTypes()
+            .stream()
+            .map(TypeResult::getType)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllMediaStatuses() {
+        return mediaRepository
+            .findAllMediaStatuses()
+            .stream()
+            .map(StatusResult::getStatus)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
     }
 
     @Override

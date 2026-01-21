@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
@@ -30,6 +31,7 @@ import org.youngmonkeys.ezyplatform.repo.AdminRepository;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
@@ -256,6 +258,16 @@ public class DefaultAdminService implements AdminService {
             admin = getAdminByEmail(usernameOrEmail);
         }
         return admin;
+    }
+
+    @Override
+    public List<String> getAllAdminStatuses() {
+        return adminRepository
+            .findAllAdminStatuses()
+            .stream()
+            .map(StatusResult::getStatus)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
     }
 
     @Override

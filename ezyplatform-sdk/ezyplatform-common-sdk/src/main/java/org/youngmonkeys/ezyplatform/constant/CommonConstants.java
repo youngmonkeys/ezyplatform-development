@@ -38,6 +38,7 @@ public final class CommonConstants {
     public static final String NULL_STRING = null;
     public static final String TRUE_STRING = "true";
     public static final String FALSE_STRING = "false";
+    public static final String DELETED = "DELETED";
     public static final String UNKNOWN = "UNKNOWN";
     public static final String UNKNOWN_LOWERCASE = "unknown";
 

@@ -23,11 +23,19 @@ import org.youngmonkeys.ezyplatform.result.AvatarCoverImageIdsResult;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface AdminRepository extends EzyDatabaseRepository<Long, Admin> {
+
+    @EzyQuery(
+        "SELECT DISTINCT e.status " +
+        "FROM Admin e " +
+        "ORDER BY e.status ASC"
+    )
+    List<StatusResult> findAllAdminStatuses();
 
     @EzyQuery(
         "SELECT e.id FROM Admin e " +

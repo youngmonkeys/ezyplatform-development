@@ -36,9 +36,9 @@ import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
-import org.youngmonkeys.ezyplatform.entity.MediaStatus;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
+import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 import org.youngmonkeys.ezyplatform.event.*;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
@@ -74,8 +74,7 @@ import java.util.function.Predicate;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static java.util.Collections.singletonMap;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.model.MediaDetailsModel.fromMediaModel;
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModelBySortOrder;
 import static org.youngmonkeys.ezyplatform.util.Strings.from;
@@ -442,7 +441,7 @@ public class MediaControllerService extends EzyLoggable {
     ) {
         MediaModel media = mediaService.removeMedia(mediaId);
         if (deleteFile
-            && MediaStatus.REMOVED.equalsValue(media.getStatus())
+            && DELETED.equals(media.getStatus())
         ) {
             File file = fileSystemManager.getMediaFilePath(
                 media.getType().getFolder(),
@@ -461,7 +460,7 @@ public class MediaControllerService extends EzyLoggable {
     ) {
         MediaModel media = mediaService.removeMedia(mediaName);
         if (deleteFile
-            && MediaStatus.REMOVED.equalsValue(media.getStatus())
+            && DELETED.equals(media.getStatus())
         ) {
             String containerFolder = media.getType().getFolder();
             File filePath = fileSystemManager.getMediaFilePath(
@@ -472,6 +471,24 @@ public class MediaControllerService extends EzyLoggable {
         }
         eventHandlerManager.handleEvent(
             new MediaRemovedEvent(media)
+        );
+    }
+
+    public long saveMediaFile(
+        MediaType mediaType,
+        String mediaUrl,
+        UploadFrom uploadFrom,
+        long ownerAdminId,
+        long ownerUserId
+    ) {
+        return saveMediaFileFromUrl(
+            uploadFrom.toString(),
+            ownerAdminId,
+            ownerUserId,
+            SaveMediaFileFromUrlModel.builder()
+                .mediaType(mediaType.toString())
+                .mediaUrl(mediaUrl)
+                .build()
         );
     }
 
