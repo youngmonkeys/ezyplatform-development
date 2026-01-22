@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyfox.function.EzyExceptionFunction;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
+import com.tvd12.ezyhttp.core.util.FileSizes;
 import org.youngmonkeys.ezyplatform.entity.DataType;
 import org.youngmonkeys.ezyplatform.util.Uris;
 
@@ -113,9 +114,24 @@ public interface SettingService {
 
     Optional<String> getSettingValue(String settingName);
 
-    long getMaxUploadFileSize();
+    default long getMaxUploadFileSize() {
+        String value = getTextValue(
+            SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE,
+            DEFAULT_MAX_UPLOAD_FILE_SIZE
+        );
+        try {
+            return FileSizes.toByteSize(value);
+        } catch (Exception e) {
+            return FileSizes.toByteSize(DEFAULT_MAX_UPLOAD_FILE_SIZE);
+        }
+    }
 
-    Set<String> getAcceptedMediaMimeTypes();
+    default Set<String> getAcceptedMediaMimeTypes() {
+        return getCachedValue(
+            SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES,
+            DEFAULT_ACCEPTED_IMAGE_TYPES
+        );
+    }
 
     default String encryptValue(String settingValue) {
         throw new EzyNotImplementedException(

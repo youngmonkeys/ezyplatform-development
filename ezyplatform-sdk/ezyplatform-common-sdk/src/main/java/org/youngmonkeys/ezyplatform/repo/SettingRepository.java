@@ -17,13 +17,26 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.Setting;
+import org.youngmonkeys.ezyplatform.result.TypeResult;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface SettingRepository extends EzyDatabaseRepository<Long, Setting> {
 
     void deleteByName(String name);
 
-    Setting findByNameAndUpdatedAtGt(String name, LocalDateTime updatedAt);
+    @EzyQuery(
+        "SELECT DISTINCT e.dataType " +
+        "FROM Setting e " +
+        "ORDER BY e.dataType ASC"
+    )
+    List<TypeResult> findAllDataTypes();
+
+    Setting findByNameAndUpdatedAtGt(
+        String name,
+        LocalDateTime updatedAt
+    );
 }

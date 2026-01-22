@@ -18,7 +18,10 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
+
 import java.util.Collection;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 
 public class DefaultMediaFilter implements MediaFilter {
     public final String uploadFrom;
@@ -98,6 +101,7 @@ public class DefaultMediaFilter implements MediaFilter {
         private Collection<String> types;
         private Long ownerAdminId;
         private Long ownerUserId;
+        private boolean allowSearchByLikeOperator;
         private String prefixKeyword;
         private String likeKeyword;
         private String status;
@@ -127,6 +131,13 @@ public class DefaultMediaFilter implements MediaFilter {
 
         public T ownerUserId(Long ownerUserId) {
             this.ownerUserId = ownerUserId;
+            return (T) this;
+        }
+
+        public T allowSearchByLikeOperator(
+            boolean allowSearchByLikeOperator
+        ) {
+            this.allowSearchByLikeOperator = allowSearchByLikeOperator;
             return (T) this;
         }
 
@@ -162,6 +173,14 @@ public class DefaultMediaFilter implements MediaFilter {
 
         @Override
         public DefaultMediaFilter build() {
+            if (allowSearchByLikeOperator) {
+                prefixKeyword = NULL_STRING;
+            } else {
+                if (likeKeyword != null) {
+                    prefixKeyword = likeKeyword;
+                }
+                likeKeyword = NULL_STRING;
+            }
             return new DefaultMediaFilter(this);
         }
     }

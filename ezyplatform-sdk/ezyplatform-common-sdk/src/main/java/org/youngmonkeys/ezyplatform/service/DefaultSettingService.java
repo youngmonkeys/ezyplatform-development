@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.function.EzyExceptionFunction;
+import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyfox.util.EzyLoggable;
@@ -26,6 +27,7 @@ import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
 import org.youngmonkeys.ezyplatform.entity.Setting;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.repo.SettingRepository;
+import org.youngmonkeys.ezyplatform.result.TypeResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +40,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
@@ -175,6 +178,15 @@ public abstract class DefaultSettingService
         } catch (Exception e) {
             return encryptedSettingValue;
         }
+    }
+
+    public List<String> getAllDataTypes() {
+        return settingRepository
+            .findAllDataTypes()
+            .stream()
+            .map(TypeResult::getType)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
     }
 
     @Override

@@ -113,8 +113,8 @@ public class MediaValidator {
     }
 
     public MediaModel validateUserMedia(
-        long mediaId,
-        long userId
+        long userId,
+        long mediaId
     ) {
         MediaModel media = validateMediaId(mediaId);
         if (media.getOwnerUserId() != userId) {
