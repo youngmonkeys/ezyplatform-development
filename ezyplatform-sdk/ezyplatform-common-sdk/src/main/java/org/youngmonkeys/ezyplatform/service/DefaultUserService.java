@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.util.Next.limit;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.util.StringConverters.trimOrNull;
 
@@ -166,6 +167,15 @@ public class DefaultUserService implements UserService {
             accessToken
         );
         return getUserById(userId);
+    }
+
+    @Override
+    public String getUserStatusById(long userId) {
+        StatusResult result = userRepository
+            .findStatusById(userId);
+        return result != null
+            ? result.getStatus()
+            : NULL_STRING;
     }
 
     @Override

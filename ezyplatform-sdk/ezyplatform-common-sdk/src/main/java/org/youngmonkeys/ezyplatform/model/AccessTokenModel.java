@@ -23,6 +23,7 @@ public interface AccessTokenModel {
     default int getMaxAge() {
         long now = System.currentTimeMillis();
         long accessTokenExpiredAt = getExpiredAtTimestamp();
-        return (int) ((accessTokenExpiredAt - now) / 1000);
+        long age = (accessTokenExpiredAt - now) / 1000;
+        return age > 0 ? (int) age : 0;
     }
 }

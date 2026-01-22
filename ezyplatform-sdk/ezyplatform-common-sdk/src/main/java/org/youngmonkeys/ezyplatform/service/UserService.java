@@ -58,6 +58,8 @@ public interface UserService {
         Set<String> tokenTypes
     );
 
+    String getUserStatusById(long userId);
+
     List<UserModel> getUserListByIds(
         Collection<Long> userIds
     );

@@ -33,6 +33,12 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
     List<StatusResult> findAllUserStatuses();
 
     @EzyQuery(
+        "SELECT e.status FROM User e " +
+            "WHERE e.id = ?0"
+    )
+    StatusResult findStatusById(long userId);
+
+    @EzyQuery(
         "SELECT e.id FROM User e " +
             "WHERE e.username = ?0"
     )
