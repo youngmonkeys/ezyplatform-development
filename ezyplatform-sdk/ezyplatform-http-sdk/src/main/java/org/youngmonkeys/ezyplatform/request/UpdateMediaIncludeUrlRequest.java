@@ -18,14 +18,13 @@ package org.youngmonkeys.ezyplatform.request;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.youngmonkeys.ezyplatform.entity.MediaType;
 
 import java.math.BigDecimal;
 
 @Getter
 @Setter
 public class UpdateMediaIncludeUrlRequest {
-    private MediaType type;
+    private String type;
     private String alternativeText;
     private String title;
     private String caption;

@@ -18,7 +18,6 @@ package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.MediaType;
 
 import java.math.BigDecimal;
 
@@ -28,7 +27,7 @@ public class UpdateMediaModel {
     private long mediaId;
     private String mediaName;
     private boolean updateType;
-    private MediaType type;
+    private String type;
     private String alternativeText;
     private String title;
     private String caption;

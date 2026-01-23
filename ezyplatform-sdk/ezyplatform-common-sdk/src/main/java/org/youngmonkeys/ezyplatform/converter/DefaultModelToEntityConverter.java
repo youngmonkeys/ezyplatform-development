@@ -31,10 +31,10 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
-import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.*;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
-import static org.youngmonkeys.ezyplatform.util.Strings.*;
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigDecimalOrZero;
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @AllArgsConstructor
 @SuppressWarnings("MethodCount")
@@ -514,7 +514,10 @@ public class DefaultModelToEntityConverter {
         Media entity
     ) {
         if (model.isUpdateType()) {
-            entity.setType(from(model.getType()));
+            String type = model.getType();
+            if (isNotBlank(type)) {
+                entity.setType(type);
+            }
         }
         entity.setAlternativeText(model.getAlternativeText());
         entity.setTitle(model.getTitle());
