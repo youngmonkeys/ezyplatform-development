@@ -41,11 +41,6 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
     List<StatusResult> findAllMediaStatuses();
 
     @EzyQuery(
-        "UPDATE Media e SET e.ownerUserId = ?1 WHERE e.id = ?0"
-    )
-    void updateOwnerUserId(long mediaId, long userId);
-
-    @EzyQuery(
         "SELECT e FROM Media e " +
             "WHERE e.name = ?0 OR e.originalName = ?0"
     )

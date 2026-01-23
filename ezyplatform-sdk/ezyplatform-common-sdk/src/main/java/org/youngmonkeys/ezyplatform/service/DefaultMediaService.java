@@ -75,7 +75,7 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public void updateMedia(
+    public MediaModel updateMedia(
         UpdateMediaModel model
     ) {
         long mediaId = model.getMediaId();
@@ -97,6 +97,7 @@ public class DefaultMediaService implements MediaService {
                 model.getDurationInMinutes()
             );
         }
+        return entityToModelConverter.toModel(entity);
     }
 
     @Override
@@ -129,14 +130,28 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public void updateMediaOwner(
+    public void updateMediaOwnerUserIdIfExists(
         long mediaId,
         long ownerUserId
     ) {
-        mediaRepository.updateOwnerUserId(
-            mediaId,
-            ownerUserId
-        );
+        Media entity = mediaRepository.findById(mediaId);
+        if (entity != null) {
+            entity.setOwnerUserId(ownerUserId);
+            modelToEntityConverter.mergeUpdatedAtToEntity(entity);
+            mediaRepository.save(entity);
+        }
+    }
+
+    @Override
+    public MediaModel updateMediaStatus(
+        long mediaId,
+        String status
+    ) {
+        Media entity = getMediaEntityByIdOrThrow(mediaId);
+        entity.setStatus(status);
+        modelToEntityConverter.mergeUpdatedAtToEntity(entity);
+        mediaRepository.save(entity);
+        return entityToModelConverter.toModel(entity);
     }
 
     @Override

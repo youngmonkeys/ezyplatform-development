@@ -40,6 +40,7 @@ public class MediaDetailsModel {
     private String alternativeText;
     private String description;
     private boolean publicMedia;
+    private String status;
     private long createdAt;
     private long updatedAt;
 
@@ -61,6 +62,7 @@ public class MediaDetailsModel {
             .alternativeText(info.getAlternativeText())
             .description(info.getDescription())
             .publicMedia(info.isPublicMedia())
+            .status(info.getStatus())
             .createdAt(info.getCreatedAt())
             .updatedAt(info.getUpdatedAt());
     }

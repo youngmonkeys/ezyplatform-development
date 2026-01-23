@@ -268,6 +268,31 @@ public class MediaControllerService extends EzyLoggable {
         return media;
     }
 
+    private MediaModel saveMediaInformation(
+        String uploadFrom,
+        long ownerAdminId,
+        long ownerUserId,
+        String submittedFileName,
+        String fileName,
+        FileMetadata fileMetadata,
+        long fileSize,
+        boolean notPublic
+    ) {
+        return mediaService.addMedia(
+            uploadFrom,
+            AddMediaModel.builder()
+                .ownerAdminId(ownerAdminId)
+                .ownerUserId(ownerUserId)
+                .fileName(fileName)
+                .originalFileName(submittedFileName)
+                .mediaType(fileMetadata.getMediaType().toString())
+                .mimeType(fileMetadata.getMimeType())
+                .fileSize(fileSize)
+                .notPublic(notPublic)
+                .build()
+        );
+    }
+
     @SuppressWarnings("MethodLength")
     public void replaceMedia(
         HttpServletRequest request,
@@ -327,7 +352,7 @@ public class MediaControllerService extends EzyLoggable {
                 .uploadFrom(uploadFrom)
                 .ownerAdminId(ownerAdminId)
                 .ownerUserId(ownerUserId)
-                .mediaId(mediaId)
+                .media(media)
                 .fileMetadata(fileMetadata)
                 .build()
         );
@@ -366,111 +391,20 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
-    public void updateMedia(
+    private MediaModel replaceMediaInformation(
         long mediaId,
-        UpdateMediaRequest request,
-        Predicate<MediaModel> validMediaCondition
+        String submittedFileName,
+        FileMetadata fileMetadata,
+        long fileSize
     ) {
-        mediaValidator.validate(request);
-        MediaModel media = mediaValidator.validateMediaId(mediaId);
-        if (!validMediaCondition.test(media)) {
-            throw new MediaNotFoundException(mediaId);
-        }
-        request.setFileSize(getMediaFileSize(media));
-        UpdateMediaModel model = requestToModelConverter
-            .toModel(mediaId, request);
-        mediaService.updateMedia(model);
-        eventHandlerManager.handleEvent(
-            new MediaUpdatedEvent(model.getMediaId())
-        );
-    }
-
-    public void updateMedia(
-        long mediaId,
-        UpdateMediaIncludeUrlRequest request,
-        Predicate<MediaModel> validMediaCondition
-    ) {
-        mediaValidator.validate(request);
-        MediaModel media = mediaValidator.validateMediaId(mediaId);
-        if (!validMediaCondition.test(media)) {
-            throw new MediaNotFoundException(mediaId);
-        }
-        request.setFileSize(getMediaFileSize(media));
-        UpdateMediaModel model = requestToModelConverter
-            .toModel(mediaId, request);
-        mediaService.updateMedia(model);
-        eventHandlerManager.handleEvent(
-            new MediaUpdatedEvent(model.getMediaId())
-        );
-    }
-
-    public void updateMedia(
-        String mediaName,
-        UpdateMediaRequest request,
-        Predicate<MediaModel> validMediaCondition
-    ) {
-        mediaValidator.validate(request);
-        MediaModel media = mediaValidator.validateMediaNameAndGet(
-            mediaName
-        );
-        if (!validMediaCondition.test(media)) {
-            throw new MediaNotFoundException(mediaName);
-        }
-        request.setFileSize(getMediaFileSize(media));
-        UpdateMediaModel model = requestToModelConverter
-            .toModel(mediaName, request);
-        mediaService.updateMedia(model);
-        eventHandlerManager.handleEvent(
-            new MediaUpdatedEvent(model.getMediaId())
-        );
-    }
-
-    public long getMediaFileSize(MediaModel media) {
-        String containerFolder = media.getType().getFolder();
-        String fileName = media.getName();
-        File mediaFilePath = fileSystemManager.getMediaFilePath(
-            containerFolder,
-            fileName
-        );
-        return mediaFilePath.length();
-    }
-
-    public void removeMediaById(
-        long mediaId,
-        boolean deleteFile
-    ) {
-        MediaModel media = mediaService.removeMedia(mediaId);
-        if (deleteFile
-            && DELETED.equals(media.getStatus())
-        ) {
-            File file = fileSystemManager.getMediaFilePath(
-                media.getType().getFolder(),
-                media.getName()
-            );
-            FolderProxy.deleteFile(file);
-        }
-        eventHandlerManager.handleEvent(
-            new MediaRemovedEvent(media)
-        );
-    }
-
-    public void removeMediaByName(
-        String mediaName,
-        boolean deleteFile
-    ) {
-        MediaModel media = mediaService.removeMedia(mediaName);
-        if (deleteFile
-            && DELETED.equals(media.getStatus())
-        ) {
-            String containerFolder = media.getType().getFolder();
-            File filePath = fileSystemManager.getMediaFilePath(
-                containerFolder,
-                media.getName()
-            );
-            FolderProxy.deleteFile(filePath);
-        }
-        eventHandlerManager.handleEvent(
-            new MediaRemovedEvent(media)
+        return mediaService.replaceMedia(
+            ReplaceMediaModel.builder()
+                .mediaId(mediaId)
+                .originalFileName(submittedFileName)
+                .mediaType(from(fileMetadata.getMediaType()))
+                .mimeType(fileMetadata.getMimeType())
+                .fileSize(fileSize)
+                .build()
         );
     }
 
@@ -545,6 +479,125 @@ public class MediaControllerService extends EzyLoggable {
             logger.info("can not download media from url: {}", mediaUrl, e);
             return ZERO_LONG;
         }
+    }
+
+    public void updateMedia(
+        long mediaId,
+        UpdateMediaRequest request,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        mediaValidator.validate(request);
+        MediaModel media = mediaValidator.validateMediaId(mediaId);
+        if (!validMediaCondition.test(media)) {
+            throw new MediaNotFoundException(mediaId);
+        }
+        request.setFileSize(getMediaFileSize(media));
+        UpdateMediaModel model = requestToModelConverter
+            .toModel(mediaId, request);
+        MediaModel updatedMedia = mediaService.updateMedia(model);
+        eventHandlerManager.handleEvent(
+            new MediaUpdatedEvent(updatedMedia)
+        );
+    }
+
+    public void updateMedia(
+        long mediaId,
+        UpdateMediaIncludeUrlRequest request,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        mediaValidator.validate(request);
+        MediaModel media = mediaValidator.validateMediaId(mediaId);
+        if (!validMediaCondition.test(media)) {
+            throw new MediaNotFoundException(mediaId);
+        }
+        request.setFileSize(getMediaFileSize(media));
+        UpdateMediaModel model = requestToModelConverter
+            .toModel(mediaId, request);
+        MediaModel updatedMedia = mediaService.updateMedia(model);
+        eventHandlerManager.handleEvent(
+            new MediaUpdatedEvent(updatedMedia)
+        );
+    }
+
+    public void updateMedia(
+        String mediaName,
+        UpdateMediaRequest request,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        mediaValidator.validate(request);
+        MediaModel media = mediaValidator.validateMediaNameAndGet(
+            mediaName
+        );
+        if (!validMediaCondition.test(media)) {
+            throw new MediaNotFoundException(mediaName);
+        }
+        request.setFileSize(getMediaFileSize(media));
+        UpdateMediaModel model = requestToModelConverter
+            .toModel(mediaName, request);
+        MediaModel updatedMedia = mediaService.updateMedia(model);
+        eventHandlerManager.handleEvent(
+            new MediaUpdatedEvent(updatedMedia)
+        );
+    }
+
+    public void updateMediaStatus(
+        long mediaId,
+        String status
+    ) {
+        MediaModel media = mediaService
+            .updateMediaStatus(mediaId, status);
+        eventHandlerManager.handleEvent(
+            new MediaUpdatedEvent(media)
+        );
+    }
+
+    public long getMediaFileSize(MediaModel media) {
+        String containerFolder = media.getType().getFolder();
+        String fileName = media.getName();
+        File mediaFilePath = fileSystemManager.getMediaFilePath(
+            containerFolder,
+            fileName
+        );
+        return mediaFilePath.length();
+    }
+
+    public void removeMediaById(
+        long mediaId,
+        boolean deleteFile
+    ) {
+        MediaModel media = mediaService.removeMedia(mediaId);
+        if (deleteFile
+            && DELETED.equals(media.getStatus())
+        ) {
+            File file = fileSystemManager.getMediaFilePath(
+                media.getType().getFolder(),
+                media.getName()
+            );
+            FolderProxy.deleteFile(file);
+        }
+        eventHandlerManager.handleEvent(
+            new MediaRemovedEvent(media)
+        );
+    }
+
+    public void removeMediaByName(
+        String mediaName,
+        boolean deleteFile
+    ) {
+        MediaModel media = mediaService.removeMedia(mediaName);
+        if (deleteFile
+            && DELETED.equals(media.getStatus())
+        ) {
+            String containerFolder = media.getType().getFolder();
+            File filePath = fileSystemManager.getMediaFilePath(
+                containerFolder,
+                media.getName()
+            );
+            FolderProxy.deleteFile(filePath);
+        }
+        eventHandlerManager.handleEvent(
+            new MediaRemovedEvent(media)
+        );
     }
 
     public void getMediaByName(
@@ -700,47 +753,5 @@ public class MediaControllerService extends EzyLoggable {
             limit
         );
         return pagination.map(modelToResponseConverter::toResponse);
-    }
-
-    private MediaModel saveMediaInformation(
-        String uploadFrom,
-        long ownerAdminId,
-        long ownerUserId,
-        String submittedFileName,
-        String fileName,
-        FileMetadata fileMetadata,
-        long fileSize,
-        boolean notPublic
-    ) {
-        return mediaService.addMedia(
-            uploadFrom,
-            AddMediaModel.builder()
-                .ownerAdminId(ownerAdminId)
-                .ownerUserId(ownerUserId)
-                .fileName(fileName)
-                .originalFileName(submittedFileName)
-                .mediaType(fileMetadata.getMediaType().toString())
-                .mimeType(fileMetadata.getMimeType())
-                .fileSize(fileSize)
-                .notPublic(notPublic)
-                .build()
-        );
-    }
-
-    private MediaModel replaceMediaInformation(
-        long mediaId,
-        String submittedFileName,
-        FileMetadata fileMetadata,
-        long fileSize
-    ) {
-        return mediaService.replaceMedia(
-            ReplaceMediaModel.builder()
-                .mediaId(mediaId)
-                .originalFileName(submittedFileName)
-                .mediaType(from(fileMetadata.getMediaType()))
-                .mimeType(fileMetadata.getMimeType())
-                .fileSize(fileSize)
-                .build()
-        );
     }
 }

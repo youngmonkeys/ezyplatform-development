@@ -52,7 +52,7 @@ public interface MediaService {
         AddMediaModel model
     );
 
-    void updateMedia(
+    MediaModel updateMedia(
         UpdateMediaModel model
     );
 
@@ -60,9 +60,14 @@ public interface MediaService {
         ReplaceMediaModel model
     );
 
-    void updateMediaOwner(
+    void updateMediaOwnerUserIdIfExists(
         long mediaId,
         long ownerUserId
+    );
+
+    MediaModel updateMediaStatus(
+        long mediaId,
+        String status
     );
 
     default void saveMediaDurationInSeconds(

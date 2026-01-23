@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.event;
 import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 @Getter
 @Builder
@@ -26,6 +27,6 @@ public class MediaUploadEvent {
     private String uploadFrom;
     private long ownerAdminId;
     private long ownerUserId;
-    private long mediaId;
+    private MediaModel media;
     private FileMetadata fileMetadata;
 }

@@ -35,6 +35,7 @@ public class HttpModelToResponseConverter extends DefaultModelToResponseConverte
             .alternativeText(model.getAlternativeText())
             .description(model.getDescription())
             .publicMedia(model.isPublicMedia())
+            .status(model.getStatus())
             .createdAt(model.getCreatedAt())
             .updatedAt(model.getUpdatedAt())
             .build();

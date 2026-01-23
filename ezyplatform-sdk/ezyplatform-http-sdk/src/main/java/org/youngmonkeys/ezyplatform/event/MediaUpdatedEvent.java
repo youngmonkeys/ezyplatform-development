@@ -18,9 +18,10 @@ package org.youngmonkeys.ezyplatform.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 @Getter
 @AllArgsConstructor
 public class MediaUpdatedEvent {
-    private long mediaId;
+    private MediaModel media;
 }
