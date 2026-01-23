@@ -143,7 +143,6 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
-    @SuppressWarnings("MethodLength")
     public void addMedia(
         HttpServletRequest request,
         HttpServletResponse response,
@@ -152,6 +151,29 @@ public class MediaControllerService extends EzyLoggable {
         long ownerUserId,
         boolean avatar,
         boolean notPublic
+    ) throws Exception {
+        addMedia(
+            request,
+            response,
+            uploadFrom,
+            ownerAdminId,
+            ownerUserId,
+            avatar,
+            notPublic,
+            settingService.getMaxUploadFileSize()
+        );
+    }
+
+    @SuppressWarnings("MethodLength")
+    public void addMedia(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        String uploadFrom,
+        long ownerAdminId,
+        long ownerUserId,
+        boolean avatar,
+        boolean notPublic,
+        long maxFileSize
     ) throws Exception {
         String mediaUploaderName = settingService
             .getMediaUpDownloaderName();
@@ -216,7 +238,7 @@ public class MediaControllerService extends EzyLoggable {
             asyncContext,
             filePart,
             mediaFilePath,
-            settingService.getMaxUploadFileSize(),
+            maxFileSize,
             () -> {
                 MediaModel model = saveMediaInformation(
                     uploadFrom,
