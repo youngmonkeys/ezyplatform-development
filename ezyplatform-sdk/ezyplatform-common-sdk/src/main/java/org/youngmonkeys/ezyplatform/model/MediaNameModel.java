@@ -37,6 +37,7 @@ public class MediaNameModel {
     private String caption;
     private String alternativeText;
     private String description;
+    private long updatedAt;
 
     public static MediaNameModel fromMediaModel(
         MediaModel model
@@ -54,6 +55,7 @@ public class MediaNameModel {
             .caption(model.getCaption())
             .alternativeText(model.getAlternativeText())
             .description(model.getDescription())
+            .updatedAt(model.getUpdatedAt())
             .build();
     }
 
