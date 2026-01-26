@@ -146,6 +146,9 @@ public class DefaultDataIndexService
                 .collect(Collectors.toList());
             dataIds.addAll(fetchedDataIds);
             exclusiveDataIds = dataIds;
+            if (fetchedDataIds.size() < limit) {
+                break;
+            }
             ++fetchedRound;
         }
         return dataIds.size() <= limit ? dataIds : dataIds.subList(0, limit);

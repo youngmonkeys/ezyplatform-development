@@ -127,6 +127,9 @@ public class DefaultUserKeywordService
                 .collect(Collectors.toList());
             userIds.addAll(fetchedUserIds);
             exclusiveUserIds = userIds;
+            if (fetchedUserIds.size() < limit) {
+                break;
+            }
             ++fetchedRound;
         }
         return userIds.size() <= limit ? userIds : userIds.subList(0, limit);
