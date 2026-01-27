@@ -103,4 +103,24 @@ public interface DataIndexService {
             MAX_FETCH_ROUND
         );
     }
+
+    default List<Long> getDataIdsByTypeAndKeywordPrefix(
+        String dataType,
+        String keywordPrefix,
+        int limit
+    ) {
+        return getDataIdsByTypeAndKeywordPrefix(
+            dataType,
+            keywordPrefix,
+            limit,
+            MAX_FETCH_ROUND
+        );
+    }
+
+    List<Long> getDataIdsByTypeAndKeywordPrefix(
+        String dataType,
+        String keywordPrefix,
+        int limit,
+        int maxFetchRound
+    );
 }

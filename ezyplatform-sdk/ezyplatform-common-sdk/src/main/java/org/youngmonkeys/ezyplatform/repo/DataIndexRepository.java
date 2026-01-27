@@ -57,4 +57,18 @@ public interface DataIndexRepository
         Collection<Long> exclusiveDataIds,
         Next next
     );
+
+    @EzyQuery(
+        "SELECT e.dataId FROM DataIndex e " +
+        "WHERE e.dataType = ?0 " +
+        "AND e.keyword LIKE CONCAT(?0,'%') " +
+        "AND e.dataId NOT IN ?2 " +
+        "ORDER BY e.priority DESC, e.id DESC"
+    )
+    List<IdResult> findDataIdsByDataTypeAndKeywordPrefixAndDataIdNotInOrderByPriorityDescIdDesc(
+        String dataType,
+        String keywordPrefix,
+        Collection<Long> exclusiveDataIds,
+        Next next
+    );
 }

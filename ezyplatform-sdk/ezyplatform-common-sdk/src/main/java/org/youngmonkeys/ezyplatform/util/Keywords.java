@@ -23,12 +23,14 @@ import static com.tvd12.ezyfox.io.EzyStrings.*;
 
 public final class Keywords {
 
-    public static final int DEFAULT_MAX_KEYWORD_LENGTH = 300;
+    public static final int DEFAULT_MAX_KEYWORD_LENGTH = 30;
 
     private Keywords() {}
 
-    public static List<String> toKeywords(String str) {
-        return toKeywords(str, false);
+    public static List<String> toKeywords(
+        String str
+    ) {
+        return toKeywords(str, Boolean.FALSE);
     }
 
     public static List<String> toKeywords(
@@ -72,18 +74,30 @@ public final class Keywords {
             }
             while (longKeywordLength > maxKeywordLength) {
                 String firstWord = longKeyword.poll();
-                longKeywordLength -= Objects.requireNonNull(firstWord).length();
+                if (firstWord == null) {
+                    break;
+                }
+                longKeywordLength -= firstWord.length();
                 longKeywordLength -= 1;
             }
             String wordTrimLowerCase = wordTrim.toLowerCase();
             wordTrims.add(wordTrimLowerCase);
-            if (wordTrimLowerCase.length() > 2) {
+            int wordTrimLowerCaseLength = wordTrimLowerCase.length();
+            for (int i = 1; i < wordTrimLowerCaseLength - 2; ++i) {
+                wordTrims.add(
+                    wordTrimLowerCase.substring(
+                        i,
+                        wordTrimLowerCaseLength
+                    )
+                );
+            }
+            if (wordTrimLowerCaseLength > 2) {
                 word2s.add(wordTrimLowerCase.substring(0, 2));
             }
-            if (wordTrimLowerCase.length() > 3) {
+            if (wordTrimLowerCaseLength > 3) {
                 word3s.add(wordTrimLowerCase.substring(0, 3));
             }
-            String longKeywordString = String.join(" ", longKeyword);
+            String longKeywordString = String.join(SPACE, longKeyword);
             longKeywords.add(longKeywordString.toLowerCase());
         }
         List<String> answer = new ArrayList<>();

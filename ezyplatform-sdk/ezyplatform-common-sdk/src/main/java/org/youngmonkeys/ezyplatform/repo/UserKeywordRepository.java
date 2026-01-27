@@ -48,4 +48,16 @@ public interface UserKeywordRepository
         Collection<Long> exclusiveUserIds,
         Next next
     );
+
+    @EzyQuery(
+        "SELECT e.userId FROM UserKeyword e " +
+        "WHERE e.keyword LIKE CONCAT(?0,'%') " +
+        "AND e.userId NOT IN ?1 " +
+        "ORDER BY e.priority DESC, e.id DESC"
+    )
+    List<IdResult> findUserIdsByKeywordPrefixAndUserIdNotInOrderByPriorityDescIdDesc(
+        String keywordPrefix,
+        Collection<Long> exclusiveUserIds,
+        Next next
+    );
 }

@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
@@ -118,6 +119,39 @@ public class DefaultUserKeywordService
             List<Long> fetchedUserIds = userKeywordRepository
                 .findUserIdsByKeywordInAndUserIdNotInOrderByPriorityDescIdDesc(
                     keywords,
+                    exclusiveUserIds,
+                    Next.limit(limit)
+                )
+                .stream()
+                .map(IdResult::getId)
+                .distinct()
+                .collect(Collectors.toList());
+            userIds.addAll(fetchedUserIds);
+            exclusiveUserIds = userIds;
+            if (fetchedUserIds.size() < limit) {
+                break;
+            }
+            ++fetchedRound;
+        }
+        return userIds.size() <= limit ? userIds : userIds.subList(0, limit);
+    }
+
+    @Override
+    public List<Long> getUserIdsByKeywordPrefix(
+        String keywordPrefix,
+        int limit,
+        int maxFetchRound
+    ) {
+        if (isBlank(keywordPrefix)) {
+            return Collections.emptyList();
+        }
+        List<Long> exclusiveUserIds = Collections.singletonList(ZERO_LONG);
+        List<Long> userIds = new ArrayList<>();
+        int fetchedRound = ZERO;
+        while (fetchedRound < maxFetchRound && userIds.size() < limit) {
+            List<Long> fetchedUserIds = userKeywordRepository
+                .findUserIdsByKeywordPrefixAndUserIdNotInOrderByPriorityDescIdDesc(
+                    keywordPrefix,
                     exclusiveUserIds,
                     Next.limit(limit)
                 )

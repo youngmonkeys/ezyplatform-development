@@ -91,4 +91,21 @@ public interface UserKeywordService {
             MAX_FETCH_ROUND
         );
     }
+
+    List<Long> getUserIdsByKeywordPrefix(
+        String keywordPrefix,
+        int limit,
+        int maxFetchRound
+    );
+
+    default List<Long> getUserIdsByKeywordPrefix(
+        String keywordPrefix,
+        int limit
+    ) {
+        return getUserIdsByKeywordPrefix(
+            keywordPrefix,
+            limit,
+            MAX_FETCH_ROUND
+        );
+    }
 }

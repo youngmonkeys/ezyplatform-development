@@ -31,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
@@ -137,6 +138,41 @@ public class DefaultDataIndexService
                 .findDataIdsByDataTypeAndKeywordInAndDataIdNotInOrderByPriorityDescIdDesc(
                     dataType,
                     keywords,
+                    exclusiveDataIds,
+                    Next.limit(limit)
+                )
+                .stream()
+                .map(IdResult::getId)
+                .distinct()
+                .collect(Collectors.toList());
+            dataIds.addAll(fetchedDataIds);
+            exclusiveDataIds = dataIds;
+            if (fetchedDataIds.size() < limit) {
+                break;
+            }
+            ++fetchedRound;
+        }
+        return dataIds.size() <= limit ? dataIds : dataIds.subList(0, limit);
+    }
+
+    @Override
+    public List<Long> getDataIdsByTypeAndKeywordPrefix(
+        String dataType,
+        String keywordPrefix,
+        int limit,
+        int maxFetchRound
+    ) {
+        if (isBlank(keywordPrefix)) {
+            return Collections.emptyList();
+        }
+        List<Long> exclusiveDataIds = Collections.singletonList(ZERO_LONG);
+        List<Long> dataIds = new ArrayList<>();
+        int fetchedRound = ZERO;
+        while (fetchedRound < maxFetchRound && dataIds.size() < limit) {
+            List<Long> fetchedDataIds = dataIndexRepository
+                .findDataIdsByDataTypeAndKeywordPrefixAndDataIdNotInOrderByPriorityDescIdDesc(
+                    dataType,
+                    keywordPrefix,
                     exclusiveDataIds,
                     Next.limit(limit)
                 )

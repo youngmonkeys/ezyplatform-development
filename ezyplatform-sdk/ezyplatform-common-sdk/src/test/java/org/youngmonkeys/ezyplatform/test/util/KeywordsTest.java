@@ -39,8 +39,13 @@ public class KeywordsTest {
             "lucky wheel game",
             "lucky wheel",
             "lucky",
+            "ucky",
+            "cky",
             "wheel",
+            "heel",
+            "eel",
             "game",
+            "ame",
             "luc",
             "whe",
             "gam",
@@ -48,6 +53,82 @@ public class KeywordsTest {
             "wh",
             "ga"
         );
+
+        Asserts.assertEquals(actual, expectation);
+    }
+
+    @Test
+    public void toKeywords2Test() {
+        // given
+        String str = "EzyArticle";
+
+        // when
+        List<String> actual = Keywords.toKeywords(str);
+
+        // then
+        List<String> expectation = Lists.newArrayList(
+            "ezyarticle",
+            "zyarticle",
+            "yarticle",
+            "article",
+            "rticle",
+            "ticle",
+            "icle",
+            "cle",
+            "ezy",
+            "ez"
+        );
+
+        Asserts.assertEquals(actual, expectation);
+    }
+
+    @Test
+    public void toKeywords3Test() {
+        // given
+        String str = "我喜欢学习人工智能";
+
+        // when
+        List<String> actual = Keywords.toKeywords(str);
+
+        // then
+        List<String> expectation = Lists.newArrayList(
+            "我喜欢学习人工智能",
+            "喜欢学习人工智能",
+            "欢学习人工智能",
+            "学习人工智能",
+            "习人工智能",
+            "人工智能",
+            "工智能",
+            "我喜欢",
+            "我喜"
+        );
+
+        Asserts.assertEquals(actual, expectation);
+    }
+
+    @Test
+    public void toKeywords4Test() {
+        // given
+        String str = "0123456789 0123456789 0123456789 0123456789";
+
+        // when
+        List<String> actual = Keywords.toKeywords(str);
+
+        // then
+        List<String> expectation = Lists.newArrayList(
+            "0123456789 0123456789",
+            "0123456789",
+            "123456789",
+            "23456789",
+            "3456789",
+            "456789",
+            "56789",
+            "6789",
+            "789",
+            "012",
+            "01"
+        );
+
         Asserts.assertEquals(actual, expectation);
     }
 
@@ -81,8 +162,13 @@ public class KeywordsTest {
             "wheel game",
             "lucky wheel",
             "lucky",
+            "ucky",
+            "cky",
             "wheel",
+            "heel",
+            "eel",
             "game",
+            "ame",
             "luc",
             "whe",
             "gam",
@@ -90,6 +176,7 @@ public class KeywordsTest {
             "wh",
             "ga"
         );
+
         Asserts.assertEquals(actual, expectation);
     }
 
