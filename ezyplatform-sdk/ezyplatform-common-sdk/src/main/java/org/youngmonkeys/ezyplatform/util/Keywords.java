@@ -44,6 +44,7 @@ public final class Keywords {
         );
     }
 
+    @SuppressWarnings("MethodLength")
     public static List<String> toKeywords(
         String str,
         boolean nullIfBlank,
