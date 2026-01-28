@@ -23,6 +23,7 @@ public final class Maps {
 
     private Maps() {}
 
+    @SafeVarargs
     public static <K, V> Map<K, V> merge(
         Map<K, V>... maps
     ) {
