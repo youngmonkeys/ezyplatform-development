@@ -17,7 +17,6 @@
 package org.youngmonkeys.ezyplatform.controller.service;
 
 import lombok.AllArgsConstructor;
-import org.youngmonkeys.ezyplatform.model.KeywordsModel;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
 import org.youngmonkeys.ezyplatform.pagination.DefaultUserFilter;
@@ -27,6 +26,7 @@ import org.youngmonkeys.ezyplatform.service.PaginationUserService;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModelBySortOrder;
+import static org.youngmonkeys.ezyplatform.util.Keywords.toKeywords;
 import static org.youngmonkeys.ezyplatform.util.StringConverters.trimOrNull;
 
 @AllArgsConstructor
@@ -56,6 +56,7 @@ public class UserControllerService {
         );
     }
 
+    @SuppressWarnings("MethodLength")
     public PaginationModel<UserModel> getUserPagination(
         String keyword,
         boolean allowSearchUserByLikeOperator,
@@ -94,18 +95,48 @@ public class UserControllerService {
                 lastPage,
                 limit
             );
-            if (pagination.getCount() == ZERO) {
-                KeywordsModel keywords = KeywordsModel.extract(
-                    keyword,
-                    allowSearchUserByLikeOperator
-                );
+            if (pagination.getCount() == ZERO
+                && allowSearchUserByLikeOperator
+            ) {
                 pagination = getPaginationModelBySortOrder(
                     paginationUserService,
                     userPaginationParameterConverter,
                     filterBuilder
                         .uniqueKeyword(NULL_STRING)
-                        .likeKeyword(keywords.getLikeKeyword())
-                        .keywords(keywords.getKeywords())
+                        .likeKeyword(nullableKeyword)
+                        .build(),
+                    sortOrder,
+                    nextPageToken,
+                    prevPageToken,
+                    lastPage,
+                    limit
+                );
+            }
+            if (pagination.getCount() == ZERO) {
+                pagination = getPaginationModelBySortOrder(
+                    paginationUserService,
+                    userPaginationParameterConverter,
+                    filterBuilder
+                        .uniqueKeyword(NULL_STRING)
+                        .likeKeyword(NULL_STRING)
+                        .keywordPrefix(nullableKeyword)
+                        .build(),
+                    sortOrder,
+                    nextPageToken,
+                    prevPageToken,
+                    lastPage,
+                    limit
+                );
+            }
+            if (pagination.getCount() == ZERO) {
+                pagination = getPaginationModelBySortOrder(
+                    paginationUserService,
+                    userPaginationParameterConverter,
+                    filterBuilder
+                        .uniqueKeyword(NULL_STRING)
+                        .likeKeyword(NULL_STRING)
+                        .keywordPrefix(NULL_STRING)
+                        .keywords(toKeywords(nullableKeyword, Boolean.TRUE))
                         .build(),
                     sortOrder,
                     nextPageToken,

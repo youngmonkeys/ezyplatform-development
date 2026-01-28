@@ -26,6 +26,7 @@ public class DefaultUserFilter implements UserFilter {
     public final Collection<String> statuses;
     public final String uniqueKeyword;
     public final String likeKeyword;
+    public final String keywordPrefix;
     public final Collection<String> keywords;
     public final Long roleId;
     public final Collection<Long> roleIds;
@@ -41,6 +42,7 @@ public class DefaultUserFilter implements UserFilter {
         this.statuses = builder.statuses;
         this.uniqueKeyword = builder.uniqueKeyword;
         this.likeKeyword = builder.likeKeyword;
+        this.keywordPrefix = builder.keywordPrefix;
         this.keywords = builder.keywords;
         this.roleId = builder.roleId;
         this.roleIds = builder.roleIds;
@@ -56,7 +58,7 @@ public class DefaultUserFilter implements UserFilter {
     public void decorateQueryStringBeforeWhere(
         StringBuilder queryString
     ) {
-        if (keywords != null) {
+        if (keywordPrefix != null || keywords != null) {
             queryString.append(" INNER JOIN UserKeyword k ON e.id = k.userId");
         }
         if (roleId != null
@@ -107,9 +109,6 @@ public class DefaultUserFilter implements UserFilter {
         if (statuses != null) {
             answer.and("e.status in :statuses");
         }
-        if (keywords != null) {
-            answer.and("k.keyword IN :keywords");
-        }
         if (roleId != null) {
             answer.and("l.roleId = :roleId");
         }
@@ -141,6 +140,12 @@ public class DefaultUserFilter implements UserFilter {
                     .build()
             );
         }
+        if (keywordPrefix != null) {
+            answer.and("k.keyword LIKE CONCAT(:keywordPrefix,'%')");
+        }
+        if (keywords != null) {
+            answer.and("k.keyword IN :keywords");
+        }
         if (likeKeyword != null) {
             answer.and(
                 new EzyQueryConditionBuilder()
@@ -164,6 +169,7 @@ public class DefaultUserFilter implements UserFilter {
         private Collection<String> statuses;
         private String uniqueKeyword;
         private String likeKeyword;
+        private String keywordPrefix;
         private Collection<String> keywords;
         private Long roleId;
         private Collection<Long> roleIds;
@@ -191,6 +197,11 @@ public class DefaultUserFilter implements UserFilter {
 
         public T likeKeyword(String likeKeyword) {
             this.likeKeyword = likeKeyword;
+            return (T) this;
+        }
+
+        public T keywordPrefix(String keywordPrefix) {
+            this.keywordPrefix = keywordPrefix;
             return (T) this;
         }
 

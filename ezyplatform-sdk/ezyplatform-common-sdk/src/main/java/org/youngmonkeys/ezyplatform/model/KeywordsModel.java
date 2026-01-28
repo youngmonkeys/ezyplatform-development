@@ -38,7 +38,7 @@ public class KeywordsModel {
         if (byLikeOperator) {
             likeKeyword = value;
         } else {
-            keywords = toKeywords(value, true);
+            keywords = toKeywords(value, Boolean.TRUE);
         }
         return KeywordsModel.builder()
             .likeKeyword(likeKeyword)
