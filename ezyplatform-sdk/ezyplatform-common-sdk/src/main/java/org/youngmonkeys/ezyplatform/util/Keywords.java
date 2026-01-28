@@ -111,6 +111,23 @@ public final class Keywords {
         return answer.stream().distinct().collect(Collectors.toList());
     }
 
+    public static List<String> keywordsFromEmail(
+        String email
+    ) {
+        if (isBlank(email)) {
+            return Collections.emptyList();
+        }
+        List<String> keywords = new ArrayList<>();
+        String emailKeyword = email;
+        int maxLength = DEFAULT_MAX_KEYWORD_LENGTH;
+        if (email.length() > maxLength) {
+            emailKeyword = email.substring(0, maxLength);
+        }
+        keywords.add(emailKeyword);
+        keywords.addAll(toKeywords(keywordFromEmail(email)));
+        return keywords;
+    }
+
     public static String keywordFromEmail(String email) {
         int atIndex = email.indexOf("@");
         return atIndex < 1

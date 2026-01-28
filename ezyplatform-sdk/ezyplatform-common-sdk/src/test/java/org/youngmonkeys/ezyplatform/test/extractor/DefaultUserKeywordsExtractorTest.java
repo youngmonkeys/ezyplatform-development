@@ -43,16 +43,31 @@ public class DefaultUserKeywordsExtractorTest {
 
         // then
         Set<String> expectation = Sets.newHashSet(
-            "10",
+            "12345678",
+            "2345678",
+            "345678",
+            "45678",
+            "5678",
+            "678",
+            "123",
+            "12",
             "tvd12",
-            "dung",
+            "vd12",
+            "d12",
+            "tvd",
+            "tv",
+            "ta van dung",
+            "ta van",
             "ta",
             "van",
             "dung",
-            "ta van",
-            "ta van dung",
-            "12345678"
+            "ung",
+            "dun",
+            "va",
+            "du",
+            "dung@youngmonkeys.org",
+            "10"
         );
-        Asserts.assertNotEquals(actual, expectation);
+        Asserts.assertEquals(actual, expectation, false);
     }
 }

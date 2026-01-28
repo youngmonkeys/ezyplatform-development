@@ -28,7 +28,7 @@ import java.util.List;
 public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
-        "SELECT DISTINCT e.status as status FROM User e"
+        "SELECT DISTINCT e.status FROM User e"
     )
     List<StatusResult> findAllUserStatuses();
 
@@ -73,7 +73,7 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT e.id, e.uuid FROM User e " +
-            "WHERE e.uuid in ?0"
+            "WHERE e.uuid IN ?0"
     )
     List<IdUuidResult> findUserIdsByUuids(Collection<String> uuids);
 
@@ -85,13 +85,13 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT e.id, e.username, e.displayName " +
-            "FROM User e WHERE e.id in ?0"
+            "FROM User e WHERE e.id IN ?0"
     )
     List<IdNameResult> findUserIdAndNameByIds(Collection<Long> ids);
 
     @EzyQuery(
         "SELECT e.id, e.username, e.displayName " +
-            "FROM User e WHERE e.username in ?0"
+            "FROM User e WHERE e.username IN ?0"
     )
     List<IdNameResult> findUserIdAndNameByUsernames(
         Collection<String> usernames
@@ -107,7 +107,7 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
     @EzyQuery(
         "SELECT e.id, e.uuid, e.displayName " +
             "FROM User e " +
-            "WHERE e.id in ?0"
+            "WHERE e.id IN ?0"
     )
     List<IdUuidNameResult> findUserUuidNamesByIds(
         Collection<Long> ids
@@ -130,9 +130,9 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT " +
-            "DISTINCT(e.id) as id, " +
-            "e.username as username, " +
-            "e.displayName as displayName " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
             "FROM User e " +
             "WHERE e.phone = ?0 " +
             "OR e.email = ?0 " +
@@ -146,9 +146,9 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT " +
-            "DISTINCT(e.id) as id, " +
-            "e.username as username, " +
-            "e.displayName as displayName " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
             "FROM User e " +
             "WHERE e.phone IN ?0 " +
             "OR e.email IN ?0 " +
@@ -162,9 +162,9 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT " +
-            "DISTINCT(e.id) as id, " +
-            "e.username as username, " +
-            "e.displayName as displayName " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
             "FROM User e " +
             "WHERE e.phone LIKE CONCAT('%',?0,'%') " +
             "OR e.email LIKE CONCAT('%',?0,'%') " +
@@ -178,12 +178,12 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT " +
-            "DISTINCT(e.id) as id, " +
-            "e.username as username, " +
-            "e.displayName as displayName " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
             "FROM User e " +
             "INNER JOIN UserKeyword k ON e.id = k.userId " +
-            "WHERE k.keyword in ?0"
+            "WHERE k.keyword IN ?0"
     )
     List<IdNameResult> findUsernameByKeywords(
         Collection<String> keywords,
@@ -192,12 +192,26 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT " +
-            "DISTINCT(e.id) as id, " +
-            "e.username as username, " +
-            "e.displayName as displayName " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
+            "FROM User e " +
+            "INNER JOIN UserKeyword k ON e.id = k.userId " +
+            "WHERE k.keyword LIKE CONCAT(?0,'%')"
+    )
+    List<IdNameResult> findUsernameByKeywordPrefix(
+        String keywordPrefix,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
             "FROM User e " +
             "INNER JOIN UserRole a ON e.id = a.userId " +
-            "WHERE a.roleId in ?0 AND (" +
+            "WHERE a.roleId IN ?0 AND (" +
             "e.phone LIKE CONCAT('%',?1,'%') " +
             "OR e.email LIKE CONCAT('%',?1,'%') " +
             "OR e.displayName LIKE CONCAT('%',?1,'%') " +
@@ -212,13 +226,13 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT " +
-            "DISTINCT(e.id) as id, " +
-            "e.username as username, " +
-            "e.displayName as displayName " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
             "FROM User e " +
             "INNER JOIN UserRole a ON e.id = a.userId " +
             "INNER JOIN UserKeyword b ON e.id = b.userId " +
-            "WHERE a.roleId in ?0 AND b.keyword in ?1"
+            "WHERE a.roleId IN ?0 AND b.keyword IN ?1"
     )
     List<IdNameResult> findUsernameByKeywordsAndRoleIds(
         Collection<Long> roleIds,
@@ -228,14 +242,30 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT " +
-            "DISTINCT(e.id) as id, " +
-            "e.username as username, " +
-            "e.displayName as displayName " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
+            "FROM User e " +
+            "INNER JOIN UserRole a ON e.id = a.userId " +
+            "INNER JOIN UserKeyword b ON e.id = b.userId " +
+            "WHERE a.roleId IN ?0 AND b.keyword LIKE CONCAT(?1,'%')"
+    )
+    List<IdNameResult> findUsernameByKeywordPrefixAndRoleIds(
+        Collection<Long> roleIds,
+        String keywordPrefix,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
             "FROM User e " +
             "INNER JOIN UserRole a ON e.id = a.userId " +
             "INNER JOIN UserRoleName b ON b.id = a.roleId " +
             "INNER JOIN UserKeyword c ON e.id = c.userId " +
-            "WHERE b.name in ?0 AND (" +
+            "WHERE b.name IN ?0 AND (" +
             "e.phone LIKE CONCAT('%',?1,'%') " +
             "OR e.email LIKE CONCAT('%',?1,'%') " +
             "OR e.displayName LIKE CONCAT('%',?1,'%') " +
@@ -250,18 +280,35 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT " +
-            "DISTINCT(e.id) as id, " +
-            "e.username as username, " +
-            "e.displayName as displayName " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
             "FROM User e " +
             "INNER JOIN UserRole a ON e.id = a.userId " +
             "INNER JOIN UserRoleName b ON b.id = a.roleId " +
             "INNER JOIN UserKeyword c ON e.id = c.userId " +
-            "WHERE b.name in ?0 AND c.keyword in ?1"
+            "WHERE b.name IN ?0 AND c.keyword IN ?1"
     )
     List<IdNameResult> findUsernameByKeywordsAndRoleNames(
         Collection<String> roleNames,
         Collection<String> keywords,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT " +
+            "DISTINCT(e.id), " +
+            "e.username, " +
+            "e.displayName " +
+            "FROM User e " +
+            "INNER JOIN UserRole a ON e.id = a.userId " +
+            "INNER JOIN UserRoleName b ON b.id = a.roleId " +
+            "INNER JOIN UserKeyword c ON e.id = c.userId " +
+            "WHERE b.name IN ?0 AND c.keyword LIKE CONCAT(?1,'%')"
+    )
+    List<IdNameResult> findUsernameByKeywordPrefixAndRoleNames(
+        Collection<String> roleNames,
+        String keywordPrefix,
         Next next
     );
 

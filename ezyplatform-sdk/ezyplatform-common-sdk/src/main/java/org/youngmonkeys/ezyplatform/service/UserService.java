@@ -237,6 +237,11 @@ public interface UserService {
         int limit
     );
 
+    List<UserNameModel> simpleSearchWithKeywordPrefix(
+        String keywordPrefix,
+        int limit
+    );
+
     List<UserNameModel> simpleSearchWithRoleIds(
         Collection<Long> roleIds,
         String keyword,
@@ -249,6 +254,12 @@ public interface UserService {
         int limit
     );
 
+    List<UserNameModel> simpleSearchWithRoleIdsAndKeywordPrefix(
+        Collection<Long> roleIds,
+        String keywordKeyword,
+        int limit
+    );
+
     List<UserNameModel> simpleSearchWithRoleNames(
         Collection<String> roleNames,
         String keyword,
@@ -258,6 +269,12 @@ public interface UserService {
     List<UserNameModel> simpleSearchWithRoleNames(
         Collection<String> roleNames,
         Collection<String> keywords,
+        int limit
+    );
+
+    List<UserNameModel> simpleSearchWithRoleNamesAndKeywordPrefix(
+        Collection<String> roleNames,
+        String keywordPrefix,
         int limit
     );
 

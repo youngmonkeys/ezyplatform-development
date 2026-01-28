@@ -513,6 +513,22 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public List<UserNameModel> simpleSearchWithKeywordPrefix(
+        String keywordPrefix,
+        int limit
+    ) {
+        List<IdNameResult> results = userRepository
+            .findUsernameByKeywordPrefix(
+                keywordPrefix,
+                limit(limit)
+            );
+        return newArrayList(
+            results,
+            resultToModelConverter::toUserNameModel
+        );
+    }
+
+    @Override
     public List<UserNameModel> simpleSearchWithRoleIds(
         Collection<Long> roleIds,
         String keyword,
@@ -545,6 +561,22 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
+    public List<UserNameModel> simpleSearchWithRoleIdsAndKeywordPrefix(
+        Collection<Long> roleIds,
+        String keywordPrefix,
+        int limit
+    ) {
+        return newArrayList(
+            userRepository.findUsernameByKeywordPrefixAndRoleIds(
+                roleIds,
+                keywordPrefix,
+                limit(limit)
+            ),
+            resultToModelConverter::toUserNameModel
+        );
+    }
+
+    @Override
     public List<UserNameModel> simpleSearchWithRoleNames(
         Collection<String> roleNames,
         String keyword,
@@ -570,6 +602,22 @@ public class DefaultUserService implements UserService {
             userRepository.findUsernameByKeywordsAndRoleNames(
                 roleNames,
                 keywords,
+                limit(limit)
+            ),
+            resultToModelConverter::toUserNameModel
+        );
+    }
+
+    @Override
+    public List<UserNameModel> simpleSearchWithRoleNamesAndKeywordPrefix(
+        Collection<String> roleNames,
+        String keywordPrefix,
+        int limit
+    ) {
+        return newArrayList(
+            userRepository.findUsernameByKeywordPrefixAndRoleNames(
+                roleNames,
+                keywordPrefix,
                 limit(limit)
             ),
             resultToModelConverter::toUserNameModel

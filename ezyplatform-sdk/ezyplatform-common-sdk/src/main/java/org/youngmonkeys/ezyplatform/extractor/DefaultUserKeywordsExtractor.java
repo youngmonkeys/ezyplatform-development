@@ -18,31 +18,30 @@ package org.youngmonkeys.ezyplatform.extractor;
 
 import org.youngmonkeys.ezyplatform.entity.User;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
-import static org.youngmonkeys.ezyplatform.util.Keywords.keywordFromEmail;
+import static org.youngmonkeys.ezyplatform.util.Keywords.keywordsFromEmail;
 import static org.youngmonkeys.ezyplatform.util.Keywords.toKeywords;
 
 public class DefaultUserKeywordsExtractor implements UserKeywordsExtractor {
 
     @Override
     public Set<String> extract(User user) {
-        Set<String> answer = new HashSet<>();
-        if (isNotBlank(user.getPhone())) {
-            answer.add(user.getPhone());
+        Set<String> answer = new LinkedHashSet<>();
+        String phone = user.getPhone();
+        if (isNotBlank(phone)) {
+            answer.addAll(toKeywords(phone));
         }
-        answer.add(user.getUsername());
-        if (isNotBlank(user.getDisplayName())) {
-            answer.addAll(toKeywords(user.getDisplayName()));
+        answer.addAll(toKeywords(user.getUsername()));
+        String displayName = user.getDisplayName();
+        if (isNotBlank(displayName)) {
+            answer.addAll(toKeywords(displayName));
         }
-        if (isNotBlank(user.getEmail())) {
-            answer.add(user.getEmail());
-            String keyword = keywordFromEmail(user.getEmail());
-            if (isNotBlank(keyword)) {
-                answer.add(keyword);
-            }
+        String email = user.getEmail();
+        if (isNotBlank(email)) {
+            answer.addAll(keywordsFromEmail(email));
         }
         answer.add(String.valueOf(user.getId()));
         return answer;
