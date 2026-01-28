@@ -26,6 +26,16 @@ public interface DataRecordCountRepository
     extends EzyDatabaseRepository<String, DataRecordCount> {
 
     @EzyQuery(
+        "UPDATE DataRecordCount e " +
+            "SET e.recordCount = e.recordCount + ?1 " +
+            "WHERE e.dataType = ?0"
+    )
+    void updateRecordCountByDataType(
+        String dataType,
+        long value
+    );
+
+    @EzyQuery(
         "SELECT e.lastRecordId FROM DataRecordCount e " +
             "WHERE e.dataType = ?0"
     )

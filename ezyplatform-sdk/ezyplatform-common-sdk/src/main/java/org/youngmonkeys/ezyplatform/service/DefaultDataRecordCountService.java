@@ -20,20 +20,21 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
 import org.youngmonkeys.ezyplatform.repo.DataRecordCountRepository;
-import org.youngmonkeys.ezyplatform.repo.DataRecordCountTransactionalRepository;
 import org.youngmonkeys.ezyplatform.result.CountResult;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 public class DefaultDataRecordCountService
     implements DataRecordCountService {
 
     private final DataRecordCountRepository dataRecordCountRepository;
-    private final DataRecordCountTransactionalRepository
-        dataRecordCountTransactionalRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
     @Override
-    public void createDataRecordCountIfNotExists(String dataType) {
+    public void createDataRecordCountIfNotExists(
+        String dataType
+    ) {
         DataRecordCount entity = dataRecordCountRepository
             .findById(dataType);
         if (entity == null) {
@@ -45,8 +46,12 @@ public class DefaultDataRecordCountService
     }
 
     @Override
-    public void incrementRecordCount(String dataType, long value) {
-        dataRecordCountTransactionalRepository.incrementRecordCount(
+    public void incrementRecordCount(
+        String dataType,
+        long value
+    ) {
+        createDataRecordCountIfNotExists(dataType);
+        dataRecordCountRepository.updateRecordCountByDataType(
             dataType,
             value
         );
@@ -56,6 +61,6 @@ public class DefaultDataRecordCountService
     public long getRecordCount(String dataType) {
         CountResult result = dataRecordCountRepository
             .findRecordCountByDataType(dataType);
-        return result != null ? result.getCount() : 0L;
+        return result != null ? result.getCount() : ZERO_LONG;
     }
 }
