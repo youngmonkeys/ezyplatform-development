@@ -29,6 +29,7 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
     public final String contentType;
     public final Long creatorId;
     public final String status;
+    public final String keywordPrefix;
     public final Collection<String> keywords;
     public final String likeKeyword;
 
@@ -40,6 +41,7 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
         this.contentType = builder.contentType;
         this.creatorId = builder.creatorId;
         this.status = builder.status;
+        this.keywordPrefix = builder.keywordPrefix;
         this.keywords = builder.keywords;
         this.likeKeyword = builder.likeKeyword;
     }
@@ -48,7 +50,7 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
     public void decorateQueryStringBeforeWhere(
         StringBuilder queryString
     ) {
-        if (keywords != null) {
+        if (keywordPrefix != null || keywords != null) {
             queryString.append(" INNER JOIN DataIndex k ON e.id = k.dataId");
         }
     }
@@ -77,10 +79,14 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
         if (status != null) {
             answer.and("e.status = :status");
         }
+        if (keywordPrefix != null || keywords != null) {
+            answer.and("k.dataType = 'ezy_content_templates'");
+        }
+        if (keywordPrefix != null) {
+            answer.and("k.keyword LIKE CONCAT(:keywordPrefix,'%')");
+        }
         if (keywords != null) {
-            answer
-                .and("k.dataType = 'ezy_content_templates'")
-                .and("k.keyword IN :keywords");
+            answer.and("k.keyword IN :keywords");
         }
         if (likeKeyword != null) {
             answer.and(
@@ -104,6 +110,7 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
         protected String contentType;
         protected Long creatorId;
         protected String status;
+        protected String keywordPrefix;
         protected Collection<String> keywords;
         protected String likeKeyword;
 
@@ -139,6 +146,11 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
 
         public Builder status(String status) {
             this.status = status;
+            return this;
+        }
+
+        public Builder keywordPrefix(String keywordPrefix) {
+            this.keywordPrefix = keywordPrefix;
             return this;
         }
 

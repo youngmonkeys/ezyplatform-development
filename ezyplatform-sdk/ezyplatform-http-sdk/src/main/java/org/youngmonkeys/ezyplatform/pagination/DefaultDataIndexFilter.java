@@ -23,10 +23,12 @@ import java.util.Collection;
 
 public class DefaultDataIndexFilter implements DataIndexFilter {
     public final String dataType;
+    public final String keywordPrefix;
     public final Collection<String> keywords;
 
     protected DefaultDataIndexFilter(Builder<?> builder) {
         this.dataType = builder.dataType;
+        this.keywordPrefix = builder.keywordPrefix;
         this.keywords = builder.keywords;
     }
 
@@ -35,6 +37,9 @@ public class DefaultDataIndexFilter implements DataIndexFilter {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
         if (dataType != null) {
             answer.and("e.dataType = :dataType");
+        }
+        if (keywordPrefix != null) {
+            answer.and("e.keyword LIKE CONCAT(:keywordPrefix,'%')");
         }
         if (keywords != null) {
             answer.and("e.keyword in :keywords");
@@ -51,10 +56,16 @@ public class DefaultDataIndexFilter implements DataIndexFilter {
         implements EzyBuilder<DefaultDataIndexFilter> {
 
         private String dataType;
+        private String keywordPrefix;
         private Collection<String> keywords;
 
         public T dataType(String dataType) {
             this.dataType = dataType;
+            return (T) this;
+        }
+
+        public T keywordPrefix(String keywordPrefix) {
+            this.keywordPrefix = keywordPrefix;
             return (T) this;
         }
 

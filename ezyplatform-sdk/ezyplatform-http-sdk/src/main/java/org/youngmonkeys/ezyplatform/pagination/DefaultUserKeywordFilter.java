@@ -22,15 +22,20 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.util.Collection;
 
 public class DefaultUserKeywordFilter implements UserKeywordFilter {
+    public final String keywordPrefix;
     public final Collection<String> keywords;
 
     protected DefaultUserKeywordFilter(Builder<?> builder) {
+        this.keywordPrefix = builder.keywordPrefix;
         this.keywords = builder.keywords;
     }
 
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
+        if (keywordPrefix != null) {
+            answer.and("e.keyword LIKE CONCAT(:keywordPrefix,'%')");
+        }
         if (keywords != null) {
             answer.and("e.keyword in :keywords");
         }
@@ -45,7 +50,13 @@ public class DefaultUserKeywordFilter implements UserKeywordFilter {
     public static class Builder<T extends Builder<T>>
         implements EzyBuilder<DefaultUserKeywordFilter> {
 
+        private String keywordPrefix;
         private Collection<String> keywords;
+
+        public T keywordPrefix(String keywordPrefix) {
+            this.keywordPrefix = keywordPrefix;
+            return (T) this;
+        }
 
         public T keywords(Collection<String> keywords) {
             this.keywords = keywords;
