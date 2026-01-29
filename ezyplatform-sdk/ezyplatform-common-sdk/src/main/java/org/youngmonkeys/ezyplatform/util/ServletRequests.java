@@ -18,6 +18,8 @@ package org.youngmonkeys.ezyplatform.util;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+
 public final class ServletRequests {
 
     private static final String UNKNOWN_IP = "unknown";
@@ -52,5 +54,19 @@ public final class ServletRequests {
     
     public static boolean isUnknownIp(String ip) {
         return ip == null || ip.isEmpty() || UNKNOWN_IP.equalsIgnoreCase(ip);
+    }
+
+    public static String getRequestedDomain(
+        HttpServletRequest request
+    ) {
+        String host = request.getHeader("X-Forwarded-Host");
+        if (isNotBlank(host)) {
+            return host.split(",")[0].trim();
+        }
+        host = request.getHeader("Host");
+        if (isNotBlank(host)) {
+            return host;
+        }
+        return request.getServerName();
     }
 }
