@@ -92,7 +92,19 @@ public interface UserService {
         Collection<String> uuids
     );
 
-    Long getUserIdByAccessToken(String accessToken);
+    default Long getUserIdByAccessToken(
+        String accessToken
+    ) {
+        return getUserIdByAccessToken(
+            accessToken,
+            AccessTokenType.ACCESS_TOKEN_SINGLE_SET
+        );
+    }
+
+    Long getUserIdByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    );
 
     default long validateUserAccessToken(
         String accessToken

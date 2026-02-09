@@ -22,7 +22,16 @@ import java.util.List;
 
 public interface AdminSearchService {
 
-    List<SearchResultModel> search(String keyword);
+    default List<SearchResultModel> search(
+        long adminId,
+        String keyword
+    ) {
+        return search(keyword);
+    }
+
+    List<SearchResultModel> search(
+        String keyword
+    );
 
     default int priority() {
         return 0;

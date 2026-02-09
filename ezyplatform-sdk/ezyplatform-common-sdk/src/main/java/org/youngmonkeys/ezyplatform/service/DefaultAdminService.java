@@ -185,11 +185,16 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
-    public Long getAdminIdByAccessToken(String accessToken) {
+    public Long getAdminIdByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    ) {
         if (accessToken != null) {
             AdminAccessToken entity = accessTokenRepository
                 .findById(accessToken);
-            if (entity != null) {
+            if (entity != null
+                && tokenTypes.contains(entity.getTokenType())
+            ) {
                 return entity.getAdminId();
             }
         }

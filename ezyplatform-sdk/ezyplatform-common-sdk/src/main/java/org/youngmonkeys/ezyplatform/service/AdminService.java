@@ -23,6 +23,7 @@ import java.util.*;
 
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
 
+@SuppressWarnings("MethodCount")
 public interface AdminService {
 
     AdminModel getAdminById(long adminId);
@@ -75,7 +76,19 @@ public interface AdminService {
         Set<String> tokenTypes
     );
 
-    Long getAdminIdByAccessToken(String accessToken);
+    default Long getAdminIdByAccessToken(
+        String accessToken
+    ) {
+        return getAdminIdByAccessToken(
+            accessToken,
+            AccessTokenType.ACCESS_TOKEN_SINGLE_SET
+        );
+    }
+
+    Long getAdminIdByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    );
 
     default Map<Long, AdminModel> getAdminMapByIds(
         Collection<Long> ids

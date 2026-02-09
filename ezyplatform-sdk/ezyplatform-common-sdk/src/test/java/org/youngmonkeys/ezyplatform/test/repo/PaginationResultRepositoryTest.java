@@ -102,7 +102,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, idResults);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT e FROM User e"
+            "SELECT DISTINCT e FROM User e"
         );
         verify(query, times(1)).setFirstResult(0);
         verify(query, times(1)).setMaxResults(limit);
@@ -153,7 +153,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, idResults);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT e FROM User e WHERE (e.id < :id) ORDER BY e.id DESC"
+            "SELECT DISTINCT e FROM User e WHERE (e.id < :id) ORDER BY e.id DESC"
         );
         verify(query, times(1)).setFirstResult(0);
         verify(query, times(1)).setMaxResults(limit);
@@ -204,7 +204,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, idResults);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT e FROM User e WHERE (e.id > :id) ORDER BY e.id ASC"
+            "SELECT DISTINCT e FROM User e WHERE (e.id > :id) ORDER BY e.id ASC"
         );
         verify(query, times(1)).setFirstResult(0);
         verify(query, times(1)).setMaxResults(limit);
@@ -252,7 +252,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, idResults);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT e FROM User e"
+            "SELECT DISTINCT e FROM User e"
         );
         verify(query, times(1)).setFirstResult(0);
         verify(query, times(1)).setMaxResults(limit);
@@ -304,7 +304,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, idResults);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT e FROM User e ORDER BY e.id DESC"
+            "SELECT DISTINCT e FROM User e ORDER BY e.id DESC"
         );
         verify(query, times(1)).setFirstResult(0);
         verify(query, times(1)).setMaxResults(limit - 1);
@@ -356,7 +356,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, idResults);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT e FROM User e ORDER BY e.id DESC"
+            "SELECT DISTINCT e FROM User e ORDER BY e.id DESC"
         );
         verify(query, times(1)).setFirstResult(1);
         verify(query, times(1)).setMaxResults(limit);
@@ -389,7 +389,7 @@ public class PaginationResultRepositoryTest {
         Asserts.assertEquals(actual, count);
 
         verify(entityManager, times(1)).createQuery(
-            "SELECT COUNT(e) FROM User e WHERE username = :username"
+            "SELECT COUNT( DISTINCT e) FROM User e WHERE username = :username"
         );
         verify(query, times(1)).setParameter("username", filter.username);
         verify(query, times(1)).getSingleResult();

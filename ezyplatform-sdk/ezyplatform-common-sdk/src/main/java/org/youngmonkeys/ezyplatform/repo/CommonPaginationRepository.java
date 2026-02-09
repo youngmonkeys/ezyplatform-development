@@ -31,10 +31,4 @@ public class CommonPaginationRepository<
     F extends CommonStorageFilter,
     P extends CommonPaginationParameter,
     I,
-    E> extends PaginationRepository<F, P, I, E> {
-
-    @Override
-    protected boolean isDistinct() {
-        return true;
-    }
-}
+    E> extends PaginationRepository<F, P, I, E> {}

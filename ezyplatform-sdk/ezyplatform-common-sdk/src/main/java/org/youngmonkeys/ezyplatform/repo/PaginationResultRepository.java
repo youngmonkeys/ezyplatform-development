@@ -324,7 +324,7 @@ public class PaginationResultRepository<F, P, I, E, R> extends EzyJpaRepository<
     }
 
     protected boolean isDistinct() {
-        return false;
+        return true;
     }
 
     protected void decorateQueryStringBeforeWhere(

@@ -24,6 +24,8 @@ import org.youngmonkeys.ezyplatform.model.CommonEntityModel;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzySets.combine;
+import static com.tvd12.ezyfox.io.EzySets.newHashSet;
 import static org.youngmonkeys.ezyplatform.model.CommonEntityModel.defaultEntity;
 
 public class CommonEntityFetcherManager {
@@ -121,5 +123,27 @@ public class CommonEntityFetcherManager {
                     )
                 )
             );
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<String> getAllEntityTypes() {
+        return combine(
+            accountingEntityFetcherByEntityType.get().keySet(),
+            additionalFetcherByEntityType.keySet()
+        );
+    }
+
+    @SuppressWarnings("unchecked")
+    public Set<String> getAllModelNames() {
+        return combine(
+            newHashSet(
+                accountingEntityFetcherByEntityType.get().values(),
+                CommonEntityFetcher::getModelName
+            ),
+            newHashSet(
+                additionalFetcherByEntityType.values(),
+                CommonEntityFetcher::getModelName
+            )
+        );
     }
 }

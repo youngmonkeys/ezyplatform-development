@@ -24,6 +24,7 @@ import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
 import org.youngmonkeys.ezyplatform.result.SimpleContentTemplateResult;
 import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface ContentTemplateRepository
@@ -52,6 +53,19 @@ public interface ContentTemplateRepository
     )
     List<SimpleContentTemplateResult> findTemplatesByType(
         String templateType,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT" +
+            " e.id, e.templateName, e.titleTemplate," +
+            " e.creatorId, e.status, e.createdAt, e.updatedAt" +
+            " FROM ContentTemplate e" +
+            " WHERE e.templateType IN ?0" +
+            " ORDER BY e.id DESC"
+    )
+    List<SimpleContentTemplateResult> findTemplatesByTypeIn(
+        Collection<String> templateTypes,
         Next next
     );
 

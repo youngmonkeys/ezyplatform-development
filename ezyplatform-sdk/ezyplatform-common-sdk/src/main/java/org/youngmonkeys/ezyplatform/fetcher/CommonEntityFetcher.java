@@ -31,6 +31,10 @@ public interface CommonEntityFetcher {
 
     String getEntityType();
 
+    default String getModelName() {
+        return getEntityType();
+    }
+
     default int getPriority() {
         return 1;
     }

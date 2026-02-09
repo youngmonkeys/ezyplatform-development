@@ -32,10 +32,4 @@ public class CommonPaginationResultRepository<
     P extends CommonPaginationParameter,
     I,
     E,
-    R> extends PaginationResultRepository<F, P, I, E, R> {
-
-    @Override
-    protected boolean isDistinct() {
-        return true;
-    }
-}
+    R> extends PaginationResultRepository<F, P, I, E, R> {}

@@ -31,6 +31,8 @@ import org.youngmonkeys.ezyplatform.repo.ContentTemplateRepository;
 import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
 import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -135,6 +137,23 @@ public class DefaultContentTemplateService
         return newArrayList(
             contentTemplateRepository.findTemplatesByType(
                 templateType,
+                Next.limit(limit)
+            ),
+            resultToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<ContentTemplateModel> getTemplatesByTypes(
+        Collection<String> templateTypes,
+        int limit
+    ) {
+        if (templateTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return newArrayList(
+            contentTemplateRepository.findTemplatesByTypeIn(
+                templateTypes,
                 Next.limit(limit)
             ),
             resultToModelConverter::toModel

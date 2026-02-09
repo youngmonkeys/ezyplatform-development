@@ -164,7 +164,8 @@ public class DefaultUserService implements UserService {
         Set<String> tokenTypes
     ) {
         long userId = validateUserAccessToken(
-            accessToken
+            accessToken,
+            tokenTypes
         );
         return getUserById(userId);
     }
@@ -359,11 +360,16 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Long getUserIdByAccessToken(String accessToken) {
+    public Long getUserIdByAccessToken(
+        String accessToken,
+        Set<String> tokenTypes
+    ) {
         if (accessToken != null) {
             UserAccessToken entity =
                 accessTokenRepository.findById(accessToken);
-            if (entity != null) {
+            if (entity != null
+                && tokenTypes.contains(entity.getTokenType())
+            ) {
                 return entity.getUserId();
             }
         }
