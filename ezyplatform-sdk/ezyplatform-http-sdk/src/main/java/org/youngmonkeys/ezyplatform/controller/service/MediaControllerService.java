@@ -315,17 +315,45 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
-    @SuppressWarnings("MethodLength")
     public void replaceMedia(
         HttpServletRequest request,
         HttpServletResponse response,
         long mediaId,
         Predicate<MediaModel> validMediaCondition
     ) throws Exception {
-        MediaModel media = mediaService.getMediaById(mediaId);
+        replaceMedia(
+            request,
+            response,
+            mediaService.getMediaById(mediaId),
+            validMediaCondition
+        );
+    }
+
+    public void replaceMedia(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        String mediaName,
+        Predicate<MediaModel> validMediaCondition
+    ) throws Exception {
+        replaceMedia(
+            request,
+            response,
+            mediaService.getMediaByName(mediaName),
+            validMediaCondition
+        );
+    }
+
+    @SuppressWarnings("MethodLength")
+    public void replaceMedia(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        MediaModel media,
+        Predicate<MediaModel> validMediaCondition
+    ) throws Exception {
         if (media == null || !validMediaCondition.test(media)) {
             throw new ResourceNotFoundException("media");
         }
+        long mediaId = media.getId();
         String mediaUploaderName = settingService
             .getMediaUpDownloaderName();
         MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager

@@ -37,7 +37,7 @@ public interface ContentTemplateRepository
     List<ContentTypeResult> findAllContentTypes();
 
     @EzyQuery(
-        "SELECT DISTINCT e.templateType AS templateType " +
+        "SELECT DISTINCT e.templateType " +
             "FROM ContentTemplate e " +
             "ORDER BY e.templateType ASC"
     )

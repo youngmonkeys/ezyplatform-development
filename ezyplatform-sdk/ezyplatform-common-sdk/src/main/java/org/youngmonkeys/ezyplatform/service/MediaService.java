@@ -117,6 +117,8 @@ public interface MediaService {
 
     boolean containsMedia(long mediaId);
 
+    boolean containsMedia(String mediaName);
+
     List<String> getAllMediaTypes();
 
     List<String> getAllMediaStatuses();

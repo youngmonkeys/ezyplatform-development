@@ -34,7 +34,8 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.util.Strings.emptyIfNull;
 import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
 @SuppressWarnings("MethodCount")
@@ -524,4 +525,54 @@ public interface AdminMetaService {
         long adminId,
         Collection<String> metaKeys
     );
+
+    default void saveAdminJobTitle(
+        long adminId,
+        String jobTitle
+    ) {
+        saveAdminMetaUniqueKey(
+            adminId,
+            META_KEY_JOB_TITLE,
+            emptyIfNull(jobTitle)
+        );
+    }
+
+    default void saveAdminDescription(
+        long adminId,
+        String description
+    ) {
+        saveAdminMetaUniqueKey(
+            adminId,
+            META_KEY_DESCRIPTION,
+            EMPTY_STRING,
+            description
+        );
+    }
+
+    default String getJobTitleByAdminId(
+        long adminId
+    ) {
+        return getLatestMetaValueByAdminIdAndMetaKey(
+            adminId,
+            META_KEY_JOB_TITLE
+        );
+    }
+
+    default Map<Long, String> getJobTitleMapByAdminIds(
+        Collection<Long> adminIds
+    ) {
+        return getAdminMetaValueMapByAdminIds(
+            adminIds,
+            META_KEY_JOB_TITLE
+        );
+    }
+
+    default String getDescriptionByAdminId(
+        long adminId
+    ) {
+        return getLatestMetaTextValueByAdminIdAndMetaKey(
+            adminId,
+            META_KEY_DESCRIPTION
+        );
+    }
 }

@@ -135,6 +135,10 @@ public interface AdminService {
         Set<String> tokenTypes
     );
 
+    AdminAccessTokenModel getAdminAccessTokenByAccessToken(
+        String accessToken
+    );
+
     default AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
         String accessToken,
         boolean verifyStatus

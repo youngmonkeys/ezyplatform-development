@@ -41,8 +41,6 @@ public class HttpRequestsTest {
 
         // then
         Asserts.assertEquals(actual, "/hello?lang=vi");
-        verify(request, times(1)).getAttribute("lang");
-        verify(request, times(1)).getHeader("lang");
         verify(request, times(1)).getParameter("lang");
         verifyNoMoreInteractions(request);
     }
@@ -62,8 +60,6 @@ public class HttpRequestsTest {
 
         // then
         Asserts.assertEquals(actual, "/hello?value=world&lang=vi");
-        verify(request, times(1)).getAttribute("lang");
-        verify(request, times(1)).getHeader("lang");
         verify(request, times(1)).getParameter("lang");
         verifyNoMoreInteractions(request);
     }

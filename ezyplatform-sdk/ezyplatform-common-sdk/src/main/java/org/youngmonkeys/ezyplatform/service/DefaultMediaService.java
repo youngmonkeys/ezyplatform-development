@@ -46,6 +46,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 @AllArgsConstructor
+@SuppressWarnings("MethodCount")
 public class DefaultMediaService implements MediaService {
 
     private final FileSystemManager fileSystemManager;
@@ -182,6 +183,14 @@ public class DefaultMediaService implements MediaService {
     @Override
     public boolean containsMedia(long mediaId) {
         return mediaRepository.containsById(mediaId);
+    }
+
+    @Override
+    public boolean containsMedia(String mediaName) {
+        return mediaRepository.containsByField(
+            "name",
+            mediaName
+        );
     }
 
     @Override

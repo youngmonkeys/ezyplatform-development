@@ -17,10 +17,20 @@
 package org.youngmonkeys.ezyplatform.admin.service;
 
 import org.youngmonkeys.ezyplatform.admin.model.SearchResultModel;
+import org.youngmonkeys.ezyplatform.data.AdminRolesProxy;
 
+import java.util.Collections;
 import java.util.List;
 
 public interface AdminSearchService {
+
+    default List<SearchResultModel> search(
+        long adminId,
+        AdminRolesProxy rolesProxy,
+        String keyword
+    ) {
+        return search(adminId, keyword);
+    }
 
     default List<SearchResultModel> search(
         long adminId,
@@ -29,9 +39,11 @@ public interface AdminSearchService {
         return search(keyword);
     }
 
-    List<SearchResultModel> search(
+    default List<SearchResultModel> search(
         String keyword
-    );
+    ) {
+        return Collections.emptyList();
+    }
 
     default int priority() {
         return 0;

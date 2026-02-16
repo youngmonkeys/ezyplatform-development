@@ -288,6 +288,15 @@ public class DefaultAdminService implements AdminService {
     }
 
     @Override
+    public AdminAccessTokenModel getAdminAccessTokenByAccessToken(
+        String accessToken
+    ) {
+        return entityToModelConverter.toModel(
+            accessTokenRepository.findById(accessToken)
+        );
+    }
+
+    @Override
     public AdminAccessTokenModel getAdminAccessTokenOrThrowByAccessToken(
         String accessToken,
         Set<String> tokenTypes,

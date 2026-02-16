@@ -22,13 +22,15 @@ import org.youngmonkeys.ezyplatform.service.LanguageService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
+import static org.youngmonkeys.ezyplatform.util.HttpRequests.getLanguage;
+
 @AllArgsConstructor
 public class RequestLocalFetcher {
 
     private final LanguageService languageService;
 
     public Locale getLocal(HttpServletRequest request) {
-        String lang = request.getParameter("lang");
+        String lang = getLanguage(request);
         if (lang == null) {
             lang = languageService.getDefaultLanguageCode();
         }
