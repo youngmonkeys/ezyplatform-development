@@ -11,12 +11,13 @@ import java.util.Collection;
 public class Default${entityClassName}Filter implements ${entityClassName}Filter {
     public final Collection<String> keywords;
     public final String likeKeyword;
+    public final String keywordPrefix;
 
     @Override
     public void decorateQueryStringBeforeWhere(
         StringBuilder queryString
     ) {
-        if (keywords != null) {
+        if (keywordPrefix != null || keywords != null) {
             queryString.append(" INNER JOIN DataIndex k ON e.id = k.dataId");
         }
     }
@@ -24,10 +25,14 @@ public class Default${entityClassName}Filter implements ${entityClassName}Filter
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
-        if (keywords != null) {
-            answer
-                .and("k.dataType = '${tableName}'")
-                .and("k.keyword IN :keywords");
+        if (keywordPrefix != null || keywords != null) {
+            answer.and("k.dataType = '${tableName}'");
+            if (keywordPrefix != null) {
+                answer.and("k.keyword LIKE CONCAT(:keywordPrefix, '%')");
+            }
+            if (keywords != null) {
+                answer.and("k.keyword IN :keywords");
+            }
         }
         if (likeKeyword != null) {
             answer.and(

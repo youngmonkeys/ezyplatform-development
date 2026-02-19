@@ -16,17 +16,21 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder
 public class ContentTemplateModel {
     private long id;
+    private String ownerType;
+    private long ownerId;
     private String type;
     private String name;
     private String titleTemplate;
     private String contentTemplate;
     private String contentType;
+    private String creatorType;
     private long creatorId;
     private String status;
     private long createdAt;
