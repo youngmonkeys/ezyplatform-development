@@ -114,6 +114,10 @@ public class DefaultUserService implements UserService {
         userRepository.save(user);
     }
 
+    public void removeUserAccessToken(long userId) {
+        accessTokenRepository.deleteByUserId(userId);
+    }
+
     public List<String> getAllUserStatuses() {
         return userRepository
             .findAllUserStatuses()
