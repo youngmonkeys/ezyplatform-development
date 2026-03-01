@@ -59,6 +59,7 @@ public class CommonUserEntityFetcher
     ) {
         return CommonEntityModel.builder()
             .id(model.getUserId())
+            .code(model.getUsername())
             .displayName(model.getName())
             .url(getUriPrefix() + "/" + model.getUsername())
             .build();

@@ -21,6 +21,8 @@ import org.youngmonkeys.ezyplatform.model.CommonEntityModel;
 import java.util.Collection;
 import java.util.Map;
 
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+
 public interface CommonEntityFetcher {
 
     CommonEntityModel getEntityById(long entityId);
@@ -29,10 +31,20 @@ public interface CommonEntityFetcher {
         Collection<Long> entityIds
     );
 
-    String getEntityType();
+    default String getEntityType() {
+        return EMPTY_STRING;
+    }
+
+    default String[] getEntityTypes() {
+        return new String[] { getEntityType() };
+    }
 
     default String getModelName() {
         return getEntityType();
+    }
+
+    default String getModuleName() {
+        return EMPTY_STRING;
     }
 
     default int getPriority() {

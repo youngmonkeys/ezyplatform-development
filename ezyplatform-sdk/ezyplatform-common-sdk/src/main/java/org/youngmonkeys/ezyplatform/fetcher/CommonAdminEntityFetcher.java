@@ -59,6 +59,7 @@ public class CommonAdminEntityFetcher
     ) {
         return CommonEntityModel.builder()
             .id(model.getAdminId())
+            .code(model.getUsername())
             .displayName(model.getName())
             .url("/admins/" + model.getUsername())
             .build();

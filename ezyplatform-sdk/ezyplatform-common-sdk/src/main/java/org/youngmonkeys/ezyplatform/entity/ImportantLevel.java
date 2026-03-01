@@ -21,6 +21,6 @@ public enum ImportantLevel {
     NORMAL;
 
     public boolean equalsValue(String value) {
-        return value != null && this.toString().equals(value);
+        return toString().equals(value);
     }
 }

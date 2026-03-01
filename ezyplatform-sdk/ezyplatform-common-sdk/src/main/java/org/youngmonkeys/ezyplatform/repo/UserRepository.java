@@ -25,7 +25,9 @@ import org.youngmonkeys.ezyplatform.result.*;
 import java.util.Collection;
 import java.util.List;
 
-public interface UserRepository extends EzyDatabaseRepository<Long, User> {
+@SuppressWarnings("MethodCount")
+public interface UserRepository
+    extends EzyDatabaseRepository<Long, User> {
 
     @EzyQuery(
         "SELECT DISTINCT e.status FROM User e"
@@ -82,6 +84,14 @@ public interface UserRepository extends EzyDatabaseRepository<Long, User> {
             "FROM User e WHERE e.id = ?0"
     )
     IdNameResult findUserIdAndNameById(long id);
+
+    @EzyQuery(
+        "SELECT e.id, e.username, e.displayName " +
+            "FROM User e WHERE e.username = ?0"
+    )
+    IdNameResult findUserIdAndNameByUsername(
+        String username
+    );
 
     @EzyQuery(
         "SELECT e.id, e.username, e.displayName " +

@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+
 @Getter
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -30,4 +32,10 @@ public class UpdateMediaRequest {
     private String description;
     private long fileSize;
     private boolean notPublic;
+
+    public void setFileSize(long fileSize) {
+        if (fileSize > ZERO_LONG) {
+            this.fileSize = fileSize;
+        }
+    }
 }
