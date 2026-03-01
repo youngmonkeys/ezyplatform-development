@@ -24,13 +24,7 @@ import org.youngmonkeys.ezyplatform.fetcher.CommonEntityFetcher;
 import org.youngmonkeys.ezyplatform.manager.CommonEntityFetcherManager;
 import org.youngmonkeys.ezyplatform.model.CommonEntityModel;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -183,10 +177,167 @@ public class CommonEntityFetcherManagerTest {
         );
     }
 
+    @Test
+    public void shouldHandleModuleSpecificFetchersAndOverrides() {
+        CommonEntityModel generalModel = CommonEntityModel.builder()
+            .id(10L)
+            .name("general-user")
+            .displayName("General user")
+            .build();
+        CommonEntityModel moduleModel = CommonEntityModel.builder()
+            .id(20L)
+            .name("module-user")
+            .displayName("Module user")
+            .build();
+        CommonEntityModel additionalModel = CommonEntityModel.builder()
+            .id(30L)
+            .name("additional-user")
+            .displayName("Additional user")
+            .build();
+
+        CommonEntityFetcher generalFetcher = new TestCommonEntityFetcher(
+            "user",
+            1,
+            Collections.singletonMap(generalModel.getId(), generalModel),
+            "general-model"
+        );
+        CommonEntityFetcher moduleFetcher = new TestCommonEntityFetcher(
+            "user",
+            2,
+            Collections.singletonMap(moduleModel.getId(), moduleModel),
+            "module-model",
+            "module-1"
+        );
+
+        EzySingletonFactory singletonFactory = mock(EzySingletonFactory.class);
+        when(singletonFactory.getSingletonsOf(CommonEntityFetcher.class))
+            .thenReturn(Arrays.asList(generalFetcher, moduleFetcher));
+
+        CommonEntityFetcherManager manager = new CommonEntityFetcherManager(
+            singletonFactory
+        );
+
+        CommonEntityModel moduleEntity = manager.getEntityByModuleNameAndEntityTypeAndId(
+            "module-1",
+            "user",
+            moduleModel.getId()
+        );
+        CommonEntityModel generalEntity = manager.getEntityByModuleNameAndEntityTypeAndId(
+            "missing-module",
+            "user",
+            generalModel.getId()
+        );
+        Map<Long, CommonEntityModel> moduleMapBefore =
+            manager.getEntityMapByModuleNameAndEntityTypeAndIds(
+                "module-1",
+                "user",
+                Collections.singleton(moduleModel.getId())
+            );
+
+        Asserts.assertEquals(moduleEntity.getName(), moduleModel.getName());
+        Asserts.assertEquals(generalEntity.getName(), generalModel.getName());
+        Asserts.assertEquals(moduleMapBefore.get(moduleModel.getId()).getDisplayName(), moduleModel.getDisplayName());
+        Asserts.assertEquals(
+            manager.getEntityByModuleNameAndEntityTypeAndId(
+                "test",
+                generalFetcher.getEntityType(),
+                generalModel.getId()
+            ),
+            generalModel
+        );
+        Asserts.assertEquals(
+            manager.getEntityByModuleNameAndEntityTypeAndId(
+                "test",
+                "test",
+                0
+            ),
+            CommonEntityModel.defaultEntity(
+                0,
+                "test"
+            )
+        );
+        Asserts.assertEquals(
+            manager.getEntityMapByModuleNameAndEntityTypeAndIds(
+                "test",
+                "test",
+                Collections.emptyList()
+            ),
+            Collections.emptyMap()
+        );
+        Asserts.assertEquals(
+            manager.getEntityMapByEntityTypeAndIds(
+                "test",
+                Collections.emptyList()
+            ),
+            Collections.emptyMap()
+        );
+        Asserts.assertEquals(
+            manager.getEntityMapByModuleNameAndEntityIdsByType(
+                "module-1",
+                Collections.singletonMap(
+                    "user",
+                    Collections.singleton(moduleModel.getId())
+                )
+            ),
+            Collections.singletonMap(
+                "user",
+                Collections.singletonMap(
+                    moduleModel.getId(),
+                    moduleModel
+                )
+            ),
+            false
+        );
+
+        CommonEntityFetcher additionalModuleFetcher = new TestCommonEntityFetcher(
+            "user",
+            3,
+            Collections.singletonMap(additionalModel.getId(), additionalModel),
+            "additional-model",
+            "module-1"
+        );
+        manager.addEntityFetcher(additionalModuleFetcher);
+
+        CommonEntityModel additionalEntity = manager.getEntityByModuleNameAndEntityTypeAndId(
+            "module-1",
+            "user",
+            additionalModel.getId()
+        );
+        CommonEntityFetcher fetcher = manager.getEntityFetcherByModuleNameAndEntityType(
+            "module-1",
+            "user"
+        );
+        Map<Long, CommonEntityModel> moduleMapAfter =
+            manager.getEntityMapByModuleNameAndEntityTypeAndIds(
+                "module-1",
+                "user",
+                Collections.singleton(additionalModel.getId())
+            );
+
+        Asserts.assertEquals(additionalEntity.getName(), additionalModel.getName());
+        Asserts.assertEquals(fetcher, additionalModuleFetcher);
+        Asserts.assertEquals(moduleMapAfter.get(additionalModel.getId()).getDisplayName(), additionalModel.getDisplayName());
+        Asserts.assertEquals(
+            manager.getEntityFetcherByModuleNameAndEntityType("another", "user"),
+            generalFetcher
+        );
+        Asserts.assertEquals(
+            manager.getAllEntityTypes(),
+            Sets.newHashSet("user"),
+            false
+        );
+        Asserts.assertEquals(
+            manager.getAllModelNames(),
+            Sets.newHashSet("general-model", "additional-model", "module-model"),
+            false
+        );
+    }
+
     private static final class TestCommonEntityFetcher
         implements CommonEntityFetcher {
 
         private final String entityType;
+        private final String moduleName;
         private final int priority;
         private final Map<Long, CommonEntityModel> entities;
         private final String modelName;
@@ -197,10 +348,21 @@ public class CommonEntityFetcherManagerTest {
             Map<Long, CommonEntityModel> entities,
             String modelName
         ) {
+            this(entityType, priority, entities, modelName, "");
+        }
+
+        private TestCommonEntityFetcher(
+            String entityType,
+            int priority,
+            Map<Long, CommonEntityModel> entities,
+            String modelName,
+            String moduleName
+        ) {
             this.entityType = entityType;
             this.priority = priority;
             this.entities = new HashMap<>(entities);
             this.modelName = modelName;
+            this.moduleName = moduleName != null ? moduleName : "";
         }
 
         @Override
@@ -233,6 +395,11 @@ public class CommonEntityFetcherManagerTest {
         @Override
         public String getModelName() {
             return modelName != null ? modelName : entityType;
+        }
+
+        @Override
+        public String getModuleName() {
+            return moduleName;
         }
     }
 }

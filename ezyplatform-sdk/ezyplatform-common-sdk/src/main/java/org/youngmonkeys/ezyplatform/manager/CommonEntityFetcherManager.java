@@ -260,6 +260,12 @@ public class CommonEntityFetcherManager {
         return combine(
             accountingEntityFetcherByEntityType.get().keySet(),
             additionalFetcherByEntityType.keySet(),
+            accountingEntityFetcherByEntityTypeByModuleName
+                .get()
+                .values()
+                .stream()
+                .flatMap(it -> it.keySet().stream())
+                .collect(Collectors.toSet()),
             additionalFetcherByEntityTypeByModuleName
                 .values()
                 .stream()
@@ -279,6 +285,15 @@ public class CommonEntityFetcherManager {
                 additionalFetcherByEntityType.values(),
                 CommonEntityFetcher::getModelName
             ),
+            accountingEntityFetcherByEntityTypeByModuleName
+                .get()
+                .values()
+                .stream()
+                .flatMap(it -> it.values()
+                    .stream()
+                    .map(CommonEntityFetcher::getModelName)
+                )
+                .collect(Collectors.toSet()),
             additionalFetcherByEntityTypeByModuleName
                 .values()
                 .stream()
