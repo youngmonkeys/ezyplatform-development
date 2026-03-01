@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyhttp.server.core.util.HttpServletRequests;
 import com.tvd12.ezyhttp.server.core.view.View;
 import lombok.Setter;
+import org.youngmonkeys.ezyplatform.annotation.UserRoles;
 import org.youngmonkeys.ezyplatform.data.UserRolesProxy;
 import org.youngmonkeys.ezyplatform.model.MediaNameModel;
 import org.youngmonkeys.ezyplatform.model.UserModel;
@@ -71,7 +72,7 @@ public class WebViewDecorator extends WebViewLanguageDecorator {
             view.setVariable("userUuid", user.getUuid());
             view.setVariable("loggedIn", Boolean.TRUE);
             UserRolesProxy userRoles = (UserRolesProxy) request.getAttribute(
-                UserRolesProxy.class.getName()
+                UserRoles.class.getName()
             );
             if (userRoles != null) {
                 view.setVariable("userRoles", userRoles);
