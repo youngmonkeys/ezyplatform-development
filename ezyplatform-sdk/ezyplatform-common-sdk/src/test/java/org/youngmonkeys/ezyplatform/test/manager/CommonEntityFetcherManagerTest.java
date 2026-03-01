@@ -78,7 +78,7 @@ public class CommonEntityFetcherManagerTest {
         CommonEntityFetcher actualFetcher = manager.getEntityFetcherByEntityType(
             "user"
         );
-        CommonEntityModel actualModel = manager.getEntityEntityTypeAndId(
+        CommonEntityModel actualModel = manager.getEntityByEntityTypeAndId(
             "user",
             highModel.getId()
         );
@@ -155,11 +155,11 @@ public class CommonEntityFetcherManagerTest {
 
         // when
         CommonEntityModel actualPrioritizedModel =
-            manager.getEntityEntityTypeAndId("user", prioritizedModel.getId());
+            manager.getEntityByEntityTypeAndId("user", prioritizedModel.getId());
         Map<String, Map<Long, CommonEntityModel>> mapsByType =
             manager.getEntityMapByEntityIdsByType(idsByType);
         CommonEntityModel fallbackModel =
-            manager.getEntityEntityTypeAndId("missing", 9L);
+            manager.getEntityByEntityTypeAndId("missing", 9L);
 
         // then
         Asserts.assertEquals(

@@ -150,7 +150,13 @@ public interface UserService {
         );
     }
 
-    UserNameModel getUsernameById(long userId);
+    UserNameModel getUsernameById(
+        long userId
+    );
+
+    UserNameModel getUsernameByUsername(
+        String username
+    );
 
     Map<Long, UserNameModel> getUsernameMapByIds(
         Collection<Long> userIds

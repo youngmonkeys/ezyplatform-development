@@ -255,6 +255,17 @@ public class DefaultUserService implements UserService {
         );
     }
 
+    @Override
+    public UserNameModel getUsernameByUsername(
+        String username
+    ) {
+        return resultToModelConverter.toUserNameModel(
+            userRepository.findUserIdAndNameByUsername(
+                username
+            )
+        );
+    }
+
     public Map<Long, UserNameModel> getUsernameMapByIds(
         Collection<Long> userIds
     ) {

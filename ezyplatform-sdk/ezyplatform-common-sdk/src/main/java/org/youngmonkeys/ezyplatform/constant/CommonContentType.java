@@ -25,6 +25,6 @@ public enum CommonContentType {
     THYMELEAF;
 
     public boolean equalsValue(String value) {
-        return value != null && toString().equals(value);
+        return toString().equals(value);
     }
 }

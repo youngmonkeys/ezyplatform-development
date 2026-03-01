@@ -26,6 +26,7 @@ import java.util.Map;
 @Builder
 public class CommonEntityModel {
     private long id;
+    private String code;
     private String name;
     private String displayName;
     private String url;
