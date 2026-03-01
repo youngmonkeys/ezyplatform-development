@@ -48,20 +48,7 @@ public class CommonEntityFetcherManager {
         this.accountingEntityFetcherByEntityType = new EzyLazyInitializer<>(() -> {
             List<CommonEntityFetcher> beans = singletonFactory
                 .getSingletonsOf(CommonEntityFetcher.class);
-            Map<String, CommonEntityFetcher> map = new ConcurrentHashMap<>();
-            for (CommonEntityFetcher fetcher : beans) {
-                if (isNotBlank(fetcher.getModuleName())) {
-                    continue;
-                }
-                for (String entityType : fetcher.getEntityTypes()) {
-                    map.compute(
-                        entityType,
-                        (k, v) -> v == null || fetcher.getPriority() >= v.getPriority()
-                            ? fetcher
-                            : v
-                    );
-                }
-            }
+            Map<String, CommonEntityFetcher> map = extractEntityFetcherMap(beans);
             List<CommonEntityFetcher> prioritizedBeans =
                 getPrioritizedEntityFetchers(singletonFactory);
             for (CommonEntityFetcher fetcher : prioritizedBeans) {
@@ -77,24 +64,8 @@ public class CommonEntityFetcherManager {
         this.accountingEntityFetcherByEntityTypeByModuleName = new EzyLazyInitializer<>(() -> {
             List<CommonEntityFetcher> beans = singletonFactory
                 .getSingletonsOf(CommonEntityFetcher.class);
-            Map<String, Map<String, CommonEntityFetcher>> mapByModuleName =
-                new ConcurrentHashMap<>();
-            for (CommonEntityFetcher fetcher : beans) {
-                String moduleName = fetcher.getModuleName();
-                if (isBlank(moduleName)) {
-                    continue;
-                }
-                for (String entityType : fetcher.getEntityTypes()) {
-                    mapByModuleName
-                        .computeIfAbsent(moduleName, k -> new ConcurrentHashMap<>())
-                        .compute(
-                            entityType,
-                            (k, v) -> v == null || fetcher.getPriority() >= v.getPriority()
-                                ? fetcher
-                                : v
-                        );
-                }
-            }
+            Map<String, Map<String, CommonEntityFetcher>> map =
+                extractModuleEntityFetcherMap(beans);
             List<CommonEntityFetcher> prioritizedBeans =
                 getPrioritizedEntityFetchers(singletonFactory);
             for (CommonEntityFetcher fetcher : prioritizedBeans) {
@@ -103,15 +74,59 @@ public class CommonEntityFetcherManager {
                     continue;
                 }
                 for (String entityType : fetcher.getEntityTypes()) {
-                    mapByModuleName
+                    map
                         .computeIfAbsent(moduleName, k -> new ConcurrentHashMap<>())
                         .put(entityType, fetcher);
                 }
             }
-            return mapByModuleName;
+            return map;
         });
         this.additionalFetcherByEntityType = new ConcurrentHashMap<>();
         this.additionalFetcherByEntityTypeByModuleName = new ConcurrentHashMap<>();
+    }
+
+    private static Map<String, CommonEntityFetcher> extractEntityFetcherMap(
+        List<CommonEntityFetcher> beans
+    ) {
+        Map<String, CommonEntityFetcher> map = new ConcurrentHashMap<>();
+        for (CommonEntityFetcher fetcher : beans) {
+            if (isNotBlank(fetcher.getModuleName())) {
+                continue;
+            }
+            for (String entityType : fetcher.getEntityTypes()) {
+                map.compute(
+                    entityType,
+                    (k, v) -> v == null || fetcher.getPriority() >= v.getPriority()
+                        ? fetcher
+                        : v
+                );
+            }
+        }
+        return map;
+    }
+
+    private static Map<String, Map<String, CommonEntityFetcher>> extractModuleEntityFetcherMap(
+        List<CommonEntityFetcher> beans
+    ) {
+        Map<String, Map<String, CommonEntityFetcher>> map =
+                new ConcurrentHashMap<>();
+        for (CommonEntityFetcher fetcher : beans) {
+            String moduleName = fetcher.getModuleName();
+            if (isBlank(moduleName)) {
+                continue;
+            }
+            for (String entityType : fetcher.getEntityTypes()) {
+                map
+                    .computeIfAbsent(moduleName, k -> new ConcurrentHashMap<>())
+                    .compute(
+                        entityType,
+                        (k, v) -> v == null || fetcher.getPriority() >= v.getPriority()
+                            ? fetcher
+                            : v
+                    );
+            }
+        }
+        return map;
     }
 
     protected List<CommonEntityFetcher> getPrioritizedEntityFetchers(
