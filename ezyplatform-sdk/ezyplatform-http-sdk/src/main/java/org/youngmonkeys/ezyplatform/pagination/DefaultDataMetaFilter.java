@@ -22,10 +22,14 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 public class DefaultDataMetaFilter implements DataMetaFilter {
     public final String dataType;
     public final Long dataId;
+    public final String metaKey;
+    public final String likeKeyword;
 
     public DefaultDataMetaFilter(Builder builder) {
         this.dataType = builder.dataType;
         this.dataId = builder.dataId;
+        this.metaKey = builder.metaKey;
+        this.likeKeyword = builder.likeKeyword;
     }
 
     @Override
@@ -36,6 +40,15 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         }
         if (dataId != null) {
             answer.and("e.dataId = :dataId");
+        }
+        if (metaKey != null) {
+            answer.and("e.metaKey = :metaKey");
+        }
+        if (likeKeyword != null) {
+            answer.and(
+                "(e.metaValue LIKE CONCAT(:likeKeyword, '%')" +
+                " OR e.metaTextValue LIKE CONCAT(:likeKeyword, '%'))"
+            );
         }
         return answer.build();
     }
@@ -48,6 +61,8 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
 
         private String dataType;
         private Long dataId;
+        private String metaKey;
+        private String likeKeyword;
 
         public Builder dataType(String dataType) {
             this.dataType = dataType;
@@ -56,6 +71,16 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
 
         public Builder dataId(Long dataId) {
             this.dataId = dataId;
+            return this;
+        }
+
+        public Builder metaKey(String metaKey) {
+            this.metaKey = metaKey;
+            return this;
+        }
+
+        public Builder likeKeyword(String likeKeyword) {
+            this.likeKeyword = likeKeyword;
             return this;
         }
 

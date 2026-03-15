@@ -179,4 +179,37 @@ public class JavascriptExecutorsTest {
         // then
         Asserts.assertNull(result);
     }
+
+    @Test
+    public void executeReturnFormulaStrTest() {
+        // given
+        String script =
+            "if (price > 20000) { \n" +
+            "    0.1; \n" +
+            "} else if (price == 20000) { \n" +
+            "    0.09; \n" +
+            "} else if (price == 19000) { \n" +
+            "    0.08; \n" +
+            "} else if (price == 18000) {\n" +
+            "    0.07; \n" +
+            "} else if (price == 17000) {\n" +
+            "    0.06; \n" +
+            "} else {\n" +
+            "    0.05;\n" +
+            "}";
+
+        // when
+        BigDecimal result = JavascriptExecutors
+            .execute(
+                script,
+                EzyMapBuilder.mapBuilder()
+                    .put("price", 18000)
+                    .toMap(),
+                2,
+                RoundingMode.UP
+            );
+
+        // then
+        Asserts.assertEquals(result, new BigDecimal("0.07"));
+    }
 }

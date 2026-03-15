@@ -333,6 +333,18 @@ public class CommonEntityFetcherManagerTest {
             Sets.newHashSet("general-model", "additional-model", "module-model"),
             false
         );
+        Asserts.assertNull(
+            manager.getEntityFetcherByModuleNameAndEntityType(
+                "",
+                "user"
+            )
+        );
+        Asserts.assertNull(
+            manager.getEntityFetcherByModuleNameAndEntityType(
+                "module-1",
+                ""
+            )
+        );
     }
 
     @Test
@@ -496,6 +508,11 @@ public class CommonEntityFetcherManagerTest {
                 "entity-type3"
             ),
             fetcher4
+        );
+        Asserts.assertNull(
+            instance.getEntityFetcherByEntityType(
+                ""
+            )
         );
     }
 

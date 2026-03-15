@@ -154,6 +154,9 @@ public class CommonEntityFetcherManager {
         String moduleName,
         String entityType
     ) {
+        if (isBlank(moduleName) || isBlank(entityType)) {
+            return null;
+        }
         CommonEntityFetcher fetcher = additionalFetcherByEntityTypeByModuleName
             .getOrDefault(moduleName, Collections.emptyMap())
             .get(entityType);
@@ -172,6 +175,9 @@ public class CommonEntityFetcherManager {
     public CommonEntityFetcher getEntityFetcherByEntityType(
         String entityType
     ) {
+        if (isBlank(entityType)) {
+            return null;
+        }
         CommonEntityFetcher fetcher = additionalFetcherByEntityType
             .get(entityType);
         if (fetcher == null) {
