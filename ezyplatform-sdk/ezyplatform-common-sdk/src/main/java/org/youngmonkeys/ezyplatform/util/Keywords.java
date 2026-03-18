@@ -16,10 +16,14 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import static com.tvd12.ezyfox.io.EzyStrings.*;
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static java.lang.Character.isWhitespace;
+import static org.youngmonkeys.ezyplatform.util.Strings.substring;
 
 public final class Keywords {
 
@@ -53,62 +57,21 @@ public final class Keywords {
         if (isBlank(str)) {
             return nullIfBlank ? null : Collections.emptyList();
         }
-        List<String> wordTrims = new ArrayList<>();
-        List<String> word2s = new ArrayList<>();
-        List<String> word3s = new ArrayList<>();
-        List<String> longKeywords = new ArrayList<>();
-        List<String> words = splitString(str);
-        int longKeywordLength = 0;
-        Queue<String> longKeyword = null;
-        for (String word : words) {
-            String wordTrim = word.trim();
-            if (wordTrim.length() > maxKeywordLength) {
-                wordTrim = wordTrim.substring(0, maxKeywordLength);
-            }
-            if (longKeyword == null) {
-                longKeyword = new LinkedList<>();
-            }
-            longKeyword.add(wordTrim);
-            longKeywordLength += wordTrim.length();
-            if (longKeyword.size() > 1) {
-                longKeywordLength += 1;
-            }
-            while (longKeywordLength > maxKeywordLength) {
-                String firstWord = longKeyword.poll();
-                if (firstWord == null) {
-                    break;
-                }
-                longKeywordLength -= firstWord.length();
-                longKeywordLength -= 1;
-            }
-            String wordTrimLowerCase = wordTrim.toLowerCase();
-            wordTrims.add(wordTrimLowerCase);
-            int wordTrimLowerCaseLength = wordTrimLowerCase.length();
-            for (int i = 1; i < wordTrimLowerCaseLength - 2; ++i) {
-                wordTrims.add(
-                    wordTrimLowerCase.substring(
-                        i,
-                        wordTrimLowerCaseLength
-                    )
-                );
-            }
-            if (wordTrimLowerCaseLength > 2) {
-                word2s.add(wordTrimLowerCase.substring(0, 2));
-            }
-            if (wordTrimLowerCaseLength > 3) {
-                word3s.add(wordTrimLowerCase.substring(0, 3));
-            }
-            String longKeywordString = String.join(SPACE, longKeyword);
-            longKeywords.add(longKeywordString.toLowerCase());
+        if (maxKeywordLength == 0) {
+            return Collections.emptyList();
         }
         List<String> answer = new ArrayList<>();
-        for (int i = longKeywords.size() - 1; i >= 0; --i) {
-            answer.add(longKeywords.get(i));
+        for (int i = 0; i < str.length(); ++i) {
+            char ch = str.charAt(i);
+            if (!isWhitespace(ch)) {
+                answer.add(
+                    substring(str, i, i + maxKeywordLength)
+                    .trim()
+                    .toLowerCase()
+                );
+            }
         }
-        answer.addAll(wordTrims);
-        answer.addAll(word3s);
-        answer.addAll(word2s);
-        return answer.stream().distinct().collect(Collectors.toList());
+        return answer;
     }
 
     public static List<String> keywordsFromEmail(
@@ -133,26 +96,5 @@ public final class Keywords {
         return atIndex < 1
             ? EMPTY_STRING
             : email.substring(0, atIndex).toLowerCase();
-    }
-
-    public static List<String> splitString(String str) {
-        List<String> answer = new ArrayList<>();
-        StringBuilder buffer = new StringBuilder();
-        for (int i = 0; i < str.length(); ++i) {
-            char ch = str.charAt(i);
-            if (isWordSeparator(ch) || ch == '/') {
-                if (buffer.length() == 0) {
-                    continue;
-                }
-                answer.add(buffer.toString());
-                buffer.delete(0, buffer.length());
-            } else {
-                buffer.append(ch);
-            }
-        }
-        if (buffer.length() > 0) {
-            answer.add(buffer.toString());
-        }
-        return answer;
     }
 }
