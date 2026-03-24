@@ -30,6 +30,7 @@ public class LinkModel {
     private String description;
     private String sourceType;
     private long sourceId;
+    private String status;
     private long createdAt;
     private long updatedAt;
 }

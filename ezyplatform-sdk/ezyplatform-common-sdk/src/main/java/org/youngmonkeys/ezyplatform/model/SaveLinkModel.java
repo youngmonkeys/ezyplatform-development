@@ -27,5 +27,6 @@ public class SaveLinkModel {
     private String sourceType;
     private String description;
     private long sourceId;
+    private String status;
     private long linkImageId;
 }

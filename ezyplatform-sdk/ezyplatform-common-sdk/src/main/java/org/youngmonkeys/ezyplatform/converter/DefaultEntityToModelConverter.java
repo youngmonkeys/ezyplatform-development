@@ -385,6 +385,7 @@ public class DefaultEntityToModelConverter {
             .description(entity.getDescription())
             .sourceType(entity.getSourceType())
             .sourceId(entity.getSourceId())
+            .status(entity.getStatus())
             .createdAt(toTimestamp(entity.getCreatedAt()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
             .build();

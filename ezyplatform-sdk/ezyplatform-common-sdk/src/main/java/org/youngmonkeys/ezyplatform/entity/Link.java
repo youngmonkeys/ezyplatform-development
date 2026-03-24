@@ -54,6 +54,8 @@ public class Link {
     @Column(name = "source_id")
     private long sourceId;
 
+    private String status;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
