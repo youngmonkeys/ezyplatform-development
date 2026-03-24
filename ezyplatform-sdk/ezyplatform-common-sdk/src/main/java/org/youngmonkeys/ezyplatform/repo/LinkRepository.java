@@ -20,12 +20,20 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.Link;
+import org.youngmonkeys.ezyplatform.result.TypeResult;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface LinkRepository extends EzyDatabaseRepository<Long, Link> {
     
     void deleteByLinkUri(String linkUri);
+
+    @EzyQuery(
+        "SELECT DISTINCT e.linkType FROM Link e " +
+            "ORDER BY e.linkType ASC"
+    )
+    List<TypeResult> findAllLinkTypes();
 
     @EzyQuery(
         "SELECT e FROM Link e " +
@@ -35,10 +43,21 @@ public interface LinkRepository extends EzyDatabaseRepository<Long, Link> {
     List<Link> findByIdGt(long idExclusive, Next next);
 
     @EzyQuery(
-        "SELECT e FROM Link e WHERE e.linkType = ?0 ORDER BY e.id DESC"
+        "SELECT e FROM Link e " +
+            "WHERE e.linkType = ?0 " +
+            "ORDER BY e.id DESC"
     )
     List<Link> findByLinkTypeOrderByIdDesc(
         String linkType,
         Next next
+    );
+
+    @EzyQuery(
+        "SELECT DISTINCT e.linkType FROM Link e " +
+            "WHERE e.linkType <> ?0 " +
+            "ORDER BY e.linkType ASC"
+    )
+    List<TypeResult> findLinkTypesExclude(
+        Collection<String> exclusiveLinkTypes
     );
 }

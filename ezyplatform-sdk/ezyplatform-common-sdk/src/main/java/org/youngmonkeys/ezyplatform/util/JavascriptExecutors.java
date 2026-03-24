@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Map;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigDecimalOrNull;
 
 public final class JavascriptExecutors {
@@ -34,8 +35,7 @@ public final class JavascriptExecutors {
         String script,
         Map<String, Object> parameters
     ) {
-        Context context = Context.enter();
-        try {
+        try(Context context = Context.enter()) {
             Scriptable scope = context.initStandardObjects();
             for (Map.Entry<String, Object> e : parameters.entrySet()) {
                 scope.put(e.getKey(), scope, e.getValue());
@@ -43,12 +43,10 @@ public final class JavascriptExecutors {
             return context.evaluateString(
                 scope,
                 script,
-                null,
-                0,
-                null
+                NULL_STRING,
+                ZERO,
+                NULL_STRING
             );
-        } finally {
-            Context.exit();
         }
     }
 
@@ -59,18 +57,15 @@ public final class JavascriptExecutors {
         RoundingMode roundingMode
     ) {
         Object result = execute(script, parameters);
-        if (result == null) {
-            return null;
-        }
-        if (result instanceof Undefined) {
-            return null;
+        if (result == null || result instanceof Undefined) {
+            return NULL_BIG_DECIMAL;
         }
         String resultStr = result.toString();
         BigDecimal resultBigDecimal = toBigDecimalOrNull(
             resultStr
         );
         if (resultBigDecimal == null) {
-            return null;
+            return NULL_BIG_DECIMAL;
         }
         return resultBigDecimal.setScale(
             bigDecimalScale,

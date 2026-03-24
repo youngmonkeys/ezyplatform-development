@@ -20,11 +20,13 @@ import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
 import java.util.Collection;
+import java.util.List;
 
 public class DefaultContentTemplateFilter implements ContentTemplateFilter {
     public final String ownerType;
     public final Long ownerId;
     public final String templateType;
+    public final List<String> templateTypeList;
     public final String templateName;
     public final String contentType;
     public final Long creatorId;
@@ -37,6 +39,7 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
         this.ownerType = builder.ownerType;
         this.ownerId = builder.ownerId;
         this.templateType = builder.templateType;
+        this.templateTypeList = builder.templateTypeList;
         this.templateName = builder.templateName;
         this.contentType = builder.contentType;
         this.creatorId = builder.creatorId;
@@ -66,6 +69,9 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
         }
         if (templateType != null) {
             answer.and("e.templateType = :templateType");
+        }
+        if (templateTypeList != null) {
+            answer.and("e.templateType IN :templateTypeList");
         }
         if (templateName != null) {
             answer.and("e.templateName = :templateName");
@@ -106,6 +112,7 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
         protected String ownerType;
         protected Long ownerId;
         protected String templateType;
+        protected List<String> templateTypeList;
         protected String templateName;
         protected String contentType;
         protected Long creatorId;
@@ -126,6 +133,11 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
 
         public Builder templateType(String templateType) {
             this.templateType = templateType;
+            return this;
+        }
+
+        public Builder templateTypeList(List<String> templateTypeList) {
+            this.templateTypeList = templateTypeList;
             return this;
         }
 
