@@ -388,6 +388,7 @@ public class DefaultEntityToModelConverter {
             .status(entity.getStatus())
             .createdAt(toTimestamp(entity.getCreatedAt()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .updatedAtLocalDateTime(entity.getUpdatedAt())
             .build();
     }
 

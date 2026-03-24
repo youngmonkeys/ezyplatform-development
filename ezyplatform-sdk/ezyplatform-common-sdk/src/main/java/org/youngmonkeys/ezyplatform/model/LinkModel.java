@@ -19,6 +19,8 @@ package org.youngmonkeys.ezyplatform.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class LinkModel {
@@ -33,4 +35,5 @@ public class LinkModel {
     private String status;
     private long createdAt;
     private long updatedAt;
+    private LocalDateTime updatedAtLocalDateTime;
 }

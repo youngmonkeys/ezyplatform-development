@@ -41,6 +41,10 @@ public class LinkPaginationParameterConverter
             LinkPaginationSortOrder.ID_DESC.toString(),
             IdDescLinkPaginationParameter.class
         );
+        map.put(
+            LinkPaginationSortOrder.UPDATED_AT_DESC_ID_DESC.toString(),
+            UpdatedAtDescIdDescLinkPaginationParameter.class
+        );
     }
 
     @Override
@@ -50,6 +54,13 @@ public class LinkPaginationParameterConverter
         map.put(
             LinkPaginationSortOrder.ID_DESC.toString(),
             model -> new IdDescLinkPaginationParameter(
+                model.getId()
+            )
+        );
+        map.put(
+            LinkPaginationSortOrder.UPDATED_AT_DESC_ID_DESC.toString(),
+            model -> new UpdatedAtDescIdDescLinkPaginationParameter(
+                model.getUpdatedAtLocalDateTime(),
                 model.getId()
             )
         );

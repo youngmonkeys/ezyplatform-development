@@ -17,5 +17,6 @@
 package org.youngmonkeys.ezyplatform.pagination;
 
 public enum LinkPaginationSortOrder {
-    ID_DESC
+    ID_DESC,
+    UPDATED_AT_DESC_ID_DESC
 }
