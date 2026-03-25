@@ -35,7 +35,7 @@ public final class JavascriptExecutors {
         String script,
         Map<String, Object> parameters
     ) {
-        try(Context context = Context.enter()) {
+        try (Context context = Context.enter()) {
             Scriptable scope = context.initStandardObjects();
             for (Map.Entry<String, Object> e : parameters.entrySet()) {
                 scope.put(e.getKey(), scope, e.getValue());

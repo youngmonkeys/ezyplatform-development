@@ -18,7 +18,7 @@ package org.youngmonkeys.ezyplatform.extractor;
 
 import org.youngmonkeys.ezyplatform.entity.User;
 
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
@@ -29,7 +29,8 @@ public class DefaultUserKeywordsExtractor implements UserKeywordsExtractor {
 
     @Override
     public Set<String> extract(User user) {
-        Set<String> answer = new LinkedHashSet<>();
+        Set<String> answer = new HashSet<>();
+        answer.add(String.valueOf(user.getId()));
         String phone = user.getPhone();
         if (isNotBlank(phone)) {
             answer.addAll(toKeywords(phone));
