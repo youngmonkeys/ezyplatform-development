@@ -553,6 +553,7 @@ public class DefaultModelToEntityConverter {
         entity.setDescription(model.getDescription());
         entity.setSourceType(sourceType);
         entity.setSourceId(model.getSourceId());
+        entity.setStatus(model.getStatus());
         entity.setUpdatedAt(clock.nowDateTime());
     }
 

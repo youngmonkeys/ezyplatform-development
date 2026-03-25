@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,22 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.workflow;
 
-import lombok.Builder;
-import lombok.Getter;
+import java.util.Map;
 
-@Getter
-@Builder
-public class SaveLinkModel {
-    private String linkUri;
-    private String linkType;
-    private String sourceType;
-    private String description;
-    private long sourceId;
-    private String status;
-    private long linkImageId;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+
+public interface WorkflowHandler {
+
+    void handle(
+        Map<String, Object> input,
+        Map<String, Object> output
+    );
+
+    String getName();
+
+    default String getDisplayName() {
+        return NULL_STRING;
+    }
 }

@@ -14,19 +14,20 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.repo;
 
-import lombok.Builder;
-import lombok.Getter;
+import org.youngmonkeys.ezyplatform.entity.Link;
+import org.youngmonkeys.ezyplatform.pagination.LinkFilter;
+import org.youngmonkeys.ezyplatform.pagination.LinkPaginationParameter;
 
-@Getter
-@Builder
-public class SaveLinkModel {
-    private String linkUri;
-    private String linkType;
-    private String sourceType;
-    private String description;
-    private long sourceId;
-    private String status;
-    private long linkImageId;
+public class PaginationLinkRepository extends PaginationRepository<
+    LinkFilter,
+    LinkPaginationParameter,
+    Long,
+    Link> {
+
+    @Override
+    protected Class<Link> getEntityType() {
+        return Link.class;
+    }
 }

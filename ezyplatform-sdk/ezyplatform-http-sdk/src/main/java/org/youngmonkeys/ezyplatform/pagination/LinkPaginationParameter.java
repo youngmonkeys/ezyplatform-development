@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2023 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,6 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.pagination;
 
-import lombok.Builder;
-import lombok.Getter;
-
-@Getter
-@Builder
-public class SaveLinkModel {
-    private String linkUri;
-    private String linkType;
-    private String sourceType;
-    private String description;
-    private long sourceId;
-    private String status;
-    private long linkImageId;
-}
+public interface LinkPaginationParameter extends CommonPaginationParameter {}

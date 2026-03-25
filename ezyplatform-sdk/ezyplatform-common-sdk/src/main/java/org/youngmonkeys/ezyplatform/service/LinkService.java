@@ -19,6 +19,9 @@ package org.youngmonkeys.ezyplatform.service;
 import org.youngmonkeys.ezyplatform.model.LinkModel;
 import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface LinkService {
 
     void saveLink(SaveLinkModel model);
@@ -34,6 +37,12 @@ public interface LinkService {
 
     boolean containsLinkByUri(String uri);
 
+    List<String> getAllLinkTypes();
+
+    List<String> getLinkTypesExclude(
+        Collection<String> exclusiveLinkTypes
+    );
+
     LinkModel getLinkById(long linkId);
 
     LinkModel getLinkByIdIncludeImage(long linkId);
@@ -46,4 +55,14 @@ public interface LinkService {
         LinkModel model = getLinkById(linkId);
         return  model != null ? model.getLinkUri() : null;
     }
+
+    List<LinkModel> getLinksByIdGt(
+        long idExclusive,
+        int limit
+    );
+
+    List<LinkModel> getLinksByTypeOrderByIdDesc(
+        String linkType,
+        int limit
+    );
 }

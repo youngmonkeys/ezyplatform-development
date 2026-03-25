@@ -20,10 +20,10 @@ import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
 public class DefaultNotificationFilter implements LetterFilter {
-    private final String type;
-    private final Long fromAdminId;
-    private final Long fromUserId;
-    private final String status;
+    public final String type;
+    public final Long fromAdminId;
+    public final Long fromUserId;
+    public final String status;
 
     protected DefaultNotificationFilter(Builder<?> builder) {
         this.type = builder.type;

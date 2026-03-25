@@ -14,19 +14,6 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.pagination;
 
-import lombok.Builder;
-import lombok.Getter;
-
-@Getter
-@Builder
-public class SaveLinkModel {
-    private String linkUri;
-    private String linkType;
-    private String sourceType;
-    private String description;
-    private long sourceId;
-    private String status;
-    private long linkImageId;
-}
+public interface LinkFilter extends CommonStorageFilter {}

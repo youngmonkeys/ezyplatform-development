@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.model.MediaNameModel.getMediaUrlOrNull;
 
 @AllArgsConstructor
@@ -360,7 +361,14 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
-    public LinkModel toModel(Link entity, MediaNameModel image) {
+    public LinkModel toModel(Link entity) {
+        return toModel(entity, NULL_STRING);
+    }
+
+    public LinkModel toModel(
+        Link entity,
+        MediaNameModel image
+    ) {
         return toModel(entity, getMediaUrlOrNull(image));
     }
 
@@ -377,8 +385,10 @@ public class DefaultEntityToModelConverter {
             .description(entity.getDescription())
             .sourceType(entity.getSourceType())
             .sourceId(entity.getSourceId())
+            .status(entity.getStatus())
             .createdAt(toTimestamp(entity.getCreatedAt()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .updatedAtLocalDateTime(entity.getUpdatedAt())
             .build();
     }
 

@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyStrings;
+import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
@@ -24,7 +26,14 @@ import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.model.LinkModel;
 import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
 import org.youngmonkeys.ezyplatform.repo.LinkRepository;
+import org.youngmonkeys.ezyplatform.result.TypeResult;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static org.youngmonkeys.ezyplatform.model.MediaNameModel.getMediaUrlOrNull;
 
@@ -77,6 +86,32 @@ public class DefaultLinkService implements LinkService {
     }
 
     @Override
+    public List<String> getAllLinkTypes() {
+        return linkRepository
+            .findAllLinkTypes()
+            .stream()
+            .map(TypeResult::getType)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getLinkTypesExclude(
+        Collection<String> exclusiveLinkTypes
+    ) {
+        Collection<String> exclusive = exclusiveLinkTypes;
+        if (exclusive.isEmpty()) {
+            exclusive = Collections.singletonList(EMPTY_STRING);
+        }
+        return linkRepository
+            .findLinkTypesExclude(exclusive)
+            .stream()
+            .map(TypeResult::getType)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public LinkModel getLinkById(long linkId) {
         return entityToModelConverter.toModel(
             linkRepository.findById(linkId),
@@ -116,6 +151,34 @@ public class DefaultLinkService implements LinkService {
                 : getMediaUrlOrNull(
                     mediaService.getMediaNameById(link.getImageId())
                 )
+        );
+    }
+
+    @Override
+    public List<LinkModel> getLinksByIdGt(
+        long idExclusive,
+        int limit
+    ) {
+        return newArrayList(
+            linkRepository.findByIdGt(
+                idExclusive,
+                Next.limit(limit)
+            ),
+            entityToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<LinkModel> getLinksByTypeOrderByIdDesc(
+        String linkType,
+        int limit
+    ) {
+        return newArrayList(
+            linkRepository.findByLinkTypeOrderByIdDesc(
+                linkType,
+                Next.limit(limit)
+            ),
+            entityToModelConverter::toModel
         );
     }
 
