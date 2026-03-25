@@ -18,7 +18,10 @@ package org.youngmonkeys.ezyplatform.pagination;
 
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
+
 import java.util.Collection;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_ADMIN;
 
 public class DefaultAdminFilter implements AdminFilter {
     public final Collection<Long> ids;
@@ -26,6 +29,7 @@ public class DefaultAdminFilter implements AdminFilter {
     public final Collection<String> statuses;
     public final String exclusiveStatus;
     public final String uniqueKeyword;
+    public final String keywordPrefix;
     public final String likeKeyword;
     public final Long roleId;
     public final Collection<Long> roleIds;
@@ -42,6 +46,7 @@ public class DefaultAdminFilter implements AdminFilter {
         this.statuses = builder.statuses;
         this.exclusiveStatus = builder.exclusiveStatus;
         this.uniqueKeyword = builder.uniqueKeyword;
+        this.keywordPrefix = builder.keywordPrefix;
         this.likeKeyword = builder.likeKeyword;
         this.roleId = builder.roleId;
         this.roleIds = builder.roleIds;
@@ -57,6 +62,11 @@ public class DefaultAdminFilter implements AdminFilter {
     public void decorateQueryStringBeforeWhere(
         StringBuilder queryString
     ) {
+        if (keywordPrefix != null) {
+            queryString.append(
+                " INNER JOIN DataIndex k ON e.id = k.dataId"
+            );
+        }
         if (roleId != null
             || roleIds != null
             || roleName != null
@@ -142,6 +152,11 @@ public class DefaultAdminFilter implements AdminFilter {
                     .build()
             );
         }
+        if (keywordPrefix != null) {
+            answer
+                .and("k.dataType = '" + TABLE_NAME_ADMIN + "'")
+                .and("k.keyword LIKE CONCAT(:keywordPrefix, '%')");
+        }
         if (likeKeyword != null) {
             answer.and(
                 new EzyQueryConditionBuilder()
@@ -165,6 +180,7 @@ public class DefaultAdminFilter implements AdminFilter {
         private Collection<String> statuses;
         private String exclusiveStatus;
         private String uniqueKeyword;
+        private String keywordPrefix;
         private String likeKeyword;
         private Long roleId;
         private Collection<Long> roleIds;
@@ -197,6 +213,11 @@ public class DefaultAdminFilter implements AdminFilter {
 
         public T uniqueKeyword(String uniqueKeyword) {
             this.uniqueKeyword = uniqueKeyword;
+            return (T) this;
+        }
+
+        public T keywordPrefix(String keywordPrefix) {
+            this.keywordPrefix = keywordPrefix;
             return (T) this;
         }
 
