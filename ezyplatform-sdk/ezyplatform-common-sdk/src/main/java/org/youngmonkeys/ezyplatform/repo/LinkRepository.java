@@ -54,7 +54,7 @@ public interface LinkRepository extends EzyDatabaseRepository<Long, Link> {
 
     @EzyQuery(
         "SELECT DISTINCT e.linkType FROM Link e " +
-            "WHERE e.linkType <> ?0 " +
+            "WHERE e.linkType NOT IN ?0 " +
             "ORDER BY e.linkType ASC"
     )
     List<TypeResult> findLinkTypesExclude(
