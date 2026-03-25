@@ -34,6 +34,7 @@
 			<package name="org.youngmonkeys.ezyplatform.test.service"/>
 			<package name="org.youngmonkeys.ezyplatform.test.util"/>
 			<package name="org.youngmonkeys.ezyplatform.test.validator"/>
+			<package name="org.youngmonkeys.ezyplatform.test.workflow"/>
 		</packages>
 	</test>
 </suite>
