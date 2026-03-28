@@ -373,6 +373,17 @@ public class DefaultModelToEntityConverter {
         return userAccessToken;
     }
 
+    public UserRole toUserRoleByUserIdAndRoleId(
+        long userId,
+        long roleId
+    ) {
+        UserRole entity = new UserRole();
+        entity.setUserId(userId);
+        entity.setRoleId(roleId);
+        entity.setCreatedAt(clock.nowDateTime());
+        return entity;
+    }
+
     public Setting toSettingEntity(
         String name,
         String dataType,
@@ -542,7 +553,10 @@ public class DefaultModelToEntityConverter {
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
-    public void mergeToEntity(SaveLinkModel model, Link entity) {
+    public void mergeToEntity(
+        SaveLinkModel model,
+        Link entity
+    ) {
         String sourceType = model.getSourceType();
         if (isBlank(sourceType)) {
             sourceType = CommonConstants.UNKNOWN;

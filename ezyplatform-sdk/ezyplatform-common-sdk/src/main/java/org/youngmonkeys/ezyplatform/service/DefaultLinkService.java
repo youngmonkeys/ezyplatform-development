@@ -26,6 +26,7 @@ import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.model.LinkModel;
 import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
 import org.youngmonkeys.ezyplatform.repo.LinkRepository;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
 
 import java.util.Collection;
@@ -107,6 +108,16 @@ public class DefaultLinkService implements LinkService {
             .findLinkTypesExclude(exclusive)
             .stream()
             .map(TypeResult::getType)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllLinkStatuses() {
+        return linkRepository
+            .findAllLinkStatuses()
+            .stream()
+            .map(StatusResult::getStatus)
             .filter(EzyStrings::isNotBlank)
             .collect(Collectors.toList());
     }

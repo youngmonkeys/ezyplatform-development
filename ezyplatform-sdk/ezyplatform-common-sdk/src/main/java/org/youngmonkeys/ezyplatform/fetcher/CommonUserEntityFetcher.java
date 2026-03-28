@@ -70,7 +70,10 @@ public class CommonUserEntityFetcher
     }
 
     @Override
-    public String getEntityType() {
-        return TABLE_NAME_USER;
+    public String[] getEntityTypes() {
+        return new String[] {
+            "USER",
+            TABLE_NAME_USER
+        };
     }
 }
