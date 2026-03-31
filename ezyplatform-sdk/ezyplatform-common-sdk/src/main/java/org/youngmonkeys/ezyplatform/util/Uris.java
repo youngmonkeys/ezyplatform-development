@@ -18,14 +18,22 @@ package org.youngmonkeys.ezyplatform.util;
 
 import com.tvd12.ezyfox.io.EzyStrings;
 
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.URI;
+
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTPS_URL;
 
 public final class Uris {
 
     private Uris() {}
 
-    public static String resolveUrl(String root, String path) {
+    public static String resolveUrl(
+        String root,
+        String path
+    ) {
         if (root.endsWith("/")) {
             if (path.startsWith("/")) {
                 if (path.length() == 1) {
@@ -44,8 +52,13 @@ public final class Uris {
         }
     }
 
-    public static boolean uriStartsWith(String uri, String prefix) {
-        String compareUri = prefix.startsWith("/") ? prefix : "/" + prefix;
+    public static boolean uriStartsWith(
+        String uri,
+        String prefix
+    ) {
+        String compareUri = prefix.startsWith("/")
+            ? prefix
+            : "/" + prefix;
         if (uri.equals(compareUri)) {
             return true;
         }
@@ -53,11 +66,16 @@ public final class Uris {
         return uri.startsWith(compareUriPrefix);
     }
 
-    public static String getSiteName(String siteUrl) {
+    public static String getSiteName(
+        String siteUrl
+    ) {
         return getSiteName(siteUrl, EMPTY_STRING);
     }
 
-    public static String getSiteName(String siteUrl, String defaultValue) {
+    public static String getSiteName(
+        String siteUrl,
+        String defaultValue
+    ) {
         if (isBlank(siteUrl)) {
             return defaultValue;
         }
@@ -81,7 +99,9 @@ public final class Uris {
         return EzyStrings.toDisplayName(host);
     }
 
-    public static String getFileExtensionInUrl(String url) {
+    public static String getFileExtensionInUrl(
+        String url
+    ) {
         if (isBlank(url)) {
             return null;
         }
@@ -100,5 +120,74 @@ public final class Uris {
         return (index >= 0 && index < length)
             ? url.substring(index)
             : null;
+    }
+
+    public static boolean isSslDomain(
+        String domain
+    ) {
+        if (isBlank(domain) || !domain.startsWith(PREFIX_HTTPS_URL)) {
+            return false;
+        }
+        try {
+            String host = new URI(domain).getHost();
+            return !isBlank(host)
+                && !isIpHost(host);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static boolean isIpHost(
+        String host
+    ) {
+        return isIpv4Host(host)
+            || isIpv6Host(host);
+    }
+
+    private static boolean isIpv4Host(
+        String host
+    ) {
+        String[] items = host.split("\\.");
+        if (items.length != 4) {
+            return false;
+        }
+        for (String item : items) {
+            if (isBlank(item) || !item.matches("\\d{1,3}")) {
+                return false;
+            }
+            int value = Integer.parseInt(item);
+            if (value < 0 || value > 255) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static boolean isIpv6Host(
+        String host
+    ) {
+        String normalizedHost = host;
+        if (host.startsWith("[") && host.endsWith("]")) {
+            normalizedHost = host.substring(1, host.length() - 1);
+        }
+        if (isBlank(normalizedHost)) {
+            return false;
+        }
+        for (int i = 0; i < normalizedHost.length(); ++i) {
+            char ch = normalizedHost.charAt(i);
+            if (Character.digit(ch, 16) >= 0
+                || ch == ':'
+                || ch == '.'
+                || ch == '%'
+            ) {
+                continue;
+            }
+            return false;
+        }
+        try {
+            return InetAddress.getByName(normalizedHost) instanceof Inet6Address;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

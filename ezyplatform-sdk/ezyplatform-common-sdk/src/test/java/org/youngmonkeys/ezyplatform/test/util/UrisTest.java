@@ -20,6 +20,7 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.util.Uris;
 
+import static org.youngmonkeys.ezyplatform.util.Uris.isSslDomain;
 import static org.youngmonkeys.ezyplatform.util.Uris.uriStartsWith;
 
 public class UrisTest {
@@ -105,5 +106,15 @@ public class UrisTest {
         Asserts.assertTrue(uriStartsWith("/hello/world", "/hello"));
         Asserts.assertFalse(uriStartsWith("/hellos", "hello"));
         Asserts.assertFalse(uriStartsWith("/hellos", "/hello"));
+    }
+
+    @Test
+    public void isSslDomainTest() {
+        Asserts.assertTrue(isSslDomain("https://youngmonkeys.org"));
+        Asserts.assertTrue(isSslDomain("https://admin.youngmonkeys.org/path"));
+        Asserts.assertFalse(isSslDomain("http://youngmonkeys.org"));
+        Asserts.assertFalse(isSslDomain("https://127.0.0.1"));
+        Asserts.assertFalse(isSslDomain("https://[2001:db8::1]"));
+        Asserts.assertFalse(isSslDomain(null));
     }
 }
