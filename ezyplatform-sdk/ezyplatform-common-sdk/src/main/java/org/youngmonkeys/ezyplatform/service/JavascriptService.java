@@ -16,49 +16,57 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
-import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import lombok.AllArgsConstructor;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.tvd12.ezyfox.io.EzySets.combine;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 
 public class JavascriptService {
 
     private final EzyBeanContext beanContext;
     private final SettingService settingService;
-    private final Set<String> beanNames;
+    private final Map<String, String> jsBeanNameByJavaBeanName;
 
     public JavascriptService(
         EzyBeanContext beanContext,
+        ObjectMapper objectMapper,
         SettingService settingService
     ) {
         this.beanContext = beanContext;
         this.settingService = settingService;
-        this.beanNames = ConcurrentHashMap.newKeySet();
+        this.jsBeanNameByJavaBeanName = new ConcurrentHashMap<>();
         settingService.addValueConverter(
             SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-            it -> SingletonStringDeserializer
-                .getInstance()
-                .deserialize(it, List.class, String.class)
+            it -> objectMapper.readValue(
+                it,
+                Map.class
+            )
         );
         settingService.watchLastUpdatedTimeAndCache(
             SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES
         );
     }
 
-    public void addBeanName(String beanName) {
-        beanNames.add(beanName);
+    public void includeBeanName(
+        String javaBeanName,
+        String jsBeanName
+    ) {
+        jsBeanNameByJavaBeanName.put(
+            javaBeanName,
+            jsBeanName
+        );
     }
 
-    @SuppressWarnings("unchecked")
     public Object execute(
         String script,
         Map<String, Object> parameters
@@ -66,30 +74,17 @@ public class JavascriptService {
         return execute(
             script,
             parameters,
-            combine(
-                beanNames,
-                settingService.getCachedValue(
-                    SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                    Collections.emptyList()
-                )
-            )
+            getAllJsBeanNameByJavaBeanName()
         );
     }
 
-    @SuppressWarnings("unchecked")
     public Object execute(
         Map<String, Object> parameters,
         JavascriptFunction func
     ) {
         return execute(
             parameters,
-            combine(
-                beanNames,
-                settingService.getCachedValue(
-                    SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                    Collections.emptyList()
-                )
-            ),
+            getAllJsBeanNameByJavaBeanName(),
             func
         );
     }
@@ -97,18 +92,18 @@ public class JavascriptService {
     public Object execute(
         String script,
         Map<String, Object> parameters,
-        Collection<String> beanNames
+        Map<String, String> jsBeanNameByJavaBeanName
     ) {
         return execute(
             parameters,
-            beanNames,
+            jsBeanNameByJavaBeanName,
             new DefaultJavascriptFunction(script)
         );
     }
 
     public Object execute(
         Map<String, Object> parameters,
-        Collection<String> beanNames,
+        Map<String, String> jsBeanNameByJavaBeanName,
         JavascriptFunction func
     ) {
         try (Context context = Context.enter()) {
@@ -121,19 +116,34 @@ public class JavascriptService {
                 scope,
                 beanContext.getProperties()
             );
-            for (String beanName : beanNames) {
+            for (Map.Entry<String, String> e
+                : jsBeanNameByJavaBeanName.entrySet()
+            ) {
                 Object bean = beanContext
-                    .getBean(beanName, Object.class);
+                    .getBean(e.getKey(), Object.class);
                 if (bean != null) {
                     ScriptableObject.putProperty(
                         scope,
-                        beanName,
+                        e.getValue(),
                         Context.javaToJS(bean, scope)
                     );
                 }
             }
             return func.run(context, scope);
         }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    public Map<String, String> getAllJsBeanNameByJavaBeanName() {
+        Map<String, String> beanNameMap = new HashMap<>();
+        beanNameMap.putAll(jsBeanNameByJavaBeanName);
+        beanNameMap.putAll(
+            (Map) settingService.getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyList()
+            )
+        );
+        return beanNameMap;
     }
 
     public interface JavascriptFunction {
