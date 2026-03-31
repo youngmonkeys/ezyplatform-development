@@ -282,6 +282,8 @@ public final class CommonConstants {
         "web_additional_script";
     public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
         "web_additional_foot";
+    public static final String SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES =
+        "javascript_service_bean_names";
 
     public static final int DEFAULT_TIMEOUT_SECONDS = 15;
     public static final String DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
