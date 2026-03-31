@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 import static org.youngmonkeys.ezyplatform.util.Randoms.randomEmailFromUrl;
@@ -416,7 +417,7 @@ public interface SettingService {
     default boolean isAllowSendStatisticsData() {
         return getBooleanValue(
             SETTING_NAME_ALLOW_SEND_STATISTICS_DATA,
-            true
+            Boolean.TRUE
         );
     }
 
@@ -426,10 +427,22 @@ public interface SettingService {
     }
 
     default String resolveAdminUri(String uri) {
+        if (isBlank(uri)
+            || uri.startsWith(PREFIX_HTTP_URL)
+            || uri.startsWith(PREFIX_HTTPS_URL)
+        ) {
+            return uri;
+        }
         return Uris.resolveUrl(getAdminUrl(), uri);
     }
 
     default String resolveWebUri(String uri) {
+        if (isBlank(uri)
+            || uri.startsWith(PREFIX_HTTP_URL)
+            || uri.startsWith(PREFIX_HTTPS_URL)
+        ) {
+            return uri;
+        }
         return Uris.resolveUrl(getWebUrl(), uri);
     }
 

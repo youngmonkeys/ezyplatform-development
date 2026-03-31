@@ -19,16 +19,22 @@ package org.youngmonkeys.ezyplatform.pagination;
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
+import java.util.Collection;
+
 public class DefaultDataMetaFilter implements DataMetaFilter {
     public final String dataType;
     public final Long dataId;
     public final String metaKey;
+    public final String exclusiveMetaKey;
+    public final Collection<String> exclusiveMetaKeys;
     public final String likeKeyword;
 
     public DefaultDataMetaFilter(Builder builder) {
         this.dataType = builder.dataType;
         this.dataId = builder.dataId;
         this.metaKey = builder.metaKey;
+        this.exclusiveMetaKey = builder.exclusiveMetaKey;
+        this.exclusiveMetaKeys = builder.exclusiveMetaKeys;
         this.likeKeyword = builder.likeKeyword;
     }
 
@@ -43,6 +49,12 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         }
         if (metaKey != null) {
             answer.and("e.metaKey = :metaKey");
+        }
+        if (exclusiveMetaKey != null) {
+            answer.and("e.metaKey <> :exclusiveMetaKey");
+        }
+        if (exclusiveMetaKeys != null) {
+            answer.and("e.metaKey NOT IN :exclusiveMetaKeys");
         }
         if (likeKeyword != null) {
             answer.and(
@@ -62,6 +74,8 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         private String dataType;
         private Long dataId;
         private String metaKey;
+        private String exclusiveMetaKey;
+        private Collection<String> exclusiveMetaKeys;
         private String likeKeyword;
 
         public Builder dataType(String dataType) {
@@ -76,6 +90,18 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
 
         public Builder metaKey(String metaKey) {
             this.metaKey = metaKey;
+            return this;
+        }
+
+        public Builder exclusiveMetaKey(String exclusiveMetaKey) {
+            this.exclusiveMetaKey = exclusiveMetaKey;
+            return this;
+        }
+
+        public Builder exclusiveMetaKeys(
+            Collection<String> exclusiveMetaKeys
+        ) {
+            this.exclusiveMetaKeys = exclusiveMetaKeys;
             return this;
         }
 
