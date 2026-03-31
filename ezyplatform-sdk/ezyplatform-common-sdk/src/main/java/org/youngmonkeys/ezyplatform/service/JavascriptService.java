@@ -24,17 +24,17 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static com.tvd12.ezyfox.io.EzySets.combine;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 
 public class JavascriptService {
 
     private final EzyBeanContext beanContext;
     private final SettingService settingService;
+    private final Set<String> beanNames;
 
     public JavascriptService(
         EzyBeanContext beanContext,
@@ -42,6 +42,7 @@ public class JavascriptService {
     ) {
         this.beanContext = beanContext;
         this.settingService = settingService;
+        this.beanNames = ConcurrentHashMap.newKeySet();
         settingService.addValueConverter(
             SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
             it -> SingletonStringDeserializer
@@ -53,6 +54,11 @@ public class JavascriptService {
         );
     }
 
+    public void addBeanName(String beanName) {
+        beanNames.add(beanName);
+    }
+
+    @SuppressWarnings("unchecked")
     public Object execute(
         String script,
         Map<String, Object> parameters
@@ -60,22 +66,29 @@ public class JavascriptService {
         return execute(
             script,
             parameters,
-            settingService.getCachedValue(
-                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+            combine(
+                beanNames,
+                settingService.getCachedValue(
+                    SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                    Collections.emptyList()
+                )
             )
         );
     }
 
+    @SuppressWarnings("unchecked")
     public Object execute(
         Map<String, Object> parameters,
         JavascriptFunction func
     ) {
         return execute(
             parameters,
-            settingService.getCachedValue(
-                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+            combine(
+                beanNames,
+                settingService.getCachedValue(
+                    SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                    Collections.emptyList()
+                )
             ),
             func
         );

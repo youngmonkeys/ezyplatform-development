@@ -18,6 +18,8 @@ package org.youngmonkeys.ezyplatform.test.service;
 
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.test.assertion.Asserts;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.service.JavascriptService;
@@ -144,6 +146,107 @@ public class JavascriptServiceTest {
     }
 
     @Test
+    public void executeWithJavascriptFunctionAndBeanNamesFromSettingTest() {
+        // given
+        Properties properties = new Properties();
+        properties.setProperty("siteName", "EzyPlatform");
+        when(beanContext.getProperties()).thenReturn(properties);
+        when(beanContext.getBean("greetingBean", Object.class))
+            .thenReturn(new GreetingBean());
+        when(
+            settingService.getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyList()
+            )
+        )
+            .thenReturn(Collections.singletonList("greetingBean"));
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            settingService
+        );
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", "Platform");
+        parameters.put("number", 5);
+
+        // when
+        Object actual = instance.execute(
+            parameters,
+            (context, scope) -> ((Context) context).evaluateString(
+                (Scriptable) scope,
+                "greetingBean.greet(name) + '-' + properties.get('siteName') + '-' + (number * 2)",
+                "JavascriptServiceTest",
+                1,
+                null
+            ).toString()
+        );
+
+        // then
+        Asserts.assertEquals(actual, "Hello Platform-EzyPlatform-10");
+        verify(settingService, times(1)).addValueConverter(
+            eq(SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES),
+            any()
+        );
+        verify(settingService, times(1)).watchLastUpdatedTimeAndCache(
+            SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES
+        );
+        verify(settingService, times(1)).getCachedValue(
+            SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+            Collections.emptyList()
+        );
+        verify(beanContext, times(1)).getProperties();
+        verify(beanContext, times(1)).getBean("greetingBean", Object.class);
+    }
+
+    @Test
+    public void executeWithAddedBeanNameTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        when(beanContext.getBean("greetingBean", Object.class))
+            .thenReturn(new GreetingBean());
+        when(beanContext.getBean("sumBean", Object.class))
+            .thenReturn(new SumBean());
+        when(
+            settingService.getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyList()
+            )
+        )
+            .thenReturn(Collections.singletonList("greetingBean"));
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            settingService
+        );
+        instance.addBeanName("sumBean");
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", "Codex");
+        parameters.put("a", 2);
+        parameters.put("b", 3);
+
+        // when
+        Object actual = instance.execute(
+            "greetingBean.greet(name) + '-' + sumBean.sum(a, b)",
+            parameters
+        );
+
+        // then
+        Asserts.assertEquals(actual, "Hello Codex-5");
+        verify(settingService, times(1)).addValueConverter(
+            eq(SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES),
+            any()
+        );
+        verify(settingService, times(1)).watchLastUpdatedTimeAndCache(
+            SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES
+        );
+        verify(settingService, times(1)).getCachedValue(
+            SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+            Collections.emptyList()
+        );
+        verify(beanContext, times(1)).getProperties();
+        verify(beanContext, times(1)).getBean("greetingBean", Object.class);
+        verify(beanContext, times(1)).getBean("sumBean", Object.class);
+    }
+
+    @Test
     public void executeUndefinedResultTest() {
         // given
         when(beanContext.getProperties()).thenReturn(new Properties());
@@ -162,6 +265,32 @@ public class JavascriptServiceTest {
         // when
         Object actual = instance.execute(
             "var answer = 1 + 1;",
+            Collections.emptyMap()
+        );
+
+        // then
+        Asserts.assertEquals(actual, NULL_STRING);
+    }
+
+    @Test
+    public void executeNullResultTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        when(
+            settingService.getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyList()
+            )
+        )
+            .thenReturn(Collections.emptyList());
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            settingService
+        );
+
+        // when
+        Object actual = instance.execute(
+            "null",
             Collections.emptyMap()
         );
 
