@@ -29,17 +29,37 @@ import java.util.Set;
 public class SettingServiceTest {
 
     @Test
+    public void resolveAdminUriTest() {
+        // given
+        String uri = RandomUtil.randomShortAlphabetString();
+        String fullUri = "https://" + RandomUtil.randomShortAlphabetString() + ".com";
+        InternalSettingService internalSettingService = new InternalSettingService();
+
+        // when
+        String actual = internalSettingService.resolveAdminUri(uri);
+        String fullUriActual = internalSettingService.resolveAdminUri(fullUri);
+
+        // then
+        String expectation = CommonConstants.DEFAULT_ADMIN_URL + "/" + uri;
+        Asserts.assertEquals(actual, expectation);
+        Asserts.assertEquals(fullUriActual, fullUri);
+    }
+
+    @Test
     public void resolveWebUriTest() {
         // given
         String uri = RandomUtil.randomShortAlphabetString();
+        String fullUri = "https://" + RandomUtil.randomShortAlphabetString() + ".com";
         InternalSettingService internalSettingService = new InternalSettingService();
 
         // when
         String actual = internalSettingService.resolveWebUri(uri);
+        String fullUriActual = internalSettingService.resolveWebUri(fullUri);
 
         // then
         String expectation = CommonConstants.DEFAULT_WEB_URL + "/" + uri;
         Asserts.assertEquals(actual, expectation);
+        Asserts.assertEquals(fullUriActual, fullUri);
     }
 
     private static class InternalSettingService implements SettingService {
