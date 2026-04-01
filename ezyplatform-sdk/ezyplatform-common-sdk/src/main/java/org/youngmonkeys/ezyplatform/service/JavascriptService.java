@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 
 public class JavascriptService {
@@ -159,6 +160,9 @@ public class JavascriptService {
 
         @Override
         public Object run(Object context, Object scope) {
+            if (isBlank(script)) {
+                return NULL_STRING;
+            }
             Object result = ((Context) context).evaluateString(
                 (Scriptable) scope,
                 script,
