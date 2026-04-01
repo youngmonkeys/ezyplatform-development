@@ -134,12 +134,11 @@ public class JavascriptService {
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public Map<String, String> getAllJsBeanNameByJavaBeanName() {
         Map<String, String> beanNameMap = new HashMap<>();
         beanNameMap.putAll(jsBeanNameByJavaBeanName);
         beanNameMap.putAll(
-            (Map) settingService.getCachedValue(
+            settingService.getCachedValue(
                 SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
                 Collections.emptyMap()
             )
