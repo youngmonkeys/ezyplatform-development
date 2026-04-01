@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.web.controller;
 
 import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
@@ -24,6 +25,7 @@ import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import lombok.Setter;
+import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
 import org.youngmonkeys.ezyplatform.manager.EnvironmentManager;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 import static com.tvd12.ezyfox.io.EzyStrings.exceptionToSimpleString;
 import static com.tvd12.ezyhttp.server.core.constant.CoreConstants.ATTRIBUTE_MATCHED_URI;
 import static java.util.Collections.singletonMap;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.EVENT_NAME_HANDLE_GLOBAL_REQUEST_ERROR;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 
 /**
@@ -50,10 +53,13 @@ import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 public class WebGlobalErrorHandler implements UnhandledErrorHandler {
 
     @EzyAutoBind
-    protected RequestURIManager requestUriManager;
+    protected EnvironmentManager environmentManager;
 
     @EzyAutoBind
-    protected EnvironmentManager environmentManager;
+    protected EventHandlerManager eventHandlerManager;
+
+    @EzyAutoBind
+    protected RequestURIManager requestUriManager;
 
     @Override
     public Object processError(
@@ -69,6 +75,21 @@ public class WebGlobalErrorHandler implements UnhandledErrorHandler {
         }
         boolean isApiUri = method != HttpMethod.GET
             || requestUriManager.isApiURI(method, matchedUri);
+        Object result = eventHandlerManager.handleEvent(
+            EVENT_NAME_HANDLE_GLOBAL_REQUEST_ERROR,
+            EzyMapBuilder.mapBuilder()
+                .put("method", method)
+                .put("request", request)
+                .put("response", response)
+                .put("errorStatusCode", errorStatusCode)
+                .put("exception", exception)
+                .put("matchedUri", matchedUri)
+                .put("isApiUri", isApiUri)
+                .toMap()
+        );
+        if (result != null) {
+            return result;
+        }
         if (isApiUri) {
             return toResponseEntity(errorStatusCode, exception);
         }
