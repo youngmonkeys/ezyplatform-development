@@ -185,7 +185,8 @@ public final class Uris {
             return false;
         }
         try {
-            return InetAddress.getByName(normalizedHost) instanceof Inet6Address;
+            return InetAddress.getByName(normalizedHost)
+                instanceof Inet6Address;
         } catch (Exception e) {
             return false;
         }

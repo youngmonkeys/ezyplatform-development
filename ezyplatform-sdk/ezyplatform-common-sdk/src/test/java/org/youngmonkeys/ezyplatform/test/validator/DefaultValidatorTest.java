@@ -194,6 +194,10 @@ public class DefaultValidatorTest {
         // malformed
         Asserts.assertFalse(isValidExternalUrl("not a url"));
         Asserts.assertFalse(isValidExternalUrl("https://"));
+        Asserts.assertFalse(isValidExternalUrl("mailto:test@allowed.com"));
+        Asserts.assertFalse(isValidExternalUrl("https://localhost"));
+        Asserts.assertFalse(isValidExternalUrl("https://127.0.0.1"));
+        Asserts.assertFalse(isValidExternalUrl("https://[::1]"));
 
         // userinfo present
         Asserts.assertFalse(isValidExternalUrl("https://user:pass@allowed.com"));

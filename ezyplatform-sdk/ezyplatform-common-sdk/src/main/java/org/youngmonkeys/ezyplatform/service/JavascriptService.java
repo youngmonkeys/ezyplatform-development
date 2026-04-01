@@ -140,7 +140,7 @@ public class JavascriptService {
         beanNameMap.putAll(
             (Map) settingService.getCachedValue(
                 SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+                Collections.emptyMap()
             )
         );
         return beanNameMap;

@@ -26,11 +26,7 @@ import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.service.JavascriptService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
@@ -78,7 +74,7 @@ public class JavascriptServiceTest {
             .when(settingService)
             .getCachedValue(
                 SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+                Collections.emptyMap()
             );
         JavascriptService instance = new JavascriptService(
             beanContext,
@@ -99,7 +95,7 @@ public class JavascriptServiceTest {
         Asserts.assertEquals(actual, "Hello Codex-EzyPlatform-8");
         verify(settingService, times(1)).getCachedValue(
             SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-            Collections.emptyList()
+            Collections.emptyMap()
         );
         verify(beanContext, times(1)).getProperties();
         verify(beanContext, times(1)).getBean("greetingBean", Object.class);
@@ -161,7 +157,7 @@ public class JavascriptServiceTest {
             .when(settingService)
             .getCachedValue(
                 SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+                Collections.emptyMap()
             );
         JavascriptService instance = new JavascriptService(
             beanContext,
@@ -188,7 +184,7 @@ public class JavascriptServiceTest {
         Asserts.assertEquals(actual, "Hello Platform-EzyPlatform-10");
         verify(settingService, times(1)).getCachedValue(
             SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-            Collections.emptyList()
+            Collections.emptyMap()
         );
         verify(beanContext, times(1)).getProperties();
         verify(beanContext, times(1)).getBean("greetingBean", Object.class);
@@ -206,7 +202,7 @@ public class JavascriptServiceTest {
             .when(settingService)
             .getCachedValue(
                 SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+                Collections.emptyMap()
             );
         JavascriptService instance = new JavascriptService(
             beanContext,
@@ -229,7 +225,7 @@ public class JavascriptServiceTest {
         Asserts.assertEquals(actual, "Hello Codex-5");
         verify(settingService, times(1)).getCachedValue(
             SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-            Collections.emptyList()
+            Collections.emptyMap()
         );
         verify(beanContext, times(1)).getProperties();
         verify(beanContext, times(1)).getBean("greetingBean", Object.class);
@@ -246,7 +242,7 @@ public class JavascriptServiceTest {
             .when(settingService)
             .getCachedValue(
                 SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+                Collections.emptyMap()
             );
         JavascriptService instance = new JavascriptService(
             beanContext,
@@ -275,7 +271,7 @@ public class JavascriptServiceTest {
             .when(settingService)
             .getCachedValue(
                 SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+                Collections.emptyMap()
             );
         JavascriptService instance = new JavascriptService(
             beanContext,
@@ -301,7 +297,7 @@ public class JavascriptServiceTest {
             .when(settingService)
             .getCachedValue(
                 SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyList()
+                Collections.emptyMap()
             );
         JavascriptService instance = new JavascriptService(
             beanContext,
