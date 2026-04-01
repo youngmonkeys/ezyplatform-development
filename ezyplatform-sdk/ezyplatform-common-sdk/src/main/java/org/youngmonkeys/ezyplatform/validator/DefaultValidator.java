@@ -21,7 +21,9 @@ import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Locale;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.properties.file.util.PropertiesUtil.getKeysFromVariableName;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
@@ -77,17 +79,37 @@ public final class DefaultValidator {
     public static boolean isValidExternalUrl(String url) {
         try {
             URI uri = new URI(url);
+            if (uri.isOpaque()) {
+                return false;
+            }
             String scheme = uri.getScheme();
             String host = uri.getHost();
-            return scheme.equals(HTTPS)
-                && isNotBlank(host)
-                && !host.equals(LOCALHOST)
-                && isPublicHost(host)
-                && !host.matches(PATTERN_IP)
-                && uri.getUserInfo() == null;
+            if (!HTTPS.equalsIgnoreCase(scheme)
+                || isBlank(host)
+                || uri.getUserInfo() != null
+            ) {
+                return false;
+            }
+            String normalizedHost = normalizeHost(host);
+            return isNotBlank(normalizedHost)
+                && !LOCALHOST.equals(normalizedHost)
+                && !normalizedHost.matches(PATTERN_IP)
+                && !normalizedHost.contains(":")
+                && isPublicHost(normalizedHost);
         } catch (Exception e) {
             return false;
         }
+    }
+
+    private static String normalizeHost(String host) {
+        String normalizedHost = host.trim().toLowerCase(Locale.ROOT);
+        while (normalizedHost.endsWith(".")) {
+            normalizedHost = normalizedHost.substring(
+                0,
+                normalizedHost.length() - 1
+            );
+        }
+        return normalizedHost;
     }
 
     public static boolean isPublicHost(String host) {
@@ -104,12 +126,15 @@ public final class DefaultValidator {
         }
     }
 
+    @SuppressWarnings("MethodLength")
     private static boolean isInternalNetworkAddress(
         InetAddress address
     ) {
         if (address.isAnyLocalAddress()
             || address.isLoopbackAddress()
             || address.isLinkLocalAddress()
+            || address.isSiteLocalAddress()
+            || address.isMulticastAddress()
         ) {
             return true;
         }
@@ -119,7 +144,12 @@ public final class DefaultValidator {
             int second = Byte.toUnsignedInt(b[1]);
 
             // 10.0.0.0/8
-            if (first == 10) {
+            if (first == 0 || first == 10 || first == 127) {
+                return true;
+            }
+
+            // 100.64.0.0/10 (carrier-grade NAT)
+            if (first == 100 && (second >= 64 && second <= 127)) {
                 return true;
             }
 
@@ -137,6 +167,42 @@ public final class DefaultValidator {
             if (first == 169 && second == 254) {
                 return true;
             }
+
+            // 192.0.0.0/24
+            if (first == 192
+                && second == 0
+                && Byte.toUnsignedInt(b[2]) == 0
+            ) {
+                return true;
+            }
+
+            // 192.0.2.0/24, 198.51.100.0/24,
+            // 203.0.113.0/24 (documentation)
+            if ((first == 192
+                && second == 0
+                && Byte.toUnsignedInt(b[2]) == 2)
+                || (first == 198
+                && second == 51
+                && Byte.toUnsignedInt(b[2]) == 100)
+                || (first == 203
+                && second == 0
+                && Byte.toUnsignedInt(b[2]) == 113)
+            ) {
+                return true;
+            }
+
+            // 198.18.0.0/15 (benchmark testing)
+            if (first == 198
+                && (second == 18 || second == 19)
+            ) {
+                return true;
+            }
+
+            // 224.0.0.0/4 multicast,
+            // 240.0.0.0/4 reserved, 255.255.255.255
+            if (first >= 224) {
+                return true;
+            }
         }
         if (address instanceof Inet6Address) {
             if (address.isLoopbackAddress()) {
@@ -144,7 +210,17 @@ public final class DefaultValidator {
             }
             byte[] b = address.getAddress();
             int firstByte = Byte.toUnsignedInt(b[0]);
-            return (firstByte & 0xfe) == 0xfc;
+            int secondByte = Byte.toUnsignedInt(b[1]);
+            if ((firstByte & 0xfe) == 0xfc) {
+                return true;
+            }
+            // fe80::/10 link-local is already covered above, but keep
+            // documentation and discard-only ranges explicit here.
+            return (firstByte == 0x20 && secondByte == 0x01
+                    && Byte.toUnsignedInt(b[2]) == 0x0d
+                    && Byte.toUnsignedInt(b[3]) == 0xb8)
+                || firstByte == 0x00
+                || firstByte == 0xff;
         }
         return false;
     }

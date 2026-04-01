@@ -151,6 +151,9 @@ public final class CommonConstants {
 
     public static final String KEY_AUTHENTICATED = "authenticated";
 
+    public static final String EVENT_NAME_HANDLE_GLOBAL_REQUEST_ERROR =
+        "handle_global_request_error";
+
     public static final String META_KEY_SLUG = "slug";
     public static final String META_KEY_LOGIN_FAILURES = "login_failures";
     public static final String META_KEY_LOGIN_BLOCKED_UTIL = "login_blocked_util";
@@ -282,6 +285,8 @@ public final class CommonConstants {
         "web_additional_script";
     public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
         "web_additional_foot";
+    public static final String SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES =
+        "javascript_service_bean_names";
 
     public static final int DEFAULT_TIMEOUT_SECONDS = 15;
     public static final String DEFAULT_DATE_FORMAT = "YYYY-MM-DD";

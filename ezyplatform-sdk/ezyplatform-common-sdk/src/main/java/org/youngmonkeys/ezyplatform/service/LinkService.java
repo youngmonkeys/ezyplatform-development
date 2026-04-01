@@ -43,6 +43,8 @@ public interface LinkService {
         Collection<String> exclusiveLinkTypes
     );
 
+    List<String> getAllLinkStatuses();
+
     LinkModel getLinkById(long linkId);
 
     LinkModel getLinkByIdIncludeImage(long linkId);

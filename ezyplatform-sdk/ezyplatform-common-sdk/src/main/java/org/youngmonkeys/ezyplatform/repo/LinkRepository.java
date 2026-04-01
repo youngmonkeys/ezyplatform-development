@@ -20,6 +20,7 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.Link;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
 
 import java.util.Collection;
@@ -34,6 +35,12 @@ public interface LinkRepository extends EzyDatabaseRepository<Long, Link> {
             "ORDER BY e.linkType ASC"
     )
     List<TypeResult> findAllLinkTypes();
+
+    @EzyQuery(
+        "SELECT DISTINCT e.status FROM Link e " +
+            "ORDER BY e.status ASC"
+    )
+    List<StatusResult> findAllLinkStatuses();
 
     @EzyQuery(
         "SELECT e FROM Link e " +

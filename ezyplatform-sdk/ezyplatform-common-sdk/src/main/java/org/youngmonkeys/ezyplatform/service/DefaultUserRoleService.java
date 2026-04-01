@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyfox.io.EzyCollections;
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
 import org.youngmonkeys.ezyplatform.entity.UserRoleId;
 import org.youngmonkeys.ezyplatform.entity.UserRoleName;
@@ -37,6 +38,33 @@ public class DefaultUserRoleService implements UserRoleService {
 
     private final UserRoleRepository userRoleRepository;
     private final UserRoleNameRepository userRoleNameRepository;
+    private final DefaultModelToEntityConverter modelToEntityConverter;
+
+    public void saveUserRoleByUserIdAndRoleId(
+        long userId,
+        long roleId
+    ) {
+        UserRole entity = userRoleRepository.findById(
+            new UserRoleId(
+                roleId,
+                userId
+            )
+        );
+        if (entity == null) {
+            entity = modelToEntityConverter
+                .toUserRoleByUserIdAndRoleId(userId, roleId);
+            userRoleRepository.save(entity);
+        }
+    }
+
+    public void deleteUserRoleByUserIdAndRoleId(
+        long userId,
+        long roleId
+    ) {
+        userRoleRepository.delete(
+            new UserRoleId(roleId, userId)
+        );
+    }
 
     @Override
     public long getRoleIdByName(String roleName) {

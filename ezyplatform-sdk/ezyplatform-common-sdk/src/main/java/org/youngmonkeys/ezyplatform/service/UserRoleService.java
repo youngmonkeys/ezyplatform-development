@@ -24,6 +24,16 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1500_R
 
 public interface UserRoleService {
 
+    void saveUserRoleByUserIdAndRoleId(
+        long userId,
+        long roleId
+    );
+
+    void deleteUserRoleByUserIdAndRoleId(
+        long userId,
+        long roleId
+    );
+
     long getRoleIdByName(String roleName);
 
     Set<Long> getRoleIdsByNames(
