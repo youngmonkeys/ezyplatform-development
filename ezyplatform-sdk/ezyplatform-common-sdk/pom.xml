@@ -102,7 +102,6 @@
             <groupId>org.mozilla</groupId>
             <artifactId>rhino</artifactId>
             <version>${rhino.version}</version>
-            <optional>true</optional>
         </dependency>
     </dependencies>
 </project>
