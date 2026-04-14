@@ -124,7 +124,7 @@ public final class CommonConstants {
     public static final int LIMIT_1_000_000_RECORDS = 1_000_000;
 
     public static final int MIN_PAGE_SIZE = 1;
-    public static final int MAX_PAGE_SIZE = 500;
+    public static final int MAX_PAGE_SIZE = 5000;
     public static final int WEB_MAX_PAGE_SIZE = 100;
 
     public static final String COOKIE_NAME_ACCESS_TOKEN = "accessToken";

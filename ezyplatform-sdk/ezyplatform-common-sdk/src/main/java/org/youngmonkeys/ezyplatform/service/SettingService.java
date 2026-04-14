@@ -21,17 +21,53 @@ import com.tvd12.ezyfox.function.EzyExceptionFunction;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import com.tvd12.ezyhttp.core.util.FileSizes;
 import org.youngmonkeys.ezyplatform.entity.DataType;
+import org.youngmonkeys.ezyplatform.model.SettingValueDataTypeModel;
 import org.youngmonkeys.ezyplatform.util.Uris;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_ACCEPTED_IMAGE_TYPES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_ADMIN_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATETIME_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATE_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATE_MINUTE_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_UPLOAD_FILE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TIME_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TOKEN_EXPIRED_IN_DAY;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_WEBSOCKET_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_WEB_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1_000_000_RECORDS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTPS_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTP_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_DATETIME_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_DATE_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_DATE_MINUTE_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_TIME_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ALLOW_SEND_STATISTICS_DATA;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_PAGINATION_COUNT_LIMIT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_USER_ACCESS_TOKEN_HTTP_ONLY;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEBSOCKET_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATETIME_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATE_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATE_MINUTE_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_MANAGEMENT_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_SITE_TITLE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_TIME_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NODE_NAME;
 import static org.youngmonkeys.ezyplatform.util.Randoms.randomEmailFromUrl;
 
 @SuppressWarnings("MethodCount")
@@ -114,6 +150,14 @@ public interface SettingService {
     <T> T getCachedValue(String settingName, T defaultValue);
 
     Optional<String> getSettingValue(String settingName);
+
+    Map<String, String> getSettingValueMapByNames(
+        Collection<String> names
+    );
+
+    Map<String, SettingValueDataTypeModel> getSettingValueDataTypeMapByNames(
+        Collection<String> names
+    );
 
     default long getMaxUploadFileSize() {
         String value = getTextValue(

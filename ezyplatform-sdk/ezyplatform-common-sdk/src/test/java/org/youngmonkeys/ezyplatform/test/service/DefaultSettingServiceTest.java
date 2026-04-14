@@ -27,6 +27,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.repo.SettingRepository;
 import org.youngmonkeys.ezyplatform.service.DefaultSettingService;
@@ -35,7 +36,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Set;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FILE_ENCRYPTION_KEYS;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FOLDER_SETTINGS;
 
@@ -101,9 +106,16 @@ public class DefaultSettingServiceTest {
             Scheduler scheduler,
             ObjectMapper objectMapper,
             FileSystemManager fileSystemManager,
-            SettingRepository settingRepository
+            SettingRepository settingRepository,
+            DefaultEntityToModelConverter entityToModelConverter
         ) {
-            super(scheduler, objectMapper, fileSystemManager, settingRepository);
+            super(
+                scheduler,
+                objectMapper,
+                fileSystemManager,
+                settingRepository,
+                entityToModelConverter
+            );
         }
 
         @Override

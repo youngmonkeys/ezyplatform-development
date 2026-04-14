@@ -21,6 +21,7 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
 import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.DataType;
 import org.youngmonkeys.ezyplatform.entity.Setting;
@@ -40,13 +41,15 @@ public abstract class MutableSettingService
         ObjectMapper objectMapper,
         FileSystemManager fileSystemManager,
         SettingRepository settingRepository,
+        DefaultEntityToModelConverter entityToModelConverter,
         DefaultModelToEntityConverter modelToEntityConverter
     ) {
         super(
             scheduler,
             objectMapper,
             fileSystemManager,
-            settingRepository
+            settingRepository,
+            entityToModelConverter
         );
         this.settingRepository = settingRepository;
         this.modelToEntityConverter = modelToEntityConverter;

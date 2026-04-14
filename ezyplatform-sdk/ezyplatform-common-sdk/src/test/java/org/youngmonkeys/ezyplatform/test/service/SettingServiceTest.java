@@ -21,8 +21,12 @@ import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.util.RandomUtil;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.constant.CommonConstants;
+import org.youngmonkeys.ezyplatform.model.SettingValueDataTypeModel;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -99,6 +103,20 @@ public class SettingServiceTest {
         @Override
         public Optional<String> getSettingValue(String settingName) {
             return Optional.empty();
+        }
+
+        @Override
+        public Map<String, String> getSettingValueMapByNames(
+            Collection<String> names
+        ) {
+            return Collections.emptyMap();
+        }
+
+        @Override
+        public Map<String, SettingValueDataTypeModel> getSettingValueDataTypeMapByNames(
+            Collection<String> names
+        ) {
+            return Collections.emptyMap();
         }
 
         @Override

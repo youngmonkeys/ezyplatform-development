@@ -24,8 +24,10 @@ import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.Setting;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
+import org.youngmonkeys.ezyplatform.model.SettingValueDataTypeModel;
 import org.youngmonkeys.ezyplatform.repo.SettingRepository;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
 
@@ -33,6 +35,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +59,7 @@ public abstract class DefaultSettingService
     private final Scheduler scheduler;
     private final ObjectMapper objectMapper;
     private final SettingRepository settingRepository;
+    private final DefaultEntityToModelConverter entityToModelConverter;
     protected final File encryptionKeysFile;
     private final AtomicLong encryptionKeysFileLastModified
         = new AtomicLong();
@@ -78,11 +83,13 @@ public abstract class DefaultSettingService
         Scheduler scheduler,
         ObjectMapper objectMapper,
         FileSystemManager fileSystemManager,
-        SettingRepository settingRepository
+        SettingRepository settingRepository,
+        DefaultEntityToModelConverter entityToModelConverter
     ) {
         this.scheduler = scheduler;
         this.objectMapper = objectMapper;
         this.settingRepository = settingRepository;
+        this.entityToModelConverter = entityToModelConverter;
         this.encryptionKeysFile = fileSystemManager.concatWithEzyHome(
             Paths.get(FOLDER_SETTINGS, FILE_ENCRYPTION_KEYS)
         );
@@ -219,6 +226,40 @@ public abstract class DefaultSettingService
                 settingName
             )
             .map(Setting::getValue);
+    }
+
+    public Map<String, String> getSettingValueMapByNames(
+        Collection<String> names
+    ) {
+        if (names.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return settingRepository
+            .findByNameIn(names)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Setting::getName,
+                    Setting::getValue
+                )
+            );
+    }
+
+    public Map<String, SettingValueDataTypeModel> getSettingValueDataTypeMapByNames(
+        Collection<String> names
+    ) {
+        if (names.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return settingRepository
+            .findByNameIn(names)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Setting::getName,
+                    entityToModelConverter::toSettingValueDataTypeModel
+                )
+            );
     }
 
     @SuppressWarnings("unchecked")

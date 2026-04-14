@@ -17,8 +17,56 @@
 package org.youngmonkeys.ezyplatform.converter;
 
 import lombok.AllArgsConstructor;
-import org.youngmonkeys.ezyplatform.entity.*;
-import org.youngmonkeys.ezyplatform.model.*;
+import org.youngmonkeys.ezyplatform.entity.AccessTokenMeta;
+import org.youngmonkeys.ezyplatform.entity.Admin;
+import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
+import org.youngmonkeys.ezyplatform.entity.AdminMeta;
+import org.youngmonkeys.ezyplatform.entity.AdminRole;
+import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
+import org.youngmonkeys.ezyplatform.entity.DataIndex;
+import org.youngmonkeys.ezyplatform.entity.DataMapping;
+import org.youngmonkeys.ezyplatform.entity.DataMeta;
+import org.youngmonkeys.ezyplatform.entity.Letter;
+import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
+import org.youngmonkeys.ezyplatform.entity.Link;
+import org.youngmonkeys.ezyplatform.entity.Media;
+import org.youngmonkeys.ezyplatform.entity.MediaType;
+import org.youngmonkeys.ezyplatform.entity.Notification;
+import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
+import org.youngmonkeys.ezyplatform.entity.Setting;
+import org.youngmonkeys.ezyplatform.entity.UniqueData;
+import org.youngmonkeys.ezyplatform.entity.User;
+import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
+import org.youngmonkeys.ezyplatform.entity.UserKeyword;
+import org.youngmonkeys.ezyplatform.entity.UserMeta;
+import org.youngmonkeys.ezyplatform.entity.UserRole;
+import org.youngmonkeys.ezyplatform.entity.UserRoleName;
+import org.youngmonkeys.ezyplatform.model.AccessTokenMetaModel;
+import org.youngmonkeys.ezyplatform.model.AdminAccessTokenModel;
+import org.youngmonkeys.ezyplatform.model.AdminMetaModel;
+import org.youngmonkeys.ezyplatform.model.AdminModel;
+import org.youngmonkeys.ezyplatform.model.AdminRoleModel;
+import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
+import org.youngmonkeys.ezyplatform.model.DataIndexModel;
+import org.youngmonkeys.ezyplatform.model.DataMappingModel;
+import org.youngmonkeys.ezyplatform.model.DataMetaModel;
+import org.youngmonkeys.ezyplatform.model.LetterModel;
+import org.youngmonkeys.ezyplatform.model.LetterReceiverModel;
+import org.youngmonkeys.ezyplatform.model.LinkModel;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaNameModel;
+import org.youngmonkeys.ezyplatform.model.NotificationModel;
+import org.youngmonkeys.ezyplatform.model.NotificationReceiverModel;
+import org.youngmonkeys.ezyplatform.model.SettingValueDataTypeModel;
+import org.youngmonkeys.ezyplatform.model.SimpleLetterModel;
+import org.youngmonkeys.ezyplatform.model.SimpleNotificationModel;
+import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
+import org.youngmonkeys.ezyplatform.model.UserAccessTokenModel;
+import org.youngmonkeys.ezyplatform.model.UserKeywordModel;
+import org.youngmonkeys.ezyplatform.model.UserMetaModel;
+import org.youngmonkeys.ezyplatform.model.UserModel;
+import org.youngmonkeys.ezyplatform.model.UserRoleModel;
+import org.youngmonkeys.ezyplatform.model.UserRoleNameModel;
 import org.youngmonkeys.ezyplatform.util.LocalDateTimes;
 
 import java.time.LocalDateTime;
@@ -497,6 +545,18 @@ public class DefaultEntityToModelConverter {
             .audience(entity.getAudience())
             .notBefore(toTimestamp(entity.getNotBefore()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .build();
+    }
+
+    public SettingValueDataTypeModel toSettingValueDataTypeModel(
+        Setting entity
+    ) {
+        if (entity == null) {
+            return null;
+        }
+        return SettingValueDataTypeModel.builder()
+            .value(entity.getValue())
+            .dataType(entity.getDataType())
             .build();
     }
 

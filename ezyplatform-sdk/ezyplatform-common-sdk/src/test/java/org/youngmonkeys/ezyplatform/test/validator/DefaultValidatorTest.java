@@ -41,6 +41,38 @@ public class DefaultValidatorTest {
     }
 
     @Test
+    public void isValidUsernameTest() {
+        Asserts.assertTrue(
+            DefaultValidator.isValidUsername("user123")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidUsername("user-name")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidUsername("user_name")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidUsername("user.name")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isValidUsername("user-name_123.test")
+        );
+
+        Asserts.assertFalse(
+            DefaultValidator.isValidUsername("ab")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidUsername("user name")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidUsername("user@name")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isValidUsername(null)
+        );
+    }
+
+    @Test
     public void isValidPhoneTest() {
         Asserts.assertTrue(
             DefaultValidator.isValidUIntNumber("123")

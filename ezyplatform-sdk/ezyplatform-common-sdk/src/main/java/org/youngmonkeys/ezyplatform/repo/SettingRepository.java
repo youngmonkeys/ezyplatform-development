@@ -22,9 +22,11 @@ import org.youngmonkeys.ezyplatform.entity.Setting;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
-public interface SettingRepository extends EzyDatabaseRepository<Long, Setting> {
+public interface SettingRepository
+    extends EzyDatabaseRepository<Long, Setting> {
 
     void deleteByName(String name);
 
@@ -38,5 +40,9 @@ public interface SettingRepository extends EzyDatabaseRepository<Long, Setting> 
     Setting findByNameAndUpdatedAtGt(
         String name,
         LocalDateTime updatedAt
+    );
+
+    List<Setting> findByNameIn(
+        Collection<String> names
     );
 }
