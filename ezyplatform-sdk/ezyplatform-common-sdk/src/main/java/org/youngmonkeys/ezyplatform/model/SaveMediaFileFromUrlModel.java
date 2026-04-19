@@ -24,4 +24,5 @@ import lombok.Getter;
 public class SaveMediaFileFromUrlModel {
     private String mediaType;
     private String mediaUrl;
+    private boolean notPublic;
 }

@@ -24,6 +24,7 @@ import java.net.URI;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_FILE_EXTENSION_LENGTH;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTPS_URL;
 
 public final class Uris {
@@ -105,8 +106,11 @@ public final class Uris {
         if (isBlank(url)) {
             return null;
         }
+        int length = url.indexOf('?');
+        if (length < 0) {
+            length = url.length();
+        }
         int index = -1;
-        int length = url.length();
         for (int i = length - 1; i >= 0; --i) {
             char ch = url.charAt(i);
             if (ch == '.') {
@@ -117,9 +121,14 @@ public final class Uris {
                 break;
             }
         }
-        return (index >= 0 && index < length)
-            ? url.substring(index)
-            : null;
+        if (index < 0 || index >= length) {
+            return null;
+        }
+        int extensionLength = length - index;
+        if (extensionLength > MAX_FILE_EXTENSION_LENGTH) {
+            extensionLength = MAX_FILE_EXTENSION_LENGTH;
+        }
+        return url.substring(index, index + extensionLength);
     }
 
     public static boolean isSslDomain(

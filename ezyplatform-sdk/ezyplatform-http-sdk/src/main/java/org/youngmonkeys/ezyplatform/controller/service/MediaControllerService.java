@@ -39,7 +39,14 @@ import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
-import org.youngmonkeys.ezyplatform.event.*;
+import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
+import org.youngmonkeys.ezyplatform.event.GetMediaFilePathEvent;
+import org.youngmonkeys.ezyplatform.event.MediaAddedEvent;
+import org.youngmonkeys.ezyplatform.event.MediaDownloadEvent;
+import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
+import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
+import org.youngmonkeys.ezyplatform.event.MediaUploadEvent;
+import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.io.FolderProxy;
@@ -48,7 +55,14 @@ import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloader;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloaderManager;
 import org.youngmonkeys.ezyplatform.media.MediaUploadArguments;
-import org.youngmonkeys.ezyplatform.model.*;
+import org.youngmonkeys.ezyplatform.media.MediaUploadFromUrlArguments;
+import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaDetailsModel;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
+import org.youngmonkeys.ezyplatform.model.PaginationModel;
+import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
+import org.youngmonkeys.ezyplatform.model.SaveMediaFileFromUrlModel;
+import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
@@ -69,12 +83,15 @@ import javax.servlet.http.Part;
 import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.function.Predicate;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static java.util.Collections.singletonMap;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.model.MediaDetailsModel.fromMediaModel;
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModelBySortOrder;
 import static org.youngmonkeys.ezyplatform.util.Strings.from;
@@ -180,7 +197,9 @@ public class MediaControllerService extends EzyLoggable {
         MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
             .getMediaUpDownloaderByName(mediaUploaderName);
         FileUploader fileUploader = fileUploaderWrapper.get();
-        if (mediaUpDownloader != null) {
+        if (mediaUpDownloader != null
+            && mediaUpDownloader.isUploadSupported()
+        ) {
             mediaUpDownloader.upload(
                 MediaUploadArguments.builder()
                     .tika(tika.get())
@@ -363,7 +382,9 @@ public class MediaControllerService extends EzyLoggable {
         long ownerAdminId = media.getOwnerAdminId();
         long ownerUserId = media.getOwnerUserId();
         boolean avatar = media.getType() == MediaType.AVATAR;
-        if (mediaUpDownloader != null) {
+        if (mediaUpDownloader != null
+            && mediaUpDownloader.isUploadSupported()
+        ) {
             mediaUpDownloader.upload(
                 MediaUploadArguments.builder()
                     .tika(tika.get())
@@ -476,6 +497,7 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
+    @SuppressWarnings("MethodLength")
     public long saveMediaFileFromUrl(
         String uploadFrom,
         long ownerAdminId,
@@ -486,8 +508,29 @@ public class MediaControllerService extends EzyLoggable {
         if (isBlank(mediaUrl)) {
             return ZERO_LONG;
         }
-        String mediaTypeText = model.getMediaType();
         try {
+            String mediaUploaderName = settingService
+                .getMediaUpDownloaderName();
+            MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
+                .getMediaUpDownloaderByName(mediaUploaderName);
+            String mediaTypeText = model.getMediaType();
+            if (mediaUpDownloader != null
+                && mediaUpDownloader.isUploadFromUrlSupported()
+            ) {
+                return mediaUpDownloader.uploadFromUrl(
+                    MediaUploadFromUrlArguments.builder()
+                        .tika(tika.get())
+                        .httpClient(httpClient)
+                        .uploadFrom(uploadFrom)
+                        .action(UploadAction.ADD)
+                        .mediaType(mediaTypeText)
+                        .mediaUrl(mediaUrl)
+                        .ownerAdminId(ownerAdminId)
+                        .ownerUserId(ownerUserId)
+                        .notPublic(model.isNotPublic())
+                        .build()
+                );
+            }
             File outFolder = fileSystemManager.getMediaFolderPath(
                 MediaType.ofName(mediaTypeText)
             );
@@ -500,12 +543,14 @@ public class MediaControllerService extends EzyLoggable {
                 outFolder,
                 fileName
             );
+            String newFileName = result.getNewFileName();
+            Path mediaFilePath = outFolder
+                .toPath()
+                .resolve(newFileName);
             org.apache.tika.mime.MediaType tikaMediaType;
             try (
                 InputStream inputStream = Files.newInputStream(
-                    outFolder
-                        .toPath()
-                        .resolve(result.getNewFileName())
+                    mediaFilePath
                 )
             ) {
                 tikaMediaType = tika.get().getDetector().detect(
@@ -516,13 +561,19 @@ public class MediaControllerService extends EzyLoggable {
             MediaModel media = mediaService.addMedia(
                 uploadFrom,
                 AddMediaModel.builder()
-                    .fileName(result.getNewFileName())
+                    .fileName(newFileName)
                     .originalFileName(result.getOriginalFileName())
                     .mediaType(mediaTypeText)
                     .mimeType(tikaMediaType.toString())
                     .ownerAdminId(ownerAdminId)
                     .ownerUserId(ownerUserId)
                     .build()
+            );
+            eventHandlerManager.handleEvent(
+                new MediaUploadedEvent(
+                    media,
+                    mediaFilePath.toFile()
+                )
             );
             return media.getId();
         } catch (Exception e) {
@@ -660,7 +711,9 @@ public class MediaControllerService extends EzyLoggable {
             .getMediaUpDownloaderName();
         MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
             .getMediaUpDownloaderByName(mediaUploaderName);
-        if (mediaUpDownloader != null) {
+        if (mediaUpDownloader != null
+            && mediaUpDownloader.isDownloadSupported()
+        ) {
             mediaUpDownloader.download(
                 MediaDownloadArguments.builder()
                     .requestArguments(requestArguments)

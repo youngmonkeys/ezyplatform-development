@@ -16,35 +16,23 @@
 
 package org.youngmonkeys.ezyplatform.media;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+import com.tvd12.ezyhttp.client.HttpClient;
+import lombok.Builder;
+import lombok.Getter;
+import org.apache.tika.config.TikaConfig;
+import org.youngmonkeys.ezyplatform.entity.UploadAction;
 
-public interface MediaUpDownloader {
-
-    default void upload(
-        MediaUploadArguments arguments
-    ) {}
-
-    default boolean isUploadSupported() {
-        return Boolean.FALSE;
-    }
-
-    default long uploadFromUrl(
-        MediaUploadFromUrlArguments arguments
-    ) {
-        return ZERO_LONG;
-    }
-
-    default boolean isUploadFromUrlSupported() {
-        return Boolean.FALSE;
-    }
-
-    default void download(
-        MediaDownloadArguments arguments
-    ) {}
-
-    default boolean isDownloadSupported() {
-        return Boolean.FALSE;
-    }
-
-    String getName();
+@Getter
+@Builder
+public class MediaUploadFromUrlArguments {
+    private TikaConfig tika;
+    private HttpClient httpClient;
+    private String uploadFrom;
+    private UploadAction action;
+    private long mediaId;
+    private String mediaType;
+    private String mediaUrl;
+    private long ownerAdminId;
+    private long ownerUserId;
+    private boolean notPublic;
 }
