@@ -769,23 +769,7 @@ public class MediaControllerService extends EzyLoggable {
         if (media == null || !validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaId);
         }
-        String mediaUploaderName = settingService
-            .getMediaUpDownloaderName();
-        MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
-            .getMediaUpDownloaderByName(mediaUploaderName);
-        MediaDetailsModel mediaDetails = null;
-        if (mediaUpDownloader != null) {
-            mediaDetails = mediaUpDownloader.getMediaDetails(media);
-        }
-        if (mediaDetails == null) {
-            mediaDetails = eventHandlerManager.handleEvent(
-                new GetMediaDetailsEvent(media)
-            );
-        }
-        if (mediaDetails == null) {
-            mediaDetails = getMediaDetails(media);
-        }
-        return mediaDetails;
+        return getMediaDetailsAnyway(media);
     }
 
     public MediaDetailsModel getMediaDetailsByName(
@@ -796,6 +780,12 @@ public class MediaControllerService extends EzyLoggable {
         if (media == null || !validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaName);
         }
+        return getMediaDetailsAnyway(media);
+    }
+
+    public MediaDetailsModel getMediaDetailsAnyway(
+        MediaModel media
+    ) {
         String mediaUploaderName = settingService
             .getMediaUpDownloaderName();
         MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
