@@ -45,6 +45,7 @@ import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
 import org.youngmonkeys.ezyplatform.event.GetMediaFilePathEvent;
+import org.youngmonkeys.ezyplatform.event.MediaAddedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaDownloadEvent;
 import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
@@ -65,6 +66,7 @@ import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.repo.PaginationMediaRepository;
+import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
@@ -1732,6 +1734,87 @@ public class MediaControllerServiceTest {
         );
         inOrder.verify(commonValidator).validatePageSize(20);
         inOrder.verify(modelToResponseConverter).toResponse(mediaModel);
+    }
+
+    @Test
+    public void addMediaFromUrlRequestTest() {
+        // given
+        AddMediaFromUrlRequest request = new AddMediaFromUrlRequest();
+        request.setType(MediaType.IMAGE);
+        request.setUrl("https://cdn.example.com/banner.png");
+        AddMediaModel addMediaModel = AddMediaModel.builder()
+            .ownerAdminId(111L)
+            .ownerUserId(222L)
+            .fileName("banner-generated.png")
+            .build();
+        MediaModel media = MediaModel.builder()
+            .id(909L)
+            .name("banner-generated.png")
+            .build();
+        when(mediaService.generateMediaFileName(
+            "https://cdn.example.com/banner.png",
+            "image"
+        )).thenReturn("banner-generated.png");
+        when(requestToModelConverter.toModel(
+            111L,
+            222L,
+            "banner-generated.png",
+            request,
+            true
+        )).thenReturn(addMediaModel);
+        when(mediaService.addMedia("ADMIN", addMediaModel)).thenReturn(media);
+
+        // when
+        MediaModel actual = instance.addMedia(
+            "ADMIN",
+            111L,
+            222L,
+            request,
+            true
+        );
+
+        // then
+        ArgumentCaptor<MediaAddedEvent> eventCaptor =
+            ArgumentCaptor.forClass(MediaAddedEvent.class);
+
+        verify(mediaValidator).validate(request);
+        verify(mediaService).generateMediaFileName(
+            "https://cdn.example.com/banner.png",
+            "image"
+        );
+        verify(requestToModelConverter).toModel(
+            111L,
+            222L,
+            "banner-generated.png",
+            request,
+            true
+        );
+        verify(mediaService).addMedia("ADMIN", addMediaModel);
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+
+        Asserts.assertEquals(actual, media);
+        Asserts.assertEquals(eventCaptor.getValue().getMediaId(), 909L);
+
+        InOrder inOrder = inOrder(
+            mediaValidator,
+            mediaService,
+            requestToModelConverter,
+            eventHandlerManager
+        );
+        inOrder.verify(mediaValidator).validate(request);
+        inOrder.verify(mediaService).generateMediaFileName(
+            "https://cdn.example.com/banner.png",
+            "image"
+        );
+        inOrder.verify(requestToModelConverter).toModel(
+            111L,
+            222L,
+            "banner-generated.png",
+            request,
+            true
+        );
+        inOrder.verify(mediaService).addMedia("ADMIN", addMediaModel);
+        inOrder.verify(eventHandlerManager).handleEvent(any(MediaAddedEvent.class));
     }
 
     private static class CapturingServletOutputStream
