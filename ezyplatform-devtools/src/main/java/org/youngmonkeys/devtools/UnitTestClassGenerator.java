@@ -21,22 +21,29 @@ import com.tvd12.ezyfox.reflect.EzyField;
 import com.tvd12.ezyfox.reflect.EzyFields;
 
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
-import static com.tvd12.ezyfox.io.EzySets.newHashSet;
+import static com.tvd12.ezyfox.io.EzyMaps.newHashMap;
 import static com.tvd12.ezyfox.reflect.EzyClasses.getVariableName;
 
 public class UnitTestClassGenerator {
 
     private final String classSimpleName;
     private final List<EzyField> components;
+    private final Map<Class<?>, EzyField> componentByType;
     private boolean hasConstructor;
     private final List<String> imports = new ArrayList<>();
     private final List<String> content = new ArrayList<>();
 
+    @SuppressWarnings("unchecked")
     public UnitTestClassGenerator(Class<?> javaClass) {
         EzyClass clazz = new EzyClass(javaClass);
         this.classSimpleName = javaClass.getSimpleName();
@@ -45,23 +52,22 @@ public class UnitTestClassGenerator {
             .stream()
             .max(Comparator.comparingInt(Constructor::getParameterCount))
             .orElse(null);
+        List<EzyField> fields;
         if (constructor != null && constructor.getParameterCount() > 0) {
             hasConstructor = true;
-            components = Stream
-                .of(constructor.getParameterTypes())
-                .map(it ->
-                    EzyField.builder()
-                        .clazz(it)
-                        .fieldName(getVariableName(it))
-                        .build()
-                )
-                .collect(Collectors.toList());
-        } else {
-            components = newArrayList(
-                EzyFields.getFields(javaClass),
-                EzyField::new
-            );
         }
+        components = EzyFields.getFields(javaClass)
+            .stream()
+            .map(EzyField::new)
+            .filter(it ->
+                it.getField() != null
+                    && !Modifier.isStatic(it.getField().getModifiers())
+            )
+            .collect(Collectors.toList());
+        componentByType = newHashMap(
+            components,
+            EzyField::getType
+        );
     }
 
     public void printContent() {
@@ -77,7 +83,7 @@ public class UnitTestClassGenerator {
             )
         );
         imports.add(InstanceRandom.class.getName() + ";");
-        Set<Class<?>> componentClasses = newHashSet(
+        List<Class<?>> componentClasses = newArrayList(
             components,
             EzyField::getType
         );
@@ -125,8 +131,12 @@ public class UnitTestClassGenerator {
             );
             List<String> params = new ArrayList<>();
             for (Class<?> componentClass : componentClasses) {
+                String paramName = Optional
+                    .ofNullable(componentByType.get(componentClass))
+                    .map(EzyField::getName)
+                    .orElseGet(() -> getVariableName(componentClass));
                 params.add(
-                    tabs(3) + getVariableName(componentClass)
+                    tabs(3) + paramName
                 );
             }
             content.add(String.join(",\n", params));

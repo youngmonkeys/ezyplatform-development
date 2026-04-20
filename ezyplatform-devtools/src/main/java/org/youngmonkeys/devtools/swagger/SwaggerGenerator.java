@@ -23,11 +23,25 @@ import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyfox.file.EzySimpleFileWriter;
 import com.tvd12.ezyfox.io.EzyCollections;
 import com.tvd12.ezyfox.io.EzyStrings;
-import com.tvd12.ezyfox.reflect.*;
+import com.tvd12.ezyfox.reflect.EzyFields;
+import com.tvd12.ezyfox.reflect.EzyGenerics;
+import com.tvd12.ezyfox.reflect.EzyMethods;
+import com.tvd12.ezyfox.reflect.EzyReflection;
+import com.tvd12.ezyfox.reflect.EzyReflectionProxy;
+import com.tvd12.ezyfox.reflect.EzyTypes;
 import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
-import com.tvd12.ezyhttp.server.core.annotation.*;
+import com.tvd12.ezyhttp.server.core.annotation.Api;
+import com.tvd12.ezyhttp.server.core.annotation.Authenticated;
+import com.tvd12.ezyhttp.server.core.annotation.Controller;
+import com.tvd12.ezyhttp.server.core.annotation.DoDelete;
+import com.tvd12.ezyhttp.server.core.annotation.DoGet;
+import com.tvd12.ezyhttp.server.core.annotation.DoPost;
+import com.tvd12.ezyhttp.server.core.annotation.DoPut;
+import com.tvd12.ezyhttp.server.core.annotation.PathVariable;
+import com.tvd12.ezyhttp.server.core.annotation.RequestBody;
+import com.tvd12.ezyhttp.server.core.annotation.RequestParam;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 import com.tvd12.ezyhttp.server.core.view.View;
 import lombok.AllArgsConstructor;
@@ -44,7 +58,16 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -56,7 +79,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 @AllArgsConstructor
 public class SwaggerGenerator {
 
-    private final String packageToScan;
+    private final Set<String> packagesToScan;
 
     private static final int ONE = 1;
     private static final int TWO = 2;
@@ -93,6 +116,10 @@ public class SwaggerGenerator {
             .put("long", "int64")
             .toMap();
 
+    public SwaggerGenerator(String packageToScan) {
+        this(Collections.singleton(packageToScan));
+    }
+
     public void generateToDefaultFile() throws IOException {
         generateToFile(
             "swagger.yaml"
@@ -116,7 +143,7 @@ public class SwaggerGenerator {
 
     public String generate() {
         EzyReflection reflection = new EzyReflectionProxy(
-            packageToScan
+            packagesToScan
         );
         Set<Class<?>> controllerClasses = reflection.getAnnotatedClasses(
             Controller.class
