@@ -40,6 +40,7 @@ import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
+import org.youngmonkeys.ezyplatform.event.GetMediaDetailsEvent;
 import org.youngmonkeys.ezyplatform.event.GetMediaFilePathEvent;
 import org.youngmonkeys.ezyplatform.event.MediaAddedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaDownloadEvent;
@@ -768,7 +769,23 @@ public class MediaControllerService extends EzyLoggable {
         if (media == null || !validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaId);
         }
-        return getMediaDetails(media);
+        String mediaUploaderName = settingService
+            .getMediaUpDownloaderName();
+        MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
+            .getMediaUpDownloaderByName(mediaUploaderName);
+        MediaDetailsModel mediaDetails = null;
+        if (mediaUpDownloader != null) {
+            mediaDetails = mediaUpDownloader.getMediaDetails(media);
+        }
+        if (mediaDetails == null) {
+            mediaDetails = eventHandlerManager.handleEvent(
+                new GetMediaDetailsEvent(media)
+            );
+        }
+        if (mediaDetails == null) {
+            mediaDetails = getMediaDetails(media);
+        }
+        return mediaDetails;
     }
 
     public MediaDetailsModel getMediaDetailsByName(
@@ -779,7 +796,23 @@ public class MediaControllerService extends EzyLoggable {
         if (media == null || !validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaName);
         }
-        return getMediaDetails(media);
+        String mediaUploaderName = settingService
+            .getMediaUpDownloaderName();
+        MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
+            .getMediaUpDownloaderByName(mediaUploaderName);
+        MediaDetailsModel mediaDetails = null;
+        if (mediaUpDownloader != null) {
+            mediaDetails = mediaUpDownloader.getMediaDetails(media);
+        }
+        if (mediaDetails == null) {
+            mediaDetails = eventHandlerManager.handleEvent(
+                new GetMediaDetailsEvent(media)
+            );
+        }
+        if (mediaDetails == null) {
+            mediaDetails = getMediaDetails(media);
+        }
+        return mediaDetails;
     }
 
     public MediaDetailsModel getMediaDetails(
