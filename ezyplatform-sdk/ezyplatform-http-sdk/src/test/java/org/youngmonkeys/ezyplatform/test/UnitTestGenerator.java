@@ -17,13 +17,13 @@
 package org.youngmonkeys.ezyplatform.test;
 
 import org.youngmonkeys.devtools.UnitTestClassGenerator;
-import org.youngmonkeys.ezyplatform.view.EzyProcessorDialect;
+import org.youngmonkeys.ezyplatform.controller.service.MediaControllerService;
 
 public class UnitTestGenerator {
 
     public static void main(String[] args) {
         new UnitTestClassGenerator(
-            EzyProcessorDialect.class
+            MediaControllerService.class
         ).printContent();
     }
 }

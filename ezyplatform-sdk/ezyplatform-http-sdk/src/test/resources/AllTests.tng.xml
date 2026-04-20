@@ -19,6 +19,7 @@
 <suite name="AllTests">
 	<test name="All">
 		<packages>
+			<package name="org.youngmonkeys.ezyplatform.test.controller.service"/>
 			<package name="org.youngmonkeys.ezyplatform.test.util"/>
 			<package name="org.youngmonkeys.ezyplatform.test.validator"/>
 		</packages>

@@ -565,8 +565,10 @@ public class MediaControllerService extends EzyLoggable {
                     .originalFileName(result.getOriginalFileName())
                     .mediaType(mediaTypeText)
                     .mimeType(tikaMediaType.toString())
+                    .fileSize(Files.size(mediaFilePath))
                     .ownerAdminId(ownerAdminId)
                     .ownerUserId(ownerUserId)
+                    .notPublic(model.isNotPublic())
                     .build()
             );
             eventHandlerManager.handleEvent(
