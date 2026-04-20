@@ -515,6 +515,7 @@ public class MediaControllerService extends EzyLoggable {
             MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
                 .getMediaUpDownloaderByName(mediaUploaderName);
             String mediaTypeText = model.getMediaType();
+            boolean isNotPublic = model.isNotPublic();
             if (mediaUpDownloader != null
                 && mediaUpDownloader.isUploadFromUrlSupported()
             ) {
@@ -528,7 +529,7 @@ public class MediaControllerService extends EzyLoggable {
                         .mediaUrl(mediaUrl)
                         .ownerAdminId(ownerAdminId)
                         .ownerUserId(ownerUserId)
-                        .notPublic(model.isNotPublic())
+                        .notPublic(isNotPublic)
                         .build()
                 );
             }
@@ -569,7 +570,7 @@ public class MediaControllerService extends EzyLoggable {
                     .fileSize(Files.size(mediaFilePath))
                     .ownerAdminId(ownerAdminId)
                     .ownerUserId(ownerUserId)
-                    .notPublic(model.isNotPublic())
+                    .notPublic(isNotPublic)
                     .build()
             );
             eventHandlerManager.handleEvent(
