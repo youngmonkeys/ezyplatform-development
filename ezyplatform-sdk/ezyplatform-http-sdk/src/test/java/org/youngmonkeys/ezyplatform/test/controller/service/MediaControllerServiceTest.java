@@ -44,6 +44,7 @@ import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
+import org.youngmonkeys.ezyplatform.event.GetMediaDetailsEvent;
 import org.youngmonkeys.ezyplatform.event.GetMediaFilePathEvent;
 import org.youngmonkeys.ezyplatform.event.MediaAddedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaDownloadEvent;
@@ -1386,6 +1387,7 @@ public class MediaControllerServiceTest {
         // given
         @SuppressWarnings("unchecked")
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
         MediaModel media = MediaModel.builder()
             .id(905L)
             .name("video-detail.mp4")
@@ -1406,6 +1408,12 @@ public class MediaControllerServiceTest {
             .build();
         when(mediaService.getMediaById(905L)).thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(true);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(mediaUpDownloader);
+        when(mediaUpDownloader.getMediaDetails(media)).thenReturn(null);
+        when(eventHandlerManager.handleEvent(any(GetMediaDetailsEvent.class)))
+            .thenReturn(null);
         when(mediaService.getMediaFileLengthOrNegative(
             MediaType.VIDEO,
             "video-detail.mp4"
@@ -1420,6 +1428,10 @@ public class MediaControllerServiceTest {
         // then
         verify(mediaService).getMediaById(905L);
         verify(validMediaCondition).test(media);
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(mediaUpDownloader).getMediaDetails(media);
+        verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
         verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.VIDEO,
             "video-detail.mp4"
@@ -1448,15 +1460,26 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual.getWidth(), 0L);
         Asserts.assertEquals(actual.getHeight(), 0L);
 
-        InOrder inOrder = inOrder(mediaService, validMediaCondition);
+        InOrder inOrder = inOrder(
+            mediaService,
+            validMediaCondition,
+            settingService,
+            mediaUpDownloaderManager,
+            mediaUpDownloader,
+            eventHandlerManager
+        );
         inOrder.verify(mediaService).getMediaById(905L);
         inOrder.verify(validMediaCondition).test(media);
+        inOrder.verify(settingService).getMediaUpDownloaderName();
+        inOrder.verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        inOrder.verify(mediaUpDownloader).getMediaDetails(media);
+        inOrder.verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
         inOrder.verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.VIDEO,
             "video-detail.mp4"
         );
 
-        verifyNoMoreInteractions(validMediaCondition);
+        verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
 
     @Test
@@ -1464,6 +1487,7 @@ public class MediaControllerServiceTest {
         // given
         @SuppressWarnings("unchecked")
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
         MediaModel media = MediaModel.builder()
             .id(906L)
             .name("audio-detail.mp3")
@@ -1484,6 +1508,12 @@ public class MediaControllerServiceTest {
             .build();
         when(mediaService.getMediaByName("audio-detail.mp3")).thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(true);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(mediaUpDownloader);
+        when(mediaUpDownloader.getMediaDetails(media)).thenReturn(null);
+        when(eventHandlerManager.handleEvent(any(GetMediaDetailsEvent.class)))
+            .thenReturn(null);
         when(mediaService.getMediaFileLengthOrNegative(
             MediaType.AUDIO,
             "audio-detail.mp3"
@@ -1498,6 +1528,10 @@ public class MediaControllerServiceTest {
         // then
         verify(mediaService).getMediaByName("audio-detail.mp3");
         verify(validMediaCondition).test(media);
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(mediaUpDownloader).getMediaDetails(media);
+        verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
         verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.AUDIO,
             "audio-detail.mp3"
@@ -1526,15 +1560,26 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual.getWidth(), 0L);
         Asserts.assertEquals(actual.getHeight(), 0L);
 
-        InOrder inOrder = inOrder(mediaService, validMediaCondition);
+        InOrder inOrder = inOrder(
+            mediaService,
+            validMediaCondition,
+            settingService,
+            mediaUpDownloaderManager,
+            mediaUpDownloader,
+            eventHandlerManager
+        );
         inOrder.verify(mediaService).getMediaByName("audio-detail.mp3");
         inOrder.verify(validMediaCondition).test(media);
+        inOrder.verify(settingService).getMediaUpDownloaderName();
+        inOrder.verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        inOrder.verify(mediaUpDownloader).getMediaDetails(media);
+        inOrder.verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
         inOrder.verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.AUDIO,
             "audio-detail.mp3"
         );
 
-        verifyNoMoreInteractions(validMediaCondition);
+        verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
 
     @Test
