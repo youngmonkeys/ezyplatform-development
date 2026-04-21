@@ -35,6 +35,7 @@ public class DefaultMediaFilter implements MediaFilter {
     public final String status;
     public final Collection<String> statuses;
     public final String exclusiveStatus;
+    public final Collection<String> exclusiveStatuses;
     public final Boolean publicMedia;
     public final LocalDateTime createdAtStartInclusive;
     public final LocalDateTime createdAtEndExclusive;
@@ -51,6 +52,7 @@ public class DefaultMediaFilter implements MediaFilter {
         this.status = builder.status;
         this.statuses = builder.statuses;
         this.exclusiveStatus = builder.exclusiveStatus;
+        this.exclusiveStatuses = builder.exclusiveStatuses;
         this.publicMedia = builder.publicMedia;
         this.createdAtStartInclusive = builder.createdAtStartInclusive;
         this.createdAtEndExclusive = builder.createdAtEndExclusive;
@@ -86,6 +88,9 @@ public class DefaultMediaFilter implements MediaFilter {
         }
         if (exclusiveStatus != null) {
             answer.and("e.status <> :exclusiveStatus");
+        }
+        if (exclusiveStatuses != null) {
+            answer.and("e.status NOT IN :exclusiveStatuses");
         }
         if (prefixKeyword != null) {
             answer.and("e.originalName LIKE CONCAT(:prefixKeyword,'%')");
@@ -125,6 +130,7 @@ public class DefaultMediaFilter implements MediaFilter {
         private String status;
         private Collection<String> statuses;
         private String exclusiveStatus;
+        private Collection<String> exclusiveStatuses;
         private Boolean publicMedia;
         private LocalDateTime createdAtStartInclusive;
         private LocalDateTime createdAtEndExclusive;
@@ -184,6 +190,11 @@ public class DefaultMediaFilter implements MediaFilter {
 
         public T exclusiveStatus(String exclusiveStatus) {
             this.exclusiveStatus = exclusiveStatus;
+            return (T) this;
+        }
+
+        public T exclusiveStatuses(Collection<String> exclusiveStatuses) {
+            this.exclusiveStatuses = exclusiveStatuses;
             return (T) this;
         }
 
