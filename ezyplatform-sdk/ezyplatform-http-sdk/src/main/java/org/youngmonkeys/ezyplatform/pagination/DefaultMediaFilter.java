@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.pagination;
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
@@ -35,6 +36,9 @@ public class DefaultMediaFilter implements MediaFilter {
     public final Collection<String> statuses;
     public final String exclusiveStatus;
     public final Boolean publicMedia;
+    public final LocalDateTime createdAtStartInclusive;
+    public final LocalDateTime createdAtEndExclusive;
+    public final LocalDateTime createdAtEndInclusive;
 
     protected DefaultMediaFilter(Builder<?> builder) {
         this.type = builder.type;
@@ -48,6 +52,9 @@ public class DefaultMediaFilter implements MediaFilter {
         this.statuses = builder.statuses;
         this.exclusiveStatus = builder.exclusiveStatus;
         this.publicMedia = builder.publicMedia;
+        this.createdAtStartInclusive = builder.createdAtStartInclusive;
+        this.createdAtEndExclusive = builder.createdAtEndExclusive;
+        this.createdAtEndInclusive = builder.createdAtEndInclusive;
     }
 
     @Override
@@ -86,6 +93,17 @@ public class DefaultMediaFilter implements MediaFilter {
         if (likeKeyword != null) {
             answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
         }
+        if (this.createdAtStartInclusive != null) {
+            answer.and("e.createdAt >= :createdAtStartInclusive");
+        }
+
+        if (this.createdAtEndExclusive != null) {
+            answer.and("e.createdAt < :createdAtEndExclusive");
+        }
+
+        if (this.createdAtEndInclusive != null) {
+            answer.and("e.createdAt <= :createdAtEndInclusive");
+        }
         return answer.build();
     }
 
@@ -108,6 +126,9 @@ public class DefaultMediaFilter implements MediaFilter {
         private Collection<String> statuses;
         private String exclusiveStatus;
         private Boolean publicMedia;
+        private LocalDateTime createdAtStartInclusive;
+        private LocalDateTime createdAtEndExclusive;
+        private LocalDateTime createdAtEndInclusive;
 
         public T type(String type) {
             this.type = type;
@@ -168,6 +189,21 @@ public class DefaultMediaFilter implements MediaFilter {
 
         public T publicMedia(Boolean publicMedia) {
             this.publicMedia = publicMedia;
+            return (T) this;
+        }
+
+        public T createdAtStartInclusive(LocalDateTime createdAtStartInclusive) {
+            this.createdAtStartInclusive = createdAtStartInclusive;
+            return (T) this;
+        }
+
+        public T createdAtEndExclusive(LocalDateTime createdAtEndExclusive) {
+            this.createdAtEndExclusive = createdAtEndExclusive;
+            return (T) this;
+        }
+
+        public T createdAtEndInclusive(LocalDateTime createdAtEndInclusive) {
+            this.createdAtEndInclusive = createdAtEndInclusive;
             return (T) this;
         }
 
