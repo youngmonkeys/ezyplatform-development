@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,25 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.media;
 
+import com.tvd12.ezyhttp.client.HttpClient;
 import lombok.Builder;
 import lombok.Getter;
+import org.apache.tika.config.TikaConfig;
+import org.youngmonkeys.ezyplatform.entity.UploadAction;
 
 @Getter
 @Builder
-public class SaveMediaFileFromUrlModel {
+public class MediaUploadFromUrlArguments {
+    private TikaConfig tika;
+    private HttpClient httpClient;
+    private String uploadFrom;
+    private UploadAction action;
+    private long mediaId;
     private String mediaType;
     private String mediaUrl;
+    private long ownerAdminId;
+    private long ownerUserId;
     private boolean notPublic;
 }

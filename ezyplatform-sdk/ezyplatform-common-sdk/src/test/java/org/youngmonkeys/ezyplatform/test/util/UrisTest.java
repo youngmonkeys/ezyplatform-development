@@ -83,6 +83,10 @@ public class UrisTest {
             Uris.getFileExtensionInUrl("https://hello.world/abc.jpg"),
             "jpg"
         );
+        Asserts.assertEquals(
+            Uris.getFileExtensionInUrl("https://hello.world/abc.01234567890123456789"),
+            "0123456789012345"
+        );
         Asserts.assertNull(
             Uris.getFileExtensionInUrl("https://hello.world/abc.")
         );
@@ -93,6 +97,10 @@ public class UrisTest {
             Uris.getFileExtensionInUrl(null)
         );
         Asserts.assertNull(Uris.getFileExtensionInUrl("abc"));
+        Asserts.assertEquals(
+            Uris.getFileExtensionInUrl("https://scontent.fhan2-3.fna.fbcdn.net/v/t1.6435-9/130865829_3624731430883679_313484451003519932_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=1d70fc&_nc_eui2=AeH_FXQlED9X5uNzBLW8xfSzX8q6x63I8kpfyrrHrcjyStgx92yZYSOS1pP37zNu8Kl5xk5S7FwSVCoE62bKxHt3&_nc_ohc=3v6deKSRaZIQ7kNvwG2_jH8&_nc_oc=Adqf6X08eMZy3LnNbGB9JSZHTU_tU_cefChY3mOigUHbHIwA7fHn8_HmlWKhUoVF4gQ&_nc_zt=23&_nc_ht=scontent.fhan2-3.fna&_nc_gid=g49LZ-O-2_iqg4MD-hhyGQ&_nc_ss=7a3a8&oh=00_Af3hdykopSaMkztdAd9DB1Sq6RG1h2o4fXAwHD5NeHTQ8Q&oe=6A0BE50C"),
+            "jpg"
+        );
     }
 
     @Test

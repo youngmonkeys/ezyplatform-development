@@ -16,15 +16,44 @@
 
 package org.youngmonkeys.ezyplatform.media;
 
+import org.youngmonkeys.ezyplatform.model.MediaDetailsModel;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+
 public interface MediaUpDownloader {
 
     default void upload(
         MediaUploadArguments arguments
     ) {}
 
+    default boolean isUploadSupported() {
+        return Boolean.FALSE;
+    }
+
+    default long uploadFromUrl(
+        MediaUploadFromUrlArguments arguments
+    ) {
+        return ZERO_LONG;
+    }
+
+    default boolean isUploadFromUrlSupported() {
+        return Boolean.FALSE;
+    }
+
     default void download(
         MediaDownloadArguments arguments
     ) {}
+
+    default boolean isDownloadSupported() {
+        return Boolean.FALSE;
+    }
+
+    default MediaDetailsModel getMediaDetails(
+        MediaModel media
+    ) {
+        return null;
+    }
 
     String getName();
 }

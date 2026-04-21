@@ -16,13 +16,26 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
+import com.tvd12.ezyfox.collect.Sets;
 import lombok.Getter;
+
+import java.util.Collections;
+import java.util.Set;
 
 @Getter
 public enum MediaStatus {
 
     ADDED,
+    ARCHIVED,
     REMOVED;
+
+    public static final Set<String> INVISIBLE_STATUSES =
+        Collections.unmodifiableSet(
+            Sets.newHashSet(
+                ARCHIVED.toString(),
+                REMOVED.toString()
+            )
+        );
 
     public boolean equalsValue(String value) {
         return toString().equals(value);

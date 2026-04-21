@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.pagination;
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
@@ -34,7 +35,11 @@ public class DefaultMediaFilter implements MediaFilter {
     public final String status;
     public final Collection<String> statuses;
     public final String exclusiveStatus;
+    public final Collection<String> exclusiveStatuses;
     public final Boolean publicMedia;
+    public final LocalDateTime createdAtStartInclusive;
+    public final LocalDateTime createdAtEndExclusive;
+    public final LocalDateTime createdAtEndInclusive;
 
     protected DefaultMediaFilter(Builder<?> builder) {
         this.type = builder.type;
@@ -47,7 +52,11 @@ public class DefaultMediaFilter implements MediaFilter {
         this.status = builder.status;
         this.statuses = builder.statuses;
         this.exclusiveStatus = builder.exclusiveStatus;
+        this.exclusiveStatuses = builder.exclusiveStatuses;
         this.publicMedia = builder.publicMedia;
+        this.createdAtStartInclusive = builder.createdAtStartInclusive;
+        this.createdAtEndExclusive = builder.createdAtEndExclusive;
+        this.createdAtEndInclusive = builder.createdAtEndInclusive;
     }
 
     @Override
@@ -80,11 +89,25 @@ public class DefaultMediaFilter implements MediaFilter {
         if (exclusiveStatus != null) {
             answer.and("e.status <> :exclusiveStatus");
         }
+        if (exclusiveStatuses != null) {
+            answer.and("e.status NOT IN :exclusiveStatuses");
+        }
         if (prefixKeyword != null) {
             answer.and("e.originalName LIKE CONCAT(:prefixKeyword,'%')");
         }
         if (likeKeyword != null) {
             answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
+        }
+        if (this.createdAtStartInclusive != null) {
+            answer.and("e.createdAt >= :createdAtStartInclusive");
+        }
+
+        if (this.createdAtEndExclusive != null) {
+            answer.and("e.createdAt < :createdAtEndExclusive");
+        }
+
+        if (this.createdAtEndInclusive != null) {
+            answer.and("e.createdAt <= :createdAtEndInclusive");
         }
         return answer.build();
     }
@@ -107,7 +130,11 @@ public class DefaultMediaFilter implements MediaFilter {
         private String status;
         private Collection<String> statuses;
         private String exclusiveStatus;
+        private Collection<String> exclusiveStatuses;
         private Boolean publicMedia;
+        private LocalDateTime createdAtStartInclusive;
+        private LocalDateTime createdAtEndExclusive;
+        private LocalDateTime createdAtEndInclusive;
 
         public T type(String type) {
             this.type = type;
@@ -166,8 +193,28 @@ public class DefaultMediaFilter implements MediaFilter {
             return (T) this;
         }
 
+        public T exclusiveStatuses(Collection<String> exclusiveStatuses) {
+            this.exclusiveStatuses = exclusiveStatuses;
+            return (T) this;
+        }
+
         public T publicMedia(Boolean publicMedia) {
             this.publicMedia = publicMedia;
+            return (T) this;
+        }
+
+        public T createdAtStartInclusive(LocalDateTime createdAtStartInclusive) {
+            this.createdAtStartInclusive = createdAtStartInclusive;
+            return (T) this;
+        }
+
+        public T createdAtEndExclusive(LocalDateTime createdAtEndExclusive) {
+            this.createdAtEndExclusive = createdAtEndExclusive;
+            return (T) this;
+        }
+
+        public T createdAtEndInclusive(LocalDateTime createdAtEndInclusive) {
+            this.createdAtEndInclusive = createdAtEndInclusive;
             return (T) this;
         }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 youngmonkeys.org
+ * Copyright 2024 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.event;
 
-import lombok.Builder;
-import lombok.Getter;
+public class MediaUpdatedEventHandler
+    extends AbstractEventHandler<MediaUpdatedEvent, Void> {
 
-@Getter
-@Builder
-public class SaveMediaFileFromUrlModel {
-    private String mediaType;
-    private String mediaUrl;
-    private boolean notPublic;
+    @Override
+    public String getEventName() {
+        return MediaUpdatedEvent.class.getName();
+    }
 }

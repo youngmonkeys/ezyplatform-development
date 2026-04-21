@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.test;
 
-import lombok.Builder;
-import lombok.Getter;
+import org.youngmonkeys.devtools.UnitTestClassGenerator;
+import org.youngmonkeys.ezyplatform.controller.service.MediaControllerService;
 
-@Getter
-@Builder
-public class SaveMediaFileFromUrlModel {
-    private String mediaType;
-    private String mediaUrl;
-    private boolean notPublic;
+public class UnitTestGenerator {
+
+    public static void main(String[] args) {
+        new UnitTestClassGenerator(
+            MediaControllerService.class
+        ).printContent();
+    }
 }

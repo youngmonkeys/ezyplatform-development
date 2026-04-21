@@ -49,6 +49,7 @@ public class MediaDetailsModel {
     ) {
         return builder()
             .id(info.getId())
+            .size(info.getFileSize())
             .name(info.getName())
             .originalName(info.getOriginalName())
             .url(info.getUrl())

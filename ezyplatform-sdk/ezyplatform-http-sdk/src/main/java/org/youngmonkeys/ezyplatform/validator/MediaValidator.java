@@ -16,7 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.validator;
 
-import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyFileUtil;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import lombok.AllArgsConstructor;
@@ -45,7 +44,14 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.ezyhttp.core.constant.ContentType.getExtensionOfMimeType;
 import static org.apache.tika.metadata.TikaCoreProperties.RESOURCE_NAME_KEY;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_ALT_TEXT_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_CAPTION_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_DESCRIPTION_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_ORIGINAL_NAME_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_TITLE_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_URL_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.entity.MediaType.AVATAR;
 import static org.youngmonkeys.ezyplatform.entity.MediaType.ofMimeTypeName;
 import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidMediaName;
@@ -158,11 +164,11 @@ public class MediaValidator {
             errors.put("file", "invalid");
         } else {
             String fileName = filePart.getSubmittedFileName();
-            if (EzyStrings.isNoContent(fileName)) {
+            if (isBlank(fileName)) {
                 errors.put("fileName", "invalid");
             }
             extension = EzyFileUtil.getFileExtension(fileName);
-            if (EzyStrings.isNoContent(extension)) {
+            if (isBlank(extension)) {
                 errors.put("fileType", "invalid");
             }
             fileSize = filePart.getSize();

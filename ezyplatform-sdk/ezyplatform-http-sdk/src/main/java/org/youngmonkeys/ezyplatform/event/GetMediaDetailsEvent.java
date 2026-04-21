@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 youngmonkeys.org
+ * Copyright 2023 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,14 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.event;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 @Getter
-@Builder
-public class SaveMediaFileFromUrlModel {
-    private String mediaType;
-    private String mediaUrl;
-    private boolean notPublic;
+@AllArgsConstructor
+public class GetMediaDetailsEvent {
+    private MediaModel media;
 }
