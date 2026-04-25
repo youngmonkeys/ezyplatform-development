@@ -356,11 +356,11 @@ public class StringsTest extends BaseTest {
             BigInteger.ZERO
         );
 
-        long time = Performance
-            .create()
-            .test(() -> toBigIntegerOrZero("hello world"))
-            .getTime();
-        System.out.println("toBigIntegerOrZero elapsed time: " + time);
+        // long time = Performance
+        //    .create()
+        //    .test(() -> toBigIntegerOrZero("hello world"))
+        //    .getTime();
+        // System.out.println("toBigIntegerOrZero elapsed time: " + time);
     }
 
     @Test

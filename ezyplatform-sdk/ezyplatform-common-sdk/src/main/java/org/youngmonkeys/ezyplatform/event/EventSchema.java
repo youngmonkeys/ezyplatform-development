@@ -14,26 +14,18 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.workflow;
+package org.youngmonkeys.ezyplatform.event;
 
-import java.util.Map;
+import lombok.Builder;
+import lombok.Getter;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import java.util.List;
 
-public interface WorkflowHandler {
-
-    void handle(
-        Map<String, Object> input,
-        Map<String, Object> output
-    );
-
-    default Object getState() {
-        return null;
-    }
-
-    String getName();
-
-    default String getDisplayName() {
-        return NULL_STRING;
-    }
+@Getter
+@Builder
+public class EventSchema {
+    private String description;
+    private Object argumentSchema;
+    private Object resultSchema;
+    private List<String> examples;
 }

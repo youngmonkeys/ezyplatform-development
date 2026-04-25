@@ -38,4 +38,21 @@ public interface EventHandler<D, R> {
     default int getPriority() {
         return 0;
     }
+
+    default EventSchema getSchema() {
+        try {
+            Class<?>[] args = EzyGenerics.getGenericInterfacesArguments(
+                getClass(),
+                EventHandler.class,
+                2
+            );
+            return EventSchema.builder()
+                .description(getClass().getSimpleName())
+                .argumentSchema(args[0])
+                .resultSchema(args[1])
+                .build();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }
