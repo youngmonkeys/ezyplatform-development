@@ -32,7 +32,7 @@ public class InstanceRandom extends EzyObjectInstanceRandom {
         T instance,
         boolean includeAllFields
     ) {
-        return (T) randomObjectValues(
+        return randomObjectValues(
             instance,
             includeAllFields
         );
