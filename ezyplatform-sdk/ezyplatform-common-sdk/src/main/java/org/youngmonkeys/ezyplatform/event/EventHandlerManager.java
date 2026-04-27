@@ -21,6 +21,7 @@ import com.tvd12.ezyfox.concurrent.EzyLazyInitializer;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,6 +31,8 @@ public class EventHandlerManager {
 
     private final EzyLazyInitializer<Map<String, List<EventHandler>>>
         eventHandlersByName;
+    private final EzyLazyInitializer<Map<String, EventSchemaFetcher>>
+        eventSchemaFetcherByName;
 
     public EventHandlerManager(EzySingletonFactory singletonFactory) {
         this.eventHandlersByName = new EzyLazyInitializer<>(() ->
@@ -42,6 +45,19 @@ public class EventHandlerManager {
                     Collectors.groupingBy(
                         EventHandler::getEventName,
                         Collectors.toList()
+                    )
+                )
+        );
+        this.eventSchemaFetcherByName = new EzyLazyInitializer<>(() ->
+            ((List<EventSchemaFetcher>) singletonFactory
+                .getSingletonsOf(EventSchemaFetcher.class)
+            )
+                .stream()
+                .collect(
+                    Collectors.toMap(
+                        EventSchemaFetcher::getEventName,
+                        it -> it,
+                        (o, n) -> n
                     )
                 )
         );
@@ -66,5 +82,17 @@ public class EventHandlerManager {
             }
         }
         return null;
+    }
+
+    public EventSchemaFetcher getEventSchemaFetcherByEventName(
+        String eventName
+    ) {
+        return eventSchemaFetcherByName
+            .get()
+            .get(eventName);
+    }
+
+    public Map<String, EventSchemaFetcher> getEventSchemaFetcherMap() {
+        return new HashMap<>(eventSchemaFetcherByName.get());
     }
 }

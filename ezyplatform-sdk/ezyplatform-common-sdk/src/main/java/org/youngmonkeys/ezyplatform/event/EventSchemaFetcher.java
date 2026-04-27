@@ -16,24 +16,9 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import lombok.Builder;
-import lombok.Getter;
+public interface EventSchemaFetcher {
 
-import java.util.List;
+    EventSchema getSchema();
 
-@Getter
-@Builder
-public class EventSchema {
-    private String description;
-    private DataSchema argumentSchema;
-    private DataSchema resultSchema;
-    private List<String> examples;
-
-    public static class DataSchema {
-        private Class<?> dataType;
-        private String name;
-        private String description;
-        private String example;
-        private List<DataSchema> fields;
-    }
+    String getEventName();
 }
