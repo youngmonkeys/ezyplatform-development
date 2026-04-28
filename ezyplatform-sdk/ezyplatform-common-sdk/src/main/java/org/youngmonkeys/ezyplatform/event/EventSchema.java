@@ -16,24 +16,125 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import lombok.Builder;
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-@Builder
 public class EventSchema {
-    private String description;
-    private DataSchema argumentSchema;
-    private DataSchema resultSchema;
-    private List<String> examples;
+    private final String description;
+    private final DataSchema argumentSchema;
+    private final DataSchema resultSchema;
+    private final List<String> examples;
 
-    public static class DataSchema {
-        private Class<?> dataType;
-        private String name;
+    public EventSchema(Builder builder) {
+        this.description = builder.description;
+        this.argumentSchema = builder.argumentSchema;
+        this.resultSchema = builder.resultSchema;
+        this.examples = builder.examples;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements EzyBuilder<EventSchema> {
         private String description;
-        private String example;
-        private List<DataSchema> fields;
+        private DataSchema argumentSchema;
+        private DataSchema resultSchema;
+        private List<String> examples;
+
+        public Builder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder argumentSchema(DataSchema argumentSchema) {
+            this.argumentSchema = argumentSchema;
+            return this;
+        }
+
+        public Builder resultSchema(DataSchema resultSchema) {
+            this.resultSchema = resultSchema;
+            return this;
+        }
+
+        public Builder examples(List<String> examples) {
+            this.examples = examples;
+            return this;
+        }
+
+        @Override
+        public EventSchema build() {
+            return new EventSchema(this);
+        }
+    }
+
+    @Getter
+    public static class DataSchema {
+        private final Class<?> dataType;
+        private final String name;
+        private final boolean required;
+        private final String description;
+        private final String example;
+        private final List<DataSchema> fields;
+
+        public DataSchema(DataSchema.Builder builder) {
+            this.dataType = builder.dataType;
+            this.name = builder.name;
+            this.required = builder.required;
+            this.description = builder.description;
+            this.example = builder.example;
+            this.fields = builder.fields;
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
+
+        public static class Builder implements EzyBuilder<DataSchema> {
+            private Class<?> dataType;
+            private String name;
+            private boolean required;
+            private String description;
+            private String example;
+            private List<DataSchema> fields;
+
+            public Builder dataType(Class<?> dataType) {
+                this.dataType = dataType;
+                return this;
+            }
+
+            public Builder name(String name) {
+                this.name = name;
+                return this;
+            }
+
+            public Builder required(boolean required) {
+                this.required = required;
+                return this;
+            }
+
+            public Builder description(String description) {
+                this.description = description;
+                return this;
+            }
+
+            public Builder example(String example) {
+                this.example = example;
+                return this;
+            }
+
+            public Builder fields(List<DataSchema> fields) {
+                this.fields = fields;
+                return this;
+            }
+
+            @Override
+            public DataSchema build() {
+                return new DataSchema(this);
+            }
+        }
     }
 }
