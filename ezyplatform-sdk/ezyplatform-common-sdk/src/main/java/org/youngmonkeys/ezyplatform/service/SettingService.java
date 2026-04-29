@@ -59,6 +59,8 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEBSOCKET_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ALLOW_REDUCE_IMAGE_FILE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATETIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATE_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATE_MINUTE_FORMAT;
@@ -169,6 +171,18 @@ public interface SettingService {
         } catch (Exception e) {
             return FileSizes.toByteSize(DEFAULT_MAX_UPLOAD_FILE_SIZE);
         }
+    }
+
+    default boolean isWebAllowReplaceMedia() {
+        return getBooleanValue(
+            SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA
+        );
+    }
+
+    default boolean isWebAllowReduceImageFileSize() {
+        return getBooleanValue(
+            SETTING_NAME_WEB_ALLOW_REDUCE_IMAGE_FILE_SIZE
+        );
     }
 
     default Set<String> getAcceptedMediaMimeTypes() {

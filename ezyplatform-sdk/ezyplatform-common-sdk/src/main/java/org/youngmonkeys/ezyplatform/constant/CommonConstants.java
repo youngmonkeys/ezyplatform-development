@@ -286,6 +286,10 @@ public final class CommonConstants {
         "web_additional_script";
     public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
         "web_additional_foot";
+    public static final String SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA =
+        "web_allow_media_replacement";
+    public static final String SETTING_NAME_WEB_ALLOW_REDUCE_IMAGE_FILE_SIZE =
+        "web_allow_image_file_size_reduction";
     public static final String SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES =
         "javascript_service_bean_names";
 
