@@ -290,11 +290,8 @@ public final class DefaultValidator {
     }
 
     public static boolean isBoolean(String value) {
-        try {
-            return value.equals("true") || value.equals("false");
-        } catch (Exception e) {
-            return false;
-        }
+        return value != null
+            && (value.equals("true") || value.equals("false"));
     }
 
     public static boolean containsSqlComment(String str) {

@@ -183,6 +183,28 @@ public class DefaultValidatorTest {
     }
 
     @Test
+    public void isBooleanTest() {
+        Asserts.assertTrue(
+            DefaultValidator.isBoolean("true")
+        );
+        Asserts.assertTrue(
+            DefaultValidator.isBoolean("false")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isBoolean(null)
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isBoolean("")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isBoolean("TRUE")
+        );
+        Asserts.assertFalse(
+            DefaultValidator.isBoolean("yes")
+        );
+    }
+
+    @Test
     public void isValidMediaNameTest() {
         Asserts.assertTrue(
             DefaultValidator.isValidMediaName("example.txt")

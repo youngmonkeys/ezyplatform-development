@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 import static java.nio.file.Files.readAllLines;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FILE_ENCRYPTION_KEYS;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FOLDER_SETTINGS;
 
@@ -126,7 +127,7 @@ public abstract class DefaultSettingService
                 settingName,
                 fetchAndCacheLastChangedTimeAndParseValue(settingName)
             ),
-            0L,
+            ZERO_LONG,
             periodInSecond,
             TimeUnit.SECONDS
         );
@@ -370,13 +371,16 @@ public abstract class DefaultSettingService
         long settingValue = getLongValue(key);
         long currentValue = lastUpdatedTimeBySettingName.getOrDefault(
             settingName,
-            0L
+            ZERO_LONG
         );
-        if ((currentValue == 0 && settingValue > 0)
-            || (currentValue != 0 && settingValue > currentValue)
+        if ((currentValue == ZERO_LONG && settingValue > ZERO_LONG)
+            || (currentValue != ZERO_LONG && settingValue > currentValue)
         ) {
             lastUpdatedTimeBySettingName.put(settingName, settingValue);
-            processWithLogException(onLastUpdatedTimeChange::run, true);
+            processWithLogException(
+                onLastUpdatedTimeChange::run,
+                Boolean.TRUE
+            );
         }
     }
 }
