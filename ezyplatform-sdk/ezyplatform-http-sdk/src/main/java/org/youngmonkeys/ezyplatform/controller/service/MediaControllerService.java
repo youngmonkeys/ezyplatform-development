@@ -505,85 +505,104 @@ public class MediaControllerService extends EzyLoggable {
         long ownerUserId,
         SaveMediaFileFromUrlModel model
     ) {
+        try {
+            return saveMediaFileFromUrlOrThrow(
+                uploadFrom,
+                ownerAdminId,
+                ownerUserId,
+                model
+            );
+        } catch (Exception e) {
+            logger.warn(
+                "can not download media from url: {}",
+                model.getMediaUrl(),
+                e
+            );
+            return ZERO_LONG;
+        }
+    }
+
+    @SuppressWarnings("MethodLength")
+    public long saveMediaFileFromUrlOrThrow(
+        String uploadFrom,
+        long ownerAdminId,
+        long ownerUserId,
+        SaveMediaFileFromUrlModel model
+    ) throws Exception {
         String mediaUrl = model.getMediaUrl();
         if (isBlank(mediaUrl)) {
             return ZERO_LONG;
         }
-        try {
-            String mediaUploaderName = settingService
-                .getMediaUpDownloaderName();
-            MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
-                .getMediaUpDownloaderByName(mediaUploaderName);
-            String mediaTypeText = model.getMediaType();
-            boolean isNotPublic = model.isNotPublic();
-            if (mediaUpDownloader != null
-                && mediaUpDownloader.isUploadFromUrlSupported()
-            ) {
-                return mediaUpDownloader.uploadFromUrl(
-                    MediaUploadFromUrlArguments.builder()
-                        .tika(tika.get())
-                        .httpClient(httpClient)
-                        .uploadFrom(uploadFrom)
-                        .action(UploadAction.ADD)
-                        .mediaType(mediaTypeText)
-                        .mediaUrl(mediaUrl)
-                        .ownerAdminId(ownerAdminId)
-                        .ownerUserId(ownerUserId)
-                        .notPublic(isNotPublic)
-                        .build()
-                );
-            }
-            File outFolder = fileSystemManager.getMediaFolderPath(
-                MediaType.ofName(mediaTypeText)
-            );
-            String fileName = mediaService.generateMediaFileName(
-                mediaUrl,
-                Uris.getFileExtensionInUrl(mediaUrl)
-            );
-            DownloadFileResult result = httpClient.download(
-                mediaUrl,
-                outFolder,
-                fileName
-            );
-            String newFileName = result.getNewFileName();
-            Path mediaFilePath = outFolder
-                .toPath()
-                .resolve(newFileName);
-            org.apache.tika.mime.MediaType tikaMediaType;
-            try (
-                InputStream inputStream = Files.newInputStream(
-                    mediaFilePath
-                )
-            ) {
-                tikaMediaType = tika.get().getDetector().detect(
-                    TikaInputStream.get(inputStream),
-                    new Metadata()
-                );
-            }
-            MediaModel media = mediaService.addMedia(
-                uploadFrom,
-                AddMediaModel.builder()
-                    .fileName(newFileName)
-                    .originalFileName(result.getOriginalFileName())
+        String mediaUploaderName = settingService
+            .getMediaUpDownloaderName();
+        MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
+            .getMediaUpDownloaderByName(mediaUploaderName);
+        String mediaTypeText = model.getMediaType();
+        boolean isNotPublic = model.isNotPublic();
+        if (mediaUpDownloader != null
+            && mediaUpDownloader.isUploadFromUrlSupported()
+        ) {
+            return mediaUpDownloader.uploadFromUrl(
+                MediaUploadFromUrlArguments.builder()
+                    .tika(tika.get())
+                    .httpClient(httpClient)
+                    .uploadFrom(uploadFrom)
+                    .action(UploadAction.ADD)
                     .mediaType(mediaTypeText)
-                    .mimeType(tikaMediaType.toString())
-                    .fileSize(Files.size(mediaFilePath))
+                    .mediaUrl(mediaUrl)
                     .ownerAdminId(ownerAdminId)
                     .ownerUserId(ownerUserId)
                     .notPublic(isNotPublic)
                     .build()
             );
-            eventHandlerManager.handleEvent(
-                new MediaUploadedEvent(
-                    media,
-                    mediaFilePath.toFile()
-                )
-            );
-            return media.getId();
-        } catch (Exception e) {
-            logger.info("can not download media from url: {}", mediaUrl, e);
-            return ZERO_LONG;
         }
+        File outFolder = fileSystemManager.getMediaFolderPath(
+            MediaType.ofName(mediaTypeText)
+        );
+        String fileName = mediaService.generateMediaFileName(
+            mediaUrl,
+            Uris.getFileExtensionInUrl(mediaUrl)
+        );
+        DownloadFileResult result = httpClient.download(
+            mediaUrl,
+            outFolder,
+            fileName
+        );
+        String newFileName = result.getNewFileName();
+        Path mediaFilePath = outFolder
+            .toPath()
+            .resolve(newFileName);
+        org.apache.tika.mime.MediaType tikaMediaType;
+        try (
+            InputStream inputStream = Files.newInputStream(
+                mediaFilePath
+            )
+        ) {
+            tikaMediaType = tika.get().getDetector().detect(
+                TikaInputStream.get(inputStream),
+                new Metadata()
+            );
+        }
+        MediaModel media = mediaService.addMedia(
+            uploadFrom,
+            AddMediaModel.builder()
+                .fileName(newFileName)
+                .originalFileName(result.getOriginalFileName())
+                .mediaType(mediaTypeText)
+                .mimeType(tikaMediaType.toString())
+                .fileSize(Files.size(mediaFilePath))
+                .ownerAdminId(ownerAdminId)
+                .ownerUserId(ownerUserId)
+                .notPublic(isNotPublic)
+                .build()
+        );
+        eventHandlerManager.handleEvent(
+            new MediaUploadedEvent(
+                media,
+                mediaFilePath.toFile()
+            )
+        );
+        return media.getId();
     }
 
     public void updateMedia(
