@@ -93,6 +93,14 @@ public final class DefaultValidator {
         }
     }
 
+    /**
+     * Checks whether the URL is an HTTPS URL suitable for server-side external
+     * media fetches.
+     *
+     * <p>This method rejects opaque URIs, non-HTTPS schemes, missing hosts,
+     * user-info credentials, localhost, IP literals, numeric-only hosts, and
+     * hosts that resolve to private or otherwise non-public addresses.</p>
+     */
     public static boolean isValidExternalUrl(String url) {
         try {
             URI uri = new URI(url);
@@ -129,6 +137,13 @@ public final class DefaultValidator {
         return normalizedHost;
     }
 
+    /**
+      * Resolves a host and returns whether all resolved addresses are public.
+      *
+      * <p>This method performs DNS resolution. Use it in request execution paths
+      * that need stricter SSRF checks than {@link #isValidExternalUrl(String)} can
+      * provide from URL syntax alone.</p>
+      */
     public static boolean isPublicHost(String host) {
         try {
             InetAddress[] addresses = InetAddress.getAllByName(host);

@@ -114,6 +114,15 @@ public class JavascriptService extends EzyLoggable {
         );
     }
 
+    /**
+     * Executes JavaScript in a Rhino context with selected Java objects exposed
+     * to the script scope.
+     *
+     * <p>The script and function passed to this method must come from trusted
+     * application configuration or code. Do not pass user-controlled JavaScript
+     * here because exposed parameters, properties, logger, and configured beans
+     * can allow access to application internals.</p>
+     */
     public Object execute(
         Map<String, Object> parameters,
         Map<String, String> jsBeanNameByJavaBeanName,

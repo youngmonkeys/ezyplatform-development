@@ -24,6 +24,7 @@ import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.data.DownloadFileResult;
+import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
@@ -63,6 +64,7 @@ import org.youngmonkeys.ezyplatform.model.MediaDetailsModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
+import org.youngmonkeys.ezyplatform.model.SaveMediaFileFromUrlModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameterConverter;
@@ -683,7 +685,7 @@ public class MediaControllerServiceTest {
         // when
         long actual = instance.saveMediaFile(
             MediaType.IMAGE,
-            "https://cdn.example.com/banner.png",
+            "https://ezyplatform.com/images/logo.png",
             UploadFrom.ADMIN,
             77L,
             88L
@@ -704,7 +706,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(arguments.getMediaType(), "IMAGE");
         Asserts.assertEquals(
             arguments.getMediaUrl(),
-            "https://cdn.example.com/banner.png"
+            "https://ezyplatform.com/images/logo.png"
         );
         Asserts.assertEquals(arguments.getOwnerAdminId(), 77L);
         Asserts.assertEquals(arguments.getOwnerUserId(), 88L);
@@ -721,7 +723,7 @@ public class MediaControllerServiceTest {
         MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
         File outFolder = Files.createTempDirectory("save-media-file-test")
             .toFile();
-        String mediaUrl = "https://cdn.example.com/banner.png";
+        String mediaUrl = "https://ezyplatform.com/images/logo.png";
         DownloadFileResult downloadResult = new DownloadFileResult(
             "banner-original.png",
             "banner-saved.png"
@@ -809,6 +811,60 @@ public class MediaControllerServiceTest {
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaUploadedEvent.class));
 
         verifyNoMoreInteractions(mediaUpDownloader);
+    }
+
+    @Test
+    public void saveMediaFileFromInternalUrlTest() {
+        // given
+        String mediaUrl = "https://127.0.0.1/banner.png";
+
+        // when
+        long actual = instance.saveMediaFile(
+            MediaType.IMAGE,
+            mediaUrl,
+            UploadFrom.ADMIN,
+            101L,
+            202L
+        );
+
+        // then
+        Asserts.assertEquals(actual, 0L);
+        verifyNoMoreInteractions(
+            settingService,
+            mediaUpDownloaderManager,
+            fileSystemManager,
+            mediaService,
+            httpClient
+        );
+    }
+
+    @Test
+    public void saveMediaFileFromInternalUrlOrThrowTest() {
+        // given
+        String mediaUrl = "https://127.0.0.1/banner.png";
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.saveMediaFileFromUrlOrThrow(
+                "ADMIN",
+                101L,
+                202L,
+                SaveMediaFileFromUrlModel.builder()
+                    .mediaType(MediaType.IMAGE.toString())
+                    .mediaUrl(mediaUrl)
+                    .build()
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, HttpBadRequestException.class);
+        verifyNoMoreInteractions(
+            settingService,
+            mediaUpDownloaderManager,
+            fileSystemManager,
+            mediaService,
+            httpClient
+        );
     }
 
     @Test

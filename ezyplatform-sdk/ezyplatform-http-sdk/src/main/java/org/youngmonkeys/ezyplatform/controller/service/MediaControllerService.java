@@ -24,6 +24,7 @@ import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyfox.util.EzyReturner;
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.data.DownloadFileResult;
+import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.exception.HttpNotAcceptableException;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.handler.ResourceRequestHandler;
@@ -96,6 +97,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.model.MediaDetailsModel.fromMediaModel;
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModelBySortOrder;
 import static org.youngmonkeys.ezyplatform.util.Strings.from;
+import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidExternalUrl;
 
 public class MediaControllerService extends EzyLoggable {
 
@@ -546,6 +548,11 @@ public class MediaControllerService extends EzyLoggable {
         String mediaUrl = model.getMediaUrl();
         if (isBlank(mediaUrl)) {
             return ZERO_LONG;
+        }
+        if (!isValidExternalUrl(mediaUrl)) {
+            throw new HttpBadRequestException(
+                singletonMap("mediaUrl", "invalid")
+            );
         }
         String mediaUploaderName = settingService
             .getMediaUpDownloaderName();

@@ -335,6 +335,12 @@ public abstract class DefaultSettingService
      * Reads the encryption key from the configured key file and applies it to
      * the service.
      *
+     * <p>If the key file is missing or empty, the service falls back to
+     * {@link #DEFAULT_ENCRYPTION_KEY} for backward compatibility with existing
+     * installations. Production deployments should create
+     * {@code settings/encryption-keys.txt} with a deployment-specific key before
+     * encrypting tokens or settings.</p>
+     *
      * <p>For stronger security, users can create the encryption-key file with a
      * custom encryption password during EzyPlatform initialization, or configure
      * a custom encryption key later from the Admin settings page.</p>
