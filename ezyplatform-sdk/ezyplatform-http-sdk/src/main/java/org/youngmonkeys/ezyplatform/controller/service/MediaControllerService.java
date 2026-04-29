@@ -498,6 +498,20 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
+    /**
+     * Saves a media file from the URL in the given model.
+     *
+     * <p>When an error occurs, this method catches the exception, writes a
+     * warning log with the media URL and exception details, and returns {@code 0}.
+     * The generated log can contain sensitive information if the URL or exception
+     * message includes credentials, tokens, private paths, or other confidential
+     * data. Use {@link #saveMediaFileFromUrlOrThrow(String, long, long,
+     * SaveMediaFileFromUrlModel)} when you need to handle the exception yourself
+     * or avoid logging sensitive information from this method.</p>
+     *
+     * @return the saved media ID, or {@code 0} if the URL is blank or the media
+     *     file cannot be saved.
+     */
     @SuppressWarnings("MethodLength")
     public long saveMediaFileFromUrl(
         String uploadFrom,

@@ -331,6 +331,14 @@ public abstract class DefaultSettingService
         return encryptionKey.get();
     }
 
+    /**
+     * Reads the encryption key from the configured key file and applies it to
+     * the service.
+     *
+     * <p>For stronger security, users can create the encryption-key file with a
+     * custom encryption password during EzyPlatform initialization, or configure
+     * a custom encryption key later from the Admin settings page.</p>
+     */
     private void readAndSetEncryptionKeyFromFile() {
         String keyFromFile = readEncryptionKeyFile();
         if (isBlank(keyFromFile)) {

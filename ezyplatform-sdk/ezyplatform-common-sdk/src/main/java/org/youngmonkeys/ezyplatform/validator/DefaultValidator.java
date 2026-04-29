@@ -54,6 +54,14 @@ public final class DefaultValidator {
             && username.matches(PATTERN_USERNAME);
     }
 
+    /**
+     * Checks whether the password length is within the allowed range.
+     *
+     * <p>This method only validates password length. It does not enforce
+     * complexity rules such as uppercase letters, lowercase letters, numbers,
+     * special characters, or breached-password checks. Add additional validation
+     * logic when password complexity requirements are needed.</p>
+     */
     public static boolean isValidPassword(String password) {
         return password != null
             && password.length() >= MIN_LENGTH_PASSWORD
@@ -67,6 +75,15 @@ public final class DefaultValidator {
             && phone.matches(PATTERN_PHONE);
     }
 
+    /**
+     * Checks whether the given value can be parsed as a URI.
+     *
+     * <p>This method only performs basic URI syntax validation. It does not
+     * validate whether the target host is public, whether the scheme is safe, or
+     * whether the URL can be used for SSRF attacks. Use
+     * {@link #isValidExternalUrl(String)} when validating user-controlled URLs
+     * that will be requested by the server.</p>
+     */
     public static boolean isValidUrl(String url) {
         try {
             new URI(url);
