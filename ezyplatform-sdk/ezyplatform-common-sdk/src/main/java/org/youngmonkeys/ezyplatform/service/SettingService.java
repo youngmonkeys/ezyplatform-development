@@ -184,7 +184,7 @@ public interface SettingService {
         );
     }
 
-    default boolean isWebAllowReduceMediaFileSize() {
+    default boolean isAllowReduceMediaFileSize() {
         return getBooleanValue(
             SETTING_NAME_WEB_ALLOW_REDUCE_MEDIA_FILE_SIZE
         );

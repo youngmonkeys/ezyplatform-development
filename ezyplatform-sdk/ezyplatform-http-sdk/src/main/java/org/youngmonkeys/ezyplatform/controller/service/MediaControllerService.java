@@ -657,6 +657,9 @@ public class MediaControllerService extends EzyLoggable {
         MediaType mediaType,
         File mediaFilePath
     ) {
+        if (!settingService.isAllowReduceMediaFileSize()) {
+            return MediaFileSizeReductionResult.builder().build();
+        }
         String mediaUploaderName = settingService
             .getMediaUpDownloaderName();
         MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
@@ -679,7 +682,7 @@ public class MediaControllerService extends EzyLoggable {
                 )
             );
         if (result == null) {
-            result = mediaFileService.reduceImageFileSize(
+            result = mediaFileService.reduceMediaFileSize(
                 mediaType,
                 mediaFilePath
             );

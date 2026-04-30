@@ -290,7 +290,13 @@ public class MediaControllerServiceTest {
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
         when(mediaUpDownloader.isUploadSupported()).thenReturn(false);
-        when(mediaFileService.reduceImageFileSize(MediaType.IMAGE, mediaFilePath))
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath
+            )
+        )
             .thenReturn(MediaFileSizeReductionResult.NO);
         when(request.getPart("file")).thenReturn(filePart);
         when(mediaValidator.validateFilePart(filePart, false))
@@ -348,6 +354,7 @@ public class MediaControllerServiceTest {
 
         verify(settingService).getMaxUploadFileSize();
         verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
         verify(mediaUpDownloaderManager, times(2))
             .getMediaUpDownloaderByName("cloud");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
@@ -370,7 +377,7 @@ public class MediaControllerServiceTest {
             eq(maxFileSize),
             any(EzyExceptionVoid.class)
         );
-        verify(mediaFileService).reduceImageFileSize(
+        verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
             mediaFilePath
         );
@@ -429,7 +436,7 @@ public class MediaControllerServiceTest {
         inOrder.verify(eventHandlerManager).handleEvent(
             any(MediaFileSizeReductionEvent.class)
         );
-        inOrder.verify(mediaFileService).reduceImageFileSize(
+        inOrder.verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
             mediaFilePath
         );
@@ -561,7 +568,13 @@ public class MediaControllerServiceTest {
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
         when(mediaUpDownloader.isUploadSupported()).thenReturn(false);
-        when(mediaFileService.reduceImageFileSize(MediaType.IMAGE, mediaFilePath))
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath
+            )
+        )
             .thenReturn(MediaFileSizeReductionResult.NO);
         when(request.getPart("file")).thenReturn(filePart);
         when(mediaValidator.validateFilePart(filePart, false))
@@ -616,6 +629,7 @@ public class MediaControllerServiceTest {
         verify(mediaService).getMediaById(654L);
         verify(validMediaCondition).test(media);
         verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
         verify(mediaUpDownloaderManager, times(2))
             .getMediaUpDownloaderByName("cloud");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
@@ -638,7 +652,7 @@ public class MediaControllerServiceTest {
             eq(4096L),
             any(EzyExceptionVoid.class)
         );
-        verify(mediaFileService).reduceImageFileSize(
+        verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
             mediaFilePath
         );
@@ -700,7 +714,7 @@ public class MediaControllerServiceTest {
         inOrder.verify(eventHandlerManager).handleEvent(
             any(MediaFileSizeReductionEvent.class)
         );
-        inOrder.verify(mediaFileService).reduceImageFileSize(
+        inOrder.verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
             mediaFilePath
         );
@@ -762,7 +776,13 @@ public class MediaControllerServiceTest {
             .thenReturn(null);
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
-        when(mediaFileService.reduceImageFileSize(MediaType.IMAGE, mediaFilePath))
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath
+            )
+        )
             .thenReturn(MediaFileSizeReductionResult.NO);
         when(request.getPart("file")).thenReturn(filePart);
         when(mediaValidator.validateFilePart(filePart, false))
@@ -817,6 +837,7 @@ public class MediaControllerServiceTest {
         verify(mediaService).getMediaByName("current-media.jpg");
         verify(validMediaCondition).test(currentMedia);
         verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
         verify(mediaUpDownloaderManager, times(2))
             .getMediaUpDownloaderByName("local");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
@@ -837,7 +858,7 @@ public class MediaControllerServiceTest {
             eq(8192L),
             any(EzyExceptionVoid.class)
         );
-        verify(mediaFileService).reduceImageFileSize(
+        verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
             mediaFilePath
         );
@@ -890,6 +911,30 @@ public class MediaControllerServiceTest {
             validMediaCondition,
             singletonFactory
         );
+    }
+
+    @Test
+    public void reduceMediaFileSizeWhenNotAllowTest() throws Exception {
+        // given
+        File mediaFilePath = File.createTempFile(
+            "reduce-media-disabled-",
+            ".png"
+        );
+        mediaFilePath.deleteOnExit();
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(false);
+
+        // when
+        MediaFileSizeReductionResult actual = instance.reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath
+        );
+
+        // then
+        Asserts.assertTrue(!actual.isReduced());
+        Asserts.assertEquals(actual.getOriginalSizeFileName(), null);
+        Asserts.assertEquals(actual.getNewFileMimeType(), null);
+        Asserts.assertEquals(actual.getNewFileSize(), 0L);
+        verify(settingService).isAllowReduceMediaFileSize();
     }
 
     @Test

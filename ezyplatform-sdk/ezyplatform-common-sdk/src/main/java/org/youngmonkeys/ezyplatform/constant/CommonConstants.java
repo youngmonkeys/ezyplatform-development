@@ -207,6 +207,8 @@ public final class CommonConstants {
         = "admin_max_upload_file_size";
     public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_IMAGE_FILE_SIZE =
         "admin_max_upload_image_file_size";
+    public static final String SETTING_NAME_ADMIN_ALLOW_REDUCE_MEDIA_FILE_SIZE =
+        "admin_allow_media_file_size_reduction";
     public static final String SETTING_NAME_ADMIN_TOKEN_EXPIRED_IN_DAY
         = "admin_token_expired_in_day";
     public static final String SETTING_NAME_ADMIN_ACCEPTED_MEDIA_MIME_TYPES

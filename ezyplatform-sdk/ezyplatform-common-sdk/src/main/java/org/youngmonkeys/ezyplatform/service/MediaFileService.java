@@ -27,7 +27,7 @@ public class MediaFileService {
 
     private final ImageFileService imageFileService;
 
-    public MediaFileSizeReductionResult reduceImageFileSize(
+    public MediaFileSizeReductionResult reduceMediaFileSize(
         MediaType mediaType,
         File mediaFilePath
     ) {
