@@ -57,14 +57,9 @@ public class ImageFileService extends EzyLoggable {
                 return MediaFileSizeReductionResult.NO;
             }
             File parentFile = imageFile.getAbsoluteFile().getParentFile();
-            bestFile = File.createTempFile(
-                "image-best-",
-                ".tmp",
-                parentFile
-            );
-            candidateFile = File.createTempFile(
+            bestFile = createTempImageFile("image-best-", parentFile);
+            candidateFile = createTempImageFile(
                 "image-candidate-",
-                ".tmp",
                 parentFile
             );
             boolean keepOriginalSizeImageFile = settingService
@@ -171,6 +166,13 @@ public class ImageFileService extends EzyLoggable {
             quality -= 0.1F;
         } while (quality >= 0.25F);
         return new ReducedFile(bestFileSize, reduced);
+    }
+
+    private File createTempImageFile(
+        String prefix,
+        File parentFile
+    ) throws IOException {
+        return File.createTempFile(prefix, ".tmp", parentFile);
     }
 
     private File saveOriginalSizeFile(

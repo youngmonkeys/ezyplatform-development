@@ -43,7 +43,6 @@ public class ImageFileServiceTest {
         ImageFileService instance = new ImageFileService(settingService);
         File imageFile = File.createTempFile("image-service-", ".unknown");
         imageFile.deleteOnExit();
-        String fileName = "image-file.unknown";
         BufferedImage image = new BufferedImage(
             400,
             400,
@@ -76,23 +75,15 @@ public class ImageFileServiceTest {
 
         // when
         MediaFileSizeReductionResult result = instance.reduceImageFileSize(
-            imageFile,
-            fileName
+            imageFile
         );
 
         // then
         Asserts.assertTrue(result.isReduced());
         Asserts.assertEquals(
             result.getOriginalSizeFileName(),
-            "original_" + fileName
+            "original_" + imageFile.getName()
         );
-        File originalSizeFile = new File(
-            imageFile.getParentFile(),
-            result.getOriginalSizeFileName()
-        );
-        originalSizeFile.deleteOnExit();
-        Asserts.assertTrue(originalSizeFile.isFile());
-        Asserts.assertEquals(originalSizeFile.length(), originalFileSize);
         Asserts.assertTrue(imageFile.length() < originalFileSize);
         ImageSize imageSize = ImageProxy.getImageSize(imageFile);
         Asserts.assertTrue(imageSize.getWidth() > 0);
