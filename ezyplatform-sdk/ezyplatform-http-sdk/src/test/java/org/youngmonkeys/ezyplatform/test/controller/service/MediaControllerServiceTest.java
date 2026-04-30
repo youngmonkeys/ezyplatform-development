@@ -893,40 +893,10 @@ public class MediaControllerServiceTest {
     }
 
     @Test
-    public void saveMediaFileUseMediaUpDownloaderWhenUrlInvalidTest() {
-        // given
-        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
-        String mediaUrl = "https://allowed.com/images/logo.png";
-
-        // when
-        long actual = instance.saveMediaFile(
-            MediaType.IMAGE,
-            mediaUrl,
-            UploadFrom.ADMIN,
-            77L,
-            88L
-        );
-
-        // then
-        Asserts.assertEquals(actual, 0L);
-        verifyNoMoreInteractions(
-            settingService,
-            mediaUpDownloaderManager,
-            mediaUpDownloader,
-            httpClient,
-            mediaService,
-            mediaFileService,
-            eventHandlerManager
-        );
-    }
-
-    @Test
     public void saveMediaFileWhenUrlInvalidTest() throws Exception {
         // given
         MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
-        File outFolder = Files.createTempDirectory("save-media-file-test")
-            .toFile();
-        String mediaUrl = "https://allowed.com/images/logo.png";
+        String mediaUrl = "http://not-found.invalid/images/logo.png";
 
         // when
         long actual = instance.saveMediaFile(

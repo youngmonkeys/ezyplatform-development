@@ -477,15 +477,11 @@ public interface SettingService {
         return getTextValue(SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME);
     }
 
-    default String getMaxUploadImageFileSizeText() {
-        return getTextValue(
+    default long getMaxUploadImageFileSize() {
+        String value = getTextValue(
             SETTING_NAME_WEB_MAX_UPLOAD_IMAGE_FILE_SIZE,
             DEFAULT_MAX_UPLOAD_IMAGE_SIZE
         );
-    }
-
-    default long getMaxUploadImageFileSize() {
-        String value = getMaxUploadImageFileSizeText();
         try {
             return FileSizes.toByteSize(value);
         } catch (Exception e) {
@@ -493,15 +489,11 @@ public interface SettingService {
         }
     }
 
-    default String getMaxReducedImageFileSizeText() {
-        return getTextValue(
+    default long getMaxReducedImageFileSize() {
+        String value = getTextValue(
             SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE,
             DEFAULT_MAX_REDUCED_IMAGE_SIZE
         );
-    }
-
-    default long getMaxReducedImageFileSize() {
-        String value = getMaxReducedImageFileSizeText();
         try {
             return FileSizes.toByteSize(value);
         } catch (Exception e) {
