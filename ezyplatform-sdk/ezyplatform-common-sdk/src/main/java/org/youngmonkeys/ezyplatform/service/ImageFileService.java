@@ -12,6 +12,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.imageio.stream.ImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -24,6 +25,22 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 
 @AllArgsConstructor
 public class ImageFileService extends EzyLoggable {
+
+    private static final String TEMP_BEST_FILE_PREFIX = "image-best-";
+    private static final String TEMP_CANDIDATE_FILE_PREFIX =
+        "image-candidate-";
+    private static final String TEMP_FILE_SUFFIX = ".tmp";
+    private static final String ORIGINAL_SIZE_FILE_PREFIX = "original_";
+    private static final String IMAGE_FORMAT_JPG = "jpg";
+    private static final String IMAGE_FORMAT_JPEG = "jpeg";
+    private static final float FULL_SCALE = 1.0F;
+    private static final float MIN_SCALE = 0.05F;
+    private static final float SCALE_REDUCTION_RATIO = 0.85F;
+    private static final float INITIAL_QUALITY = 0.85F;
+    private static final float QUALITY_REDUCTION_STEP = 0.1F;
+    private static final float MIN_QUALITY = 0.25F;
+    private static final float MIN_COMPRESSION_QUALITY = 0.0F;
+    private static final int MIN_IMAGE_SIZE = 1;
 
     private final SettingService settingService;
 
@@ -57,9 +74,12 @@ public class ImageFileService extends EzyLoggable {
                 return MediaFileSizeReductionResult.NO;
             }
             File parentFile = imageFile.getAbsoluteFile().getParentFile();
-            bestFile = createTempImageFile("image-best-", parentFile);
+            bestFile = createTempImageFile(
+                TEMP_BEST_FILE_PREFIX,
+                parentFile
+            );
             candidateFile = createTempImageFile(
-                "image-candidate-",
+                TEMP_CANDIDATE_FILE_PREFIX,
                 parentFile
             );
             boolean keepOriginalSizeImageFile = settingService
@@ -113,8 +133,8 @@ public class ImageFileService extends EzyLoggable {
     ) throws IOException {
         long bestFileSize = originalFileSize;
         boolean reduced = false;
-        float scale = 1.0F;
-        while (scale > 0.05F) {
+        float scale = FULL_SCALE;
+        while (scale > MIN_SCALE) {
             BufferedImage image = resizeImage(imageData.image, scale);
             ReducedFile reducedFile = reduceImageFileSize(
                 image,
@@ -127,11 +147,14 @@ public class ImageFileService extends EzyLoggable {
             bestFileSize = reducedFile.fileSize;
             reduced = reduced || reducedFile.reduced;
             if (bestFileSize <= maxFileSize
-                || (image.getWidth() == 1 && image.getHeight() == 1)
+                || (
+                    image.getWidth() == MIN_IMAGE_SIZE
+                        && image.getHeight() == MIN_IMAGE_SIZE
+                )
             ) {
                 break;
             }
-            scale *= 0.85F;
+            scale *= SCALE_REDUCTION_RATIO;
         }
         return new ReducedFile(bestFileSize, reduced);
     }
@@ -145,7 +168,7 @@ public class ImageFileService extends EzyLoggable {
         File candidateFile
     ) throws IOException {
         boolean reduced = false;
-        float quality = 0.85F;
+        float quality = INITIAL_QUALITY;
         do {
             writeImage(image, formatName, quality, candidateFile);
             long candidateFileSize = candidateFile.length();
@@ -163,8 +186,8 @@ public class ImageFileService extends EzyLoggable {
             ) {
                 break;
             }
-            quality -= 0.1F;
-        } while (quality >= 0.25F);
+            quality -= QUALITY_REDUCTION_STEP;
+        } while (quality >= MIN_QUALITY);
         return new ReducedFile(bestFileSize, reduced);
     }
 
@@ -172,14 +195,15 @@ public class ImageFileService extends EzyLoggable {
         String prefix,
         File parentFile
     ) throws IOException {
-        return File.createTempFile(prefix, ".tmp", parentFile);
+        return File.createTempFile(prefix, TEMP_FILE_SUFFIX, parentFile);
     }
 
     private File saveOriginalSizeFile(
         File imageFile
     ) throws IOException {
         File parentFile = imageFile.getAbsoluteFile().getParentFile();
-        String originalSizeFileName = "original_" + imageFile.getName();
+        String originalSizeFileName =
+            ORIGINAL_SIZE_FILE_PREFIX + imageFile.getName();
         File originalSizeFile = new File(parentFile, originalSizeFileName);
         Files.copy(
             imageFile.toPath(),
@@ -214,15 +238,22 @@ public class ImageFileService extends EzyLoggable {
         return null;
     }
 
-    private static BufferedImage resizeImage(
+    @SuppressWarnings("MethodLength")
+    private BufferedImage resizeImage(
         BufferedImage image,
         float scale
     ) {
-        if (scale >= 1.0F) {
+        if (scale >= FULL_SCALE) {
             return image;
         }
-        int width = Math.max(1, Math.round(image.getWidth() * scale));
-        int height = Math.max(1, Math.round(image.getHeight() * scale));
+        int width = Math.max(
+            MIN_IMAGE_SIZE,
+            Math.round(image.getWidth() * scale)
+        );
+        int height = Math.max(
+            MIN_IMAGE_SIZE,
+            Math.round(image.getHeight() * scale)
+        );
         int type = image.getTransparency() == Transparency.OPAQUE
             ? BufferedImage.TYPE_INT_RGB
             : BufferedImage.TYPE_INT_ARGB;
@@ -241,7 +272,37 @@ public class ImageFileService extends EzyLoggable {
                 RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON
             );
-            graphics.drawImage(image, 0, 0, width, height, null);
+            graphics.drawImage(
+                image,
+                ZERO,
+                ZERO,
+                width,
+                height,
+                (
+                    drewImage,
+                    infoFlags,
+                    x,
+                    y,
+                    drewWidth,
+                    drewHeight
+                ) -> {
+                    if ((infoFlags & ImageObserver.ERROR) != ZERO
+                        || (infoFlags & ImageObserver.ABORT) != ZERO
+                    ) {
+                        logger.warn(
+                            "resize image draw update error, flags: {}",
+                            infoFlags
+                        );
+                    }
+                    return (infoFlags
+                        & (
+                            ImageObserver.ALLBITS
+                                | ImageObserver.ERROR
+                                | ImageObserver.ABORT
+                            )
+                        ) == ZERO;
+                }
+            );
         } finally {
             graphics.dispose();
         }
@@ -271,7 +332,9 @@ public class ImageFileService extends EzyLoggable {
                         ImageWriteParam.MODE_EXPLICIT
                     );
                     writeParam.setCompressionQuality(
-                        isLossyFormat(formatName) ? quality : 0.0F
+                        isLossyFormat(formatName)
+                            ? quality
+                            : MIN_COMPRESSION_QUALITY
                     );
                 } catch (RuntimeException e) {
                     writeParam = writer.getDefaultWriteParam();
@@ -317,8 +380,8 @@ public class ImageFileService extends EzyLoggable {
     private boolean isLossyFormat(
         String formatName
     ) {
-        return "jpg".equalsIgnoreCase(formatName)
-            || "jpeg".equalsIgnoreCase(formatName);
+        return IMAGE_FORMAT_JPG.equalsIgnoreCase(formatName)
+            || IMAGE_FORMAT_JPEG.equalsIgnoreCase(formatName);
     }
 
     private void deleteQuietly(
