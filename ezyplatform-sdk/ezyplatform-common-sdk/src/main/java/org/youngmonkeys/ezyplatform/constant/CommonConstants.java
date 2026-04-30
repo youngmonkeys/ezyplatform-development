@@ -205,7 +205,7 @@ public final class CommonConstants {
     public static final String SETTING_NAME_ADMIN_ACCEPTED_MEDIA_MIME_TYPES
         = "admin_accepted_media_mime_types";
     public static final String SETTING_NAME_ADMIN_AUTO_PASS_MANAGEMENT_URIS
-        = "admin_auto_pass_management_uris";
+        = "auto_pass_management_uris";
     public static final String SETTING_NAME_ADMIN_ACCESS_TOKEN_ENCRYPTION_KEY
         = "admin_access_token_encryption_key";
     public static final String SETTING_NAME_ADMIN_ACCESS_TOKEN_HTTP_ONLY
@@ -288,8 +288,8 @@ public final class CommonConstants {
         "web_additional_foot";
     public static final String SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA =
         "web_allow_media_replacement";
-    public static final String SETTING_NAME_WEB_ALLOW_REDUCE_IMAGE_FILE_SIZE =
-        "web_allow_image_file_size_reduction";
+    public static final String SETTING_NAME_WEB_ALLOW_REDUCE_MEDIA_FILE_SIZE =
+        "web_allow_media_file_size_reduction";
     public static final String SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES =
         "javascript_service_bean_names";
 
