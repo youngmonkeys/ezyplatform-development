@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.test.service;
 
 import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
@@ -29,11 +30,82 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ImageFileServiceTest {
+
+    @DataProvider
+    public Object[][] imageExtensionsWithoutDefaultImageIoSupport() {
+        return new Object[][] {
+            {".webp", webpFileBytes()},
+            {".avif", avifFileBytes()},
+            {".svg", svgFileBytes()}
+        };
+    }
+
+    @Test
+    public void reduceImageFileSizeShouldSupportPng()
+        throws Exception {
+        reduceImageFileSizeShouldSupportImageFormat("png", ".png");
+    }
+
+    @Test
+    public void reduceImageFileSizeShouldSupportGif()
+        throws Exception {
+        reduceImageFileSizeShouldSupportImageFormat("gif", ".gif");
+    }
+
+    @Test
+    public void reduceImageFileSizeShouldSupportJpg()
+        throws Exception {
+        reduceImageFileSizeShouldSupportImageFormat("jpg", ".jpg");
+    }
+
+    @Test
+    public void reduceImageFileSizeShouldSupportJpeg()
+        throws Exception {
+        reduceImageFileSizeShouldSupportImageFormat("jpeg", ".jpeg");
+    }
+
+    private void reduceImageFileSizeShouldSupportImageFormat(
+        String formatName,
+        String fileSuffix
+    )
+        throws Exception {
+        // given
+        SettingService settingService = mock(SettingService.class);
+        ImageFileService instance = new ImageFileService(settingService);
+        File imageFile = File.createTempFile("image-service-", fileSuffix);
+        imageFile.deleteOnExit();
+        BufferedImage image = newTestImage();
+        Asserts.assertTrue(ImageIO.write(image, formatName, imageFile));
+        long originalFileSize = imageFile.length();
+        Asserts.assertTrue(originalFileSize > 0);
+        when(settingService.getMaxReducedImageFileSize())
+            .thenReturn(originalFileSize / 2);
+        when(settingService.isKeepOriginalSizeImageFile())
+            .thenReturn(true);
+
+        // when
+        MediaFileSizeReductionResult result = instance.reduceImageFileSize(
+            imageFile
+        );
+
+        // then
+        Asserts.assertTrue(result.isReduced());
+        Asserts.assertEquals(
+            result.getOriginalSizeFileName(),
+            "original_" + imageFile.getName()
+        );
+        Asserts.assertTrue(imageFile.length() < originalFileSize);
+        ImageSize imageSize = ImageProxy.getImageSize(imageFile);
+        Asserts.assertTrue(imageSize.getWidth() > 0);
+        Asserts.assertTrue(imageSize.getHeight() > 0);
+    }
 
     @Test
     public void reduceImageFileSizeShouldNotDependOnExtension()
@@ -43,28 +115,7 @@ public class ImageFileServiceTest {
         ImageFileService instance = new ImageFileService(settingService);
         File imageFile = File.createTempFile("image-service-", ".unknown");
         imageFile.deleteOnExit();
-        BufferedImage image = new BufferedImage(
-            400,
-            400,
-            BufferedImage.TYPE_INT_RGB
-        );
-        Graphics2D graphics = image.createGraphics();
-        try {
-            for (int y = 0; y < image.getHeight(); ++y) {
-                for (int x = 0; x < image.getWidth(); ++x) {
-                    graphics.setColor(
-                        new Color(
-                            (x * 17 + y) % 256,
-                            (x + y * 31) % 256,
-                            (x * y) % 256
-                        )
-                    );
-                    graphics.fillRect(x, y, 1, 1);
-                }
-            }
-        } finally {
-            graphics.dispose();
-        }
+        BufferedImage image = newTestImage();
         Asserts.assertTrue(ImageIO.write(image, "jpg", imageFile));
         long originalFileSize = imageFile.length();
         Asserts.assertTrue(originalFileSize > 0);
@@ -88,5 +139,74 @@ public class ImageFileServiceTest {
         ImageSize imageSize = ImageProxy.getImageSize(imageFile);
         Asserts.assertTrue(imageSize.getWidth() > 0);
         Asserts.assertTrue(imageSize.getHeight() > 0);
+    }
+
+    @Test(dataProvider = "imageExtensionsWithoutDefaultImageIoSupport")
+    public void reduceImageFileSizeShouldReturnNoForUnsupportedImageIoFormats(
+        String fileSuffix,
+        byte[] fileBytes
+    )
+        throws Exception {
+        // given
+        SettingService settingService = mock(SettingService.class);
+        ImageFileService instance = new ImageFileService(settingService);
+        File imageFile = File.createTempFile("image-service-", fileSuffix);
+        imageFile.deleteOnExit();
+        Files.write(imageFile.toPath(), fileBytes);
+        long originalFileSize = imageFile.length();
+        when(settingService.getMaxReducedImageFileSize())
+            .thenReturn(1L);
+
+        // when
+        MediaFileSizeReductionResult result = instance.reduceImageFileSize(
+            imageFile
+        );
+
+        // then
+        Asserts.assertFalse(result.isReduced());
+        Asserts.assertEquals(imageFile.length(), originalFileSize);
+    }
+
+    private BufferedImage newTestImage() {
+        BufferedImage image = new BufferedImage(
+            400,
+            400,
+            BufferedImage.TYPE_INT_RGB
+        );
+        Graphics2D graphics = image.createGraphics();
+        try {
+            for (int y = 0; y < image.getHeight(); ++y) {
+                for (int x = 0; x < image.getWidth(); ++x) {
+                    graphics.setColor(
+                        new Color(
+                            (x * 17 + y) % 256,
+                            (x + y * 31) % 256,
+                            (x * y) % 256
+                        )
+                    );
+                    graphics.fillRect(x, y, 1, 1);
+                }
+            }
+        } finally {
+            graphics.dispose();
+        }
+        return image;
+    }
+
+    private static byte[] webpFileBytes() {
+        return "unsupported webp image".getBytes(StandardCharsets.UTF_8);
+    }
+
+    private static byte[] avifFileBytes() {
+        return "unsupported avif image".getBytes(StandardCharsets.UTF_8);
+    }
+
+    private static byte[] svgFileBytes() {
+        return (
+            "<svg xmlns=\"http://www.w3.org/2000/svg\" " +
+                "width=\"400\" height=\"400\">" +
+                "<rect width=\"400\" height=\"400\" fill=\"#d33\"/>" +
+                "</svg>"
+        ).getBytes(StandardCharsets.UTF_8);
     }
 }
