@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.media;
 
+import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
 import org.youngmonkeys.ezyplatform.model.MediaDetailsModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
@@ -46,6 +47,16 @@ public interface MediaUpDownloader {
     ) {}
 
     default boolean isDownloadSupported() {
+        return Boolean.FALSE;
+    }
+
+    default MediaFileSizeReductionResult reduceMediaFileSize(
+        MediaFileSizeReductionArguments arguments
+    ) {
+        return MediaFileSizeReductionResult.NO;
+    }
+
+    default boolean isReduceMediaSupported() {
         return Boolean.FALSE;
     }
 

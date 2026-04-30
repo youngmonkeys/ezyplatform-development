@@ -39,7 +39,9 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_ADMI
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATETIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATE_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATE_MINUTE_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_REDUCED_IMAGE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_UPLOAD_FILE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_UPLOAD_IMAGE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TOKEN_EXPIRED_IN_DAY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_WEBSOCKET_URL;
@@ -53,6 +55,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ALLOW_SEND_STATISTICS_DATA;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_PAGINATION_COUNT_LIMIT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_USER_ACCESS_TOKEN_HTTP_ONLY;
@@ -66,6 +69,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATE_MINUTE_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_MANAGEMENT_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_MAX_UPLOAD_IMAGE_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_SITE_TITLE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_URL;
@@ -470,6 +474,38 @@ public interface SettingService {
 
     default String getMediaUpDownloaderName() {
         return getTextValue(SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME);
+    }
+
+    default String getMaxUploadImageFileSizeText() {
+        return getTextValue(
+            SETTING_NAME_WEB_MAX_UPLOAD_IMAGE_FILE_SIZE,
+            DEFAULT_MAX_UPLOAD_IMAGE_SIZE
+        );
+    }
+
+    default long getMaxUploadImageFileSize() {
+        String value = getMaxUploadImageFileSizeText();
+        try {
+            return FileSizes.toByteSize(value);
+        } catch (Exception e) {
+            return FileSizes.toByteSize(DEFAULT_MAX_UPLOAD_IMAGE_SIZE);
+        }
+    }
+
+    default String getMaxReducedImageFileSizeText() {
+        return getTextValue(
+            SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE,
+            DEFAULT_MAX_REDUCED_IMAGE_SIZE
+        );
+    }
+
+    default long getMaxReducedImageFileSize() {
+        String value = getMaxReducedImageFileSizeText();
+        try {
+            return FileSizes.toByteSize(value);
+        } catch (Exception e) {
+            return FileSizes.toByteSize(DEFAULT_MAX_REDUCED_IMAGE_SIZE);
+        }
     }
 
     default boolean isAllowSendStatisticsData() {

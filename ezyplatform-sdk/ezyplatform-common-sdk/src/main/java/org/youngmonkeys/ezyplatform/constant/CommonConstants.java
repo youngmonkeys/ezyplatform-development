@@ -175,6 +175,7 @@ public final class CommonConstants {
     public static final String META_KEY_DURATION_IN_MINUTES = "durationInMinutes";
     public static final String META_KEY_JOB_TITLE = "job_title";
     public static final String META_KEY_DESCRIPTION = "description";
+    public static final String META_KEY_ORIGINAL_SIZE_FILE_NAME = "original_size_file_name";
 
     public static final String SETTING_NODE_NAME = "ezyplatformNodeName";
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
@@ -184,6 +185,8 @@ public final class CommonConstants {
         "ezyplatform_pagination_count_limit";
     public static final String SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME =
         "ezyplatform_media_up_down_loader_name";
+    public static final String SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE =
+        "ezyplatform_max_upload_reduced_file_size";
     public static final String SETTING_NAME_ADMIN_DATE_FORMAT
         = "admin_date_format";
     public static final String SETTING_NAME_ADMIN_TIME_FORMAT
@@ -200,6 +203,8 @@ public final class CommonConstants {
         = "admin_login_failure_block_durations";
     public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_FILE_SIZE
         = "admin_max_upload_file_size";
+    public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_IMAGE_FILE_SIZE =
+        "admin_max_upload_image_file_size";
     public static final String SETTING_NAME_ADMIN_TOKEN_EXPIRED_IN_DAY
         = "admin_token_expired_in_day";
     public static final String SETTING_NAME_ADMIN_ACCEPTED_MEDIA_MIME_TYPES
@@ -238,6 +243,8 @@ public final class CommonConstants {
         = "web_default_language";
     public static final String SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE
         = "web_max_upload_file_size";
+    public static final String SETTING_NAME_WEB_MAX_UPLOAD_IMAGE_FILE_SIZE =
+        "web_max_upload_image_file_size";
     public static final String SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES
         = "web_accepted_media_mime_types";
     public static final String SETTING_NAME_WEB_SITE_NAME
@@ -307,6 +314,8 @@ public final class CommonConstants {
     public static final String DEFAULT_HIDDEN_PASSWORD = "************";
     public static final long DEFAULT_TOKEN_EXPIRED_IN_DAY = 7;
     public static final String DEFAULT_MAX_UPLOAD_FILE_SIZE = "5MB";
+    public static final String DEFAULT_MAX_UPLOAD_IMAGE_SIZE = "1MB";
+    public static final String DEFAULT_MAX_REDUCED_IMAGE_SIZE = "1MB";
     public static final Set<String> DEFAULT_ACCEPTED_IMAGE_TYPES =
         Collections.unmodifiableSet(
             Sets.newHashSet(

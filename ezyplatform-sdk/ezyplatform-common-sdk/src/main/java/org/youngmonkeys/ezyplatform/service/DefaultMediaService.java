@@ -28,7 +28,11 @@ import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.io.ImageProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
-import org.youngmonkeys.ezyplatform.model.*;
+import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
+import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
+import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
+import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
@@ -42,7 +46,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_SIZE_FILE_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 @AllArgsConstructor
@@ -50,6 +58,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_
 public class DefaultMediaService implements MediaService {
 
     private final FileSystemManager fileSystemManager;
+    private final DataMetaService dataMetaService;
     private final UniqueDataService uniqueDataService;
     private final MediaRepository mediaRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
@@ -128,6 +137,21 @@ public class DefaultMediaService implements MediaService {
                 )
                 .build()
         );
+    }
+
+    @Override
+    public void saveMediaOriginalSizeFileName(
+        long mediaId,
+        String originalSizeFileName
+    ) {
+        if (isNotBlank(originalSizeFileName)) {
+            dataMetaService.saveDataMetaUniqueKey(
+                TABLE_NAME_MEDIA,
+                mediaId,
+                META_KEY_ORIGINAL_SIZE_FILE_NAME,
+                originalSizeFileName
+            );
+        }
     }
 
     @Override
@@ -408,5 +432,16 @@ public class DefaultMediaService implements MediaService {
             throw new MediaNotFoundException(mediaName);
         }
         return entity;
+    }
+
+    @Override
+    public String getOriginalSizeFileNameByMediaId(
+        long mediaId
+    ) {
+        return dataMetaService.getLatestMetaValueByDataIdAndMetaKey(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_ORIGINAL_SIZE_FILE_NAME
+        );
     }
 }

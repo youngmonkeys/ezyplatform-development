@@ -26,6 +26,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+
 @EzySingleton
 @AllArgsConstructor
 public class ClockProxy {
@@ -54,7 +56,7 @@ public class ClockProxy {
     }
 
     public LocalDate toLocalDateOrNull(long millis) {
-        return millis <= 0
+        return millis <= ZERO_LONG
             ? null
             : toLocalDateTime(millis).toLocalDate();
     }
@@ -67,7 +69,7 @@ public class ClockProxy {
     }
 
     public LocalDateTime toLocalDateTimeOrNull(long millis) {
-        return millis <= 0
+        return millis <= ZERO_LONG
             ? null
             : EzyDates.millisToDateTime(millis, zoneId);
     }
@@ -75,8 +77,6 @@ public class ClockProxy {
     public LocalDateTime nowDateTimeIfNull(
         LocalDateTime value
     ) {
-        return value != null
-            ? value
-            : nowDateTime();
+        return value != null ? value : nowDateTime();
     }
 }

@@ -53,6 +53,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_UR
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.entity.MediaType.AVATAR;
+import static org.youngmonkeys.ezyplatform.entity.MediaType.IMAGE;
 import static org.youngmonkeys.ezyplatform.entity.MediaType.ofMimeTypeName;
 import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidMediaName;
 import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidUrl;
@@ -158,7 +159,7 @@ public class MediaValidator {
         long fileSize = ZERO_LONG;
         String extension = null;
         String mimeType = null;
-        org.apache.tika.mime.MediaType mediaType = null;
+        MediaType mediaTypeEnum = null;
         Map<String, String> errors = new HashMap<>();
         if (filePart == null) {
             errors.put("file", "invalid");
@@ -175,6 +176,7 @@ public class MediaValidator {
             if (fileSize > settingService.getMaxUploadFileSize()) {
                 errors.put("uploadSize", "over");
             }
+            org.apache.tika.mime.MediaType mediaType;
             try (TikaInputStream tikaInputStream =
                      TikaInputStream.get(filePart.getInputStream())
             ) {
@@ -192,6 +194,14 @@ public class MediaValidator {
                 && !acceptedMediaMimeTypes.contains("*")) {
                 errors.put("fileType", "invalid");
             }
+            mediaTypeEnum = avatar
+                ? AVATAR
+                : ofMimeTypeName(mediaType.getType());
+            if ((mediaTypeEnum == AVATAR || mediaTypeEnum == IMAGE)
+                && fileSize > settingService.getMaxUploadImageFileSize()
+            ) {
+                errors.put("uploadSize", "over");
+            }
         }
         if (!errors.isEmpty()) {
             throw new HttpBadRequestException(errors);
@@ -200,7 +210,7 @@ public class MediaValidator {
             .mimeType(mimeType)
             .fileSize(fileSize)
             .extension(getExtensionOfMimeType(mimeType, extension))
-            .mediaType(avatar ? AVATAR : ofMimeTypeName(mediaType.getType()))
+            .mediaType(mediaTypeEnum)
             .build();
     }
 
