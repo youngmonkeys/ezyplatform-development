@@ -55,6 +55,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ALLOW_SEND_STATISTICS_DATA;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_PAGINATION_COUNT_LIMIT;
@@ -506,6 +507,13 @@ public interface SettingService {
         } catch (Exception e) {
             return FileSizes.toByteSize(DEFAULT_MAX_REDUCED_IMAGE_SIZE);
         }
+    }
+
+    default boolean isKeepOriginalSizeImageFile() {
+        return getBooleanValue(
+            SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE,
+            Boolean.TRUE
+        );
     }
 
     default boolean isAllowSendStatisticsData() {

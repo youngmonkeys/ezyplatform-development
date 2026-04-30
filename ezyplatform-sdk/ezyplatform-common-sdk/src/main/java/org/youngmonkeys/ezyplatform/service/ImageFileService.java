@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 
 @AllArgsConstructor
@@ -27,8 +28,7 @@ public class ImageFileService extends EzyLoggable {
     private final SettingService settingService;
 
     public MediaFileSizeReductionResult reduceImageFileSize(
-        File imageFile,
-        String fileName
+        File imageFile
     ) {
         if (imageFile == null
             || !imageFile.isFile()
@@ -41,20 +41,37 @@ public class ImageFileService extends EzyLoggable {
         ) {
             return MediaFileSizeReductionResult.NO;
         }
+        return reduceImageFileSize(imageFile, maxFileSize);
+    }
+
+    private MediaFileSizeReductionResult reduceImageFileSize(
+        File imageFile,
+        long maxFileSize
+    ) {
         File bestFile = null;
         File candidateFile = null;
+        File originalSizeFile = null;
         try {
             ImageData imageData = readImageData(imageFile);
             if (imageData == null) {
                 return MediaFileSizeReductionResult.NO;
             }
             File parentFile = imageFile.getAbsoluteFile().getParentFile();
-            bestFile = File.createTempFile("image-best-", ".tmp", parentFile);
+            bestFile = File.createTempFile(
+                "image-best-",
+                ".tmp",
+                parentFile
+            );
             candidateFile = File.createTempFile(
                 "image-candidate-",
                 ".tmp",
                 parentFile
             );
+            boolean keepOriginalSizeImageFile = settingService
+                .isKeepOriginalSizeImageFile();
+            if (keepOriginalSizeImageFile) {
+                originalSizeFile = saveOriginalSizeFile(imageFile);
+            }
             ReducedFile reducedFile = reduceImageFileSize(
                 imageData,
                 maxFileSize,
@@ -68,6 +85,15 @@ public class ImageFileService extends EzyLoggable {
                     imageFile.toPath(),
                     StandardCopyOption.REPLACE_EXISTING
                 );
+                return MediaFileSizeReductionResult.builder()
+                    .reduced(true)
+                    .originalSizeFileName(
+                        originalSizeFile != null
+                            ? originalSizeFile.getName()
+                            : NULL_STRING
+                    )
+                    .newFileSize(imageFile.length())
+                    .build();
             }
         } catch (Throwable e) {
             logger.info(
@@ -76,6 +102,7 @@ public class ImageFileService extends EzyLoggable {
                 e
             );
         } finally {
+            deleteQuietly(originalSizeFile);
             deleteQuietly(bestFile);
             deleteQuietly(candidateFile);
         }
@@ -144,6 +171,20 @@ public class ImageFileService extends EzyLoggable {
             quality -= 0.1F;
         } while (quality >= 0.25F);
         return new ReducedFile(bestFileSize, reduced);
+    }
+
+    private File saveOriginalSizeFile(
+        File imageFile
+    ) throws IOException {
+        File parentFile = imageFile.getAbsoluteFile().getParentFile();
+        String originalSizeFileName = "original_" + imageFile.getName();
+        File originalSizeFile = new File(parentFile, originalSizeFileName);
+        Files.copy(
+            imageFile.toPath(),
+            originalSizeFile.toPath(),
+            StandardCopyOption.REPLACE_EXISTING
+        );
+        return originalSizeFile;
     }
 
     private ImageData readImageData(
@@ -282,7 +323,10 @@ public class ImageFileService extends EzyLoggable {
         File file
     ) {
         if (file != null && file.isFile() && !file.delete()) {
-            logger.info("can not delete temporary image file: {}", file);
+            logger.warn(
+                "can not delete temporary image file: {}",
+                file
+            );
         }
     }
 

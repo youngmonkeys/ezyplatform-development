@@ -13,15 +13,13 @@ public class MediaFileService {
 
     public MediaFileSizeReductionResult reduceImageFileSize(
         MediaType mediaType,
-        File mediaFilePath,
-        String fileName
+        File mediaFilePath
     ) {
         if (mediaType == MediaType.AVATAR
             || mediaType == MediaType.IMAGE
         ) {
             return imageFileService.reduceImageFileSize(
-                mediaFilePath,
-                fileName
+                mediaFilePath
             );
         }
         return MediaFileSizeReductionResult.NO;

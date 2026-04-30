@@ -19,8 +19,10 @@ package org.youngmonkeys.ezyplatform.test.service;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
+import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
 import org.youngmonkeys.ezyplatform.io.ImageProxy;
 import org.youngmonkeys.ezyplatform.service.ImageFileService;
+import org.youngmonkeys.ezyplatform.service.SettingService;
 
 import javax.imageio.ImageIO;
 import java.awt.Color;
@@ -28,15 +30,20 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 public class ImageFileServiceTest {
 
     @Test
     public void reduceImageFileSizeShouldNotDependOnExtension()
         throws Exception {
         // given
-        ImageFileService instance = new ImageFileService();
+        SettingService settingService = mock(SettingService.class);
+        ImageFileService instance = new ImageFileService(settingService);
         File imageFile = File.createTempFile("image-service-", ".unknown");
         imageFile.deleteOnExit();
+        String fileName = "image-file.unknown";
         BufferedImage image = new BufferedImage(
             400,
             400,
@@ -62,11 +69,30 @@ public class ImageFileServiceTest {
         Asserts.assertTrue(ImageIO.write(image, "jpg", imageFile));
         long originalFileSize = imageFile.length();
         Asserts.assertTrue(originalFileSize > 0);
+        when(settingService.getMaxReducedImageFileSize())
+            .thenReturn(originalFileSize / 2);
+        when(settingService.isKeepOriginalSizeImageFile())
+            .thenReturn(true);
 
         // when
-        instance.reduceImageFileSize(imageFile, originalFileSize / 2);
+        MediaFileSizeReductionResult result = instance.reduceImageFileSize(
+            imageFile,
+            fileName
+        );
 
         // then
+        Asserts.assertTrue(result.isReduced());
+        Asserts.assertEquals(
+            result.getOriginalSizeFileName(),
+            "original_" + fileName
+        );
+        File originalSizeFile = new File(
+            imageFile.getParentFile(),
+            result.getOriginalSizeFileName()
+        );
+        originalSizeFile.deleteOnExit();
+        Asserts.assertTrue(originalSizeFile.isFile());
+        Asserts.assertEquals(originalSizeFile.length(), originalFileSize);
         Asserts.assertTrue(imageFile.length() < originalFileSize);
         ImageSize imageSize = ImageProxy.getImageSize(imageFile);
         Asserts.assertTrue(imageSize.getWidth() > 0);

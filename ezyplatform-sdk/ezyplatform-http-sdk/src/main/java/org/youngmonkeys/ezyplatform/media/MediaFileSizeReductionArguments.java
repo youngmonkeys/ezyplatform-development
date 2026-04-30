@@ -27,5 +27,4 @@ import java.io.File;
 public class MediaFileSizeReductionArguments {
     private MediaType mediaType;
     private File mediaFilePath;
-    private String fileName;
 }

@@ -187,6 +187,8 @@ public final class CommonConstants {
         "ezyplatform_media_up_down_loader_name";
     public static final String SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE =
         "ezyplatform_max_upload_reduced_file_size";
+    public static final String SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE =
+        "ezyplatform_keep_original_size_image_file";
     public static final String SETTING_NAME_ADMIN_DATE_FORMAT
         = "admin_date_format";
     public static final String SETTING_NAME_ADMIN_TIME_FORMAT

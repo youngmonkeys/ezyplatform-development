@@ -271,8 +271,7 @@ public class MediaControllerService extends EzyLoggable {
             () -> {
                 MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
                     fileMetadata.getMediaType(),
-                    mediaFilePath,
-                    newFileName
+                    mediaFilePath
                 );
                 MediaModel model = saveMediaInformation(
                     uploadFrom,
@@ -465,8 +464,7 @@ public class MediaControllerService extends EzyLoggable {
             () -> {
                 MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
                     fileMetadata.getMediaType(),
-                    mediaFilePath,
-                    fileName
+                    mediaFilePath
                 );
                 MediaModel model = replaceMediaInformation(
                     mediaId,
@@ -636,8 +634,7 @@ public class MediaControllerService extends EzyLoggable {
         }
         MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
             mediaType,
-            mediaFilePath.toFile(),
-            newFileName
+            mediaFilePath.toFile()
         );
         MediaModel media = mediaService.addMedia(
             uploadFrom,
@@ -669,8 +666,7 @@ public class MediaControllerService extends EzyLoggable {
 
     public MediaFileSizeReductionResult reduceMediaFileSize(
         MediaType mediaType,
-        File mediaFilePath,
-        String fileName
+        File mediaFilePath
     ) {
         String mediaUploaderName = settingService
             .getMediaUpDownloaderName();
@@ -683,7 +679,6 @@ public class MediaControllerService extends EzyLoggable {
                 MediaFileSizeReductionArguments.builder()
                     .mediaType(mediaType)
                     .mediaFilePath(mediaFilePath)
-                    .fileName(fileName)
                     .build()
             );
         }
@@ -691,15 +686,13 @@ public class MediaControllerService extends EzyLoggable {
             .handleEvent(
                 new MediaFileSizeReductionEvent(
                     mediaType,
-                    mediaFilePath,
-                    fileName
+                    mediaFilePath
                 )
             );
         if (result == null) {
             result = mediaFileService.reduceImageFileSize(
                 mediaType,
-                mediaFilePath,
-                fileName
+                mediaFilePath
             );
         }
         return result;
