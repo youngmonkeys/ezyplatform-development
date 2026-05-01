@@ -35,6 +35,7 @@ import java.nio.file.Files;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 public class ImageFileServiceTest {
 
@@ -66,7 +67,8 @@ public class ImageFileServiceTest {
 
         // when
         MediaFileSizeReductionResult result = instance.reduceImageFileSize(
-            imageFile
+            imageFile,
+            ZERO_LONG
         );
 
         // then
@@ -116,7 +118,8 @@ public class ImageFileServiceTest {
 
         // when
         MediaFileSizeReductionResult result = instance.reduceImageFileSize(
-            imageFile
+            imageFile,
+            ZERO_LONG
         );
 
         // then
@@ -150,7 +153,8 @@ public class ImageFileServiceTest {
 
         // when
         MediaFileSizeReductionResult result = instance.reduceImageFileSize(
-            imageFile
+            imageFile,
+            ZERO_LONG
         );
 
         // then
@@ -180,7 +184,8 @@ public class ImageFileServiceTest {
 
         // when
         MediaFileSizeReductionResult result = instance.reduceImageFileSize(
-            imageFile
+            imageFile,
+            ZERO_LONG
         );
 
         // then
@@ -212,7 +217,8 @@ public class ImageFileServiceTest {
 
         // when
         MediaFileSizeReductionResult result = instance.reduceImageFileSize(
-            imageFile
+            imageFile,
+            ZERO_LONG
         );
 
         // then

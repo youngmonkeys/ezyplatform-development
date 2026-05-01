@@ -113,6 +113,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 public class MediaControllerServiceTest {
     private HttpClient httpClient;
@@ -301,7 +302,8 @@ public class MediaControllerServiceTest {
         when(
             mediaFileService.reduceMediaFileSize(
                 MediaType.IMAGE,
-                mediaFilePath
+                mediaFilePath,
+                ZERO_LONG
             )
         )
             .thenReturn(MediaFileSizeReductionResult.NO);
@@ -386,7 +388,8 @@ public class MediaControllerServiceTest {
         );
         verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
-            mediaFilePath
+            mediaFilePath,
+            ZERO_LONG
         );
         verify(mediaService).addMedia(eq("local"), addMediaCaptor.capture());
         verify(objectMapper).writeValueAsString(mediaModel);
@@ -445,7 +448,8 @@ public class MediaControllerServiceTest {
         );
         inOrder.verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
-            mediaFilePath
+            mediaFilePath,
+            ZERO_LONG
         );
         inOrder.verify(mediaService).addMedia(eq("local"), any(AddMediaModel.class));
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaUploadedEvent.class));
@@ -502,7 +506,8 @@ public class MediaControllerServiceTest {
         when(
             mediaFileService.reduceMediaFileSize(
                 MediaType.IMAGE,
-                mediaFilePath
+                mediaFilePath,
+                ZERO_LONG
             )
         )
             .thenReturn(MediaFileSizeReductionResult.NO);
@@ -589,7 +594,8 @@ public class MediaControllerServiceTest {
         );
         verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
-            mediaFilePath
+            mediaFilePath,
+            ZERO_LONG
         );
         verify(mediaService).addMedia(eq("local"), addMediaCaptor.capture());
         verify(objectMapper).writeValueAsString(mediaModel);
@@ -744,7 +750,8 @@ public class MediaControllerServiceTest {
         when(
             mediaFileService.reduceMediaFileSize(
                 MediaType.IMAGE,
-                mediaFilePath
+                mediaFilePath,
+                ZERO_LONG
             )
         )
             .thenReturn(MediaFileSizeReductionResult.NO);
@@ -826,7 +833,8 @@ public class MediaControllerServiceTest {
         );
         verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
-            mediaFilePath
+            mediaFilePath,
+            ZERO_LONG
         );
         verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
         verify(objectMapper).writeValueAsString(replacedMedia);
@@ -888,7 +896,8 @@ public class MediaControllerServiceTest {
         );
         inOrder.verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
-            mediaFilePath
+            mediaFilePath,
+            ZERO_LONG
         );
         inOrder.verify(mediaService).replaceMedia(any(ReplaceMediaModel.class));
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaUploadedEvent.class));
@@ -957,7 +966,8 @@ public class MediaControllerServiceTest {
         when(
             mediaFileService.reduceMediaFileSize(
                 MediaType.IMAGE,
-                mediaFilePath
+                mediaFilePath,
+                ZERO_LONG
             )
         )
             .thenReturn(MediaFileSizeReductionResult.NO);
@@ -1041,7 +1051,8 @@ public class MediaControllerServiceTest {
         );
         verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
-            mediaFilePath
+            mediaFilePath,
+            ZERO_LONG
         );
         verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
         verify(objectMapper).writeValueAsString(replacedMedia);
@@ -1123,7 +1134,8 @@ public class MediaControllerServiceTest {
         when(
             mediaFileService.reduceMediaFileSize(
                 MediaType.IMAGE,
-                mediaFilePath
+                mediaFilePath,
+                ZERO_LONG
             )
         )
             .thenReturn(MediaFileSizeReductionResult.NO);
@@ -1203,7 +1215,8 @@ public class MediaControllerServiceTest {
         );
         verify(mediaFileService).reduceMediaFileSize(
             MediaType.IMAGE,
-            mediaFilePath
+            mediaFilePath,
+            ZERO_LONG
         );
         verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
         verify(objectMapper).writeValueAsString(replacedMedia);

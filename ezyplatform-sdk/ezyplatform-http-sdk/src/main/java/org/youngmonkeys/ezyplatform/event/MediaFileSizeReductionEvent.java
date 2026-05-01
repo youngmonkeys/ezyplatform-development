@@ -27,4 +27,5 @@ import java.io.File;
 public class MediaFileSizeReductionEvent {
     private MediaType mediaType;
     private File mediaFilePath;
+    private long expectedFileSize;
 }

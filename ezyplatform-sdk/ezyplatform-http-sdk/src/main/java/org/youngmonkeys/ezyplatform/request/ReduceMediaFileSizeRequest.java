@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,13 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.media;
+package org.youngmonkeys.ezyplatform.request;
 
-import lombok.Builder;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.entity.MediaType;
-
-import java.io.File;
+import lombok.Setter;
 
 @Getter
-@Builder
-public class MediaFileSizeReductionArguments {
-    private MediaType mediaType;
-    private File mediaFilePath;
+@Setter
+public class ReduceMediaFileSizeRequest {
     private long expectedFileSize;
 }

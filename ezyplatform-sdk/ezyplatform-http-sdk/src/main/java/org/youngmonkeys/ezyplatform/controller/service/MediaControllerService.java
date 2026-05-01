@@ -672,6 +672,66 @@ public class MediaControllerService extends EzyLoggable {
         MediaType mediaType,
         File mediaFilePath
     ) {
+        return reduceMediaFileSize(
+            mediaType,
+            mediaFilePath,
+            ZERO_LONG
+        );
+    }
+
+    public MediaFileSizeReductionResult reduceMediaFileSizeById(
+        long mediaId,
+        long expectedFileSize,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        MediaModel media = mediaService.getMediaById(mediaId);
+        if (media == null || !validMediaCondition.test(media)) {
+            throw new MediaNotFoundException(mediaId);
+        }
+        return reduceMediaFileSizeAnyway(media, expectedFileSize);
+    }
+
+    public MediaFileSizeReductionResult reduceMediaFileSizeByName(
+        String mediaName,
+        long expectedFileSize,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        MediaModel media = mediaService.getMediaByName(mediaName);
+        if (media == null || !validMediaCondition.test(media)) {
+            throw new MediaNotFoundException(mediaName);
+        }
+        return reduceMediaFileSizeAnyway(media, expectedFileSize);
+    }
+
+    public MediaFileSizeReductionResult reduceMediaFileSizeAnyway(
+        MediaModel media,
+        long expectedFileSize
+    ) {
+        String fileName = media.getName();
+        MediaType mediaType = media.getType();
+        String containerFolder = mediaType.getFolder();
+        File mediaFilePath = fileSystemManager.getMediaFilePath(
+            containerFolder,
+            fileName
+        );
+        MediaFileSizeReductionResult result = reduceMediaFileSize(
+            mediaType,
+            mediaFilePath,
+            expectedFileSize
+        );
+        saveMediaFileSizeReductionResult(
+            media.getId(),
+            result,
+            fileName
+        );
+        return result;
+    }
+
+    public MediaFileSizeReductionResult reduceMediaFileSize(
+        MediaType mediaType,
+        File mediaFilePath,
+        long expectedFileSize
+    ) {
         if (!settingService.isAllowReduceMediaFileSize()) {
             return MediaFileSizeReductionResult.builder().build();
         }
@@ -686,6 +746,7 @@ public class MediaControllerService extends EzyLoggable {
                 MediaFileSizeReductionArguments.builder()
                     .mediaType(mediaType)
                     .mediaFilePath(mediaFilePath)
+                    .expectedFileSize(expectedFileSize)
                     .build()
             );
         }
@@ -693,13 +754,15 @@ public class MediaControllerService extends EzyLoggable {
             .handleEvent(
                 new MediaFileSizeReductionEvent(
                     mediaType,
-                    mediaFilePath
+                    mediaFilePath,
+                    expectedFileSize
                 )
             );
         if (result == null) {
             result = mediaFileService.reduceMediaFileSize(
                 mediaType,
-                mediaFilePath
+                mediaFilePath,
+                expectedFileSize
             );
         }
         return result;
@@ -785,14 +848,18 @@ public class MediaControllerService extends EzyLoggable {
         }
         String originalFileName = result.getOriginalSizeFileName();
         if (isNotBlank(originalFileName)) {
-            mediaService.saveMediaOriginalSizeFileName(
-                mediaId,
-                originalFileName
-            );
-            mediaService.saveMediaSlug(
-                mediaId,
-                originalFileName
-            );
+            String originalFileNameInDB = mediaService
+                .getOriginalSizeFileNameByMediaId(mediaId);
+            if (isBlank(originalFileNameInDB)) {
+                mediaService.saveMediaOriginalSizeFileName(
+                    mediaId,
+                    originalFileName
+                );
+                mediaService.saveMediaSlug(
+                    mediaId,
+                    originalFileName
+                );
+            }
         }
         String newFileName = result.getNewFileName();
         if (isNotBlank(newFileName) && isNotBlank(mediaSlug)) {

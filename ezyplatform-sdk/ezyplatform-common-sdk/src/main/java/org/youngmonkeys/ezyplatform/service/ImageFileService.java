@@ -39,9 +39,12 @@ import java.util.Iterator;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_FILE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 public class ImageFileService extends EzyLoggable {
+
+    private final SettingService settingService;
 
     private static final String TEMP_BEST_FILE_PREFIX = "image-best-";
     private static final String TEMP_CANDIDATE_FILE_PREFIX =
@@ -62,29 +65,24 @@ public class ImageFileService extends EzyLoggable {
     private static final float MIN_COMPRESSION_QUALITY = 0.0F;
     private static final int MIN_IMAGE_SIZE = 1;
 
-    private final SettingService settingService;
-
+    @SuppressWarnings("MethodLength")
     public MediaFileSizeReductionResult reduceImageFileSize(
-        File imageFile
+        File imageFile,
+        long expectedFileSize
     ) {
         if (imageFile == null
             || !imageFile.isFile()
         ) {
             return MediaFileSizeReductionResult.NO;
         }
-        long maxFileSize = settingService.getMaxReducedImageFileSize();
+        long maxFileSize = expectedFileSize > ZERO_LONG
+            ? expectedFileSize
+            : settingService.getMaxReducedImageFileSize();
         if (maxFileSize <= ZERO
             || imageFile.length() <= maxFileSize
         ) {
             return MediaFileSizeReductionResult.NO;
         }
-        return reduceImageFileSize(imageFile, maxFileSize);
-    }
-
-    private MediaFileSizeReductionResult reduceImageFileSize(
-        File imageFile,
-        long maxFileSize
-    ) {
         File bestFile = null;
         File candidateFile = null;
         File originalSizeFile = null;

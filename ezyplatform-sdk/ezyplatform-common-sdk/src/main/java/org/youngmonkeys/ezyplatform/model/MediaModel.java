@@ -48,6 +48,12 @@ public class MediaModel {
     private long createdAt;
     private long updatedAt;
 
+    public MediaType getType() {
+        return type == null
+            ? MediaType.FILE
+            : type;
+    }
+
     public String getTypeText() {
         return isBlank(typeText)
             ? from(type)
