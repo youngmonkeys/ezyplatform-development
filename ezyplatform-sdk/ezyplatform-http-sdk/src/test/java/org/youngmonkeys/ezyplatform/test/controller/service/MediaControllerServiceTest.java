@@ -1393,8 +1393,6 @@ public class MediaControllerServiceTest {
                 any(MediaFileSizeReductionEvent.class)
             )
         ).thenReturn(reductionResult);
-        when(mediaService.getOriginalSizeFileNameByMediaId(123L))
-            .thenReturn(null);
 
         // when
         MediaFileSizeReductionResult actual = instance.reduceMediaFileSizeById(
@@ -1418,13 +1416,15 @@ public class MediaControllerServiceTest {
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
-        verify(mediaService).getOriginalSizeFileNameByMediaId(123L);
-        verify(mediaService).saveMediaOriginalSizeFileName(
+        verify(mediaService).saveMediaOriginalSizeFileNameIfNotExists(
             123L,
             "avatar-original.png"
         );
-        verify(mediaService).saveMediaSlug(123L, "avatar-original.png");
-        verify(mediaService).saveMediaSlug(123L, "avatar.png");
+        verify(mediaService).saveMediaSlugIfNotExists(
+            123L,
+            "avatar-original.png"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(123L, "avatar.png");
 
         MediaFileSizeReductionEvent event = eventCaptor.getValue();
         Asserts.assertEquals(event.getMediaType(), MediaType.IMAGE);
@@ -1499,8 +1499,6 @@ public class MediaControllerServiceTest {
                 any(MediaFileSizeReductionEvent.class)
             )
         ).thenReturn(reductionResult);
-        when(mediaService.getOriginalSizeFileNameByMediaId(456L))
-            .thenReturn(null);
 
         // when
         MediaFileSizeReductionResult actual =
@@ -1525,13 +1523,15 @@ public class MediaControllerServiceTest {
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
-        verify(mediaService).getOriginalSizeFileNameByMediaId(456L);
-        verify(mediaService).saveMediaOriginalSizeFileName(
+        verify(mediaService).saveMediaOriginalSizeFileNameIfNotExists(
             456L,
             "intro-original.mp4"
         );
-        verify(mediaService).saveMediaSlug(456L, "intro-original.mp4");
-        verify(mediaService).saveMediaSlug(456L, "intro.mp4");
+        verify(mediaService).saveMediaSlugIfNotExists(
+            456L,
+            "intro-original.mp4"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(456L, "intro.mp4");
 
         MediaFileSizeReductionEvent event = eventCaptor.getValue();
         Asserts.assertEquals(event.getMediaType(), MediaType.VIDEO);
@@ -1583,8 +1583,6 @@ public class MediaControllerServiceTest {
                 .newFileMimeType("image/jpeg")
                 .newFileSize(123L)
                 .build();
-        when(mediaService.getOriginalSizeFileNameByMediaId(678L))
-            .thenReturn(null);
 
         // when
         instance.saveMediaFileSizeReductionResult(
@@ -1594,13 +1592,15 @@ public class MediaControllerServiceTest {
         );
 
         // then
-        verify(mediaService).getOriginalSizeFileNameByMediaId(678L);
-        verify(mediaService).saveMediaOriginalSizeFileName(
+        verify(mediaService).saveMediaOriginalSizeFileNameIfNotExists(
             678L,
             "original_logo.png"
         );
-        verify(mediaService).saveMediaSlug(678L, "original_logo.png");
-        verify(mediaService).saveMediaSlug(678L, "logo.png");
+        verify(mediaService).saveMediaSlugIfNotExists(
+            678L,
+            "original_logo.png"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(678L, "logo.png");
     }
 
     @Test

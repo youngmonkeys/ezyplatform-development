@@ -91,12 +91,12 @@ public interface MediaService {
         BigDecimal duration
     );
 
-    void saveMediaSlug(
+    void saveMediaSlugIfNotExists(
         long mediaId,
         String slug
     );
 
-    void saveMediaOriginalSizeFileName(
+    void saveMediaOriginalSizeFileNameIfNotExists(
         long mediaId,
         String originalSizeFileName
     );

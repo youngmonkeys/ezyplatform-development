@@ -143,7 +143,7 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public void saveMediaOriginalSizeFileName(
+    public void saveMediaOriginalSizeFileNameIfNotExists(
         long mediaId,
         String originalSizeFileName
     ) {
@@ -158,7 +158,7 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public void saveMediaSlug(
+    public void saveMediaSlugIfNotExists(
         long mediaId,
         String slug
     ) {

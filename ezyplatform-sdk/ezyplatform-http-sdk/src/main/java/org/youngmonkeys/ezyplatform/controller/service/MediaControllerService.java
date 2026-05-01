@@ -848,22 +848,18 @@ public class MediaControllerService extends EzyLoggable {
         }
         String originalFileName = result.getOriginalSizeFileName();
         if (isNotBlank(originalFileName)) {
-            String originalFileNameInDb = mediaService
-                .getOriginalSizeFileNameByMediaId(mediaId);
-            if (isBlank(originalFileNameInDb)) {
-                mediaService.saveMediaOriginalSizeFileName(
-                    mediaId,
-                    originalFileName
-                );
-                mediaService.saveMediaSlug(
-                    mediaId,
-                    originalFileName
-                );
-            }
+            mediaService.saveMediaOriginalSizeFileNameIfNotExists(
+                mediaId,
+                originalFileName
+            );
+            mediaService.saveMediaSlugIfNotExists(
+                mediaId,
+                originalFileName
+            );
         }
         String newFileName = result.getNewFileName();
         if (isNotBlank(newFileName) && isNotBlank(mediaSlug)) {
-            mediaService.saveMediaSlug(
+            mediaService.saveMediaSlugIfNotExists(
                 mediaId,
                 mediaSlug
             );
