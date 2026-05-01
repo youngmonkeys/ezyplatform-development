@@ -1006,6 +1006,11 @@ public class MediaControllerService extends EzyLoggable {
             .width(width)
             .height(height)
             .size(size)
+            .originalSizeFileName(
+                mediaService.getOriginalSizeFileNameByMediaId(
+                    media.getId()
+                )
+            )
             .build();
     }
 

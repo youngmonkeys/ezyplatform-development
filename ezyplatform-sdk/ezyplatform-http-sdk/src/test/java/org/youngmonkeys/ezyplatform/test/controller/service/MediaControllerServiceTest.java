@@ -2380,6 +2380,7 @@ public class MediaControllerServiceTest {
             MediaType.VIDEO,
             "video-detail.mp4"
         );
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
 
         verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
@@ -2480,6 +2481,7 @@ public class MediaControllerServiceTest {
             MediaType.AUDIO,
             "audio-detail.mp3"
         );
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
 
         verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
@@ -2533,6 +2535,7 @@ public class MediaControllerServiceTest {
         );
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
         verify(mediaService).getMediaImageSizeOrDefault(mediaFilePath);
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
 
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), media);
         Asserts.assertEquals(actual.getId(), 907L);

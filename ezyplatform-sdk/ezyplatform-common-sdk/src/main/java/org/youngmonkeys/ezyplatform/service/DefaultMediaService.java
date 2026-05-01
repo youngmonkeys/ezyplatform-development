@@ -444,6 +444,20 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
+    public Map<Long, String> getOriginalSizeFileNameMapByMediaIds(
+        Collection<Long> mediaIds
+    ) {
+        if (mediaIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dataMetaService.getDataMetaValueMapByDataIds(
+            TABLE_NAME_MEDIA,
+            mediaIds,
+            META_KEY_ORIGINAL_SIZE_FILE_NAME
+        );
+    }
+
+    @Override
     public long getUpdatedAtByMediaName(String mediaName) {
         UpdatedAtValueResult result = mediaRepository
             .findUpdatedAtByNameOrOriginalName(mediaName);

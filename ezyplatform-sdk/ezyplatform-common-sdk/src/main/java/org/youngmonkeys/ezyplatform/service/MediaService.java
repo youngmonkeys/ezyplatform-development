@@ -258,5 +258,9 @@ public interface MediaService {
 
     String getOriginalSizeFileNameByMediaId(long mediaId);
 
+    Map<Long, String> getOriginalSizeFileNameMapByMediaIds(
+        Collection<Long> mediaIds
+    );
+
     long getUpdatedAtByMediaName(String mediaName);
 }
