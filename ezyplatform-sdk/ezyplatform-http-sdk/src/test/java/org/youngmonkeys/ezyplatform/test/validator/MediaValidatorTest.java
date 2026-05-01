@@ -112,6 +112,27 @@ public class MediaValidatorTest {
     }
 
     @Test
+    public void validateMediaNameTest() {
+        // given
+        String validMediaName = "media-1.png";
+        String invalidMediaName = "folder/media-1.png";
+
+        // when
+        instance.validateMediaName(validMediaName);
+        Throwable e = Asserts.assertThrows(() ->
+            instance.validateMediaName(invalidMediaName)
+        );
+
+        // then
+        Asserts.assertEqualsType(e, HttpBadRequestException.class);
+        assertErrorData(
+            ((HttpBadRequestException) e).getData(),
+            "mediaName",
+            "invalid"
+        );
+    }
+
+    @Test
     public void validateMediaNameAndGetTest() {
         // given
         String existingMediaName = "media-1";
