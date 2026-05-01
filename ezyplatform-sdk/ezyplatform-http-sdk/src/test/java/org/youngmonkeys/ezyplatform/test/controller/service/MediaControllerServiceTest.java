@@ -23,6 +23,7 @@ import com.tvd12.ezyfox.concurrent.callback.EzyResultCallback;
 import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
 import com.tvd12.ezyhttp.client.HttpClient;
+import com.tvd12.ezyhttp.client.data.DownloadFileResult;
 import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
@@ -91,6 +92,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
@@ -1018,6 +1022,97 @@ public class MediaControllerServiceTest {
             mediaService,
             httpClient
         );
+    }
+
+    @Test
+    public void saveMediaFileFromUrlOrThrowWithValidUrlTest()
+        throws Exception {
+        // given
+        String mediaUrl = "https://ezyplatform.com/images/logo.png";
+        cachePublicAddressForHost("ezyplatform.com");
+        File mediaFolder = Files.createTempDirectory(
+            "save-media-from-url-"
+        ).toFile();
+        mediaFolder.deleteOnExit();
+        File mediaFile = new File(mediaFolder, "stored-logo.png");
+        mediaFile.deleteOnExit();
+        Files.write(mediaFile.toPath(), pngFileBytes());
+        MediaModel media = MediaModel.builder()
+            .id(345L)
+            .name("stored-logo.png")
+            .build();
+
+        when(settingService.getMediaUpDownloaderName()).thenReturn("local");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("local"))
+            .thenReturn(null);
+        when(fileSystemManager.getMediaFolderPath(MediaType.IMAGE))
+            .thenReturn(mediaFolder);
+        when(mediaService.generateMediaFileName(mediaUrl, "png"))
+            .thenReturn("stored-logo.png");
+        when(
+            httpClient.download(
+                mediaUrl,
+                mediaFolder,
+                "stored-logo.png"
+            )
+        )
+            .thenReturn(
+                new DownloadFileResult("logo.png", "stored-logo.png")
+            );
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(false);
+        when(mediaService.addMedia(eq("ADMIN"), any(AddMediaModel.class)))
+            .thenReturn(media);
+
+        // when
+        long actual = instance.saveMediaFileFromUrlOrThrow(
+            "ADMIN",
+            101L,
+            202L,
+            SaveMediaFileFromUrlModel.builder()
+                .mediaType(MediaType.IMAGE.toString())
+                .mediaUrl(mediaUrl)
+                .build()
+        );
+
+        // then
+        ArgumentCaptor<AddMediaModel> addMediaCaptor =
+            ArgumentCaptor.forClass(AddMediaModel.class);
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+
+        Asserts.assertEquals(actual, 345L);
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("local");
+        verify(fileSystemManager).getMediaFolderPath(MediaType.IMAGE);
+        verify(mediaService).generateMediaFileName(mediaUrl, "png");
+        verify(httpClient).download(
+            mediaUrl,
+            mediaFolder,
+            "stored-logo.png"
+        );
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaService).addMedia(
+            eq("ADMIN"),
+            addMediaCaptor.capture()
+        );
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+
+        AddMediaModel addMediaModel = addMediaCaptor.getValue();
+        Asserts.assertEquals(addMediaModel.getFileName(), "stored-logo.png");
+        Asserts.assertEquals(addMediaModel.getOriginalFileName(), "logo.png");
+        Asserts.assertEquals(addMediaModel.getMediaType(), "IMAGE");
+        Asserts.assertEquals(addMediaModel.getMimeType(), "image/png");
+        Asserts.assertEquals(addMediaModel.getFileSize(), mediaFile.length());
+        Asserts.assertEquals(addMediaModel.getOwnerAdminId(), 101L);
+        Asserts.assertEquals(addMediaModel.getOwnerUserId(), 202L);
+        Asserts.assertFalse(addMediaModel.isNotPublic());
+
+        Asserts.assertTrue(
+            eventCaptor.getValue() instanceof MediaUploadedEvent
+        );
+        MediaUploadedEvent event = (MediaUploadedEvent) eventCaptor.getValue();
+        Asserts.assertEquals(event.getMedia(), media);
+        Asserts.assertEquals(event.getMediaFilePath(), mediaFile);
     }
 
     @Test
@@ -2098,5 +2193,40 @@ public class MediaControllerServiceTest {
                 StandardCharsets.UTF_8
             );
         }
+    }
+
+    private static byte[] pngFileBytes() {
+        return new byte[] {
+            -119, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68,
+            82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 0, 0, 0, -112, 119, 83,
+            -34, 0, 0, 0, 12, 73, 68, 65, 84, 8, -41, 99, -8, -49, -64,
+            0, 0, 3, 1, 1, 0, -55, -2, -110, -17, 0, 0, 0, 0, 73, 69,
+            78, 68, -82, 66, 96, -126
+        };
+    }
+
+    private static void cachePublicAddressForHost(String host)
+        throws Exception {
+        Field addressCacheField = InetAddress.class.getDeclaredField(
+            "addressCache"
+        );
+        addressCacheField.setAccessible(true);
+        Object addressCache = addressCacheField.get(null);
+        Method putMethod = addressCache.getClass().getDeclaredMethod(
+            "put",
+            String.class,
+            InetAddress[].class
+        );
+        putMethod.setAccessible(true);
+        putMethod.invoke(
+            addressCache,
+            host,
+            new InetAddress[] {
+                InetAddress.getByAddress(
+                    host,
+                    new byte[] {93, (byte) 184, (byte) 216, 34}
+                )
+            }
+        );
     }
 }
