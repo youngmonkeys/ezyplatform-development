@@ -475,6 +475,32 @@ public interface DataMetaService {
         long dataId
     );
 
+    Map<Long, List<DataMetaModel>> getDataMetasByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds
+    );
+
+    default  <T> Map<Long, List<T>> getDataMetaValuesByDataTypeAndDataIds(
+        String dataType,
+        Collection<Long> dataIds,
+        Function<DataMetaModel, T> converter
+    ) {
+        return getDataMetasByDataTypeAndDataIds(dataType, dataIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e
+                        .getValue()
+                        .stream()
+                        .map(converter)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
+                )
+            );
+    }
+
     Map<Long, Map<String, DataMetaModel>> getDataMetaValueMapsByDataTypeAndDataIds(
         String dataType,
         Collection<Long> dataIds

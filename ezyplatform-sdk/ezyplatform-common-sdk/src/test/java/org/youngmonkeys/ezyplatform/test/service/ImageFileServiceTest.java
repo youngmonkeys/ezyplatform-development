@@ -48,15 +48,37 @@ public class ImageFileServiceTest {
     }
 
     @Test
-    public void reduceImageFileSizeShouldSupportPng()
+    public void reduceImageFileSizeShouldReducePngWithoutRenaming()
         throws Exception {
-        reduceImageFileSizeShouldSupportImageFormat("png", ".png");
-    }
+        // given
+        SettingService settingService = mock(SettingService.class);
+        ImageFileService instance = new ImageFileService(settingService);
+        File imageFile = File.createTempFile("image-service-", ".png");
+        imageFile.deleteOnExit();
+        BufferedImage image = newTestImage();
+        Asserts.assertTrue(ImageIO.write(image, "png", imageFile));
+        long originalFileSize = imageFile.length();
+        Asserts.assertTrue(originalFileSize > 0);
+        when(settingService.getMaxReducedImageFileSize())
+            .thenReturn(1L);
+        when(settingService.isKeepOriginalSizeImageFile())
+            .thenReturn(true);
 
-    @Test
-    public void reduceImageFileSizeShouldSupportGif()
-        throws Exception {
-        reduceImageFileSizeShouldSupportImageFormat("gif", ".gif");
+        // when
+        MediaFileSizeReductionResult result = instance.reduceImageFileSize(
+            imageFile
+        );
+
+        // then
+        Asserts.assertNull(result.getNewFileMimeType());
+        Asserts.assertTrue(imageFile.exists());
+        Asserts.assertTrue(imageFile.length() <= originalFileSize);
+        ImageSize imageSize = ImageProxy.getImageSize(imageFile);
+        Asserts.assertEquals(imageSize.getWidth(), image.getWidth());
+        Asserts.assertEquals(imageSize.getHeight(), image.getHeight());
+        if (result.isReduced()) {
+            Asserts.assertTrue(imageFile.length() < originalFileSize);
+        }
     }
 
     @Test
@@ -141,6 +163,35 @@ public class ImageFileServiceTest {
         Asserts.assertTrue(imageSize.getHeight() > 0);
     }
 
+    @Test
+    public void reduceImageFileSizeShouldReturnNoForGif()
+        throws Exception {
+        // given
+        SettingService settingService = mock(SettingService.class);
+        ImageFileService instance = new ImageFileService(settingService);
+        File imageFile = File.createTempFile("image-service-", ".gif");
+        imageFile.deleteOnExit();
+        Files.write(imageFile.toPath(), gifFileBytes());
+        long originalFileSize = imageFile.length();
+        when(settingService.getMaxReducedImageFileSize())
+            .thenReturn(1L);
+
+        // when
+        MediaFileSizeReductionResult result = instance.reduceImageFileSize(
+            imageFile
+        );
+
+        // then
+        Asserts.assertFalse(result.isReduced());
+        Asserts.assertEquals(imageFile.length(), originalFileSize);
+        Asserts.assertFalse(
+            new File(
+                imageFile.getParentFile(),
+                "original_" + imageFile.getName()
+            ).exists()
+        );
+    }
+
     @Test(dataProvider = "imageExtensionsWithoutDefaultImageIoSupport")
     public void reduceImageFileSizeShouldReturnNoForUnsupportedImageIoFormats(
         String fileSuffix,
@@ -199,6 +250,14 @@ public class ImageFileServiceTest {
 
     private static byte[] avifFileBytes() {
         return "unsupported avif image".getBytes(StandardCharsets.UTF_8);
+    }
+
+    private static byte[] gifFileBytes() {
+        return new byte[] {
+            71, 73, 70, 56, 57, 97, 1, 0, 1, 0, -128, 0, 0, -1, -1, -1,
+            0, 0, 0, 33, -7, 4, 1, 0, 0, 0, 0, 44, 0, 0, 0, 0, 1, 0,
+            1, 0, 0, 2, 2, 68, 1, 0, 59
+        };
     }
 
     private static byte[] svgFileBytes() {

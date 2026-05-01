@@ -49,6 +49,7 @@ public class ImageFileService extends EzyLoggable {
     private static final String ORIGINAL_SIZE_FILE_PREFIX = "original_";
     private static final String IMAGE_FORMAT_JPG = "jpg";
     private static final String IMAGE_FORMAT_JPEG = "jpeg";
+    private static final String IMAGE_FORMAT_PNG = "png";
     private static final float FULL_SCALE = 1.0F;
     private static final float MIN_SCALE = 0.05F;
     private static final float SCALE_REDUCTION_RATIO = 0.85F;
@@ -89,6 +90,9 @@ public class ImageFileService extends EzyLoggable {
             if (imageData == null) {
                 return MediaFileSizeReductionResult.NO;
             }
+            if (!isSupportedFormat(imageData.formatName)) {
+                return MediaFileSizeReductionResult.NO;
+            }
             File parentFile = imageFile.getAbsoluteFile().getParentFile();
             bestFile = createTempImageFile(
                 TEMP_BEST_FILE_PREFIX,
@@ -103,7 +107,7 @@ public class ImageFileService extends EzyLoggable {
             if (keepOriginalSizeImageFile) {
                 originalSizeFile = saveOriginalSizeFile(imageFile);
             }
-            ReducedFile reducedFile = reduceImageFileSize(
+            ReducedFile reducedFile = reduceImageDataFileSize(
                 imageData,
                 maxFileSize,
                 imageFile.length(),
@@ -111,20 +115,13 @@ public class ImageFileService extends EzyLoggable {
                 candidateFile
             );
             if (reducedFile.reduced) {
-                Files.move(
-                    bestFile.toPath(),
-                    imageFile.toPath(),
-                    StandardCopyOption.REPLACE_EXISTING
+                MediaFileSizeReductionResult result = saveReducedImageFile(
+                    imageFile,
+                    bestFile,
+                    originalSizeFile
                 );
-                return MediaFileSizeReductionResult.builder()
-                    .reduced(true)
-                    .originalSizeFileName(
-                        originalSizeFile != null
-                            ? originalSizeFile.getName()
-                            : NULL_STRING
-                    )
-                    .newFileSize(imageFile.length())
-                    .build();
+                originalSizeFile = null;
+                return result;
             }
         } catch (Throwable e) {
             logger.info(
@@ -140,19 +137,81 @@ public class ImageFileService extends EzyLoggable {
         return MediaFileSizeReductionResult.NO;
     }
 
-    private ReducedFile reduceImageFileSize(
+    private MediaFileSizeReductionResult saveReducedImageFile(
+        File imageFile,
+        File bestFile,
+        File originalSizeFile
+    ) throws IOException {
+        Files.move(
+            bestFile.toPath(),
+            imageFile.toPath(),
+            StandardCopyOption.REPLACE_EXISTING
+        );
+        return MediaFileSizeReductionResult.builder()
+            .reduced(Boolean.TRUE)
+            .originalSizeFileName(
+                originalSizeFile != null
+                    ? originalSizeFile.getName()
+                    : NULL_STRING
+            )
+            .newFileSize(imageFile.length())
+            .build();
+    }
+
+    private ReducedFile reduceImageDataFileSize(
         ImageData imageData,
         long maxFileSize,
         long originalFileSize,
         File bestFile,
         File candidateFile
     ) throws IOException {
-        long bestFileSize = originalFileSize;
-        boolean reduced = false;
+        if (isPngFormat(imageData.formatName)) {
+            return reducePngImageFileSize(
+                imageData,
+                maxFileSize,
+                originalFileSize,
+                bestFile,
+                candidateFile
+            );
+        }
+        return reduceLossyImageFileSize(
+            imageData,
+            maxFileSize,
+            originalFileSize,
+            bestFile,
+            candidateFile
+        );
+    }
+
+    private ReducedFile reducePngImageFileSize(
+        ImageData imageData,
+        long maxFileSize,
+        long originalFileSize,
+        File bestFile,
+        File candidateFile
+    ) throws IOException {
+        return reduceBufferedImageFileSize(
+            imageData.image,
+            IMAGE_FORMAT_PNG,
+            maxFileSize,
+            originalFileSize,
+            bestFile,
+            candidateFile
+        );
+    }
+
+    private ReducedFile reduceLossyImageFileSize(
+        ImageData imageData,
+        long maxFileSize,
+        long bestFileSize,
+        File bestFile,
+        File candidateFile
+    ) throws IOException {
+        boolean reduced = Boolean.FALSE;
         float scale = FULL_SCALE;
         while (scale > MIN_SCALE) {
             BufferedImage image = resizeImage(imageData.image, scale);
-            ReducedFile reducedFile = reduceImageFileSize(
+            ReducedFile reducedFile = reduceBufferedImageFileSize(
                 image,
                 imageData.formatName,
                 maxFileSize,
@@ -172,10 +231,10 @@ public class ImageFileService extends EzyLoggable {
             }
             scale *= SCALE_REDUCTION_RATIO;
         }
-        return new ReducedFile(bestFileSize, reduced);
+        return new ReducedFile(reduced, bestFileSize);
     }
 
-    private ReducedFile reduceImageFileSize(
+    private ReducedFile reduceBufferedImageFileSize(
         BufferedImage image,
         String formatName,
         long maxFileSize,
@@ -183,7 +242,7 @@ public class ImageFileService extends EzyLoggable {
         File bestFile,
         File candidateFile
     ) throws IOException {
-        boolean reduced = false;
+        boolean reduced = Boolean.FALSE;
         float quality = INITIAL_QUALITY;
         do {
             writeImage(image, formatName, quality, candidateFile);
@@ -195,7 +254,7 @@ public class ImageFileService extends EzyLoggable {
                     StandardCopyOption.REPLACE_EXISTING
                 );
                 bestFileSize = candidateFileSize;
-                reduced = true;
+                reduced = Boolean.TRUE;
             }
             if (bestFileSize <= maxFileSize
                 || !isLossyFormat(formatName)
@@ -204,7 +263,7 @@ public class ImageFileService extends EzyLoggable {
             }
             quality -= QUALITY_REDUCTION_STEP;
         } while (quality >= MIN_QUALITY);
-        return new ReducedFile(bestFileSize, reduced);
+        return new ReducedFile(reduced, bestFileSize);
     }
 
     private File createTempImageFile(
@@ -386,11 +445,31 @@ public class ImageFileService extends EzyLoggable {
         );
         Graphics2D graphics = convertedImage.createGraphics();
         try {
+            graphics.setColor(Color.WHITE);
+            graphics.fillRect(
+                ZERO,
+                ZERO,
+                convertedImage.getWidth(),
+                convertedImage.getHeight()
+            );
             graphics.drawImage(image, 0, 0, null);
         } finally {
             graphics.dispose();
         }
         return convertedImage;
+    }
+
+    private boolean isPngFormat(
+        String formatName
+    ) {
+        return IMAGE_FORMAT_PNG.equalsIgnoreCase(formatName);
+    }
+
+    private boolean isSupportedFormat(
+        String formatName
+    ) {
+        return isLossyFormat(formatName)
+            || isPngFormat(formatName);
     }
 
     private boolean isLossyFormat(
@@ -425,15 +504,15 @@ public class ImageFileService extends EzyLoggable {
     }
 
     private static class ReducedFile {
-        private final long fileSize;
         private final boolean reduced;
+        private final long fileSize;
 
         private ReducedFile(
-            long fileSize,
-            boolean reduced
+            boolean reduced,
+            long fileSize
         ) {
-            this.fileSize = fileSize;
             this.reduced = reduced;
+            this.fileSize = fileSize;
         }
     }
 }
