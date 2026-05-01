@@ -55,6 +55,7 @@ import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
+import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
 import org.youngmonkeys.ezyplatform.media.MediaFileSizeReductionArguments;
@@ -1352,6 +1353,226 @@ public class MediaControllerServiceTest {
     }
 
     @Test
+    public void reduceMediaFileSizeByIdTest() throws Exception {
+        // given
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        File mediaFilePath = File.createTempFile(
+            "reduce-media-by-id-",
+            ".png"
+        );
+        MediaModel media = MediaModel.builder()
+            .id(123L)
+            .name("avatar.png")
+            .type(MediaType.IMAGE)
+            .build();
+        MediaFileSizeReductionResult reductionResult =
+            MediaFileSizeReductionResult.builder()
+                .reduced(true)
+                .originalSizeFileName("avatar-original.png")
+                .newFileName("avatar-reduced.png")
+                .newFileMimeType("image/jpeg")
+                .newFileSize(456L)
+                .build();
+        mediaFilePath.deleteOnExit();
+
+        when(mediaService.getMediaById(123L)).thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(true);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "avatar.png"
+            )
+        ).thenReturn(mediaFilePath);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(null);
+        when(
+            eventHandlerManager.handleEvent(
+                any(MediaFileSizeReductionEvent.class)
+            )
+        ).thenReturn(reductionResult);
+        when(mediaService.getOriginalSizeFileNameByMediaId(123L))
+            .thenReturn(null);
+
+        // when
+        MediaFileSizeReductionResult actual = instance.reduceMediaFileSizeById(
+            123L,
+            789L,
+            validMediaCondition
+        );
+
+        // then
+        ArgumentCaptor<MediaFileSizeReductionEvent> eventCaptor =
+            ArgumentCaptor.forClass(MediaFileSizeReductionEvent.class);
+
+        Asserts.assertEquals(actual, reductionResult);
+        verify(mediaService).getMediaById(123L);
+        verify(validMediaCondition).test(media);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "avatar.png"
+        );
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        verify(mediaService).getOriginalSizeFileNameByMediaId(123L);
+        verify(mediaService).saveMediaOriginalSizeFileName(
+            123L,
+            "avatar-original.png"
+        );
+        verify(mediaService).saveMediaSlug(123L, "avatar-original.png");
+        verify(mediaService).saveMediaSlug(123L, "avatar.png");
+
+        MediaFileSizeReductionEvent event = eventCaptor.getValue();
+        Asserts.assertEquals(event.getMediaType(), MediaType.IMAGE);
+        Asserts.assertEquals(event.getMediaFilePath(), mediaFilePath);
+        Asserts.assertEquals(event.getExpectedFileSize(), 789L);
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void reduceMediaFileSizeByIdMediaNotFoundTest() {
+        // given
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+
+        when(mediaService.getMediaById(123L)).thenReturn(null);
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.reduceMediaFileSizeById(
+                123L,
+                789L,
+                validMediaCondition
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, MediaNotFoundException.class);
+        verify(mediaService).getMediaById(123L);
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void reduceMediaFileSizeByNameTest() throws Exception {
+        // given
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        File mediaFilePath = File.createTempFile(
+            "reduce-media-by-name-",
+            ".mp4"
+        );
+        MediaModel media = MediaModel.builder()
+            .id(456L)
+            .name("intro.mp4")
+            .type(MediaType.VIDEO)
+            .build();
+        MediaFileSizeReductionResult reductionResult =
+            MediaFileSizeReductionResult.builder()
+                .reduced(true)
+                .originalSizeFileName("intro-original.mp4")
+                .newFileName("intro-reduced.mp4")
+                .newFileMimeType("video/mp4")
+                .newFileSize(1024L)
+                .build();
+        mediaFilePath.deleteOnExit();
+
+        when(mediaService.getMediaByName("intro.mp4")).thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(true);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.VIDEO.getFolder(),
+                "intro.mp4"
+            )
+        ).thenReturn(mediaFilePath);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(null);
+        when(
+            eventHandlerManager.handleEvent(
+                any(MediaFileSizeReductionEvent.class)
+            )
+        ).thenReturn(reductionResult);
+        when(mediaService.getOriginalSizeFileNameByMediaId(456L))
+            .thenReturn(null);
+
+        // when
+        MediaFileSizeReductionResult actual =
+            instance.reduceMediaFileSizeByName(
+                "intro.mp4",
+                2048L,
+                validMediaCondition
+            );
+
+        // then
+        ArgumentCaptor<MediaFileSizeReductionEvent> eventCaptor =
+            ArgumentCaptor.forClass(MediaFileSizeReductionEvent.class);
+
+        Asserts.assertEquals(actual, reductionResult);
+        verify(mediaService).getMediaByName("intro.mp4");
+        verify(validMediaCondition).test(media);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.VIDEO.getFolder(),
+            "intro.mp4"
+        );
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        verify(mediaService).getOriginalSizeFileNameByMediaId(456L);
+        verify(mediaService).saveMediaOriginalSizeFileName(
+            456L,
+            "intro-original.mp4"
+        );
+        verify(mediaService).saveMediaSlug(456L, "intro-original.mp4");
+        verify(mediaService).saveMediaSlug(456L, "intro.mp4");
+
+        MediaFileSizeReductionEvent event = eventCaptor.getValue();
+        Asserts.assertEquals(event.getMediaType(), MediaType.VIDEO);
+        Asserts.assertEquals(event.getMediaFilePath(), mediaFilePath);
+        Asserts.assertEquals(event.getExpectedFileSize(), 2048L);
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void reduceMediaFileSizeByNameMediaInvalidTest() {
+        // given
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(456L)
+            .name("intro.mp4")
+            .type(MediaType.VIDEO)
+            .build();
+
+        when(mediaService.getMediaByName("intro.mp4")).thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(false);
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.reduceMediaFileSizeByName(
+                "intro.mp4",
+                2048L,
+                validMediaCondition
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, MediaNotFoundException.class);
+        verify(mediaService).getMediaByName("intro.mp4");
+        verify(validMediaCondition).test(media);
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
     public void saveMediaFileSizeReductionResultWhenReducedTest() {
         // given
         MediaFileSizeReductionResult reductionResult =
@@ -1362,6 +1583,8 @@ public class MediaControllerServiceTest {
                 .newFileMimeType("image/jpeg")
                 .newFileSize(123L)
                 .build();
+        when(mediaService.getOriginalSizeFileNameByMediaId(678L))
+            .thenReturn(null);
 
         // when
         instance.saveMediaFileSizeReductionResult(
@@ -1371,6 +1594,7 @@ public class MediaControllerServiceTest {
         );
 
         // then
+        verify(mediaService).getOriginalSizeFileNameByMediaId(678L);
         verify(mediaService).saveMediaOriginalSizeFileName(
             678L,
             "original_logo.png"

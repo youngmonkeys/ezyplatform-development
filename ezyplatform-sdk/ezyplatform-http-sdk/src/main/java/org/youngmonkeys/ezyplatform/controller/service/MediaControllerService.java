@@ -668,17 +668,6 @@ public class MediaControllerService extends EzyLoggable {
         return media.getId();
     }
 
-    public MediaFileSizeReductionResult reduceMediaFileSize(
-        MediaType mediaType,
-        File mediaFilePath
-    ) {
-        return reduceMediaFileSize(
-            mediaType,
-            mediaFilePath,
-            ZERO_LONG
-        );
-    }
-
     public MediaFileSizeReductionResult reduceMediaFileSizeById(
         long mediaId,
         long expectedFileSize,
@@ -725,6 +714,17 @@ public class MediaControllerService extends EzyLoggable {
             fileName
         );
         return result;
+    }
+
+    public MediaFileSizeReductionResult reduceMediaFileSize(
+        MediaType mediaType,
+        File mediaFilePath
+    ) {
+        return reduceMediaFileSize(
+            mediaType,
+            mediaFilePath,
+            ZERO_LONG
+        );
     }
 
     public MediaFileSizeReductionResult reduceMediaFileSize(
@@ -848,9 +848,9 @@ public class MediaControllerService extends EzyLoggable {
         }
         String originalFileName = result.getOriginalSizeFileName();
         if (isNotBlank(originalFileName)) {
-            String originalFileNameInDB = mediaService
+            String originalFileNameInDb = mediaService
                 .getOriginalSizeFileNameByMediaId(mediaId);
-            if (isBlank(originalFileNameInDB)) {
+            if (isBlank(originalFileNameInDb)) {
                 mediaService.saveMediaOriginalSizeFileName(
                     mediaId,
                     originalFileName
