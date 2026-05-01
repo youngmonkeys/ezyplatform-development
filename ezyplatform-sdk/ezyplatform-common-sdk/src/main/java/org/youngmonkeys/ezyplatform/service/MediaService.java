@@ -257,4 +257,6 @@ public interface MediaService {
     long getOwnerUserIdByMediaName(String mediaName);
 
     String getOriginalSizeFileNameByMediaId(long mediaId);
+
+    long getUpdatedAtByMediaName(String mediaName);
 }

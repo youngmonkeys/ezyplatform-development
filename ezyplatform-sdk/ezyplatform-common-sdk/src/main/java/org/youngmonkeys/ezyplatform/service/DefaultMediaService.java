@@ -37,6 +37,7 @@ import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
+import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -53,6 +54,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORI
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
+import static org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult.updatedAtOrNull;
 
 @AllArgsConstructor
 @SuppressWarnings("MethodCount")
@@ -430,6 +432,26 @@ public class DefaultMediaService implements MediaService {
         return result != null ? result.getId() : ZERO_LONG;
     }
 
+    @Override
+    public String getOriginalSizeFileNameByMediaId(
+        long mediaId
+    ) {
+        return dataMetaService.getLatestMetaValueByDataIdAndMetaKey(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_ORIGINAL_SIZE_FILE_NAME
+        );
+    }
+
+    @Override
+    public long getUpdatedAtByMediaName(String mediaName) {
+        UpdatedAtValueResult result = mediaRepository
+            .findUpdatedAtByNameOrOriginalName(mediaName);
+        return entityToModelConverter.toTimestamp(
+            updatedAtOrNull(result)
+        );
+    }
+
     protected Media getMediaEntityByIdOrThrow(
         long mediaId
     ) {
@@ -449,16 +471,5 @@ public class DefaultMediaService implements MediaService {
             throw new MediaNotFoundException(mediaName);
         }
         return entity;
-    }
-
-    @Override
-    public String getOriginalSizeFileNameByMediaId(
-        long mediaId
-    ) {
-        return dataMetaService.getLatestMetaValueByDataIdAndMetaKey(
-            TABLE_NAME_MEDIA,
-            mediaId,
-            META_KEY_ORIGINAL_SIZE_FILE_NAME
-        );
     }
 }

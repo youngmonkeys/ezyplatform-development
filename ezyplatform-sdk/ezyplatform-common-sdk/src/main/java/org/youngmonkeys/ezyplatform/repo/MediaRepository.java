@@ -22,6 +22,7 @@ import org.youngmonkeys.ezyplatform.entity.Media;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
+import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
 
 import java.util.List;
 
@@ -91,6 +92,14 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
             "WHERE e.name = ?0 OR e.originalName = ?0"
     )
     IdResult findOwnerUserIdByNameOrOriginalName(
+        String mediaName
+    );
+
+    @EzyQuery(
+        "SELECT e.updatedAt FROM Media e " +
+            "WHERE e.name = ?0 OR e.originalName = ?0"
+    )
+    UpdatedAtValueResult findUpdatedAtByNameOrOriginalName(
         String mediaName
     );
 }
