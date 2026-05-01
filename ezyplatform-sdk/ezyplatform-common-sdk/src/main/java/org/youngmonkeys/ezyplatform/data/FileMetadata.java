@@ -27,4 +27,14 @@ public class FileMetadata {
     private final String extension;
     private final MediaType mediaType;
     private final long fileSize;
+
+    public MediaType getMediaType() {
+        return mediaType != null
+            ? mediaType
+            : MediaType.FILE;
+    }
+
+    public String getMediaTypeText() {
+        return getMediaType().toString();
+    }
 }

@@ -20,19 +20,62 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.constant.CommonConstants;
-import org.youngmonkeys.ezyplatform.entity.*;
-import org.youngmonkeys.ezyplatform.model.*;
+import org.youngmonkeys.ezyplatform.entity.AccessTokenMeta;
+import org.youngmonkeys.ezyplatform.entity.AdminActivityHistory;
+import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
+import org.youngmonkeys.ezyplatform.entity.DataI18n;
+import org.youngmonkeys.ezyplatform.entity.DataIndex;
+import org.youngmonkeys.ezyplatform.entity.DataMapping;
+import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
+import org.youngmonkeys.ezyplatform.entity.DataType;
+import org.youngmonkeys.ezyplatform.entity.Letter;
+import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
+import org.youngmonkeys.ezyplatform.entity.Link;
+import org.youngmonkeys.ezyplatform.entity.Media;
+import org.youngmonkeys.ezyplatform.entity.MediaStatus;
+import org.youngmonkeys.ezyplatform.entity.Notification;
+import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
+import org.youngmonkeys.ezyplatform.entity.Setting;
+import org.youngmonkeys.ezyplatform.entity.UniqueData;
+import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
+import org.youngmonkeys.ezyplatform.entity.UserKeyword;
+import org.youngmonkeys.ezyplatform.entity.UserRole;
+import org.youngmonkeys.ezyplatform.model.AddAdminActivityHistoryModel;
+import org.youngmonkeys.ezyplatform.model.AddLetterModel;
+import org.youngmonkeys.ezyplatform.model.AddLetterReceiverModel;
+import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
+import org.youngmonkeys.ezyplatform.model.AddNotificationReceiverModel;
+import org.youngmonkeys.ezyplatform.model.AddUserKeywordModel;
+import org.youngmonkeys.ezyplatform.model.DataI18nModel;
+import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
+import org.youngmonkeys.ezyplatform.model.SaveAccessTokenMetaModel;
+import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
+import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
+import org.youngmonkeys.ezyplatform.model.SaveDataMappingModel;
+import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
+import org.youngmonkeys.ezyplatform.model.UniqueDataKeyValueModel;
+import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
+import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
-import static com.tvd12.ezyfox.io.EzyStrings.*;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigDecimalOrZero;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
@@ -546,6 +589,7 @@ public class DefaultModelToEntityConverter {
         ReplaceMediaModel model,
         Media entity
     ) {
+        entity.setName(model.getFileName());
         entity.setOriginalName(model.getOriginalFileName());
         entity.setType(model.getMediaType());
         entity.setMimeType(model.getMimeType());

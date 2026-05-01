@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyhttp.core.constant.ContentType;
 import org.youngmonkeys.ezyplatform.entity.TargetType;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ public final class CommonConstants {
 
     public static final BigDecimal NULL_BIG_DECIMAL = null;
     public static final BigInteger NULL_BIG_INTEGER = null;
+    public static final File NULL_FILE = null;
     public static final Integer NULL_INTEGER = null;
     public static final Long NULL_LONG = null;
     public static final Object NULL_OBJECT = null;
@@ -175,6 +177,7 @@ public final class CommonConstants {
     public static final String META_KEY_DURATION_IN_MINUTES = "durationInMinutes";
     public static final String META_KEY_JOB_TITLE = "job_title";
     public static final String META_KEY_DESCRIPTION = "description";
+    public static final String META_KEY_ORIGINAL_SIZE_FILE_NAME = "original_size_file_name";
 
     public static final String SETTING_NODE_NAME = "ezyplatformNodeName";
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
@@ -184,6 +187,10 @@ public final class CommonConstants {
         "ezyplatform_pagination_count_limit";
     public static final String SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME =
         "ezyplatform_media_up_down_loader_name";
+    public static final String SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE =
+        "ezyplatform_max_upload_reduced_file_size";
+    public static final String SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE =
+        "ezyplatform_keep_original_size_image_file";
     public static final String SETTING_NAME_ADMIN_DATE_FORMAT
         = "admin_date_format";
     public static final String SETTING_NAME_ADMIN_TIME_FORMAT
@@ -200,6 +207,10 @@ public final class CommonConstants {
         = "admin_login_failure_block_durations";
     public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_FILE_SIZE
         = "admin_max_upload_file_size";
+    public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_IMAGE_FILE_SIZE =
+        "admin_max_upload_image_file_size";
+    public static final String SETTING_NAME_ADMIN_ALLOW_REDUCE_MEDIA_FILE_SIZE =
+        "admin_allow_media_file_size_reduction";
     public static final String SETTING_NAME_ADMIN_TOKEN_EXPIRED_IN_DAY
         = "admin_token_expired_in_day";
     public static final String SETTING_NAME_ADMIN_ACCEPTED_MEDIA_MIME_TYPES
@@ -238,6 +249,8 @@ public final class CommonConstants {
         = "web_default_language";
     public static final String SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE
         = "web_max_upload_file_size";
+    public static final String SETTING_NAME_WEB_MAX_UPLOAD_IMAGE_FILE_SIZE =
+        "web_max_upload_image_file_size";
     public static final String SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES
         = "web_accepted_media_mime_types";
     public static final String SETTING_NAME_WEB_SITE_NAME
@@ -307,6 +320,8 @@ public final class CommonConstants {
     public static final String DEFAULT_HIDDEN_PASSWORD = "************";
     public static final long DEFAULT_TOKEN_EXPIRED_IN_DAY = 7;
     public static final String DEFAULT_MAX_UPLOAD_FILE_SIZE = "5MB";
+    public static final String DEFAULT_MAX_UPLOAD_IMAGE_SIZE = "1MB";
+    public static final String DEFAULT_MAX_REDUCED_IMAGE_SIZE = "1MB";
     public static final Set<String> DEFAULT_ACCEPTED_IMAGE_TYPES =
         Collections.unmodifiableSet(
             Sets.newHashSet(

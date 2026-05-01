@@ -91,6 +91,16 @@ public interface MediaService {
         BigDecimal duration
     );
 
+    void saveMediaSlug(
+        long mediaId,
+        String slug
+    );
+
+    void saveMediaOriginalSizeFileName(
+        long mediaId,
+        String originalSizeFileName
+    );
+
     MediaModel removeMedia(long mediaId);
 
     MediaModel removeMedia(String mediaName);
@@ -245,4 +255,8 @@ public interface MediaService {
     long getOwnerUserIdByMediaId(long mediaId);
 
     long getOwnerUserIdByMediaName(String mediaName);
+
+    String getOriginalSizeFileNameByMediaId(long mediaId);
+
+    long getUpdatedAtByMediaName(String mediaName);
 }

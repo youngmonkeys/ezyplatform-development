@@ -37,6 +37,7 @@ import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
+import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
@@ -45,6 +46,7 @@ import org.youngmonkeys.ezyplatform.event.GetMediaDetailsEvent;
 import org.youngmonkeys.ezyplatform.event.GetMediaFilePathEvent;
 import org.youngmonkeys.ezyplatform.event.MediaAddedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaDownloadEvent;
+import org.youngmonkeys.ezyplatform.event.MediaFileSizeReductionEvent;
 import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadEvent;
@@ -54,6 +56,7 @@ import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.io.FolderProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
+import org.youngmonkeys.ezyplatform.media.MediaFileSizeReductionArguments;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloader;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloaderManager;
 import org.youngmonkeys.ezyplatform.media.MediaUploadArguments;
@@ -71,6 +74,7 @@ import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
+import org.youngmonkeys.ezyplatform.service.MediaFileService;
 import org.youngmonkeys.ezyplatform.service.MediaService;
 import org.youngmonkeys.ezyplatform.service.PaginationMediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
@@ -90,8 +94,10 @@ import java.util.Collection;
 import java.util.function.Predicate;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.model.MediaDetailsModel.fromMediaModel;
@@ -109,6 +115,7 @@ public class MediaControllerService extends EzyLoggable {
     private final ObjectMapper objectMapper;
     private final ResourceDownloadManager resourceDownloadManager;
     private final MediaService mediaService;
+    private final MediaFileService mediaFileService;
     private final PaginationMediaService paginationMediaService;
     private final SettingService settingService;
     private final CommonValidator commonValidator;
@@ -133,6 +140,7 @@ public class MediaControllerService extends EzyLoggable {
         ResourceDownloadManager resourceDownloadManager,
         EzySingletonFactory singletonFactory,
         MediaService mediaService,
+        MediaFileService mediaFileService,
         PaginationMediaService paginationMediaService,
         SettingService settingService,
         CommonValidator commonValidator,
@@ -143,6 +151,7 @@ public class MediaControllerService extends EzyLoggable {
     ) {
         this.httpClient = httpClient;
         this.mediaService = mediaService;
+        this.mediaFileService = mediaFileService;
         this.paginationMediaService = paginationMediaService;
         this.settingService = settingService;
         this.objectMapper = objectMapper;
@@ -262,20 +271,46 @@ public class MediaControllerService extends EzyLoggable {
             mediaFilePath,
             maxFileSize,
             () -> {
-                MediaModel model = saveMediaInformation(
+                MediaFileSizeReductionResult reduceResult =
+                    reduceMediaFileSize(
+                        fileMetadata.getMediaType(),
+                        mediaFilePath
+                    );
+                String storedFileName = reduceResult
+                    .getNewFileNameOrDefault(newFileName);
+                File storedMediaFilePath = isBlank(reduceResult.getNewFileName())
+                    ? mediaFilePath
+                    : new File(mediaFilePath.getParentFile(), storedFileName);
+                MediaModel model = mediaService.addMedia(
                     uploadFrom,
-                    ownerAdminId,
-                    ownerUserId,
-                    submittedFileName,
-                    newFileName,
-                    fileMetadata,
-                    mediaFilePath.length(),
-                    notPublic
+                    AddMediaModel.builder()
+                        .ownerAdminId(ownerAdminId)
+                        .ownerUserId(ownerUserId)
+                        .fileName(storedFileName)
+                        .originalFileName(submittedFileName)
+                        .mediaType(fileMetadata.getMediaTypeText())
+                        .mimeType(
+                            reduceResult.getNewFileMimeTypeOrDefault(
+                                fileMetadata.getMimeType()
+                            )
+                        )
+                        .fileSize(
+                            reduceResult.getNewFileSizeOrDefault(
+                                storedMediaFilePath.length()
+                            )
+                        )
+                        .notPublic(notPublic)
+                        .build()
+                );
+                saveMediaFileSizeReductionResult(
+                    model.getId(),
+                    reduceResult,
+                    NULL_STRING
                 );
                 eventHandlerManager.handleEvent(
                     new MediaUploadedEvent(
                         model,
-                        mediaFilePath
+                        storedMediaFilePath
                     )
                 );
                 byte[] responseBytes = objectMapper
@@ -310,31 +345,6 @@ public class MediaControllerService extends EzyLoggable {
             new MediaAddedEvent(media.getId())
         );
         return media;
-    }
-
-    private MediaModel saveMediaInformation(
-        String uploadFrom,
-        long ownerAdminId,
-        long ownerUserId,
-        String submittedFileName,
-        String fileName,
-        FileMetadata fileMetadata,
-        long fileSize,
-        boolean notPublic
-    ) {
-        return mediaService.addMedia(
-            uploadFrom,
-            AddMediaModel.builder()
-                .ownerAdminId(ownerAdminId)
-                .ownerUserId(ownerUserId)
-                .fileName(fileName)
-                .originalFileName(submittedFileName)
-                .mediaType(fileMetadata.getMediaType().toString())
-                .mimeType(fileMetadata.getMimeType())
-                .fileSize(fileSize)
-                .notPublic(notPublic)
-                .build()
-        );
     }
 
     public void replaceMedia(
@@ -445,16 +455,42 @@ public class MediaControllerService extends EzyLoggable {
             mediaFilePath,
             settingService.getMaxUploadFileSize(),
             () -> {
-                MediaModel model = replaceMediaInformation(
+                MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
+                    fileMetadata.getMediaType(),
+                    mediaFilePath
+                );
+                String storedFileName = reduceResult
+                    .getNewFileNameOrDefault(fileName);
+                File storedMediaFilePath = isBlank(reduceResult.getNewFileName())
+                    ? mediaFilePath
+                    : new File(mediaFilePath.getParentFile(), storedFileName);
+                MediaModel model = mediaService.replaceMedia(
+                    ReplaceMediaModel.builder()
+                        .mediaId(mediaId)
+                        .fileName(storedFileName)
+                        .originalFileName(submittedFileName)
+                        .mediaType(from(fileMetadata.getMediaType()))
+                        .mimeType(
+                            reduceResult.getNewFileMimeTypeOrDefault(
+                                fileMetadata.getMimeType()
+                            )
+                        )
+                        .fileSize(
+                            reduceResult.getNewFileSizeOrDefault(
+                                storedMediaFilePath.length()
+                            )
+                        )
+                        .build()
+                );
+                saveMediaFileSizeReductionResult(
                     mediaId,
-                    submittedFileName,
-                    fileMetadata,
-                    mediaFilePath.length()
+                    reduceResult,
+                    fileName
                 );
                 eventHandlerManager.handleEvent(
                     new MediaUploadedEvent(
                         model,
-                        mediaFilePath
+                        storedMediaFilePath
                     )
                 );
                 byte[] responseBytes = objectMapper
@@ -462,23 +498,6 @@ public class MediaControllerService extends EzyLoggable {
                     .getBytes();
                 response.getOutputStream().write(responseBytes);
             }
-        );
-    }
-
-    private MediaModel replaceMediaInformation(
-        long mediaId,
-        String submittedFileName,
-        FileMetadata fileMetadata,
-        long fileSize
-    ) {
-        return mediaService.replaceMedia(
-            ReplaceMediaModel.builder()
-                .mediaId(mediaId)
-                .originalFileName(submittedFileName)
-                .mediaType(from(fileMetadata.getMediaType()))
-                .mimeType(fileMetadata.getMimeType())
-                .fileSize(fileSize)
-                .build()
         );
     }
 
@@ -577,8 +596,9 @@ public class MediaControllerService extends EzyLoggable {
                     .build()
             );
         }
+        MediaType mediaType = MediaType.ofName(mediaTypeText);
         File outFolder = fileSystemManager.getMediaFolderPath(
-            MediaType.ofName(mediaTypeText)
+            mediaType
         );
         String fileName = mediaService.generateMediaFileName(
             mediaUrl,
@@ -604,26 +624,85 @@ public class MediaControllerService extends EzyLoggable {
                 new Metadata()
             );
         }
+        MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
+            mediaType,
+            mediaFilePath.toFile()
+        );
+        String storedFileName = reduceResult
+            .getNewFileNameOrDefault(newFileName);
+        Path storedMediaFilePath = isBlank(reduceResult.getNewFileName())
+            ? mediaFilePath
+            : mediaFilePath.resolveSibling(storedFileName);
         MediaModel media = mediaService.addMedia(
             uploadFrom,
             AddMediaModel.builder()
-                .fileName(newFileName)
+                .fileName(storedFileName)
                 .originalFileName(result.getOriginalFileName())
                 .mediaType(mediaTypeText)
-                .mimeType(tikaMediaType.toString())
-                .fileSize(Files.size(mediaFilePath))
+                .mimeType(
+                    reduceResult.getNewFileMimeTypeOrDefault(
+                        tikaMediaType.toString()
+                    )
+                )
+                .fileSize(
+                    reduceResult.getNewFileSizeOrDefault(
+                        Files.size(storedMediaFilePath)
+                    )
+                )
                 .ownerAdminId(ownerAdminId)
                 .ownerUserId(ownerUserId)
                 .notPublic(isNotPublic)
                 .build()
         );
+        saveMediaFileSizeReductionResult(
+            media.getId(),
+            reduceResult,
+            NULL_STRING
+        );
         eventHandlerManager.handleEvent(
             new MediaUploadedEvent(
                 media,
-                mediaFilePath.toFile()
+                storedMediaFilePath.toFile()
             )
         );
         return media.getId();
+    }
+
+    public MediaFileSizeReductionResult reduceMediaFileSize(
+        MediaType mediaType,
+        File mediaFilePath
+    ) {
+        if (!settingService.isAllowReduceMediaFileSize()) {
+            return MediaFileSizeReductionResult.builder().build();
+        }
+        String mediaUploaderName = settingService
+            .getMediaUpDownloaderName();
+        MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
+            .getMediaUpDownloaderByName(mediaUploaderName);
+        if (mediaUpDownloader != null
+            && mediaUpDownloader.isReduceMediaSupported()
+        ) {
+            return mediaUpDownloader.reduceMediaFileSize(
+                MediaFileSizeReductionArguments.builder()
+                    .mediaType(mediaType)
+                    .mediaFilePath(mediaFilePath)
+                    .build()
+            );
+        }
+        MediaFileSizeReductionResult result = eventHandlerManager
+            .handleEvent(
+                new MediaFileSizeReductionEvent(
+                    mediaType,
+                    mediaFilePath
+                )
+            );
+        if (result == null) {
+            result = mediaFileService.reduceMediaFileSize(
+                mediaType,
+                mediaFilePath
+            );
+        }
+        return result;
     }
 
     public void updateMedia(
@@ -694,6 +773,34 @@ public class MediaControllerService extends EzyLoggable {
         eventHandlerManager.handleEvent(
             new MediaUpdatedEvent(media)
         );
+    }
+
+    public void saveMediaFileSizeReductionResult(
+        long mediaId,
+        MediaFileSizeReductionResult result,
+        String mediaSlug
+    ) {
+        if (!result.isReduced()) {
+            return;
+        }
+        String originalFileName = result.getOriginalSizeFileName();
+        if (isNotBlank(originalFileName)) {
+            mediaService.saveMediaOriginalSizeFileName(
+                mediaId,
+                originalFileName
+            );
+            mediaService.saveMediaSlug(
+                mediaId,
+                originalFileName
+            );
+        }
+        String newFileName = result.getNewFileName();
+        if (isNotBlank(newFileName) && isNotBlank(mediaSlug)) {
+            mediaService.saveMediaSlug(
+                mediaId,
+                mediaSlug
+            );
+        }
     }
 
     public long getMediaFileSize(MediaModel media) {

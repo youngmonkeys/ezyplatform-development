@@ -22,8 +22,12 @@ import org.youngmonkeys.ezyplatform.entity.Media;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
+import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
 
 import java.util.List;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
 
@@ -45,6 +49,17 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
             "WHERE e.name = ?0 OR e.originalName = ?0"
     )
     Media findByNameOrOriginalName(
+        String name
+    );
+
+    @EzyQuery(
+        "SELECT e FROM Media e " +
+            "INNER JOIN DataMeta a ON e.id = a.dataId " +
+            "WHERE a.dataType = '" + TABLE_NAME_MEDIA + "' " +
+            "AND a.metaKey = '" + META_KEY_SLUG + "' " +
+            "AND a.metaValue = ?0"
+    )
+    Media findBySlug(
         String name
     );
 
@@ -77,6 +92,14 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
             "WHERE e.name = ?0 OR e.originalName = ?0"
     )
     IdResult findOwnerUserIdByNameOrOriginalName(
+        String mediaName
+    );
+
+    @EzyQuery(
+        "SELECT e.updatedAt FROM Media e " +
+            "WHERE e.name = ?0 OR e.originalName = ?0"
+    )
+    UpdatedAtValueResult findUpdatedAtByNameOrOriginalName(
         String mediaName
     );
 }
