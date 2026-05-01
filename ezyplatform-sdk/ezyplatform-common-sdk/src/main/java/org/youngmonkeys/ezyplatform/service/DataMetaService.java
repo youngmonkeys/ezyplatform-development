@@ -480,7 +480,7 @@ public interface DataMetaService {
         Collection<Long> dataIds
     );
 
-    default  <T> Map<Long, List<T>> getDataMetaValuesByDataTypeAndDataIds(
+    default <T> Map<Long, List<T>> getDataMetaValuesByDataTypeAndDataIds(
         String dataType,
         Collection<Long> dataIds,
         Function<DataMetaModel, T> converter
