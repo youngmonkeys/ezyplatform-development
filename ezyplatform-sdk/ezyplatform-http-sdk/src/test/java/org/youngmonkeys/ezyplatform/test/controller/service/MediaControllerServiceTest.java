@@ -50,8 +50,10 @@ import org.youngmonkeys.ezyplatform.event.GetMediaDetailsEvent;
 import org.youngmonkeys.ezyplatform.event.GetMediaFilePathEvent;
 import org.youngmonkeys.ezyplatform.event.MediaAddedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaDownloadEvent;
+import org.youngmonkeys.ezyplatform.event.MediaFileSizeReducedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaFileSizeReductionEvent;
 import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
+import org.youngmonkeys.ezyplatform.event.MediaReplacedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
@@ -845,7 +847,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(events.size(), 3);
         Asserts.assertTrue(events.get(0) instanceof MediaUploadEvent);
         Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReductionEvent);
-        Asserts.assertTrue(events.get(2) instanceof MediaUploadedEvent);
+        Asserts.assertTrue(events.get(2) instanceof MediaReplacedEvent);
 
         MediaUploadEvent uploadEvent = (MediaUploadEvent) events.get(0);
         Asserts.assertEquals(uploadEvent.getUploadFrom(), "local");
@@ -869,9 +871,9 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(reductionEvent.getMediaType(), MediaType.IMAGE);
         Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
 
-        MediaUploadedEvent uploadedEvent = (MediaUploadedEvent) events.get(2);
-        Asserts.assertEquals(uploadedEvent.getMedia(), replacedMedia);
-        Asserts.assertEquals(uploadedEvent.getMediaFilePath(), mediaFilePath);
+        MediaReplacedEvent replacedEvent = (MediaReplacedEvent) events.get(2);
+        Asserts.assertEquals(replacedEvent.getMedia(), replacedMedia);
+        Asserts.assertEquals(replacedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);
 
         InOrder inOrder = inOrder(
@@ -901,7 +903,7 @@ public class MediaControllerServiceTest {
             ZERO_LONG
         );
         inOrder.verify(mediaService).replaceMedia(any(ReplaceMediaModel.class));
-        inOrder.verify(eventHandlerManager).handleEvent(any(MediaUploadedEvent.class));
+        inOrder.verify(eventHandlerManager).handleEvent(any(MediaReplacedEvent.class));
 
         verifyNoMoreInteractions(
             request,
@@ -1073,7 +1075,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(events.size(), 3);
         Asserts.assertTrue(events.get(0) instanceof MediaUploadEvent);
         Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReductionEvent);
-        Asserts.assertTrue(events.get(2) instanceof MediaUploadedEvent);
+        Asserts.assertTrue(events.get(2) instanceof MediaReplacedEvent);
         Asserts.assertEquals(outputStream.asString(), json);
 
         verifyNoMoreInteractions(
@@ -1227,7 +1229,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(events.size(), 3);
         Asserts.assertTrue(events.get(0) instanceof MediaUploadEvent);
         Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReductionEvent);
-        Asserts.assertTrue(events.get(2) instanceof MediaUploadedEvent);
+        Asserts.assertTrue(events.get(2) instanceof MediaReplacedEvent);
 
         MediaUploadEvent uploadEvent = (MediaUploadEvent) events.get(0);
         Asserts.assertEquals(uploadEvent.getUploadFrom(), "local");
@@ -1254,9 +1256,9 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(reductionEvent.getMediaType(), MediaType.IMAGE);
         Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
 
-        MediaUploadedEvent uploadedEvent = (MediaUploadedEvent) events.get(2);
-        Asserts.assertEquals(uploadedEvent.getMedia(), replacedMedia);
-        Asserts.assertEquals(uploadedEvent.getMediaFilePath(), mediaFilePath);
+        MediaReplacedEvent replacedEvent = (MediaReplacedEvent) events.get(2);
+        Asserts.assertEquals(replacedEvent.getMedia(), replacedMedia);
+        Asserts.assertEquals(replacedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);
 
         verifyNoMoreInteractions(
@@ -1364,7 +1366,13 @@ public class MediaControllerServiceTest {
         MediaModel media = MediaModel.builder()
             .id(123L)
             .name("avatar.png")
+            .originalName("avatar-source.png")
             .type(MediaType.IMAGE)
+            .mimeType("image/png")
+            .build();
+        MediaModel replacedMedia = MediaModel.builder()
+            .id(123L)
+            .name("avatar-reduced.png")
             .build();
         MediaFileSizeReductionResult reductionResult =
             MediaFileSizeReductionResult.builder()
@@ -1393,6 +1401,8 @@ public class MediaControllerServiceTest {
                 any(MediaFileSizeReductionEvent.class)
             )
         ).thenReturn(reductionResult);
+        when(mediaService.replaceMedia(any(ReplaceMediaModel.class)))
+            .thenReturn(replacedMedia);
 
         // when
         MediaFileSizeReductionResult actual = instance.reduceMediaFileSizeById(
@@ -1402,8 +1412,10 @@ public class MediaControllerServiceTest {
         );
 
         // then
-        ArgumentCaptor<MediaFileSizeReductionEvent> eventCaptor =
-            ArgumentCaptor.forClass(MediaFileSizeReductionEvent.class);
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<ReplaceMediaModel> replaceMediaCaptor =
+            ArgumentCaptor.forClass(ReplaceMediaModel.class);
 
         Asserts.assertEquals(actual, reductionResult);
         verify(mediaService).getMediaById(123L);
@@ -1415,7 +1427,8 @@ public class MediaControllerServiceTest {
         verify(settingService).isAllowReduceMediaFileSize();
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
+        verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
         verify(mediaService).saveMediaOriginalSizeFileNameIfNotExists(
             123L,
             "avatar-original.png"
@@ -1425,11 +1438,35 @@ public class MediaControllerServiceTest {
             "avatar-original.png"
         );
         verify(mediaService).saveMediaSlugIfNotExists(123L, "avatar.png");
+        List<Object> events = eventCaptor.getAllValues();
+        Asserts.assertEquals(events.size(), 2);
+        Asserts.assertTrue(events.get(0) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReducedEvent);
 
-        MediaFileSizeReductionEvent event = eventCaptor.getValue();
+        MediaFileSizeReductionEvent event =
+            (MediaFileSizeReductionEvent) events.get(0);
         Asserts.assertEquals(event.getMediaType(), MediaType.IMAGE);
         Asserts.assertEquals(event.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(event.getExpectedFileSize(), 789L);
+
+        ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
+        Asserts.assertEquals(replaceMediaModel.getMediaId(), 123L);
+        Asserts.assertEquals(replaceMediaModel.getFileName(), "avatar-reduced.png");
+        Asserts.assertEquals(
+            replaceMediaModel.getOriginalFileName(),
+            "avatar-source.png"
+        );
+        Asserts.assertEquals(replaceMediaModel.getMediaType(), media.getTypeText());
+        Asserts.assertEquals(replaceMediaModel.getMimeType(), "image/jpeg");
+        Asserts.assertEquals(replaceMediaModel.getFileSize(), 456L);
+
+        MediaFileSizeReducedEvent reducedEvent =
+            (MediaFileSizeReducedEvent) events.get(1);
+        Asserts.assertEquals(reducedEvent.getMedia(), replacedMedia);
+        Asserts.assertEquals(
+            reducedEvent.getMediaFilePath(),
+            new File(mediaFilePath.getParentFile(), "avatar-reduced.png")
+        );
 
         verifyNoMoreInteractions(validMediaCondition);
     }
@@ -1470,7 +1507,13 @@ public class MediaControllerServiceTest {
         MediaModel media = MediaModel.builder()
             .id(456L)
             .name("intro.mp4")
+            .originalName("intro-source.mp4")
             .type(MediaType.VIDEO)
+            .mimeType("video/mp4")
+            .build();
+        MediaModel replacedMedia = MediaModel.builder()
+            .id(456L)
+            .name("intro-reduced.mp4")
             .build();
         MediaFileSizeReductionResult reductionResult =
             MediaFileSizeReductionResult.builder()
@@ -1499,6 +1542,8 @@ public class MediaControllerServiceTest {
                 any(MediaFileSizeReductionEvent.class)
             )
         ).thenReturn(reductionResult);
+        when(mediaService.replaceMedia(any(ReplaceMediaModel.class)))
+            .thenReturn(replacedMedia);
 
         // when
         MediaFileSizeReductionResult actual =
@@ -1509,8 +1554,10 @@ public class MediaControllerServiceTest {
             );
 
         // then
-        ArgumentCaptor<MediaFileSizeReductionEvent> eventCaptor =
-            ArgumentCaptor.forClass(MediaFileSizeReductionEvent.class);
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<ReplaceMediaModel> replaceMediaCaptor =
+            ArgumentCaptor.forClass(ReplaceMediaModel.class);
 
         Asserts.assertEquals(actual, reductionResult);
         verify(mediaService).getMediaByName("intro.mp4");
@@ -1522,7 +1569,8 @@ public class MediaControllerServiceTest {
         verify(settingService).isAllowReduceMediaFileSize();
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
+        verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
         verify(mediaService).saveMediaOriginalSizeFileNameIfNotExists(
             456L,
             "intro-original.mp4"
@@ -1532,11 +1580,35 @@ public class MediaControllerServiceTest {
             "intro-original.mp4"
         );
         verify(mediaService).saveMediaSlugIfNotExists(456L, "intro.mp4");
+        List<Object> events = eventCaptor.getAllValues();
+        Asserts.assertEquals(events.size(), 2);
+        Asserts.assertTrue(events.get(0) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReducedEvent);
 
-        MediaFileSizeReductionEvent event = eventCaptor.getValue();
+        MediaFileSizeReductionEvent event =
+            (MediaFileSizeReductionEvent) events.get(0);
         Asserts.assertEquals(event.getMediaType(), MediaType.VIDEO);
         Asserts.assertEquals(event.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(event.getExpectedFileSize(), 2048L);
+
+        ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
+        Asserts.assertEquals(replaceMediaModel.getMediaId(), 456L);
+        Asserts.assertEquals(replaceMediaModel.getFileName(), "intro-reduced.mp4");
+        Asserts.assertEquals(
+            replaceMediaModel.getOriginalFileName(),
+            "intro-source.mp4"
+        );
+        Asserts.assertEquals(replaceMediaModel.getMediaType(), media.getTypeText());
+        Asserts.assertEquals(replaceMediaModel.getMimeType(), "video/mp4");
+        Asserts.assertEquals(replaceMediaModel.getFileSize(), 1024L);
+
+        MediaFileSizeReducedEvent reducedEvent =
+            (MediaFileSizeReducedEvent) events.get(1);
+        Asserts.assertEquals(reducedEvent.getMedia(), replacedMedia);
+        Asserts.assertEquals(
+            reducedEvent.getMediaFilePath(),
+            new File(mediaFilePath.getParentFile(), "intro-reduced.mp4")
+        );
 
         verifyNoMoreInteractions(validMediaCondition);
     }

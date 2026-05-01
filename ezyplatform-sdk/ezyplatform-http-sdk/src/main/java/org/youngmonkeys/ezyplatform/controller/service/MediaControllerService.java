@@ -46,8 +46,10 @@ import org.youngmonkeys.ezyplatform.event.GetMediaDetailsEvent;
 import org.youngmonkeys.ezyplatform.event.GetMediaFilePathEvent;
 import org.youngmonkeys.ezyplatform.event.MediaAddedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaDownloadEvent;
+import org.youngmonkeys.ezyplatform.event.MediaFileSizeReducedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaFileSizeReductionEvent;
 import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
+import org.youngmonkeys.ezyplatform.event.MediaReplacedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
@@ -488,7 +490,7 @@ public class MediaControllerService extends EzyLoggable {
                     fileName
                 );
                 eventHandlerManager.handleEvent(
-                    new MediaUploadedEvent(
+                    new MediaReplacedEvent(
                         model,
                         storedMediaFilePath
                     )
@@ -703,17 +705,47 @@ public class MediaControllerService extends EzyLoggable {
             containerFolder,
             fileName
         );
-        MediaFileSizeReductionResult result = reduceMediaFileSize(
+        MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
             mediaType,
             mediaFilePath,
             expectedFileSize
         );
+        long mediaId = media.getId();
+        String storedFileName = reduceResult
+            .getNewFileNameOrDefault(fileName);
+        File storedMediaFilePath = isBlank(reduceResult.getNewFileName())
+            ? mediaFilePath
+            : new File(mediaFilePath.getParentFile(), storedFileName);
+        MediaModel model = mediaService.replaceMedia(
+            ReplaceMediaModel.builder()
+                .mediaId(mediaId)
+                .fileName(storedFileName)
+                .originalFileName(media.getOriginalName())
+                .mediaType(media.getType().toString())
+                .mimeType(
+                    reduceResult.getNewFileMimeTypeOrDefault(
+                        media.getMimeType()
+                    )
+                )
+                .fileSize(
+                    reduceResult.getNewFileSizeOrDefault(
+                        storedMediaFilePath.length()
+                    )
+                )
+                .build()
+        );
         saveMediaFileSizeReductionResult(
             media.getId(),
-            result,
+            reduceResult,
             fileName
         );
-        return result;
+        eventHandlerManager.handleEvent(
+            new MediaFileSizeReducedEvent(
+                model,
+                storedMediaFilePath
+            )
+        );
+        return reduceResult;
     }
 
     public MediaFileSizeReductionResult reduceMediaFileSize(
