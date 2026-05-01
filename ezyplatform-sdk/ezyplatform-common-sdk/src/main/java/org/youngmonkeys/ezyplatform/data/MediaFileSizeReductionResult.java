@@ -34,20 +34,20 @@ public class MediaFileSizeReductionResult {
     public static MediaFileSizeReductionResult NO =
         MediaFileSizeReductionResult.builder().build();
 
-    public String getNewFileMimeTypeOrDefault(
-        String defaultValue
-    ) {
-        return isBlank(newFileMimeType)
-            ? defaultValue
-            : newFileMimeType;
-    }
-
     public String getNewFileNameOrDefault(
         String defaultValue
     ) {
         return isBlank(newFileName)
             ? defaultValue
             : newFileName;
+    }
+
+    public String getNewFileMimeTypeOrDefault(
+        String defaultValue
+    ) {
+        return isBlank(newFileMimeType)
+            ? defaultValue
+            : newFileMimeType;
     }
 
     public long getNewFileSizeOrDefault(
