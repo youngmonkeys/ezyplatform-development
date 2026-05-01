@@ -91,6 +91,11 @@ public interface MediaService {
         BigDecimal duration
     );
 
+    void saveMediaSlug(
+        long mediaId,
+        String slug
+    );
+
     void saveMediaOriginalSizeFileName(
         long mediaId,
         String originalSizeFileName

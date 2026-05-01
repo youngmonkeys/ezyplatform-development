@@ -23,6 +23,7 @@ import lombok.Getter;
 @Builder
 public class ReplaceMediaModel {
     private long mediaId;
+    private String fileName;
     private String originalFileName;
     private String mediaType;
     private String mimeType;

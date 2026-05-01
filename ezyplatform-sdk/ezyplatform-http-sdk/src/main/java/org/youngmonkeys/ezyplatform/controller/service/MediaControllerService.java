@@ -94,8 +94,10 @@ import java.util.Collection;
 import java.util.function.Predicate;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.model.MediaDetailsModel.fromMediaModel;
@@ -274,12 +276,17 @@ public class MediaControllerService extends EzyLoggable {
                         fileMetadata.getMediaType(),
                         mediaFilePath
                     );
+                String storedFileName = reduceResult
+                    .getNewFileNameOrDefault(newFileName);
+                File storedMediaFilePath = isBlank(reduceResult.getNewFileName())
+                    ? mediaFilePath
+                    : new File(mediaFilePath.getParentFile(), storedFileName);
                 MediaModel model = mediaService.addMedia(
                     uploadFrom,
                     AddMediaModel.builder()
                         .ownerAdminId(ownerAdminId)
                         .ownerUserId(ownerUserId)
-                        .fileName(newFileName)
+                        .fileName(storedFileName)
                         .originalFileName(submittedFileName)
                         .mediaType(fileMetadata.getMediaTypeText())
                         .mimeType(
@@ -289,22 +296,21 @@ public class MediaControllerService extends EzyLoggable {
                         )
                         .fileSize(
                             reduceResult.getNewFileSizeOrDefault(
-                                mediaFilePath.length()
+                                storedMediaFilePath.length()
                             )
                         )
                         .notPublic(notPublic)
                         .build()
                 );
-                if (reduceResult.isReduced()) {
-                    mediaService.saveMediaOriginalSizeFileName(
-                        model.getId(),
-                        reduceResult.getOriginalSizeFileName()
-                    );
-                }
+                saveMediaFileSizeReductionResult(
+                    model.getId(),
+                    reduceResult,
+                    NULL_STRING
+                );
                 eventHandlerManager.handleEvent(
                     new MediaUploadedEvent(
                         model,
-                        mediaFilePath
+                        storedMediaFilePath
                     )
                 );
                 byte[] responseBytes = objectMapper
@@ -453,9 +459,15 @@ public class MediaControllerService extends EzyLoggable {
                     fileMetadata.getMediaType(),
                     mediaFilePath
                 );
+                String storedFileName = reduceResult
+                    .getNewFileNameOrDefault(fileName);
+                File storedMediaFilePath = isBlank(reduceResult.getNewFileName())
+                    ? mediaFilePath
+                    : new File(mediaFilePath.getParentFile(), storedFileName);
                 MediaModel model = mediaService.replaceMedia(
                     ReplaceMediaModel.builder()
                         .mediaId(mediaId)
+                        .fileName(storedFileName)
                         .originalFileName(submittedFileName)
                         .mediaType(from(fileMetadata.getMediaType()))
                         .mimeType(
@@ -465,21 +477,20 @@ public class MediaControllerService extends EzyLoggable {
                         )
                         .fileSize(
                             reduceResult.getNewFileSizeOrDefault(
-                                mediaFilePath.length()
+                                storedMediaFilePath.length()
                             )
                         )
                         .build()
                 );
-                if (reduceResult.isReduced()) {
-                    mediaService.saveMediaOriginalSizeFileName(
-                        model.getId(),
-                        reduceResult.getOriginalSizeFileName()
-                    );
-                }
+                saveMediaFileSizeReductionResult(
+                    mediaId,
+                    reduceResult,
+                    fileName
+                );
                 eventHandlerManager.handleEvent(
                     new MediaUploadedEvent(
                         model,
-                        mediaFilePath
+                        storedMediaFilePath
                     )
                 );
                 byte[] responseBytes = objectMapper
@@ -617,10 +628,15 @@ public class MediaControllerService extends EzyLoggable {
             mediaType,
             mediaFilePath.toFile()
         );
+        String storedFileName = reduceResult
+            .getNewFileNameOrDefault(newFileName);
+        Path storedMediaFilePath = isBlank(reduceResult.getNewFileName())
+            ? mediaFilePath
+            : mediaFilePath.resolveSibling(storedFileName);
         MediaModel media = mediaService.addMedia(
             uploadFrom,
             AddMediaModel.builder()
-                .fileName(newFileName)
+                .fileName(storedFileName)
                 .originalFileName(result.getOriginalFileName())
                 .mediaType(mediaTypeText)
                 .mimeType(
@@ -630,7 +646,7 @@ public class MediaControllerService extends EzyLoggable {
                 )
                 .fileSize(
                     reduceResult.getNewFileSizeOrDefault(
-                        Files.size(mediaFilePath)
+                        Files.size(storedMediaFilePath)
                     )
                 )
                 .ownerAdminId(ownerAdminId)
@@ -638,16 +654,15 @@ public class MediaControllerService extends EzyLoggable {
                 .notPublic(isNotPublic)
                 .build()
         );
-        if (reduceResult.isReduced()) {
-            mediaService.saveMediaOriginalSizeFileName(
-                media.getId(),
-                reduceResult.getOriginalSizeFileName()
-            );
-        }
+        saveMediaFileSizeReductionResult(
+            media.getId(),
+            reduceResult,
+            NULL_STRING
+        );
         eventHandlerManager.handleEvent(
             new MediaUploadedEvent(
                 media,
-                mediaFilePath.toFile()
+                storedMediaFilePath.toFile()
             )
         );
         return media.getId();
@@ -758,6 +773,34 @@ public class MediaControllerService extends EzyLoggable {
         eventHandlerManager.handleEvent(
             new MediaUpdatedEvent(media)
         );
+    }
+
+    public void saveMediaFileSizeReductionResult(
+        long mediaId,
+        MediaFileSizeReductionResult result,
+        String mediaSlug
+    ) {
+        if (!result.isReduced()) {
+            return;
+        }
+        String originalFileName = result.getOriginalSizeFileName();
+        if (isNotBlank(originalFileName)) {
+            mediaService.saveMediaOriginalSizeFileName(
+                mediaId,
+                originalFileName
+            );
+            mediaService.saveMediaSlug(
+                mediaId,
+                originalFileName
+            );
+        }
+        String newFileName = result.getNewFileName();
+        if (isNotBlank(newFileName) && isNotBlank(mediaSlug)) {
+            mediaService.saveMediaSlug(
+                mediaId,
+                mediaSlug
+            );
+        }
     }
 
     public long getMediaFileSize(MediaModel media) {

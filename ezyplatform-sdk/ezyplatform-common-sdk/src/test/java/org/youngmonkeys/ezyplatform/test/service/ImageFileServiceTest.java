@@ -48,7 +48,7 @@ public class ImageFileServiceTest {
     }
 
     @Test
-    public void reduceImageFileSizeShouldReducePngWithoutRenaming()
+    public void reduceImageFileSizeShouldConvertPngToJpg()
         throws Exception {
         // given
         SettingService settingService = mock(SettingService.class);
@@ -70,15 +70,17 @@ public class ImageFileServiceTest {
         );
 
         // then
-        Asserts.assertNull(result.getNewFileMimeType());
-        Asserts.assertTrue(imageFile.exists());
-        Asserts.assertTrue(imageFile.length() <= originalFileSize);
-        ImageSize imageSize = ImageProxy.getImageSize(imageFile);
-        Asserts.assertEquals(imageSize.getWidth(), image.getWidth());
-        Asserts.assertEquals(imageSize.getHeight(), image.getHeight());
-        if (result.isReduced()) {
-            Asserts.assertTrue(imageFile.length() < originalFileSize);
-        }
+        String jpgFileName = imageFile.getName().replace(".png", ".jpg");
+        File jpgFile = new File(imageFile.getParentFile(), jpgFileName);
+        jpgFile.deleteOnExit();
+        Asserts.assertTrue(result.isReduced());
+        Asserts.assertEquals(result.getNewFileName(), jpgFileName);
+        Asserts.assertEquals(result.getNewFileMimeType(), "image/jpeg");
+        Asserts.assertFalse(imageFile.exists());
+        Asserts.assertTrue(jpgFile.exists());
+        ImageSize imageSize = ImageProxy.getImageSize(jpgFile);
+        Asserts.assertTrue(imageSize.getWidth() > 0);
+        Asserts.assertTrue(imageSize.getHeight() > 0);
     }
 
     @Test

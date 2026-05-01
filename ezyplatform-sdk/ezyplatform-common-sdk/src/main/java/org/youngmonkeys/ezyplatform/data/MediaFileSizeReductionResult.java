@@ -27,6 +27,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 public class MediaFileSizeReductionResult {
     private boolean reduced;
     private String originalSizeFileName;
+    private String newFileName;
     private String newFileMimeType;
     private long newFileSize;
 
@@ -39,6 +40,14 @@ public class MediaFileSizeReductionResult {
         return isBlank(newFileMimeType)
             ? defaultValue
             : newFileMimeType;
+    }
+
+    public String getNewFileNameOrDefault(
+        String defaultValue
+    ) {
+        return isBlank(newFileName)
+            ? defaultValue
+            : newFileName;
     }
 
     public long getNewFileSizeOrDefault(

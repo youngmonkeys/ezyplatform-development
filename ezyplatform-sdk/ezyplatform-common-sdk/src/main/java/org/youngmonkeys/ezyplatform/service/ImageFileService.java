@@ -36,6 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_FILE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 
@@ -50,6 +51,8 @@ public class ImageFileService extends EzyLoggable {
     private static final String IMAGE_FORMAT_JPG = "jpg";
     private static final String IMAGE_FORMAT_JPEG = "jpeg";
     private static final String IMAGE_FORMAT_PNG = "png";
+    private static final String JPG_FILE_EXTENSION = ".jpg";
+    private static final String IMAGE_JPEG_MIME_TYPE = "image/jpeg";
     private static final float FULL_SCALE = 1.0F;
     private static final float MIN_SCALE = 0.05F;
     private static final float SCALE_REDUCTION_RATIO = 0.85F;
@@ -111,6 +114,7 @@ public class ImageFileService extends EzyLoggable {
                 imageData,
                 maxFileSize,
                 imageFile.length(),
+                imageFile,
                 bestFile,
                 candidateFile
             );
@@ -118,7 +122,8 @@ public class ImageFileService extends EzyLoggable {
                 MediaFileSizeReductionResult result = saveReducedImageFile(
                     imageFile,
                     bestFile,
-                    originalSizeFile
+                    originalSizeFile,
+                    reducedFile
                 );
                 originalSizeFile = null;
                 return result;
@@ -140,13 +145,20 @@ public class ImageFileService extends EzyLoggable {
     private MediaFileSizeReductionResult saveReducedImageFile(
         File imageFile,
         File bestFile,
-        File originalSizeFile
+        File originalSizeFile,
+        ReducedFile reducedFile
     ) throws IOException {
+        File newImageFile = reducedFile.outputFile != null
+            ? reducedFile.outputFile
+            : imageFile;
         Files.move(
             bestFile.toPath(),
-            imageFile.toPath(),
+            newImageFile.toPath(),
             StandardCopyOption.REPLACE_EXISTING
         );
+        if (!newImageFile.equals(imageFile)) {
+            Files.deleteIfExists(imageFile.toPath());
+        }
         return MediaFileSizeReductionResult.builder()
             .reduced(Boolean.TRUE)
             .originalSizeFileName(
@@ -154,25 +166,51 @@ public class ImageFileService extends EzyLoggable {
                     ? originalSizeFile.getName()
                     : NULL_STRING
             )
-            .newFileSize(imageFile.length())
+            .newFileName(toNewFileName(imageFile, newImageFile))
+            .newFileMimeType(toNewFileMimeType(reducedFile))
+            .newFileSize(newImageFile.length())
             .build();
+    }
+
+    private String toNewFileName(
+        File imageFile,
+        File newImageFile
+    ) {
+        return newImageFile.equals(imageFile)
+            ? NULL_STRING
+            : newImageFile.getName();
+    }
+
+    private String toNewFileMimeType(ReducedFile reducedFile) {
+        return reducedFile.newFileMimeType != null
+            ? reducedFile.newFileMimeType
+            : NULL_STRING;
     }
 
     private ReducedFile reduceImageDataFileSize(
         ImageData imageData,
         long maxFileSize,
         long originalFileSize,
+        File imageFile,
         File bestFile,
         File candidateFile
     ) throws IOException {
         if (isPngFormat(imageData.formatName)) {
-            return reducePngImageFileSize(
-                imageData,
+            ReducedFile reducedFile = reduceLossyImageFileSize(
+                new ImageData(imageData.image, IMAGE_FORMAT_JPG),
                 maxFileSize,
                 originalFileSize,
                 bestFile,
                 candidateFile
             );
+            return reducedFile.reduced
+                ? new ReducedFile(
+                    Boolean.TRUE,
+                    reducedFile.fileSize,
+                    toJpgFile(imageFile),
+                    IMAGE_JPEG_MIME_TYPE
+                )
+                : reducedFile;
         }
         return reduceLossyImageFileSize(
             imageData,
@@ -183,21 +221,23 @@ public class ImageFileService extends EzyLoggable {
         );
     }
 
-    private ReducedFile reducePngImageFileSize(
-        ImageData imageData,
-        long maxFileSize,
-        long originalFileSize,
-        File bestFile,
-        File candidateFile
-    ) throws IOException {
-        return reduceBufferedImageFileSize(
-            imageData.image,
-            IMAGE_FORMAT_PNG,
-            maxFileSize,
-            originalFileSize,
-            bestFile,
-            candidateFile
+    private File toJpgFile(
+        File imageFile
+    ) {
+        return new File(
+            imageFile.getAbsoluteFile().getParentFile(),
+            toJpgFileName(imageFile.getName())
         );
+    }
+
+    private String toJpgFileName(
+        String fileName
+    ) {
+        int dotIndex = fileName.lastIndexOf('.');
+        String fileNameWithoutExtension = dotIndex > ZERO
+            ? fileName.substring(ZERO, dotIndex)
+            : fileName;
+        return fileNameWithoutExtension + JPG_FILE_EXTENSION;
     }
 
     private ReducedFile reduceLossyImageFileSize(
@@ -506,13 +546,26 @@ public class ImageFileService extends EzyLoggable {
     private static class ReducedFile {
         private final boolean reduced;
         private final long fileSize;
+        private final File outputFile;
+        private final String newFileMimeType;
 
         private ReducedFile(
             boolean reduced,
             long fileSize
         ) {
+            this(reduced, fileSize, NULL_FILE, NULL_STRING);
+        }
+
+        private ReducedFile(
+            boolean reduced,
+            long fileSize,
+            File outputFile,
+            String newFileMimeType
+        ) {
             this.reduced = reduced;
             this.fileSize = fileSize;
+            this.outputFile = outputFile;
+            this.newFileMimeType = newFileMimeType;
         }
     }
 }

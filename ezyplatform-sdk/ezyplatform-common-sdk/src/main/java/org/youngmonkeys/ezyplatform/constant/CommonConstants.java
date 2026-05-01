@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.ezyhttp.core.constant.ContentType;
 import org.youngmonkeys.ezyplatform.entity.TargetType;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ public final class CommonConstants {
 
     public static final BigDecimal NULL_BIG_DECIMAL = null;
     public static final BigInteger NULL_BIG_INTEGER = null;
+    public static final File NULL_FILE = null;
     public static final Integer NULL_INTEGER = null;
     public static final Long NULL_LONG = null;
     public static final Object NULL_OBJECT = null;

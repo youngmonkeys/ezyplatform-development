@@ -50,6 +50,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_SIZE_FILE_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
@@ -155,6 +156,19 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
+    public void saveMediaSlug(
+        long mediaId,
+        String slug
+    ) {
+        dataMetaService.saveDataMetaIfAbsent(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_SLUG,
+            slug
+        );
+    }
+
+    @Override
     public void updateMediaOwnerUserIdIfExists(
         long mediaId,
         long ownerUserId
@@ -246,9 +260,12 @@ public class DefaultMediaService implements MediaService {
 
     @Override
     public MediaModel getMediaByName(String mediaName) {
-        return entityToModelConverter.toModel(
-            mediaRepository.findByNameOrOriginalName(mediaName)
-        );
+        Media entity = mediaRepository
+            .findByNameOrOriginalName(mediaName);
+        if (entity == null) {
+            entity = mediaRepository.findBySlug(mediaName);
+        }
+        return entityToModelConverter.toModel(entity);
     }
 
     @Override

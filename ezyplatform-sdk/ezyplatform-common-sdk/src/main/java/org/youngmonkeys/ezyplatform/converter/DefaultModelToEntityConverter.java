@@ -546,6 +546,9 @@ public class DefaultModelToEntityConverter {
         ReplaceMediaModel model,
         Media entity
     ) {
+        if (isNotBlank(model.getFileName())) {
+            entity.setName(model.getFileName());
+        }
         entity.setOriginalName(model.getOriginalFileName());
         entity.setType(model.getMediaType());
         entity.setMimeType(model.getMimeType());

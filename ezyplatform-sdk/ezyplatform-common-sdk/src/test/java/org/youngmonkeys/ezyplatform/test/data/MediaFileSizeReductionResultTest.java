@@ -72,6 +72,55 @@ public class MediaFileSizeReductionResultTest {
     }
 
     @Test
+    public void getNewFileNameOrDefaultReturnNewFileNameTest() {
+        // given
+        String newFileName = "avatar.jpg";
+        String defaultValue = "avatar.png";
+        MediaFileSizeReductionResult instance = MediaFileSizeReductionResult
+            .builder()
+            .newFileName(newFileName)
+            .build();
+
+        // when
+        String actual = instance.getNewFileNameOrDefault(defaultValue);
+
+        // then
+        Asserts.assertEquals(actual, newFileName);
+    }
+
+    @Test
+    public void getNewFileNameOrDefaultReturnDefaultValueTest() {
+        // given
+        String defaultValue = "avatar.png";
+
+        // when
+        // then
+        Asserts.assertEquals(
+            MediaFileSizeReductionResult
+                .builder()
+                .build()
+                .getNewFileNameOrDefault(defaultValue),
+            defaultValue
+        );
+        Asserts.assertEquals(
+            MediaFileSizeReductionResult
+                .builder()
+                .newFileName("")
+                .build()
+                .getNewFileNameOrDefault(defaultValue),
+            defaultValue
+        );
+        Asserts.assertEquals(
+            MediaFileSizeReductionResult
+                .builder()
+                .newFileName(" ")
+                .build()
+                .getNewFileNameOrDefault(defaultValue),
+            defaultValue
+        );
+    }
+
+    @Test
     public void getNewFileSizeOrDefaultReturnNewFileSizeTest() {
         // given
         long newFileSize = 1024L;
@@ -132,6 +181,7 @@ public class MediaFileSizeReductionResultTest {
         // then
         Asserts.assertFalse(instance.isReduced());
         Asserts.assertNull(instance.getOriginalSizeFileName());
+        Asserts.assertNull(instance.getNewFileName());
         Asserts.assertNull(instance.getNewFileMimeType());
         Asserts.assertEquals(instance.getNewFileSize(), 0L);
         Asserts.assertEquals(
@@ -148,6 +198,7 @@ public class MediaFileSizeReductionResultTest {
     public void builderTest() {
         // given
         String originalSizeFileName = "avatar.png";
+        String newFileName = "avatar.jpg";
         String newFileMimeType = "image/webp";
         long newFileSize = 1024L;
 
@@ -156,6 +207,7 @@ public class MediaFileSizeReductionResultTest {
             .builder()
             .reduced(true)
             .originalSizeFileName(originalSizeFileName)
+            .newFileName(newFileName)
             .newFileMimeType(newFileMimeType)
             .newFileSize(newFileSize)
             .build();
@@ -166,6 +218,7 @@ public class MediaFileSizeReductionResultTest {
             instance.getOriginalSizeFileName(),
             originalSizeFileName
         );
+        Asserts.assertEquals(instance.getNewFileName(), newFileName);
         Asserts.assertEquals(instance.getNewFileMimeType(), newFileMimeType);
         Asserts.assertEquals(instance.getNewFileSize(), newFileSize);
     }
