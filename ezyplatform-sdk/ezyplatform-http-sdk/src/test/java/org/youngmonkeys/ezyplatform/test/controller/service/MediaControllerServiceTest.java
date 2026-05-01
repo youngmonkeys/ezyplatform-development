@@ -60,6 +60,7 @@ import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloader;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloaderManager;
 import org.youngmonkeys.ezyplatform.media.MediaUploadArguments;
+import org.youngmonkeys.ezyplatform.media.MediaUploadFromUrlArguments;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
 import org.youngmonkeys.ezyplatform.model.MediaDetailsModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
@@ -1113,6 +1114,60 @@ public class MediaControllerServiceTest {
         MediaUploadedEvent event = (MediaUploadedEvent) eventCaptor.getValue();
         Asserts.assertEquals(event.getMedia(), media);
         Asserts.assertEquals(event.getMediaFilePath(), mediaFile);
+    }
+
+    @Test
+    public void saveMediaFileFromUrlOrThrowUseMediaUpDownloaderWhenSupportedTest()
+        throws Exception {
+        // given
+        String mediaUrl = "https://ezyplatform.com/images/logo.png";
+        cachePublicAddressForHost("ezyplatform.com");
+        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(mediaUpDownloader);
+        when(mediaUpDownloader.isUploadFromUrlSupported()).thenReturn(true);
+        when(
+            mediaUpDownloader.uploadFromUrl(
+                any(MediaUploadFromUrlArguments.class)
+            )
+        )
+            .thenReturn(456L);
+
+        // when
+        long actual = instance.saveMediaFileFromUrlOrThrow(
+            "ADMIN",
+            101L,
+            202L,
+            SaveMediaFileFromUrlModel.builder()
+                .mediaType(MediaType.IMAGE.toString())
+                .mediaUrl(mediaUrl)
+                .notPublic(true)
+                .build()
+        );
+
+        // then
+        ArgumentCaptor<MediaUploadFromUrlArguments> argumentsCaptor =
+            ArgumentCaptor.forClass(MediaUploadFromUrlArguments.class);
+
+        Asserts.assertEquals(actual, 456L);
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(mediaUpDownloader).isUploadFromUrlSupported();
+        verify(mediaUpDownloader).uploadFromUrl(argumentsCaptor.capture());
+
+        MediaUploadFromUrlArguments arguments = argumentsCaptor.getValue();
+        Asserts.assertTrue(arguments.getTika() != null);
+        Asserts.assertEquals(arguments.getHttpClient(), httpClient);
+        Asserts.assertEquals(arguments.getUploadFrom(), "ADMIN");
+        Asserts.assertEquals(arguments.getAction(), UploadAction.ADD);
+        Asserts.assertEquals(arguments.getMediaType(), "IMAGE");
+        Asserts.assertEquals(arguments.getMediaUrl(), mediaUrl);
+        Asserts.assertEquals(arguments.getOwnerAdminId(), 101L);
+        Asserts.assertEquals(arguments.getOwnerUserId(), 202L);
+        Asserts.assertTrue(arguments.isNotPublic());
+
+        verifyNoMoreInteractions(mediaUpDownloader);
     }
 
     @Test
