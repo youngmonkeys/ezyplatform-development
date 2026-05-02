@@ -101,11 +101,12 @@ public class ImageFileService extends EzyLoggable {
         ) {
             return MediaFileSizeReductionResult.NO;
         }
+        long originalFileSize = imageFile.length();
         long maxFileSize = expectedFileSize > ZERO_LONG
             ? expectedFileSize
             : settingService.getMaxReducedImageFileSize();
         if (maxFileSize <= ZERO
-            || imageFile.length() <= maxFileSize
+            || originalFileSize <= maxFileSize
         ) {
             return MediaFileSizeReductionResult.NO;
         }
@@ -137,7 +138,7 @@ public class ImageFileService extends EzyLoggable {
             ReducedFile reducedFile = reduceImageDataFileSize(
                 imageData,
                 maxFileSize,
-                imageFile.length(),
+                originalFileSize,
                 imageFile,
                 bestFile,
                 candidateFile
@@ -175,12 +176,13 @@ public class ImageFileService extends EzyLoggable {
         File newImageFile = reducedFile.outputFile != null
             ? reducedFile.outputFile
             : imageFile;
+        boolean sameImageFile = isSameFilePath(imageFile, newImageFile);
         Files.move(
             bestFile.toPath(),
             newImageFile.toPath(),
             StandardCopyOption.REPLACE_EXISTING
         );
-        if (!newImageFile.equals(imageFile)) {
+        if (!sameImageFile) {
             Files.deleteIfExists(imageFile.toPath());
         }
         return MediaFileSizeReductionResult.builder()
@@ -190,19 +192,26 @@ public class ImageFileService extends EzyLoggable {
                     ? originalSizeFile.getName()
                     : NULL_STRING
             )
-            .newFileName(toNewFileName(imageFile, newImageFile))
+            .newFileName(toNewFileName(newImageFile, sameImageFile))
             .newFileMimeType(toNewFileMimeType(reducedFile))
             .newFileSize(newImageFile.length())
             .build();
     }
 
     private String toNewFileName(
-        File imageFile,
-        File newImageFile
+        File newImageFile,
+        boolean sameImageFile
     ) {
-        return newImageFile.equals(imageFile)
+        return sameImageFile
             ? NULL_STRING
             : newImageFile.getName();
+    }
+
+    private boolean isSameFilePath(
+        File first,
+        File second
+    ) throws IOException {
+        return first.getCanonicalFile().equals(second.getCanonicalFile());
     }
 
     private String toNewFileMimeType(ReducedFile reducedFile) {
@@ -332,18 +341,18 @@ public class ImageFileService extends EzyLoggable {
 
     private File createTempImageFile(
         String prefix,
-        File parentFile
+        File parentFolder
     ) throws IOException {
-        return File.createTempFile(prefix, TEMP_FILE_SUFFIX, parentFile);
+        return File.createTempFile(prefix, TEMP_FILE_SUFFIX, parentFolder);
     }
 
     private File saveOriginalSizeFile(
         File imageFile
     ) throws IOException {
-        File parentFile = imageFile.getAbsoluteFile().getParentFile();
+        File parentFolder = imageFile.getAbsoluteFile().getParentFile();
         String originalSizeFileName =
             ORIGINAL_SIZE_FILE_PREFIX + imageFile.getName();
-        File originalSizeFile = new File(parentFile, originalSizeFileName);
+        File originalSizeFile = new File(parentFolder, originalSizeFileName);
         if (!originalSizeFile.exists()) {
             Files.copy(imageFile.toPath(), originalSizeFile.toPath());
         }
