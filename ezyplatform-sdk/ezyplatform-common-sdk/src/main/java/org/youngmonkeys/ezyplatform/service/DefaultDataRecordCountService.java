@@ -24,7 +24,6 @@ import org.youngmonkeys.ezyplatform.result.CountResult;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -128,7 +127,7 @@ public class DefaultDataRecordCountService
         return dataRecordCountRepository
             .findByDataNameAndRecordTypeIn(
                 dataName,
-                new HashSet<>(recordTypes)
+                recordTypes
             )
             .stream()
             .collect(
