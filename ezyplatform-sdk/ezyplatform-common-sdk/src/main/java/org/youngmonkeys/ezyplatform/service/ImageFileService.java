@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.util.EzyLoggable;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageWriteParam;
@@ -44,8 +45,6 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 @AllArgsConstructor
 public class ImageFileService extends EzyLoggable {
 
-    private final SettingService settingService;
-
     private static final String TEMP_BEST_FILE_PREFIX = "image-best-";
     private static final String TEMP_CANDIDATE_FILE_PREFIX =
         "image-candidate-";
@@ -64,6 +63,33 @@ public class ImageFileService extends EzyLoggable {
     private static final float MIN_QUALITY = 0.25F;
     private static final float MIN_COMPRESSION_QUALITY = 0.0F;
     private static final int MIN_IMAGE_SIZE = 1;
+
+    private final SettingService settingService;
+
+    private final ImageObserver logImageObserver = (
+        drewImage,
+        infoFlags,
+        x,
+        y,
+        drewWidth,
+        drewHeight
+    ) -> {
+        if ((infoFlags & ImageObserver.ERROR) != ZERO
+            || (infoFlags & ImageObserver.ABORT) != ZERO
+        ) {
+            logger.warn(
+                "resize image draw update error, flags: {}",
+                infoFlags
+            );
+        }
+        return (infoFlags
+            & (
+            ImageObserver.ALLBITS
+                | ImageObserver.ERROR
+                | ImageObserver.ABORT
+        )
+        ) == ZERO;
+    };
 
     @SuppressWarnings("MethodLength")
     public MediaFileSizeReductionResult reduceImageFileSize(
@@ -391,30 +417,7 @@ public class ImageFileService extends EzyLoggable {
                 ZERO,
                 width,
                 height,
-                (
-                    drewImage,
-                    infoFlags,
-                    x,
-                    y,
-                    drewWidth,
-                    drewHeight
-                ) -> {
-                    if ((infoFlags & ImageObserver.ERROR) != ZERO
-                        || (infoFlags & ImageObserver.ABORT) != ZERO
-                    ) {
-                        logger.warn(
-                            "resize image draw update error, flags: {}",
-                            infoFlags
-                        );
-                    }
-                    return (infoFlags
-                        & (
-                            ImageObserver.ALLBITS
-                                | ImageObserver.ERROR
-                                | ImageObserver.ABORT
-                            )
-                        ) == ZERO;
-                }
+                logImageObserver
             );
         } finally {
             graphics.dispose();
@@ -455,7 +458,7 @@ public class ImageFileService extends EzyLoggable {
             }
             writer.write(
                 null,
-                new javax.imageio.IIOImage(
+                new IIOImage(
                     toWritableImage(image, formatName),
                     null,
                     null
@@ -490,7 +493,12 @@ public class ImageFileService extends EzyLoggable {
                 convertedImage.getWidth(),
                 convertedImage.getHeight()
             );
-            graphics.drawImage(image, 0, 0, null);
+            graphics.drawImage(
+                image,
+                ZERO,
+                ZERO,
+                logImageObserver
+            );
         } finally {
             graphics.dispose();
         }
