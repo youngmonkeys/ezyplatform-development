@@ -49,6 +49,14 @@ public final class ImageProxy {
         return getImageSize(new File(imageFilePath));
     }
 
+    /**
+     * Reads image dimensions using the JVM ImageIO providers.
+     *
+     * <p>Callers should only pass files that have already been accepted by the
+     * upload and media-type validation pipeline. This method catches reader
+     * failures and returns zero dimensions, but it does not sandbox ImageIO
+     * plugins or validate the file content itself.</p>
+     */
     public static ImageSize getImageSize(
         File imageFile
     ) {

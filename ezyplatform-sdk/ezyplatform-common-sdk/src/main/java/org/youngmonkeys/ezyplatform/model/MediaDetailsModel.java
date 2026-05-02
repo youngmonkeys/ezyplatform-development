@@ -29,6 +29,7 @@ public class MediaDetailsModel {
     private long id;
     private String name;
     private String originalName;
+    private String originalSizeFileName;
     private String url;
     private String uploadFrom;
     private String type;

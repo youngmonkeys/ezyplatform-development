@@ -28,16 +28,34 @@ public final class ReflectionObjects {
     public static boolean isEmptyObject(Object obj) {
         return getObjectProperties(
             obj,
-            true
+            Boolean.TRUE
         ).isEmpty();
     }
 
+    /**
+     * Extracts non-null object properties by reading instance fields with
+     * reflection.
+     *
+     * <p>This method can read non-public fields by making them accessible, so
+     * the returned map may contain private or sensitive data such as passwords,
+     * tokens, secrets, or internal state. Do not use this method to build API
+     * responses or data that will be exposed publicly.</p>
+     */
     public static Map<String, Object> getObjectProperties(
         Object obj
     ) {
-        return getObjectProperties(obj, false);
+        return getObjectProperties(obj, Boolean.FALSE);
     }
 
+    /**
+     * Extracts non-null object properties by reading instance fields with
+     * reflection.
+     *
+     * <p>This method can read non-public fields by making them accessible, so
+     * the returned map may contain private or sensitive data such as passwords,
+     * tokens, secrets, or internal state. Do not use this method to build API
+     * responses or data that will be exposed publicly.</p>
+     */
     public static Map<String, Object> getObjectProperties(
         Object obj,
         boolean onlyTakeFirstValue

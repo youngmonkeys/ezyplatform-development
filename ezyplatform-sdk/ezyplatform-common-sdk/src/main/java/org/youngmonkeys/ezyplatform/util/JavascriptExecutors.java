@@ -31,6 +31,14 @@ public final class JavascriptExecutors {
 
     private JavascriptExecutors() {}
 
+    /**
+     * Executes the given JavaScript script with the provided parameters.
+     *
+     * <p>The script is evaluated as executable code. If user-controlled input is
+     * passed as the script, an attacker can execute arbitrary code in the
+     * JavaScript runtime. Only execute trusted, server-controlled scripts. Do not
+     * allow end users to submit code that is passed to this method.</p>
+     */
     public static Object execute(
         String script,
         Map<String, Object> parameters
@@ -50,6 +58,15 @@ public final class JavascriptExecutors {
         }
     }
 
+    /**
+     * Executes the given JavaScript script and converts the result to
+     * {@link BigDecimal}.
+     *
+     * <p>The script is evaluated as executable code. If user-controlled input is
+     * passed as the script, an attacker can execute arbitrary code in the
+     * JavaScript runtime. Only execute trusted, server-controlled scripts. Do not
+     * allow end users to submit code that is passed to this method.</p>
+     */
     public static BigDecimal execute(
         String script,
         Map<String, Object> parameters,

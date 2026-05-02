@@ -27,6 +27,10 @@ public interface WorkflowHandler {
         Map<String, Object> output
     );
 
+    default Object getState() {
+        return null;
+    }
+
     String getName();
 
     default String getDisplayName() {

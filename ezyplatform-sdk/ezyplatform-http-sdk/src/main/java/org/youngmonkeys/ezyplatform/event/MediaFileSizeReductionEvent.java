@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2025 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,18 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.event;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.youngmonkeys.ezyplatform.entity.MediaType;
+
+import java.io.File;
 
 @Getter
-@Builder
-public class ReplaceMediaModel {
-    private long mediaId;
-    private String fileName;
-    private String originalFileName;
-    private String mediaType;
-    private String mimeType;
-    private long fileSize;
+@AllArgsConstructor
+public class MediaFileSizeReductionEvent {
+    private MediaType mediaType;
+    private File mediaFilePath;
+    private long expectedFileSize;
 }

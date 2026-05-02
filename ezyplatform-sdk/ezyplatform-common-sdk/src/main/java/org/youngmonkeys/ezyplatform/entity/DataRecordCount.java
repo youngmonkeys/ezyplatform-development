@@ -18,10 +18,7 @@ package org.youngmonkeys.ezyplatform.entity;
 
 import lombok.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_DATA_RECORD_COUNT;
@@ -35,8 +32,17 @@ import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_
 @NoArgsConstructor
 public class DataRecordCount {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
     @Column(name = "data_type")
     private String dataType;
+
+    @Column(name = "data_name")
+    private String dataName;
+
+    @Column(name = "record_type")
+    private String recordType;
 
     @Column(name = "record_count")
     private long recordCount;

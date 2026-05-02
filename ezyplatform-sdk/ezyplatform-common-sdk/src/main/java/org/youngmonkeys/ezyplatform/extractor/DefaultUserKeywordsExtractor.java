@@ -25,17 +25,25 @@ import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.util.Keywords.keywordsFromEmail;
 import static org.youngmonkeys.ezyplatform.util.Keywords.toKeywords;
 
-public class DefaultUserKeywordsExtractor implements UserKeywordsExtractor {
+public class DefaultUserKeywordsExtractor
+    implements UserKeywordsExtractor {
 
     @Override
     public Set<String> extract(User user) {
         Set<String> answer = new HashSet<>();
         answer.add(String.valueOf(user.getId()));
+        String uuid = user.getUuid();
+        if (isNotBlank(uuid)) {
+            answer.add(uuid);
+        }
         String phone = user.getPhone();
         if (isNotBlank(phone)) {
             answer.addAll(toKeywords(phone));
         }
-        answer.addAll(toKeywords(user.getUsername()));
+        String username = user.getUsername();
+        if (isNotBlank(username)) {
+            answer.addAll(toKeywords(username));
+        }
         String displayName = user.getDisplayName();
         if (isNotBlank(displayName)) {
             answer.addAll(toKeywords(displayName));
@@ -44,7 +52,6 @@ public class DefaultUserKeywordsExtractor implements UserKeywordsExtractor {
         if (isNotBlank(email)) {
             answer.addAll(keywordsFromEmail(email));
         }
-        answer.add(String.valueOf(user.getId()));
         return answer;
     }
 }

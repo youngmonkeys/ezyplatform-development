@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public class Workflow {
 
@@ -31,19 +32,25 @@ public class Workflow {
     @Getter
     private final String displayName;
     private List<WorkflowHandler> handlers;
+    private final Supplier<Boolean> runnableCondition;
 
     public Workflow(Builder builder) {
         this.name = builder.name;
         this.displayName = builder.displayName;
         this.handlers = Collections.emptyList();
+        this.runnableCondition = builder.runnableCondition;
     }
 
     public void run(
         Map<String, Object> input,
         Map<String, Object> output
     ) {
-        for (WorkflowHandler handler : handlers) {
-            handler.handle(input, output);
+        boolean runnable = runnableCondition == null
+            || runnableCondition.get();
+        if (runnable) {
+            for (WorkflowHandler handler : handlers) {
+                handler.handle(input, output);
+            }
         }
     }
 
@@ -60,6 +67,7 @@ public class Workflow {
     public static class Builder implements EzyBuilder<Workflow> {
         private String name;
         private String displayName;
+        private Supplier<Boolean> runnableCondition;
 
         public Builder name(String name) {
             this.name = name;
@@ -68,6 +76,13 @@ public class Workflow {
 
         public Builder displayName(String displayName) {
             this.displayName = displayName;
+            return this;
+        }
+
+        public Builder runnableCondition(
+            Supplier<Boolean> runnableCondition
+        ) {
+            this.runnableCondition = runnableCondition;
             return this;
         }
 

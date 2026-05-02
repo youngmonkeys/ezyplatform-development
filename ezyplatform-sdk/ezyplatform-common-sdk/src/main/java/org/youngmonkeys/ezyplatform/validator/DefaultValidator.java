@@ -54,6 +54,14 @@ public final class DefaultValidator {
             && username.matches(PATTERN_USERNAME);
     }
 
+    /**
+     * Checks whether the password length is within the allowed range.
+     *
+     * <p>This method only validates password length. It does not enforce
+     * complexity rules such as uppercase letters, lowercase letters, numbers,
+     * special characters, or breached-password checks. Add additional validation
+     * logic when password complexity requirements are needed.</p>
+     */
     public static boolean isValidPassword(String password) {
         return password != null
             && password.length() >= MIN_LENGTH_PASSWORD
@@ -67,6 +75,15 @@ public final class DefaultValidator {
             && phone.matches(PATTERN_PHONE);
     }
 
+    /**
+     * Checks whether the given value can be parsed as a URI.
+     *
+     * <p>This method only performs basic URI syntax validation. It does not
+     * validate whether the target host is public, whether the scheme is safe, or
+     * whether the URL can be used for SSRF attacks. Use
+     * {@link #isValidExternalUrl(String)} when validating user-controlled URLs
+     * that will be requested by the server.</p>
+     */
     public static boolean isValidUrl(String url) {
         try {
             new URI(url);
@@ -76,6 +93,14 @@ public final class DefaultValidator {
         }
     }
 
+    /**
+     * Checks whether the URL is an HTTPS URL suitable for server-side external
+     * media fetches.
+     *
+     * <p>This method rejects opaque URIs, non-HTTPS schemes, missing hosts,
+     * user-info credentials, localhost, IP literals, numeric-only hosts, and
+     * hosts that resolve to private or otherwise non-public addresses.</p>
+     */
     public static boolean isValidExternalUrl(String url) {
         try {
             URI uri = new URI(url);
@@ -112,6 +137,13 @@ public final class DefaultValidator {
         return normalizedHost;
     }
 
+    /**
+      * Resolves a host and returns whether all resolved addresses are public.
+      *
+      * <p>This method performs DNS resolution. Use it in request execution paths
+      * that need stricter SSRF checks than {@link #isValidExternalUrl(String)} can
+      * provide from URL syntax alone.</p>
+      */
     public static boolean isPublicHost(String host) {
         try {
             InetAddress[] addresses = InetAddress.getAllByName(host);
@@ -290,11 +322,8 @@ public final class DefaultValidator {
     }
 
     public static boolean isBoolean(String value) {
-        try {
-            return value.equals("true") || value.equals("false");
-        } catch (Exception e) {
-            return false;
-        }
+        return value != null
+            && (value.equals("true") || value.equals("false"));
     }
 
     public static boolean containsSqlComment(String str) {

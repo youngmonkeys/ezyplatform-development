@@ -112,6 +112,27 @@ public class MediaValidatorTest {
     }
 
     @Test
+    public void validateMediaNameTest() {
+        // given
+        String validMediaName = "media-1.png";
+        String invalidMediaName = "folder/media-1.png";
+
+        // when
+        instance.validateMediaName(validMediaName);
+        Throwable e = Asserts.assertThrows(() ->
+            instance.validateMediaName(invalidMediaName)
+        );
+
+        // then
+        Asserts.assertEqualsType(e, HttpBadRequestException.class);
+        assertErrorData(
+            ((HttpBadRequestException) e).getData(),
+            "mediaName",
+            "invalid"
+        );
+    }
+
+    @Test
     public void validateMediaNameAndGetTest() {
         // given
         String existingMediaName = "media-1";
@@ -147,6 +168,7 @@ public class MediaValidatorTest {
         Detector detector = mock(Detector.class);
         when(tika.getDetector()).thenReturn(detector);
         when(settingService.getMaxUploadFileSize()).thenReturn(100L);
+        when(settingService.getMaxUploadImageFileSize()).thenReturn(120L);
 
         Part validFilePart = mock(Part.class);
         when(validFilePart.getSubmittedFileName()).thenReturn("image.png");
@@ -294,6 +316,8 @@ public class MediaValidatorTest {
         );
         verify(settingService, times(6))
             .getMaxUploadFileSize();
+        verify(settingService, times(5))
+            .getMaxUploadImageFileSize();
         verify(settingService, times(6))
             .getAcceptedMediaMimeTypes();
     }

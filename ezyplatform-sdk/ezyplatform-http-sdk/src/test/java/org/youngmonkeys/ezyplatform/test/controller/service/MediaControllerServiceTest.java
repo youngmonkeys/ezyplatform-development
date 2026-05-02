@@ -24,6 +24,7 @@ import com.tvd12.ezyfox.function.EzyExceptionVoid;
 import com.tvd12.ezyfox.stream.EzyInputStreamLoader;
 import com.tvd12.ezyhttp.client.HttpClient;
 import com.tvd12.ezyhttp.client.data.DownloadFileResult;
+import com.tvd12.ezyhttp.core.exception.HttpBadRequestException;
 import com.tvd12.ezyhttp.core.resources.ResourceDownloadManager;
 import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import com.tvd12.ezyhttp.server.core.resources.FileUploader;
@@ -40,6 +41,7 @@ import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
+import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
@@ -48,12 +50,17 @@ import org.youngmonkeys.ezyplatform.event.GetMediaDetailsEvent;
 import org.youngmonkeys.ezyplatform.event.GetMediaFilePathEvent;
 import org.youngmonkeys.ezyplatform.event.MediaAddedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaDownloadEvent;
+import org.youngmonkeys.ezyplatform.event.MediaFileSizeReducedEvent;
+import org.youngmonkeys.ezyplatform.event.MediaFileSizeReductionEvent;
 import org.youngmonkeys.ezyplatform.event.MediaRemovedEvent;
+import org.youngmonkeys.ezyplatform.event.MediaReplacedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
+import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
+import org.youngmonkeys.ezyplatform.media.MediaFileSizeReductionArguments;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloader;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloaderManager;
 import org.youngmonkeys.ezyplatform.media.MediaUploadArguments;
@@ -63,6 +70,7 @@ import org.youngmonkeys.ezyplatform.model.MediaDetailsModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
+import org.youngmonkeys.ezyplatform.model.SaveMediaFileFromUrlModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameterConverter;
@@ -71,6 +79,7 @@ import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
+import org.youngmonkeys.ezyplatform.service.MediaFileService;
 import org.youngmonkeys.ezyplatform.service.MediaService;
 import org.youngmonkeys.ezyplatform.service.PaginationMediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
@@ -88,8 +97,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -103,6 +116,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 public class MediaControllerServiceTest {
     private HttpClient httpClient;
@@ -114,6 +128,7 @@ public class MediaControllerServiceTest {
     private ResourceDownloadManager resourceDownloadManager;
     private EzySingletonFactory singletonFactory;
     private MediaService mediaService;
+    private MediaFileService mediaFileService;
     private PaginationMediaService paginationMediaService;
     private SettingService settingService;
     private CommonValidator commonValidator;
@@ -138,6 +153,7 @@ public class MediaControllerServiceTest {
         resourceDownloadManager = mock(ResourceDownloadManager.class);
         singletonFactory = mock(EzySingletonFactory.class);
         mediaService = mock(MediaService.class);
+        mediaFileService = mock(MediaFileService.class);
         paginationMediaService = mock(PaginationMediaService.class);
         settingService = mock(SettingService.class);
         commonValidator = mock(CommonValidator.class);
@@ -158,6 +174,7 @@ public class MediaControllerServiceTest {
             resourceDownloadManager,
             singletonFactory,
             mediaService,
+            mediaFileService,
             paginationMediaService,
             settingService,
             commonValidator,
@@ -179,6 +196,7 @@ public class MediaControllerServiceTest {
             objectMapper,
             resourceDownloadManager,
             mediaService,
+            mediaFileService,
             paginationMediaService,
             settingService,
             commonValidator,
@@ -283,6 +301,15 @@ public class MediaControllerServiceTest {
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
         when(mediaUpDownloader.isUploadSupported()).thenReturn(false);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath,
+                ZERO_LONG
+            )
+        )
+            .thenReturn(MediaFileSizeReductionResult.NO);
         when(request.getPart("file")).thenReturn(filePart);
         when(mediaValidator.validateFilePart(filePart, false))
             .thenReturn(fileMetadata);
@@ -338,13 +365,16 @@ public class MediaControllerServiceTest {
             ArgumentCaptor.forClass(Object.class);
 
         verify(settingService).getMaxUploadFileSize();
-        verify(settingService).getMediaUpDownloaderName();
-        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaUpDownloaderManager, times(2))
+            .getMediaUpDownloaderByName("cloud");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
         verify(mediaUpDownloader).isUploadSupported();
+        verify(mediaUpDownloader).isReduceMediaSupported();
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
-        verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
+        verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(filePart).getSubmittedFileName();
         verify(mediaService).generateMediaFileName("banner.png", "png");
         verify(request).getAsyncContext();
@@ -359,14 +389,20 @@ public class MediaControllerServiceTest {
             eq(maxFileSize),
             any(EzyExceptionVoid.class)
         );
+        verify(mediaFileService).reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath,
+            ZERO_LONG
+        );
         verify(mediaService).addMedia(eq("local"), addMediaCaptor.capture());
         verify(objectMapper).writeValueAsString(mediaModel);
         verify(response).getOutputStream();
 
         List<Object> events = eventCaptor.getAllValues();
-        Asserts.assertEquals(events.size(), 2);
+        Asserts.assertEquals(events.size(), 3);
         Asserts.assertTrue(events.get(0) instanceof MediaUploadEvent);
-        Asserts.assertTrue(events.get(1) instanceof MediaUploadedEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(2) instanceof MediaUploadedEvent);
 
         MediaUploadEvent uploadEvent = (MediaUploadEvent) events.get(0);
         Asserts.assertEquals(uploadEvent.getUploadFrom(), "local");
@@ -384,7 +420,12 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(addMediaModel.getFileSize(), 7L);
         Asserts.assertTrue(addMediaModel.isNotPublic());
 
-        MediaUploadedEvent uploadedEvent = (MediaUploadedEvent) events.get(1);
+        MediaFileSizeReductionEvent reductionEvent =
+            (MediaFileSizeReductionEvent) events.get(1);
+        Asserts.assertEquals(reductionEvent.getMediaType(), MediaType.IMAGE);
+        Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
+
+        MediaUploadedEvent uploadedEvent = (MediaUploadedEvent) events.get(2);
         Asserts.assertEquals(uploadedEvent.getMedia(), mediaModel);
         Asserts.assertEquals(uploadedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);
@@ -393,6 +434,7 @@ public class MediaControllerServiceTest {
             mediaValidator,
             eventHandlerManager,
             fileUploader,
+            mediaFileService,
             mediaService
         );
         inOrder.verify(mediaValidator).validateFilePart(filePart, false);
@@ -404,8 +446,183 @@ public class MediaControllerServiceTest {
             eq(maxFileSize),
             any(EzyExceptionVoid.class)
         );
+        inOrder.verify(eventHandlerManager).handleEvent(
+            any(MediaFileSizeReductionEvent.class)
+        );
+        inOrder.verify(mediaFileService).reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath,
+            ZERO_LONG
+        );
         inOrder.verify(mediaService).addMedia(eq("local"), any(AddMediaModel.class));
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaUploadedEvent.class));
+
+        verifyNoMoreInteractions(
+            request,
+            response,
+            asyncContext,
+            filePart,
+            mediaUpDownloader,
+            fileUploader,
+            singletonFactory
+        );
+    }
+
+    @Test
+    public void addMediaFromRequestShouldUseFirstPartWhenFilePartIsNullTest()
+        throws Exception {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        Part filePart = mock(Part.class);
+        FileUploader fileUploader = mock(FileUploader.class);
+        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        CapturingServletOutputStream outputStream =
+            new CapturingServletOutputStream();
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.IMAGE)
+            .fileSize(123L)
+            .build();
+        MediaModel mediaModel = MediaModel.builder()
+            .id(100L)
+            .name("stored-first-part.png")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "media-controller-first-part-",
+            ".png"
+        );
+        long maxFileSize = 4096L;
+        String json = "{\"id\":100}";
+        mediaFilePath.deleteOnExit();
+
+        when(settingService.getMaxUploadFileSize()).thenReturn(maxFileSize);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(mediaUpDownloader);
+        when(singletonFactory.getSingletonCast(FileUploader.class))
+            .thenReturn(fileUploader);
+        when(mediaUpDownloader.isUploadSupported()).thenReturn(false);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath,
+                ZERO_LONG
+            )
+        )
+            .thenReturn(MediaFileSizeReductionResult.NO);
+        when(request.getPart("file")).thenReturn(null);
+        when(request.getParts()).thenReturn(Collections.singletonList(filePart));
+        when(mediaValidator.validateFilePart(filePart, false))
+            .thenReturn(fileMetadata);
+        when(filePart.getSubmittedFileName()).thenReturn("first-part.png");
+        when(mediaService.generateMediaFileName("first-part.png", "png"))
+            .thenReturn("stored-first-part.png");
+        when(request.getAsyncContext()).thenReturn(asyncContext);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "stored-first-part.png"
+            )
+        ).thenReturn(mediaFilePath);
+        when(mediaService.addMedia(eq("local"), any(AddMediaModel.class)))
+            .thenReturn(mediaModel);
+        when(objectMapper.writeValueAsString(mediaModel)).thenReturn(json);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        doAnswer(answer -> {
+            Object[] arguments = answer.getArguments();
+            File outputFile = (File) arguments[2];
+            EzyExceptionVoid callback = (EzyExceptionVoid) arguments[4];
+            Files.write(
+                outputFile.toPath(),
+                "fallback".getBytes(StandardCharsets.UTF_8)
+            );
+            callback.apply();
+            return null;
+        })
+            .when(fileUploader)
+            .accept(
+                same(asyncContext),
+                same(filePart),
+                same(mediaFilePath),
+                eq(maxFileSize),
+                any(EzyExceptionVoid.class)
+            );
+
+        // when
+        instance.addMedia(
+            request,
+            response,
+            "local",
+            101L,
+            202L,
+            false,
+            true
+        );
+
+        // then
+        ArgumentCaptor<AddMediaModel> addMediaCaptor =
+            ArgumentCaptor.forClass(AddMediaModel.class);
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+
+        verify(settingService).getMaxUploadFileSize();
+        verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaUpDownloaderManager, times(2))
+            .getMediaUpDownloaderByName("cloud");
+        verify(singletonFactory).getSingletonCast(FileUploader.class);
+        verify(mediaUpDownloader).isUploadSupported();
+        verify(mediaUpDownloader).isReduceMediaSupported();
+        verify(request).getPart("file");
+        verify(request).getParts();
+        verify(mediaValidator).validateFilePart(filePart, false);
+        verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
+        verify(filePart).getSubmittedFileName();
+        verify(mediaService).generateMediaFileName("first-part.png", "png");
+        verify(request).getAsyncContext();
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "stored-first-part.png"
+        );
+        verify(fileUploader).accept(
+            same(asyncContext),
+            same(filePart),
+            same(mediaFilePath),
+            eq(maxFileSize),
+            any(EzyExceptionVoid.class)
+        );
+        verify(mediaFileService).reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath,
+            ZERO_LONG
+        );
+        verify(mediaService).addMedia(eq("local"), addMediaCaptor.capture());
+        verify(objectMapper).writeValueAsString(mediaModel);
+        verify(response).getOutputStream();
+
+        AddMediaModel addMediaModel = addMediaCaptor.getValue();
+        Asserts.assertEquals(
+            addMediaModel.getFileName(),
+            "stored-first-part.png"
+        );
+        Asserts.assertEquals(
+            addMediaModel.getOriginalFileName(),
+            "first-part.png"
+        );
+        Asserts.assertEquals(addMediaModel.getMediaType(), "IMAGE");
+        Asserts.assertEquals(addMediaModel.getMimeType(), "image/png");
+        Asserts.assertEquals(addMediaModel.getFileSize(), 8L);
+
+        List<Object> events = eventCaptor.getAllValues();
+        Asserts.assertEquals(events.size(), 3);
+        Asserts.assertTrue(events.get(0) instanceof MediaUploadEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(2) instanceof MediaUploadedEvent);
+        Asserts.assertEquals(outputStream.asString(), json);
 
         verifyNoMoreInteractions(
             request,
@@ -532,6 +749,15 @@ public class MediaControllerServiceTest {
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
         when(mediaUpDownloader.isUploadSupported()).thenReturn(false);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath,
+                ZERO_LONG
+            )
+        )
+            .thenReturn(MediaFileSizeReductionResult.NO);
         when(request.getPart("file")).thenReturn(filePart);
         when(mediaValidator.validateFilePart(filePart, false))
             .thenReturn(fileMetadata);
@@ -584,13 +810,16 @@ public class MediaControllerServiceTest {
 
         verify(mediaService).getMediaById(654L);
         verify(validMediaCondition).test(media);
-        verify(settingService).getMediaUpDownloaderName();
-        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaUpDownloaderManager, times(2))
+            .getMediaUpDownloaderByName("cloud");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
         verify(mediaUpDownloader).isUploadSupported();
+        verify(mediaUpDownloader).isReduceMediaSupported();
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
-        verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
+        verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(filePart).getSubmittedFileName();
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
@@ -605,14 +834,20 @@ public class MediaControllerServiceTest {
             eq(4096L),
             any(EzyExceptionVoid.class)
         );
+        verify(mediaFileService).reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath,
+            ZERO_LONG
+        );
         verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
         verify(objectMapper).writeValueAsString(replacedMedia);
         verify(response).getOutputStream();
 
         List<Object> events = eventCaptor.getAllValues();
-        Asserts.assertEquals(events.size(), 2);
+        Asserts.assertEquals(events.size(), 3);
         Asserts.assertTrue(events.get(0) instanceof MediaUploadEvent);
-        Asserts.assertTrue(events.get(1) instanceof MediaUploadedEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(2) instanceof MediaReplacedEvent);
 
         MediaUploadEvent uploadEvent = (MediaUploadEvent) events.get(0);
         Asserts.assertEquals(uploadEvent.getUploadFrom(), "local");
@@ -631,15 +866,21 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(replaceMediaModel.getMimeType(), "image/webp");
         Asserts.assertEquals(replaceMediaModel.getFileSize(), 11L);
 
-        MediaUploadedEvent uploadedEvent = (MediaUploadedEvent) events.get(1);
-        Asserts.assertEquals(uploadedEvent.getMedia(), replacedMedia);
-        Asserts.assertEquals(uploadedEvent.getMediaFilePath(), mediaFilePath);
+        MediaFileSizeReductionEvent reductionEvent =
+            (MediaFileSizeReductionEvent) events.get(1);
+        Asserts.assertEquals(reductionEvent.getMediaType(), MediaType.IMAGE);
+        Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
+
+        MediaReplacedEvent replacedEvent = (MediaReplacedEvent) events.get(2);
+        Asserts.assertEquals(replacedEvent.getMedia(), replacedMedia);
+        Asserts.assertEquals(replacedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);
 
         InOrder inOrder = inOrder(
             mediaValidator,
             eventHandlerManager,
             fileUploader,
+            mediaFileService,
             mediaService,
             settingService
         );
@@ -653,8 +894,16 @@ public class MediaControllerServiceTest {
             eq(4096L),
             any(EzyExceptionVoid.class)
         );
+        inOrder.verify(eventHandlerManager).handleEvent(
+            any(MediaFileSizeReductionEvent.class)
+        );
+        inOrder.verify(mediaFileService).reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath,
+            ZERO_LONG
+        );
         inOrder.verify(mediaService).replaceMedia(any(ReplaceMediaModel.class));
-        inOrder.verify(eventHandlerManager).handleEvent(any(MediaUploadedEvent.class));
+        inOrder.verify(eventHandlerManager).handleEvent(any(MediaReplacedEvent.class));
 
         verifyNoMoreInteractions(
             request,
@@ -669,90 +918,768 @@ public class MediaControllerServiceTest {
     }
 
     @Test
-    public void saveMediaFileUseMediaUpDownloaderWhenSupportedTest() {
+    public void replaceMediaFromRequestShouldUseFirstPartWhenFilePartIsNullTest()
+        throws Exception {
         // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        Part filePart = mock(Part.class);
+        FileUploader fileUploader = mock(FileUploader.class);
         MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        CapturingServletOutputStream outputStream =
+            new CapturingServletOutputStream();
+        MediaModel media = MediaModel.builder()
+            .id(655L)
+            .name("cover-fallback.png")
+            .uploadFrom("local")
+            .type(MediaType.IMAGE)
+            .ownerAdminId(111L)
+            .ownerUserId(222L)
+            .publicMedia(false)
+            .build();
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.IMAGE)
+            .fileSize(333L)
+            .build();
+        MediaModel replacedMedia = MediaModel.builder()
+            .id(655L)
+            .name("cover-fallback.png")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "replace-media-first-part-",
+            ".png"
+        );
+        String json = "{\"id\":655}";
+        mediaFilePath.deleteOnExit();
+
+        when(mediaService.getMediaById(655L)).thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(true);
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
-        when(mediaUpDownloader.isUploadFromUrlSupported()).thenReturn(true);
+        when(singletonFactory.getSingletonCast(FileUploader.class))
+            .thenReturn(fileUploader);
+        when(mediaUpDownloader.isUploadSupported()).thenReturn(false);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
         when(
-            mediaUpDownloader.uploadFromUrl(any(MediaUploadFromUrlArguments.class))
-        ).thenReturn(9988L);
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath,
+                ZERO_LONG
+            )
+        )
+            .thenReturn(MediaFileSizeReductionResult.NO);
+        when(request.getPart("file")).thenReturn(null);
+        when(request.getParts()).thenReturn(Collections.singletonList(filePart));
+        when(mediaValidator.validateFilePart(filePart, false))
+            .thenReturn(fileMetadata);
+        when(filePart.getSubmittedFileName()).thenReturn("first-part.png");
+        when(request.getAsyncContext()).thenReturn(asyncContext);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "cover-fallback.png"
+            )
+        ).thenReturn(mediaFilePath);
+        when(settingService.getMaxUploadFileSize()).thenReturn(4096L);
+        when(mediaService.replaceMedia(any(ReplaceMediaModel.class)))
+            .thenReturn(replacedMedia);
+        when(objectMapper.writeValueAsString(replacedMedia)).thenReturn(json);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        doAnswer(answer -> {
+            Object[] arguments = answer.getArguments();
+            File outputFile = (File) arguments[2];
+            EzyExceptionVoid callback = (EzyExceptionVoid) arguments[4];
+            Files.write(
+                outputFile.toPath(),
+                "replacement".getBytes(StandardCharsets.UTF_8)
+            );
+            callback.apply();
+            return null;
+        })
+            .when(fileUploader)
+            .accept(
+                same(asyncContext),
+                same(filePart),
+                same(mediaFilePath),
+                eq(4096L),
+                any(EzyExceptionVoid.class)
+            );
 
         // when
-        long actual = instance.saveMediaFile(
-            MediaType.IMAGE,
-            "https://cdn.example.com/banner.png",
-            UploadFrom.ADMIN,
-            77L,
-            88L
+        instance.replaceMedia(
+            request,
+            response,
+            655L,
+            validMediaCondition
         );
 
         // then
-        ArgumentCaptor<MediaUploadFromUrlArguments> argumentsCaptor =
-            ArgumentCaptor.forClass(MediaUploadFromUrlArguments.class);
-        Asserts.assertEquals(actual, 9988L);
+        ArgumentCaptor<ReplaceMediaModel> replaceMediaCaptor =
+            ArgumentCaptor.forClass(ReplaceMediaModel.class);
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+
+        verify(mediaService).getMediaById(655L);
+        verify(validMediaCondition).test(media);
+        verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaUpDownloaderManager, times(2))
+            .getMediaUpDownloaderByName("cloud");
+        verify(singletonFactory).getSingletonCast(FileUploader.class);
+        verify(mediaUpDownloader).isUploadSupported();
+        verify(mediaUpDownloader).isReduceMediaSupported();
+        verify(request).getPart("file");
+        verify(request).getParts();
+        verify(mediaValidator).validateFilePart(filePart, false);
+        verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
+        verify(filePart).getSubmittedFileName();
+        verify(request).getAsyncContext();
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "cover-fallback.png"
+        );
+        verify(settingService).getMaxUploadFileSize();
+        verify(fileUploader).accept(
+            same(asyncContext),
+            same(filePart),
+            same(mediaFilePath),
+            eq(4096L),
+            any(EzyExceptionVoid.class)
+        );
+        verify(mediaFileService).reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath,
+            ZERO_LONG
+        );
+        verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
+        verify(objectMapper).writeValueAsString(replacedMedia);
+        verify(response).getOutputStream();
+
+        ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
+        Asserts.assertEquals(replaceMediaModel.getMediaId(), 655L);
+        Asserts.assertEquals(
+            replaceMediaModel.getOriginalFileName(),
+            "first-part.png"
+        );
+        Asserts.assertEquals(replaceMediaModel.getMediaType(), "IMAGE");
+        Asserts.assertEquals(replaceMediaModel.getMimeType(), "image/png");
+        Asserts.assertEquals(replaceMediaModel.getFileSize(), 11L);
+
+        List<Object> events = eventCaptor.getAllValues();
+        Asserts.assertEquals(events.size(), 3);
+        Asserts.assertTrue(events.get(0) instanceof MediaUploadEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(2) instanceof MediaReplacedEvent);
+        Asserts.assertEquals(outputStream.asString(), json);
+
+        verifyNoMoreInteractions(
+            request,
+            response,
+            asyncContext,
+            filePart,
+            mediaUpDownloader,
+            fileUploader,
+            validMediaCondition,
+            singletonFactory
+        );
+    }
+
+    @Test
+    public void replaceMediaByNameFromRequestTest() throws Exception {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        Part filePart = mock(Part.class);
+        FileUploader fileUploader = mock(FileUploader.class);
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        CapturingServletOutputStream outputStream =
+            new CapturingServletOutputStream();
+        MediaModel currentMedia = MediaModel.builder()
+            .id(789L)
+            .name("current-media.jpg")
+            .uploadFrom("local")
+            .type(MediaType.IMAGE)
+            .ownerAdminId(55L)
+            .ownerUserId(66L)
+            .publicMedia(true)
+            .build();
+        FileMetadata replacementMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.IMAGE)
+            .fileSize(444L)
+            .build();
+        MediaModel replacedMedia = MediaModel.builder()
+            .id(789L)
+            .name("current-media.jpg")
+            .build();
+        File mediaFilePath = File.createTempFile("replace-media-by-name-", ".png");
+        String json = "{\"id\":789,\"name\":\"current-media.jpg\"}";
+        mediaFilePath.deleteOnExit();
+
+        when(mediaService.getMediaByName("current-media.jpg"))
+            .thenReturn(currentMedia);
+        when(validMediaCondition.test(currentMedia)).thenReturn(true);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("local");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("local"))
+            .thenReturn(null);
+        when(singletonFactory.getSingletonCast(FileUploader.class))
+            .thenReturn(fileUploader);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath,
+                ZERO_LONG
+            )
+        )
+            .thenReturn(MediaFileSizeReductionResult.NO);
+        when(request.getPart("file")).thenReturn(filePart);
+        when(mediaValidator.validateFilePart(filePart, false))
+            .thenReturn(replacementMetadata);
+        when(filePart.getSubmittedFileName()).thenReturn("replacement.png");
+        when(request.getAsyncContext()).thenReturn(asyncContext);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "current-media.jpg"
+            )
+        ).thenReturn(mediaFilePath);
+        when(settingService.getMaxUploadFileSize()).thenReturn(8192L);
+        when(mediaService.replaceMedia(any(ReplaceMediaModel.class)))
+            .thenReturn(replacedMedia);
+        when(objectMapper.writeValueAsString(replacedMedia)).thenReturn(json);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        doAnswer(answer -> {
+            Object[] arguments = answer.getArguments();
+            File outputFile = (File) arguments[2];
+            EzyExceptionVoid callback = (EzyExceptionVoid) arguments[4];
+            Files.write(
+                outputFile.toPath(),
+                "replacement-content".getBytes(StandardCharsets.UTF_8)
+            );
+            callback.apply();
+            return null;
+        })
+            .when(fileUploader)
+            .accept(
+                same(asyncContext),
+                same(filePart),
+                same(mediaFilePath),
+                eq(8192L),
+                any(EzyExceptionVoid.class)
+            );
+
+        // when
+        instance.replaceMedia(
+            request,
+            response,
+            "current-media.jpg",
+            validMediaCondition
+        );
+
+        // then
+        ArgumentCaptor<ReplaceMediaModel> replaceMediaCaptor =
+            ArgumentCaptor.forClass(ReplaceMediaModel.class);
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+
+        verify(mediaService).getMediaByName("current-media.jpg");
+        verify(validMediaCondition).test(currentMedia);
+        verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaUpDownloaderManager, times(2))
+            .getMediaUpDownloaderByName("local");
+        verify(singletonFactory).getSingletonCast(FileUploader.class);
+        verify(request).getPart("file");
+        verify(mediaValidator).validateFilePart(filePart, false);
+        verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
+        verify(filePart).getSubmittedFileName();
+        verify(request).getAsyncContext();
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "current-media.jpg"
+        );
+        verify(settingService).getMaxUploadFileSize();
+        verify(fileUploader).accept(
+            same(asyncContext),
+            same(filePart),
+            same(mediaFilePath),
+            eq(8192L),
+            any(EzyExceptionVoid.class)
+        );
+        verify(mediaFileService).reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath,
+            ZERO_LONG
+        );
+        verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
+        verify(objectMapper).writeValueAsString(replacedMedia);
+        verify(response).getOutputStream();
+
+        List<Object> events = eventCaptor.getAllValues();
+        Asserts.assertEquals(events.size(), 3);
+        Asserts.assertTrue(events.get(0) instanceof MediaUploadEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(2) instanceof MediaReplacedEvent);
+
+        MediaUploadEvent uploadEvent = (MediaUploadEvent) events.get(0);
+        Asserts.assertEquals(uploadEvent.getUploadFrom(), "local");
+        Asserts.assertEquals(uploadEvent.getOwnerAdminId(), 55L);
+        Asserts.assertEquals(uploadEvent.getOwnerUserId(), 66L);
+        Asserts.assertEquals(uploadEvent.getMedia(), currentMedia);
+        Asserts.assertEquals(
+            uploadEvent.getFileMetadata(),
+            replacementMetadata
+        );
+
+        ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
+        Asserts.assertEquals(replaceMediaModel.getMediaId(), 789L);
+        Asserts.assertEquals(
+            replaceMediaModel.getOriginalFileName(),
+            "replacement.png"
+        );
+        Asserts.assertEquals(replaceMediaModel.getMediaType(), "IMAGE");
+        Asserts.assertEquals(replaceMediaModel.getMimeType(), "image/png");
+        Asserts.assertEquals(replaceMediaModel.getFileSize(), 19L);
+
+        MediaFileSizeReductionEvent reductionEvent =
+            (MediaFileSizeReductionEvent) events.get(1);
+        Asserts.assertEquals(reductionEvent.getMediaType(), MediaType.IMAGE);
+        Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
+
+        MediaReplacedEvent replacedEvent = (MediaReplacedEvent) events.get(2);
+        Asserts.assertEquals(replacedEvent.getMedia(), replacedMedia);
+        Asserts.assertEquals(replacedEvent.getMediaFilePath(), mediaFilePath);
+        Asserts.assertEquals(outputStream.asString(), json);
+
+        verifyNoMoreInteractions(
+            request,
+            response,
+            asyncContext,
+            filePart,
+            fileUploader,
+            validMediaCondition,
+            singletonFactory
+        );
+    }
+
+    @Test
+    public void reduceMediaFileSizeWhenNotAllowTest() throws Exception {
+        // given
+        File mediaFilePath = File.createTempFile(
+            "reduce-media-disabled-",
+            ".png"
+        );
+        mediaFilePath.deleteOnExit();
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(false);
+
+        // when
+        MediaFileSizeReductionResult actual = instance.reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath
+        );
+
+        // then
+        Asserts.assertTrue(!actual.isReduced());
+        Asserts.assertEquals(actual.getOriginalSizeFileName(), null);
+        Asserts.assertEquals(actual.getNewFileMimeType(), null);
+        Asserts.assertEquals(actual.getNewFileSize(), 0L);
+        verify(settingService).isAllowReduceMediaFileSize();
+    }
+
+    @Test
+    public void reduceMediaFileSizeUseMediaUpDownloaderWhenSupportedTest()
+        throws Exception {
+        // given
+        File mediaFilePath = File.createTempFile(
+            "reduce-media-cloud-",
+            ".png"
+        );
+        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        MediaFileSizeReductionResult reductionResult =
+            MediaFileSizeReductionResult.builder()
+                .reduced(true)
+                .originalSizeFileName("original_logo.png")
+                .newFileName("logo-reduced.png")
+                .newFileMimeType("image/jpeg")
+                .newFileSize(123L)
+                .build();
+        mediaFilePath.deleteOnExit();
+
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(mediaUpDownloader);
+        when(mediaUpDownloader.isReduceMediaSupported()).thenReturn(true);
+        when(
+            mediaUpDownloader.reduceMediaFileSize(
+                any(MediaFileSizeReductionArguments.class)
+            )
+        )
+            .thenReturn(reductionResult);
+
+        // when
+        MediaFileSizeReductionResult actual = instance.reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath
+        );
+
+        // then
+        ArgumentCaptor<MediaFileSizeReductionArguments> argumentsCaptor =
+            ArgumentCaptor.forClass(MediaFileSizeReductionArguments.class);
+
+        Asserts.assertEquals(actual, reductionResult);
+        verify(settingService).isAllowReduceMediaFileSize();
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        verify(mediaUpDownloader).isUploadFromUrlSupported();
-        verify(mediaUpDownloader).uploadFromUrl(argumentsCaptor.capture());
-
-        MediaUploadFromUrlArguments arguments = argumentsCaptor.getValue();
-        Asserts.assertEquals(arguments.getUploadFrom(), "ADMIN");
-        Asserts.assertEquals(arguments.getAction(), UploadAction.ADD);
-        Asserts.assertEquals(arguments.getMediaType(), "IMAGE");
-        Asserts.assertEquals(
-            arguments.getMediaUrl(),
-            "https://cdn.example.com/banner.png"
+        verify(mediaUpDownloader).isReduceMediaSupported();
+        verify(mediaUpDownloader).reduceMediaFileSize(
+            argumentsCaptor.capture()
         );
-        Asserts.assertEquals(arguments.getOwnerAdminId(), 77L);
-        Asserts.assertEquals(arguments.getOwnerUserId(), 88L);
-        Asserts.assertTrue(!arguments.isNotPublic());
-        Asserts.assertEquals(arguments.getHttpClient(), httpClient);
-        Asserts.assertTrue(arguments.getTika() != null);
+
+        MediaFileSizeReductionArguments arguments =
+            argumentsCaptor.getValue();
+        Asserts.assertEquals(arguments.getMediaType(), MediaType.IMAGE);
+        Asserts.assertEquals(arguments.getMediaFilePath(), mediaFilePath);
 
         verifyNoMoreInteractions(mediaUpDownloader);
     }
 
     @Test
-    public void saveMediaFileTest() throws Exception {
+    public void reduceMediaFileSizeByIdTest() throws Exception {
         // given
-        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
-        File outFolder = Files.createTempDirectory("save-media-file-test")
-            .toFile();
-        String mediaUrl = "https://cdn.example.com/banner.png";
-        DownloadFileResult downloadResult = new DownloadFileResult(
-            "banner-original.png",
-            "banner-saved.png"
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        File mediaFilePath = File.createTempFile(
+            "reduce-media-by-id-",
+            ".png"
         );
-        File downloadedFile = outFolder.toPath()
-            .resolve("banner-saved.png")
-            .toFile();
         MediaModel media = MediaModel.builder()
-            .id(12345L)
-            .name("banner-saved.png")
+            .id(123L)
+            .name("avatar.png")
+            .originalName("avatar-source.png")
+            .type(MediaType.IMAGE)
+            .mimeType("image/png")
             .build();
+        MediaModel replacedMedia = MediaModel.builder()
+            .id(123L)
+            .name("avatar-reduced.png")
+            .build();
+        MediaFileSizeReductionResult reductionResult =
+            MediaFileSizeReductionResult.builder()
+                .reduced(true)
+                .originalSizeFileName("avatar-original.png")
+                .newFileName("avatar-reduced.png")
+                .newFileMimeType("image/jpeg")
+                .newFileSize(456L)
+                .build();
+        mediaFilePath.deleteOnExit();
 
+        when(mediaService.getMediaById(123L)).thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(true);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "avatar.png"
+            )
+        ).thenReturn(mediaFilePath);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
-            .thenReturn(mediaUpDownloader);
-        when(mediaUpDownloader.isUploadFromUrlSupported()).thenReturn(false);
-        when(fileSystemManager.getMediaFolderPath(MediaType.IMAGE))
-            .thenReturn(outFolder);
-        when(mediaService.generateMediaFileName(mediaUrl, "png"))
-            .thenReturn("banner-saved.png");
-        when(httpClient.download(mediaUrl, outFolder, "banner-saved.png"))
-            .thenAnswer(answer -> {
-                byte[] pngBytes = new byte[] {
-                    (byte) 0x89, 0x50, 0x4E, 0x47,
-                    0x0D, 0x0A, 0x1A, 0x0A
-                };
-                Files.write(downloadedFile.toPath(), pngBytes);
-                return downloadResult;
-            });
-        when(mediaService.addMedia(eq("ADMIN"), any(AddMediaModel.class)))
-            .thenReturn(media);
+            .thenReturn(null);
+        when(
+            eventHandlerManager.handleEvent(
+                any(MediaFileSizeReductionEvent.class)
+            )
+        ).thenReturn(reductionResult);
+        when(mediaService.replaceMedia(any(ReplaceMediaModel.class)))
+            .thenReturn(replacedMedia);
+
+        // when
+        MediaFileSizeReductionResult actual = instance.reduceMediaFileSizeById(
+            123L,
+            789L,
+            validMediaCondition
+        );
+
+        // then
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<ReplaceMediaModel> replaceMediaCaptor =
+            ArgumentCaptor.forClass(ReplaceMediaModel.class);
+
+        Asserts.assertEquals(actual, reductionResult);
+        verify(mediaService).getMediaById(123L);
+        verify(validMediaCondition).test(media);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "avatar.png"
+        );
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
+        verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
+        verify(mediaService).saveMediaOriginalSizeFileNameIfNotExists(
+            123L,
+            "avatar-original.png"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(
+            123L,
+            "avatar-original.png"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(123L, "avatar.png");
+        List<Object> events = eventCaptor.getAllValues();
+        Asserts.assertEquals(events.size(), 2);
+        Asserts.assertTrue(events.get(0) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReducedEvent);
+
+        MediaFileSizeReductionEvent event =
+            (MediaFileSizeReductionEvent) events.get(0);
+        Asserts.assertEquals(event.getMediaType(), MediaType.IMAGE);
+        Asserts.assertEquals(event.getMediaFilePath(), mediaFilePath);
+        Asserts.assertEquals(event.getExpectedFileSize(), 789L);
+
+        ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
+        Asserts.assertEquals(replaceMediaModel.getMediaId(), 123L);
+        Asserts.assertEquals(replaceMediaModel.getFileName(), "avatar-reduced.png");
+        Asserts.assertEquals(
+            replaceMediaModel.getOriginalFileName(),
+            "avatar-source.png"
+        );
+        Asserts.assertEquals(replaceMediaModel.getMediaType(), media.getTypeText());
+        Asserts.assertEquals(replaceMediaModel.getMimeType(), "image/jpeg");
+        Asserts.assertEquals(replaceMediaModel.getFileSize(), 456L);
+
+        MediaFileSizeReducedEvent reducedEvent =
+            (MediaFileSizeReducedEvent) events.get(1);
+        Asserts.assertEquals(reducedEvent.getMedia(), replacedMedia);
+        Asserts.assertEquals(
+            reducedEvent.getMediaFilePath(),
+            new File(mediaFilePath.getParentFile(), "avatar-reduced.png")
+        );
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void reduceMediaFileSizeByIdMediaNotFoundTest() {
+        // given
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+
+        when(mediaService.getMediaById(123L)).thenReturn(null);
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.reduceMediaFileSizeById(
+                123L,
+                789L,
+                validMediaCondition
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, MediaNotFoundException.class);
+        verify(mediaService).getMediaById(123L);
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void reduceMediaFileSizeByNameTest() throws Exception {
+        // given
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        File mediaFilePath = File.createTempFile(
+            "reduce-media-by-name-",
+            ".mp4"
+        );
+        MediaModel media = MediaModel.builder()
+            .id(456L)
+            .name("intro.mp4")
+            .originalName("intro-source.mp4")
+            .type(MediaType.VIDEO)
+            .mimeType("video/mp4")
+            .build();
+        MediaModel replacedMedia = MediaModel.builder()
+            .id(456L)
+            .name("intro-reduced.mp4")
+            .build();
+        MediaFileSizeReductionResult reductionResult =
+            MediaFileSizeReductionResult.builder()
+                .reduced(true)
+                .originalSizeFileName("intro-original.mp4")
+                .newFileName("intro-reduced.mp4")
+                .newFileMimeType("video/mp4")
+                .newFileSize(1024L)
+                .build();
+        mediaFilePath.deleteOnExit();
+
+        when(mediaService.getMediaByName("intro.mp4")).thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(true);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.VIDEO.getFolder(),
+                "intro.mp4"
+            )
+        ).thenReturn(mediaFilePath);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(null);
+        when(
+            eventHandlerManager.handleEvent(
+                any(MediaFileSizeReductionEvent.class)
+            )
+        ).thenReturn(reductionResult);
+        when(mediaService.replaceMedia(any(ReplaceMediaModel.class)))
+            .thenReturn(replacedMedia);
+
+        // when
+        MediaFileSizeReductionResult actual =
+            instance.reduceMediaFileSizeByName(
+                "intro.mp4",
+                2048L,
+                validMediaCondition
+            );
+
+        // then
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+        ArgumentCaptor<ReplaceMediaModel> replaceMediaCaptor =
+            ArgumentCaptor.forClass(ReplaceMediaModel.class);
+
+        Asserts.assertEquals(actual, reductionResult);
+        verify(mediaService).getMediaByName("intro.mp4");
+        verify(validMediaCondition).test(media);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.VIDEO.getFolder(),
+            "intro.mp4"
+        );
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
+        verify(mediaService).replaceMedia(replaceMediaCaptor.capture());
+        verify(mediaService).saveMediaOriginalSizeFileNameIfNotExists(
+            456L,
+            "intro-original.mp4"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(
+            456L,
+            "intro-original.mp4"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(456L, "intro.mp4");
+        List<Object> events = eventCaptor.getAllValues();
+        Asserts.assertEquals(events.size(), 2);
+        Asserts.assertTrue(events.get(0) instanceof MediaFileSizeReductionEvent);
+        Asserts.assertTrue(events.get(1) instanceof MediaFileSizeReducedEvent);
+
+        MediaFileSizeReductionEvent event =
+            (MediaFileSizeReductionEvent) events.get(0);
+        Asserts.assertEquals(event.getMediaType(), MediaType.VIDEO);
+        Asserts.assertEquals(event.getMediaFilePath(), mediaFilePath);
+        Asserts.assertEquals(event.getExpectedFileSize(), 2048L);
+
+        ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
+        Asserts.assertEquals(replaceMediaModel.getMediaId(), 456L);
+        Asserts.assertEquals(replaceMediaModel.getFileName(), "intro-reduced.mp4");
+        Asserts.assertEquals(
+            replaceMediaModel.getOriginalFileName(),
+            "intro-source.mp4"
+        );
+        Asserts.assertEquals(replaceMediaModel.getMediaType(), media.getTypeText());
+        Asserts.assertEquals(replaceMediaModel.getMimeType(), "video/mp4");
+        Asserts.assertEquals(replaceMediaModel.getFileSize(), 1024L);
+
+        MediaFileSizeReducedEvent reducedEvent =
+            (MediaFileSizeReducedEvent) events.get(1);
+        Asserts.assertEquals(reducedEvent.getMedia(), replacedMedia);
+        Asserts.assertEquals(
+            reducedEvent.getMediaFilePath(),
+            new File(mediaFilePath.getParentFile(), "intro-reduced.mp4")
+        );
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void reduceMediaFileSizeByNameMediaInvalidTest() {
+        // given
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(456L)
+            .name("intro.mp4")
+            .type(MediaType.VIDEO)
+            .build();
+
+        when(mediaService.getMediaByName("intro.mp4")).thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(false);
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.reduceMediaFileSizeByName(
+                "intro.mp4",
+                2048L,
+                validMediaCondition
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, MediaNotFoundException.class);
+        verify(mediaService).getMediaByName("intro.mp4");
+        verify(validMediaCondition).test(media);
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void saveMediaFileSizeReductionResultWhenReducedTest() {
+        // given
+        MediaFileSizeReductionResult reductionResult =
+            MediaFileSizeReductionResult.builder()
+                .reduced(true)
+                .originalSizeFileName("original_logo.png")
+                .newFileName("logo-reduced.png")
+                .newFileMimeType("image/jpeg")
+                .newFileSize(123L)
+                .build();
+
+        // when
+        instance.saveMediaFileSizeReductionResult(
+            678L,
+            reductionResult,
+            "logo.png"
+        );
+
+        // then
+        verify(mediaService).saveMediaOriginalSizeFileNameIfNotExists(
+            678L,
+            "original_logo.png"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(
+            678L,
+            "original_logo.png"
+        );
+        verify(mediaService).saveMediaSlugIfNotExists(678L, "logo.png");
+    }
+
+    @Test
+    public void saveMediaFileWhenUrlInvalidTest() throws Exception {
+        // given
+        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        String mediaUrl = "http://not-found.invalid/images/logo.png";
 
         // when
         long actual = instance.saveMediaFile(
@@ -764,49 +1691,214 @@ public class MediaControllerServiceTest {
         );
 
         // then
-        ArgumentCaptor<AddMediaModel> addMediaCaptor =
-            ArgumentCaptor.forClass(AddMediaModel.class);
-        ArgumentCaptor<MediaUploadedEvent> eventCaptor =
-            ArgumentCaptor.forClass(MediaUploadedEvent.class);
-
-        Asserts.assertEquals(actual, 12345L);
-        verify(settingService).getMediaUpDownloaderName();
-        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        verify(mediaUpDownloader).isUploadFromUrlSupported();
-        verify(fileSystemManager).getMediaFolderPath(MediaType.IMAGE);
-        verify(mediaService).generateMediaFileName(mediaUrl, "png");
-        verify(httpClient).download(mediaUrl, outFolder, "banner-saved.png");
-        verify(mediaService).addMedia(eq("ADMIN"), addMediaCaptor.capture());
-        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
-
-        AddMediaModel addMediaModel = addMediaCaptor.getValue();
-        Asserts.assertEquals(addMediaModel.getFileName(), "banner-saved.png");
-        Asserts.assertEquals(
-            addMediaModel.getOriginalFileName(),
-            "banner-original.png"
-        );
-        Asserts.assertEquals(addMediaModel.getMediaType(), "IMAGE");
-        Asserts.assertTrue(addMediaModel.getMimeType() != null);
-        Asserts.assertEquals(addMediaModel.getFileSize(), downloadedFile.length());
-        Asserts.assertEquals(addMediaModel.getOwnerAdminId(), 101L);
-        Asserts.assertEquals(addMediaModel.getOwnerUserId(), 202L);
-        Asserts.assertTrue(!addMediaModel.isNotPublic());
-
-        MediaUploadedEvent uploadedEvent = eventCaptor.getValue();
-        Asserts.assertEquals(uploadedEvent.getMedia(), media);
-        Asserts.assertEquals(uploadedEvent.getMediaFilePath(), downloadedFile);
-
-        InOrder inOrder = inOrder(
+        Asserts.assertEquals(actual, 0L);
+        verifyNoMoreInteractions(
+            settingService,
+            mediaUpDownloaderManager,
+            mediaUpDownloader,
             fileSystemManager,
             mediaService,
             httpClient,
+            mediaFileService,
             eventHandlerManager
         );
-        inOrder.verify(fileSystemManager).getMediaFolderPath(MediaType.IMAGE);
-        inOrder.verify(mediaService).generateMediaFileName(mediaUrl, "png");
-        inOrder.verify(httpClient).download(mediaUrl, outFolder, "banner-saved.png");
-        inOrder.verify(mediaService).addMedia(eq("ADMIN"), any(AddMediaModel.class));
-        inOrder.verify(eventHandlerManager).handleEvent(any(MediaUploadedEvent.class));
+    }
+
+    @Test
+    public void saveMediaFileFromInternalUrlTest() {
+        // given
+        String mediaUrl = "https://127.0.0.1/banner.png";
+
+        // when
+        long actual = instance.saveMediaFile(
+            MediaType.IMAGE,
+            mediaUrl,
+            UploadFrom.ADMIN,
+            101L,
+            202L
+        );
+
+        // then
+        Asserts.assertEquals(actual, 0L);
+        verifyNoMoreInteractions(
+            settingService,
+            mediaUpDownloaderManager,
+            fileSystemManager,
+            mediaService,
+            httpClient
+        );
+    }
+
+    @Test
+    public void saveMediaFileFromInternalUrlOrThrowTest() {
+        // given
+        String mediaUrl = "https://127.0.0.1/banner.png";
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.saveMediaFileFromUrlOrThrow(
+                "ADMIN",
+                101L,
+                202L,
+                SaveMediaFileFromUrlModel.builder()
+                    .mediaType(MediaType.IMAGE.toString())
+                    .mediaUrl(mediaUrl)
+                    .build()
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, HttpBadRequestException.class);
+        verifyNoMoreInteractions(
+            settingService,
+            mediaUpDownloaderManager,
+            fileSystemManager,
+            mediaService,
+            httpClient
+        );
+    }
+
+    @Test
+    public void saveMediaFileFromUrlOrThrowWithValidUrlTest()
+        throws Exception {
+        // given
+        String mediaUrl = "https://ezyplatform.com/images/logo.png";
+        cachePublicAddressForHost("ezyplatform.com");
+        File mediaFolder = Files.createTempDirectory(
+            "save-media-from-url-"
+        ).toFile();
+        mediaFolder.deleteOnExit();
+        File mediaFile = new File(mediaFolder, "stored-logo.png");
+        mediaFile.deleteOnExit();
+        Files.write(mediaFile.toPath(), pngFileBytes());
+        MediaModel media = MediaModel.builder()
+            .id(345L)
+            .name("stored-logo.png")
+            .build();
+
+        when(settingService.getMediaUpDownloaderName()).thenReturn("local");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("local"))
+            .thenReturn(null);
+        when(fileSystemManager.getMediaFolderPath(MediaType.IMAGE))
+            .thenReturn(mediaFolder);
+        when(mediaService.generateMediaFileName(mediaUrl, "png"))
+            .thenReturn("stored-logo.png");
+        when(
+            httpClient.download(
+                mediaUrl,
+                mediaFolder,
+                "stored-logo.png"
+            )
+        )
+            .thenReturn(
+                new DownloadFileResult("logo.png", "stored-logo.png")
+            );
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(false);
+        when(mediaService.addMedia(eq("ADMIN"), any(AddMediaModel.class)))
+            .thenReturn(media);
+
+        // when
+        long actual = instance.saveMediaFileFromUrlOrThrow(
+            "ADMIN",
+            101L,
+            202L,
+            SaveMediaFileFromUrlModel.builder()
+                .mediaType(MediaType.IMAGE.toString())
+                .mediaUrl(mediaUrl)
+                .build()
+        );
+
+        // then
+        ArgumentCaptor<AddMediaModel> addMediaCaptor =
+            ArgumentCaptor.forClass(AddMediaModel.class);
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+
+        Asserts.assertEquals(actual, 345L);
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("local");
+        verify(fileSystemManager).getMediaFolderPath(MediaType.IMAGE);
+        verify(mediaService).generateMediaFileName(mediaUrl, "png");
+        verify(httpClient).download(
+            mediaUrl,
+            mediaFolder,
+            "stored-logo.png"
+        );
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaService).addMedia(
+            eq("ADMIN"),
+            addMediaCaptor.capture()
+        );
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+
+        AddMediaModel addMediaModel = addMediaCaptor.getValue();
+        Asserts.assertEquals(addMediaModel.getFileName(), "stored-logo.png");
+        Asserts.assertEquals(addMediaModel.getOriginalFileName(), "logo.png");
+        Asserts.assertEquals(addMediaModel.getMediaType(), "IMAGE");
+        Asserts.assertEquals(addMediaModel.getMimeType(), "image/png");
+        Asserts.assertEquals(addMediaModel.getFileSize(), mediaFile.length());
+        Asserts.assertEquals(addMediaModel.getOwnerAdminId(), 101L);
+        Asserts.assertEquals(addMediaModel.getOwnerUserId(), 202L);
+        Asserts.assertFalse(addMediaModel.isNotPublic());
+
+        Asserts.assertTrue(
+            eventCaptor.getValue() instanceof MediaUploadedEvent
+        );
+        MediaUploadedEvent event = (MediaUploadedEvent) eventCaptor.getValue();
+        Asserts.assertEquals(event.getMedia(), media);
+        Asserts.assertEquals(event.getMediaFilePath(), mediaFile);
+    }
+
+    @Test
+    public void saveMediaFileFromUrlOrThrowUseMediaUpDownloaderWhenSupportedTest()
+        throws Exception {
+        // given
+        String mediaUrl = "https://ezyplatform.com/images/logo.png";
+        cachePublicAddressForHost("ezyplatform.com");
+        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(mediaUpDownloader);
+        when(mediaUpDownloader.isUploadFromUrlSupported()).thenReturn(true);
+        when(
+            mediaUpDownloader.uploadFromUrl(
+                any(MediaUploadFromUrlArguments.class)
+            )
+        )
+            .thenReturn(456L);
+
+        // when
+        long actual = instance.saveMediaFileFromUrlOrThrow(
+            "ADMIN",
+            101L,
+            202L,
+            SaveMediaFileFromUrlModel.builder()
+                .mediaType(MediaType.IMAGE.toString())
+                .mediaUrl(mediaUrl)
+                .notPublic(true)
+                .build()
+        );
+
+        // then
+        ArgumentCaptor<MediaUploadFromUrlArguments> argumentsCaptor =
+            ArgumentCaptor.forClass(MediaUploadFromUrlArguments.class);
+
+        Asserts.assertEquals(actual, 456L);
+        verify(settingService).getMediaUpDownloaderName();
+        verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
+        verify(mediaUpDownloader).isUploadFromUrlSupported();
+        verify(mediaUpDownloader).uploadFromUrl(argumentsCaptor.capture());
+
+        MediaUploadFromUrlArguments arguments = argumentsCaptor.getValue();
+        Asserts.assertTrue(arguments.getTika() != null);
+        Asserts.assertEquals(arguments.getHttpClient(), httpClient);
+        Asserts.assertEquals(arguments.getUploadFrom(), "ADMIN");
+        Asserts.assertEquals(arguments.getAction(), UploadAction.ADD);
+        Asserts.assertEquals(arguments.getMediaType(), "IMAGE");
+        Asserts.assertEquals(arguments.getMediaUrl(), mediaUrl);
+        Asserts.assertEquals(arguments.getOwnerAdminId(), 101L);
+        Asserts.assertEquals(arguments.getOwnerUserId(), 202L);
+        Asserts.assertTrue(arguments.isNotPublic());
 
         verifyNoMoreInteractions(mediaUpDownloader);
     }
@@ -1166,6 +2258,65 @@ public class MediaControllerServiceTest {
     }
 
     @Test
+    public void removeMediaByIdShouldDeleteFileWhenDeletedTest()
+        throws Exception {
+        // given
+        MediaModel removedMedia = MediaModel.builder()
+            .id(904L)
+            .name("deleted-media.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "remove-media-by-id-",
+            ".png"
+        );
+        Files.write(
+            mediaFilePath.toPath(),
+            "deleted-media".getBytes(StandardCharsets.UTF_8)
+        );
+        Asserts.assertTrue(mediaFilePath.exists());
+
+        when(mediaService.removeMedia(904L)).thenReturn(removedMedia);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "deleted-media.png"
+            )
+        ).thenReturn(mediaFilePath);
+
+        // when
+        instance.removeMediaById(904L, true);
+
+        // then
+        ArgumentCaptor<MediaRemovedEvent> eventCaptor =
+            ArgumentCaptor.forClass(MediaRemovedEvent.class);
+
+        verify(mediaService).removeMedia(904L);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "deleted-media.png"
+        );
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        Asserts.assertFalse(mediaFilePath.exists());
+        Asserts.assertEquals(eventCaptor.getValue().getMedia(), removedMedia);
+
+        InOrder inOrder = inOrder(
+            mediaService,
+            fileSystemManager,
+            eventHandlerManager
+        );
+        inOrder.verify(mediaService).removeMedia(904L);
+        inOrder.verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "deleted-media.png"
+        );
+        inOrder.verify(eventHandlerManager).handleEvent(
+            any(MediaRemovedEvent.class)
+        );
+    }
+
+    @Test
     public void removeMediaByNameTest() {
         // given
         MediaModel removedMedia = MediaModel.builder()
@@ -1191,6 +2342,66 @@ public class MediaControllerServiceTest {
         InOrder inOrder = inOrder(mediaService, eventHandlerManager);
         inOrder.verify(mediaService).removeMedia("removed-by-name.png");
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
+    }
+
+    @Test
+    public void removeMediaByNameShouldDeleteFileWhenDeletedTest()
+        throws Exception {
+        // given
+        MediaModel removedMedia = MediaModel.builder()
+            .id(905L)
+            .name("deleted-by-name.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "remove-media-by-name-",
+            ".png"
+        );
+        Files.write(
+            mediaFilePath.toPath(),
+            "deleted-media".getBytes(StandardCharsets.UTF_8)
+        );
+        Asserts.assertTrue(mediaFilePath.exists());
+
+        when(mediaService.removeMedia("deleted-by-name.png"))
+            .thenReturn(removedMedia);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "deleted-by-name.png"
+            )
+        ).thenReturn(mediaFilePath);
+
+        // when
+        instance.removeMediaByName("deleted-by-name.png", true);
+
+        // then
+        ArgumentCaptor<MediaRemovedEvent> eventCaptor =
+            ArgumentCaptor.forClass(MediaRemovedEvent.class);
+
+        verify(mediaService).removeMedia("deleted-by-name.png");
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "deleted-by-name.png"
+        );
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        Asserts.assertFalse(mediaFilePath.exists());
+        Asserts.assertEquals(eventCaptor.getValue().getMedia(), removedMedia);
+
+        InOrder inOrder = inOrder(
+            mediaService,
+            fileSystemManager,
+            eventHandlerManager
+        );
+        inOrder.verify(mediaService).removeMedia("deleted-by-name.png");
+        inOrder.verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "deleted-by-name.png"
+        );
+        inOrder.verify(eventHandlerManager).handleEvent(
+            any(MediaRemovedEvent.class)
+        );
     }
 
     @Test
@@ -1478,6 +2689,7 @@ public class MediaControllerServiceTest {
             MediaType.VIDEO,
             "video-detail.mp4"
         );
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
 
         verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
@@ -1578,6 +2790,7 @@ public class MediaControllerServiceTest {
             MediaType.AUDIO,
             "audio-detail.mp3"
         );
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
 
         verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
@@ -1631,6 +2844,7 @@ public class MediaControllerServiceTest {
         );
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
         verify(mediaService).getMediaImageSizeOrDefault(mediaFilePath);
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
 
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), media);
         Asserts.assertEquals(actual.getId(), 907L);
@@ -1689,6 +2903,7 @@ public class MediaControllerServiceTest {
             resourceDownloadManager,
             singletonFactory,
             mediaService,
+            mediaFileService,
             realPaginationMediaService,
             settingService,
             commonValidator,
@@ -1888,5 +3103,40 @@ public class MediaControllerServiceTest {
                 StandardCharsets.UTF_8
             );
         }
+    }
+
+    private static byte[] pngFileBytes() {
+        return new byte[] {
+            -119, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 13, 73, 72, 68,
+            82, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 0, 0, 0, -112, 119, 83,
+            -34, 0, 0, 0, 12, 73, 68, 65, 84, 8, -41, 99, -8, -49, -64,
+            0, 0, 3, 1, 1, 0, -55, -2, -110, -17, 0, 0, 0, 0, 73, 69,
+            78, 68, -82, 66, 96, -126
+        };
+    }
+
+    private static void cachePublicAddressForHost(String host)
+        throws Exception {
+        Field addressCacheField = InetAddress.class.getDeclaredField(
+            "addressCache"
+        );
+        addressCacheField.setAccessible(true);
+        Object addressCache = addressCacheField.get(null);
+        Method putMethod = addressCache.getClass().getDeclaredMethod(
+            "put",
+            String.class,
+            InetAddress[].class
+        );
+        putMethod.setAccessible(true);
+        putMethod.invoke(
+            addressCache,
+            host,
+            new InetAddress[] {
+                InetAddress.getByAddress(
+                    host,
+                    new byte[] {93, (byte) 184, (byte) 216, 34}
+                )
+            }
+        );
     }
 }

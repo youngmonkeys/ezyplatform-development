@@ -16,7 +16,6 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import com.tvd12.ezyhttp.server.core.annotation.Service;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.Link;
 import org.youngmonkeys.ezyplatform.model.LinkModel;
@@ -26,7 +25,6 @@ import org.youngmonkeys.ezyplatform.pagination.LinkPaginationParameter;
 import org.youngmonkeys.ezyplatform.pagination.LinkPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.repo.PaginationLinkRepository;
 
-@Service
 public class PaginationLinkService extends DefaultPaginationService<
     LinkModel,
     LinkFilter,

@@ -28,11 +28,16 @@ import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.io.ImageProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
-import org.youngmonkeys.ezyplatform.model.*;
+import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
+import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
+import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
+import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
+import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -42,14 +47,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_SIZE_FILE_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
+import static org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult.updatedAtOrNull;
 
 @AllArgsConstructor
 @SuppressWarnings("MethodCount")
 public class DefaultMediaService implements MediaService {
 
     private final FileSystemManager fileSystemManager;
+    private final DataMetaService dataMetaService;
     private final UniqueDataService uniqueDataService;
     private final MediaRepository mediaRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
@@ -127,6 +139,34 @@ public class DefaultMediaService implements MediaService {
                     duration != null ? duration : BigDecimal.ZERO
                 )
                 .build()
+        );
+    }
+
+    @Override
+    public void saveMediaOriginalSizeFileNameIfNotExists(
+        long mediaId,
+        String originalSizeFileName
+    ) {
+        if (isNotBlank(originalSizeFileName)) {
+            dataMetaService.saveDataMetaUniqueKey(
+                TABLE_NAME_MEDIA,
+                mediaId,
+                META_KEY_ORIGINAL_SIZE_FILE_NAME,
+                originalSizeFileName
+            );
+        }
+    }
+
+    @Override
+    public void saveMediaSlugIfNotExists(
+        long mediaId,
+        String slug
+    ) {
+        dataMetaService.saveDataMetaIfAbsent(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_SLUG,
+            slug
         );
     }
 
@@ -222,9 +262,12 @@ public class DefaultMediaService implements MediaService {
 
     @Override
     public MediaModel getMediaByName(String mediaName) {
-        return entityToModelConverter.toModel(
-            mediaRepository.findByNameOrOriginalName(mediaName)
-        );
+        Media entity = mediaRepository
+            .findByNameOrOriginalName(mediaName);
+        if (entity == null) {
+            entity = mediaRepository.findBySlug(mediaName);
+        }
+        return entityToModelConverter.toModel(entity);
     }
 
     @Override
@@ -387,6 +430,40 @@ public class DefaultMediaService implements MediaService {
         IdResult result = mediaRepository
             .findOwnerUserIdByNameOrOriginalName(mediaName);
         return result != null ? result.getId() : ZERO_LONG;
+    }
+
+    @Override
+    public String getOriginalSizeFileNameByMediaId(
+        long mediaId
+    ) {
+        return dataMetaService.getLatestMetaValueByDataIdAndMetaKey(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_ORIGINAL_SIZE_FILE_NAME
+        );
+    }
+
+    @Override
+    public Map<Long, String> getOriginalSizeFileNameMapByMediaIds(
+        Collection<Long> mediaIds
+    ) {
+        if (mediaIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dataMetaService.getDataMetaValueMapByDataIds(
+            TABLE_NAME_MEDIA,
+            mediaIds,
+            META_KEY_ORIGINAL_SIZE_FILE_NAME
+        );
+    }
+
+    @Override
+    public long getUpdatedAtByMediaName(String mediaName) {
+        UpdatedAtValueResult result = mediaRepository
+            .findUpdatedAtByNameOrOriginalName(mediaName);
+        return entityToModelConverter.toTimestamp(
+            updatedAtOrNull(result)
+        );
     }
 
     protected Media getMediaEntityByIdOrThrow(
