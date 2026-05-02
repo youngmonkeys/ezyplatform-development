@@ -120,14 +120,14 @@ public class ImageFileService extends EzyLoggable {
             if (!isSupportedFormat(imageData.formatName)) {
                 return MediaFileSizeReductionResult.NO;
             }
-            File parentFile = imageFile.getAbsoluteFile().getParentFile();
+            File parentFolder = imageFile.getAbsoluteFile().getParentFile();
             bestFile = createTempImageFile(
                 TEMP_BEST_FILE_PREFIX,
-                parentFile
+                parentFolder
             );
             candidateFile = createTempImageFile(
                 TEMP_CANDIDATE_FILE_PREFIX,
-                parentFile
+                parentFolder
             );
             boolean keepOriginalSizeImageFile = settingService
                 .isKeepOriginalSizeImageFile();
@@ -344,11 +344,9 @@ public class ImageFileService extends EzyLoggable {
         String originalSizeFileName =
             ORIGINAL_SIZE_FILE_PREFIX + imageFile.getName();
         File originalSizeFile = new File(parentFile, originalSizeFileName);
-        Files.copy(
-            imageFile.toPath(),
-            originalSizeFile.toPath(),
-            StandardCopyOption.REPLACE_EXISTING
-        );
+        if (!originalSizeFile.exists()) {
+            Files.copy(imageFile.toPath(), originalSizeFile.toPath());
+        }
         return originalSizeFile;
     }
 
