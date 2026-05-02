@@ -84,11 +84,11 @@ public class ImageFileService extends EzyLoggable {
         }
         return (infoFlags
             & (
-            ImageObserver.ALLBITS
-                | ImageObserver.ERROR
-                | ImageObserver.ABORT
-        )
-        ) == ZERO;
+                ImageObserver.ALLBITS
+                    | ImageObserver.ERROR
+                    | ImageObserver.ABORT
+            )
+            ) == ZERO;
     };
 
     @SuppressWarnings("MethodLength")
