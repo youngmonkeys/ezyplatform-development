@@ -31,6 +31,7 @@ import java.util.*;
 import static org.mockito.Mockito.*;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES;
+import static org.youngmonkeys.ezyplatform.service.JavascriptService.ObjectResultJavascriptFunction;
 
 public class JavascriptServiceTest {
 
@@ -315,6 +316,291 @@ public class JavascriptServiceTest {
         Asserts.assertEquals(actual, NULL_STRING);
     }
 
+    @Test
+    public void executeWithObjectResultJavascriptFunctionTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        when(beanContext.getBean("characterBean", Object.class))
+            .thenReturn(new CharacterBean());
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            objectMapper,
+            settingService
+        );
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("name", "EzyPlatform");
+        parameters.put("enabled", true);
+        Map<String, String> jsBeanNameByJavaBeanName = new HashMap<>();
+        jsBeanNameByJavaBeanName.put("characterBean", "characters");
+
+        // when
+        Object actual = instance.execute(
+            parameters,
+            jsBeanNameByJavaBeanName,
+            new ObjectResultJavascriptFunction(
+                "({" +
+                    "mapValue: {id: 1, name: name}," +
+                    "listValue: ['admin', 'web']," +
+                    "stringValue: name," +
+                    "numberValue: 21 * 2," +
+                    "booleanValue: enabled," +
+                    "characterValue: characters.first(name)" +
+                "})"
+            )
+        );
+
+        // then
+        Asserts.assertTrue(actual instanceof Map);
+        Map<?, ?> map = (Map<?, ?>) actual;
+        Map<?, ?> mapValue = (Map<?, ?>) map.get("mapValue");
+        Asserts.assertEquals(
+            ((Number) mapValue.get("id")).intValue(),
+            1
+        );
+        Asserts.assertEquals(
+            mapValue.get("name"),
+            "EzyPlatform"
+        );
+        List<?> listValue = (List<?>) map.get("listValue");
+        Asserts.assertEquals(listValue.size(), 2);
+        Asserts.assertEquals(listValue.get(0), "admin");
+        Asserts.assertEquals(listValue.get(1), "web");
+        Asserts.assertEquals(
+            map.get("stringValue"),
+            "EzyPlatform"
+        );
+        Asserts.assertEquals(
+            ((Number) map.get("numberValue")).intValue(),
+            42
+        );
+        Asserts.assertEquals(
+            map.get("booleanValue"),
+            Boolean.TRUE
+        );
+        Asserts.assertEquals(
+            map.get("characterValue"),
+            Character.valueOf('E')
+        );
+        verify(beanContext, times(1)).getProperties();
+        verify(beanContext, times(1))
+            .getBean("characterBean", Object.class);
+        verify(settingService, times(1)).addValueConverter(
+            eq(SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES),
+            any()
+        );
+        verify(settingService, times(1)).watchLastUpdatedTimeAndCache(
+            SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES
+        );
+        verifyNoMoreInteractions(settingService);
+    }
+
+    @Test
+    public void executeObjectResultJavascriptFunctionWithMapTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        doReturn(Collections.emptyMap())
+            .when(settingService)
+            .getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyMap()
+            );
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            objectMapper,
+            settingService
+        );
+
+        // when
+        Object actual = instance.execute(
+            Collections.emptyMap(),
+            new ObjectResultJavascriptFunction(
+                "({" +
+                    "id: 1," +
+                    "name: 'EzyPlatform'," +
+                    "active: true," +
+                    "tags: ['admin', 'web']," +
+                    "owner: {name: 'youngmonkeys'}" +
+                "})"
+            )
+        );
+
+        // then
+        Asserts.assertTrue(actual instanceof Map);
+        Map<?, ?> map = (Map<?, ?>) actual;
+        Asserts.assertEquals(
+            ((Number) map.get("id")).intValue(),
+            1
+        );
+        Asserts.assertEquals(map.get("name"), "EzyPlatform");
+        Asserts.assertEquals(map.get("active"), Boolean.TRUE);
+        List<?> tags = (List<?>) map.get("tags");
+        Asserts.assertEquals(tags.size(), 2);
+        Asserts.assertEquals(tags.get(0), "admin");
+        Asserts.assertEquals(tags.get(1), "web");
+        Asserts.assertEquals(
+            ((Map<?, ?>) map.get("owner")).get("name"),
+            "youngmonkeys"
+        );
+    }
+
+    @Test
+    public void executeObjectResultJavascriptFunctionWithListTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        doReturn(Collections.emptyMap())
+            .when(settingService)
+            .getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyMap()
+            );
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            objectMapper,
+            settingService
+        );
+
+        // when
+        Object actual = instance.execute(
+            Collections.emptyMap(),
+            new ObjectResultJavascriptFunction(
+                "[" +
+                    "{code: 'media', enabled: true}," +
+                    "{code: 'delivery', values: [1, 2, 3]}" +
+                "]"
+            )
+        );
+
+        // then
+        Asserts.assertTrue(actual instanceof List);
+        List<?> list = (List<?>) actual;
+        Asserts.assertEquals(list.size(), 2);
+        Asserts.assertEquals(
+            ((Map<?, ?>) list.get(0)).get("code"),
+            "media"
+        );
+        Asserts.assertEquals(
+            ((Map<?, ?>) list.get(0)).get("enabled"),
+            Boolean.TRUE
+        );
+        List<?> values = (List<?>) ((Map<?, ?>) list.get(1))
+            .get("values");
+        Asserts.assertEquals(
+            ((Number) values.get(2)).intValue(),
+            3
+        );
+    }
+
+    @Test
+    public void executeObjectResultJavascriptFunctionWithStringTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        doReturn(Collections.emptyMap())
+            .when(settingService)
+            .getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyMap()
+            );
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            objectMapper,
+            settingService
+        );
+
+        // when
+        Object actual = instance.execute(
+            Collections.emptyMap(),
+            new ObjectResultJavascriptFunction("'EzyPlatform'")
+        );
+
+        // then
+        Asserts.assertEquals(actual, "EzyPlatform");
+    }
+
+    @Test
+    public void executeObjectResultJavascriptFunctionWithNumberTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        doReturn(Collections.emptyMap())
+            .when(settingService)
+            .getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyMap()
+            );
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            objectMapper,
+            settingService
+        );
+
+        // when
+        Object actual = instance.execute(
+            Collections.emptyMap(),
+            new ObjectResultJavascriptFunction("21 * 2")
+        );
+
+        // then
+        Asserts.assertTrue(actual instanceof Number);
+        Asserts.assertEquals(((Number) actual).intValue(), 42);
+    }
+
+    @Test
+    public void executeObjectResultJavascriptFunctionWithBooleanTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        doReturn(Collections.emptyMap())
+            .when(settingService)
+            .getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyMap()
+            );
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            objectMapper,
+            settingService
+        );
+
+        // when
+        Object actual = instance.execute(
+            Collections.emptyMap(),
+            new ObjectResultJavascriptFunction("1 < 2")
+        );
+
+        // then
+        Asserts.assertEquals(actual, Boolean.TRUE);
+    }
+
+    @Test
+    public void executeObjectResultJavascriptFunctionWithCharacterTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        when(beanContext.getBean("characterBean", Object.class))
+            .thenReturn(new CharacterBean());
+        doReturn(Collections.singletonMap("characterBean", "characters"))
+            .when(settingService)
+            .getCachedValue(
+                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
+                Collections.emptyMap()
+            );
+        JavascriptService instance = new JavascriptService(
+            beanContext,
+            objectMapper,
+            settingService
+        );
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("value", "Codex");
+
+        // when
+        Object actual = instance.execute(
+            parameters,
+            new ObjectResultJavascriptFunction(
+                "characters.first(value)"
+            )
+        );
+
+        // then
+        Asserts.assertEquals(actual, Character.valueOf('C'));
+    }
+
     public static class GreetingBean {
 
         public String greet(String name) {
@@ -326,6 +612,13 @@ public class JavascriptServiceTest {
 
         public int sum(int a, int b) {
             return a + b;
+        }
+    }
+
+    public static class CharacterBean {
+
+        public Character first(String value) {
+            return value.charAt(0);
         }
     }
 }
