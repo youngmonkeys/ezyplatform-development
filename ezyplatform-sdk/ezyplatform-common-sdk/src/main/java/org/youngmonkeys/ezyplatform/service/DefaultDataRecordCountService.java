@@ -122,7 +122,7 @@ public class DefaultDataRecordCountService
         String dataName,
         Collection<String> recordTypes
     ) {
-        if (recordTypes == null || recordTypes.isEmpty()) {
+        if (recordTypes.isEmpty()) {
             return Collections.emptyMap();
         }
         return dataRecordCountRepository
