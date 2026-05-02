@@ -22,6 +22,12 @@ import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
 import org.youngmonkeys.ezyplatform.repo.DataRecordCountRepository;
 import org.youngmonkeys.ezyplatform.result.CountResult;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
@@ -36,11 +42,28 @@ public class DefaultDataRecordCountService
         String dataType
     ) {
         DataRecordCount entity = dataRecordCountRepository
-            .findById(dataType);
+            .findByDataType(dataType);
         if (entity == null) {
             entity = modelToEntityConverter.toNewDataRecordCount(
                 dataType
             );
+            dataRecordCountRepository.save(entity);
+        }
+    }
+
+    @Override
+    public void createDataRecordCountByDataNameAndRecordTypeIfNotExists(
+        String dataName,
+        String recordType
+    ) {
+        DataRecordCount entity = dataRecordCountRepository
+            .findByDataNameAndRecordType(dataName, recordType);
+        if (entity == null) {
+            entity = modelToEntityConverter.toNewDataRecordCount(
+                toDataType(dataName, recordType)
+            );
+            entity.setDataName(dataName);
+            entity.setRecordType(recordType);
             dataRecordCountRepository.save(entity);
         }
     }
@@ -58,9 +81,61 @@ public class DefaultDataRecordCountService
     }
 
     @Override
+    public void incrementRecordCountByDataNameAndRecordType(
+        String dataName,
+        String recordType,
+        long value
+    ) {
+        createDataRecordCountByDataNameAndRecordTypeIfNotExists(
+            dataName,
+            recordType
+        );
+        dataRecordCountRepository.updateRecordCountByDataNameAndRecordType(
+            dataName,
+            recordType,
+            value
+        );
+    }
+
+    @Override
     public long getRecordCount(String dataType) {
         CountResult result = dataRecordCountRepository
             .findRecordCountByDataType(dataType);
         return result != null ? result.getCount() : ZERO_LONG;
+    }
+
+    @Override
+    public long getRecordCountByDataNameAndRecordType(
+        String dataName,
+        String recordType
+    ) {
+        CountResult result = dataRecordCountRepository
+            .findRecordCountByDataNameAndRecordType(
+                dataName,
+                recordType
+            );
+        return result != null ? result.getCount() : ZERO_LONG;
+    }
+
+    @Override
+    public Map<String, Long> getRecordCountMapByDataNameAndRecordTypes(
+        String dataName,
+        Collection<String> recordTypes
+    ) {
+        if (recordTypes == null || recordTypes.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return dataRecordCountRepository
+            .findByDataNameAndRecordTypeIn(
+                dataName,
+                new HashSet<>(recordTypes)
+            )
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    DataRecordCount::getRecordType,
+                    DataRecordCount::getRecordCount
+                )
+            );
     }
 }

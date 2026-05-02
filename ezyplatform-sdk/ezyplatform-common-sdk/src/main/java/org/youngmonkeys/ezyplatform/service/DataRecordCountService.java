@@ -16,15 +16,68 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import java.util.Collection;
+import java.util.Map;
+
 public interface DataRecordCountService {
 
-    void createDataRecordCountIfNotExists(String dataType);
+    void createDataRecordCountIfNotExists(
+        String dataType
+    );
 
-    void incrementRecordCount(String dataType, long value);
+    void createDataRecordCountByDataNameAndRecordTypeIfNotExists(
+        String dataName,
+        String recordType
+    );
 
-    default void decrementRecordCount(String dataType, long value) {
+    void incrementRecordCount(
+        String dataType,
+        long value
+    );
+
+    default void decrementRecordCount(
+        String dataType,
+        long value
+    ) {
         incrementRecordCount(dataType,  -value);
     }
 
-    long getRecordCount(String dataType);
+    void incrementRecordCountByDataNameAndRecordType(
+        String dataName,
+        String recordType,
+        long value
+    );
+
+    default void decrementRecordCountByDataNameAndRecordType(
+        String dataName,
+        String recordType,
+        long value
+    ) {
+        incrementRecordCountByDataNameAndRecordType(
+            dataName,
+            recordType,
+            -value
+        );
+    }
+
+    long getRecordCount(
+        String dataType
+    );
+
+    long getRecordCountByDataNameAndRecordType(
+        String dataName,
+        String recordType
+    );
+
+    Map<String, Long> getRecordCountMapByDataNameAndRecordTypes(
+        String dataName,
+        Collection<String> recordTypes
+    );
+
+    default String toDataType(
+        String dataName,
+        String recordType
+    ) {
+        return dataName + ":" + recordType;
+    }
 }

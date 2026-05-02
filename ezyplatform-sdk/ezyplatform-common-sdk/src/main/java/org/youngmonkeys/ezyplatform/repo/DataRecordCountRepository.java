@@ -22,8 +22,23 @@ import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
 import org.youngmonkeys.ezyplatform.result.CountResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 
+import java.util.Collection;
+import java.util.List;
+
 public interface DataRecordCountRepository
-    extends EzyDatabaseRepository<String, DataRecordCount> {
+    extends EzyDatabaseRepository<Long, DataRecordCount> {
+
+    DataRecordCount findByDataType(String dataType);
+
+    DataRecordCount findByDataNameAndRecordType(
+        String dataName,
+        String recordType
+    );
+
+    List<DataRecordCount> findByDataNameAndRecordTypeIn(
+        String dataName,
+        Collection<String> recordTypes
+    );
 
     @EzyQuery(
         "UPDATE DataRecordCount e " +
@@ -46,4 +61,24 @@ public interface DataRecordCountRepository
             "WHERE e.dataType = ?0"
     )
     CountResult findRecordCountByDataType(String dataType);
+
+    @EzyQuery(
+        "UPDATE DataRecordCount e " +
+            "SET e.recordCount = e.recordCount + ?2 " +
+            "WHERE e.dataName = ?0 AND e.recordType = ?1"
+    )
+    void updateRecordCountByDataNameAndRecordType(
+        String dataName,
+        String recordType,
+        long value
+    );
+
+    @EzyQuery(
+        "SELECT e.recordCount FROM DataRecordCount e " +
+            "WHERE e.dataName = ?0 AND e.recordType = ?1"
+    )
+    CountResult findRecordCountByDataNameAndRecordType(
+        String dataName,
+        String recordType
+    );
 }
