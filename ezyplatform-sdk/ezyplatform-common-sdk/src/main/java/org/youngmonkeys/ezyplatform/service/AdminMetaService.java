@@ -364,6 +364,30 @@ public interface AdminMetaService {
 
     Map<String, String> getAdminMetaTextValues(long adminId);
 
+    Map<Long, List<AdminMetaModel>> getAdminMetasByAdminIds(
+        Collection<Long> adminIds
+    );
+
+    default <T> Map<Long, List<T>> getAdminMetaValuesByAdminIds(
+        Collection<Long> adminIds,
+        Function<AdminMetaModel, T> converter
+    ) {
+        return getAdminMetasByAdminIds(adminIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e
+                        .getValue()
+                        .stream()
+                        .map(converter)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
+                )
+            );
+    }
+
     Map<Long, Map<String, AdminMetaModel>> getAdminMetaValueMapsByAdminIds(
         Collection<Long> adminIds
     );

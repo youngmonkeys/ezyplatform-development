@@ -373,7 +373,31 @@ public interface UserMetaService {
     Map<String, String> getUserMetaValues(long userId);
 
     Map<String, String> getUserMetaTextValues(long userId);
-    
+
+    Map<Long, List<UserMetaModel>> getUserMetasByUserIds(
+        Collection<Long> userIds
+    );
+
+    default <T> Map<Long, List<T>> getUserMetaValuesByUserIds(
+        Collection<Long> userIds,
+        Function<UserMetaModel, T> converter
+    ) {
+        return getUserMetasByUserIds(userIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e
+                        .getValue()
+                        .stream()
+                        .map(converter)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList())
+                )
+            );
+    }
+
     Map<Long, Map<String, UserMetaModel>> getUserMetaValueMapsByUserIds(
         Collection<Long> userIds
     );
