@@ -28,6 +28,7 @@ import org.thymeleaf.templatemode.TemplateMode;
 import org.youngmonkeys.ezyplatform.manager.EnvironmentManager;
 
 import static org.thymeleaf.standard.expression.StandardExpressions.getExpressionParser;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.VIEW_VARIABLE_EZY_RESOURCE_VERSION;
 
 public class VersionalLinkAttributeTagProcessor
@@ -44,12 +45,12 @@ public class VersionalLinkAttributeTagProcessor
         super(
             TemplateMode.HTML,
             prefix,
-            null,
-            false,
+            NULL_STRING,
+            Boolean.FALSE,
             "v" + originalAttributeName,
-            true,
+            Boolean.TRUE,
             Integer.MIN_VALUE,
-            true
+            Boolean.TRUE
         );
         this.environmentManager = environmentManager;
         this.originalAttributeName = originalAttributeName;
@@ -69,7 +70,7 @@ public class VersionalLinkAttributeTagProcessor
         if (version == null) {
             version = environmentManager.getServerStartTime();
         }
-        String actualAttributeName = attributeValue;
+        String actualAttributeValue = attributeValue;
         if (attributeValue.startsWith("${")) {
             IEngineConfiguration configuration = context
                 .getConfiguration();
@@ -78,11 +79,11 @@ public class VersionalLinkAttributeTagProcessor
             );
             IStandardExpression expression = parser
                 .parseExpression(context, attributeValue);
-            actualAttributeName = (String) expression.execute(context);
+            actualAttributeValue = (String) expression.execute(context);
         }
         structureHandler.setAttribute(
             originalAttributeName,
-            actualAttributeName + "?v=" + version
+            actualAttributeValue + "?v=" + version
         );
     }
 }
