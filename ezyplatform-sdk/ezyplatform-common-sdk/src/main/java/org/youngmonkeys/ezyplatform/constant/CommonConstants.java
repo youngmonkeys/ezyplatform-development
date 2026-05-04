@@ -34,6 +34,7 @@ public final class CommonConstants {
     public static final String LATEST = "latest";
     public static final String SPACE = " ";
     public static final int ZERO = 0;
+    public static final int ONE = 1;
     public static final long ZERO_LONG = 0L;
 
     public static final BigDecimal NULL_BIG_DECIMAL = null;
