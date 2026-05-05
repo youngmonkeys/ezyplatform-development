@@ -40,6 +40,14 @@ public class DefaultDataRecordCountService
     public void createDataRecordCountIfNotExists(
         String dataType
     ) {
+        createDataRecordCountIfNotExistsAndGetEntity(
+            dataType
+        );
+    }
+
+    private DataRecordCount createDataRecordCountIfNotExistsAndGetEntity(
+        String dataType
+    ) {
         DataRecordCount entity = dataRecordCountRepository
             .findByDataType(dataType);
         if (entity == null) {
@@ -48,10 +56,21 @@ public class DefaultDataRecordCountService
             );
             dataRecordCountRepository.save(entity);
         }
+        return entity;
     }
 
     @Override
     public void createDataRecordCountByDataNameAndRecordTypeIfNotExists(
+        String dataName,
+        String recordType
+    ) {
+        createDataRecordCountByDataNameAndRecordTypeIfNotExistsAndGetEntity(
+            dataName,
+            recordType
+        );
+    }
+
+    public DataRecordCount createDataRecordCountByDataNameAndRecordTypeIfNotExistsAndGetEntity(
         String dataName,
         String recordType
     ) {
@@ -65,6 +84,7 @@ public class DefaultDataRecordCountService
             entity.setRecordType(recordType);
             dataRecordCountRepository.save(entity);
         }
+        return entity;
     }
 
     @Override
@@ -77,6 +97,22 @@ public class DefaultDataRecordCountService
             dataType,
             value
         );
+    }
+
+    @Override
+    public long incrementRecordCountAndGet(
+        String dataType,
+        long value
+    ) {
+        DataRecordCount entity =
+            createDataRecordCountIfNotExistsAndGetEntity(
+                dataType
+            );
+        dataRecordCountRepository.updateRecordCountByDataType(
+            dataType,
+            value
+        );
+        return entity.getRecordCount() + value;
     }
 
     @Override
@@ -94,6 +130,25 @@ public class DefaultDataRecordCountService
             recordType,
             value
         );
+    }
+
+    @Override
+    public long incrementRecordCountByDataNameAndRecordTypeAndGet(
+        String dataName,
+        String recordType,
+        long value
+    ) {
+        DataRecordCount entity =
+            createDataRecordCountByDataNameAndRecordTypeIfNotExistsAndGetEntity(
+                dataName,
+                recordType
+            );
+        dataRecordCountRepository.updateRecordCountByDataNameAndRecordType(
+            dataName,
+            recordType,
+            value
+        );
+        return entity.getRecordCount() + value;
     }
 
     @Override

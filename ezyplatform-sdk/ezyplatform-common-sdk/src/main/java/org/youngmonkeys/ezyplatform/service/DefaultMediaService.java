@@ -210,14 +210,19 @@ public class DefaultMediaService implements MediaService {
     }
 
     private void removeMediaEntity(Media entity) {
-        if (MediaStatus.REMOVED.equalsValue(entity.getStatus())) {
+        String currentStatus = entity.getStatus();
+        if (MediaStatus.REMOVED.equalsValue(currentStatus)) {
             entity.setStatus(DELETED);
-            mediaRepository.delete(entity.getId());
         } else {
             entity.setStatus(MediaStatus.REMOVED.toString());
             modelToEntityConverter.mergeUpdatedAtToEntity(entity);
             mediaRepository.save(entity);
         }
+    }
+
+    @Override
+    public void removeMediaPermanently(long mediaId) {
+        mediaRepository.delete(mediaId);
     }
 
     @Override

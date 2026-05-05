@@ -2307,6 +2307,7 @@ public class MediaControllerServiceTest {
             eventHandlerManager
         );
         inOrder.verify(mediaService).removeMedia(904L);
+        inOrder.verify(mediaService).removeMediaPermanently(904L);
         inOrder.verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
             "deleted-media.png"
@@ -2395,6 +2396,7 @@ public class MediaControllerServiceTest {
             eventHandlerManager
         );
         inOrder.verify(mediaService).removeMedia("deleted-by-name.png");
+        inOrder.verify(mediaService).removeMediaPermanently(905L);
         inOrder.verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
             "deleted-by-name.png"

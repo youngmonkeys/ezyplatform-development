@@ -909,6 +909,15 @@ public class MediaControllerService extends EzyLoggable {
     }
 
     public void removeMediaById(
+        long mediaId
+    ) {
+        removeMediaById(
+            mediaId,
+            settingService.isAllowPermanentlyDeleteMedia()
+        );
+    }
+
+    public void removeMediaById(
         long mediaId,
         boolean deleteFile
     ) {
@@ -916,6 +925,7 @@ public class MediaControllerService extends EzyLoggable {
         if (deleteFile
             && DELETED.equals(media.getStatus())
         ) {
+            mediaService.removeMediaPermanently(media.getId());
             File file = fileSystemManager.getMediaFilePath(
                 media.getType().getFolder(),
                 media.getName()
@@ -928,6 +938,15 @@ public class MediaControllerService extends EzyLoggable {
     }
 
     public void removeMediaByName(
+        String mediaName
+    ) {
+        removeMediaByName(
+            mediaName,
+            settingService.isAllowPermanentlyDeleteMedia()
+        );
+    }
+
+    public void removeMediaByName(
         String mediaName,
         boolean deleteFile
     ) {
@@ -935,6 +954,7 @@ public class MediaControllerService extends EzyLoggable {
         if (deleteFile
             && DELETED.equals(media.getStatus())
         ) {
+            mediaService.removeMediaPermanently(media.getId());
             String containerFolder = media.getType().getFolder();
             File filePath = fileSystemManager.getMediaFilePath(
                 containerFolder,

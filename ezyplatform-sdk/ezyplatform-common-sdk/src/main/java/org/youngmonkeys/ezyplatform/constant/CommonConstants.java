@@ -184,14 +184,14 @@ public final class CommonConstants {
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY
         = "ezyplatform_dictionary";
-    public static final String SETTING_NAME_PAGINATION_COUNT_LIMIT =
-        "ezyplatform_pagination_count_limit";
-    public static final String SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME =
-        "ezyplatform_media_up_down_loader_name";
-    public static final String SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE =
-        "ezyplatform_max_upload_reduced_file_size";
-    public static final String SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE =
-        "ezyplatform_keep_original_size_image_file";
+    public static final String SETTING_NAME_PAGINATION_COUNT_LIMIT
+        = "ezyplatform_pagination_count_limit";
+    public static final String SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME
+        = "ezyplatform_media_up_down_loader_name";
+    public static final String SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE
+        = "ezyplatform_max_upload_reduced_file_size";
+    public static final String SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE
+        = "ezyplatform_keep_original_size_image_file";
     public static final String SETTING_NAME_ADMIN_DATE_FORMAT
         = "admin_date_format";
     public static final String SETTING_NAME_ADMIN_TIME_FORMAT
@@ -208,10 +208,12 @@ public final class CommonConstants {
         = "admin_login_failure_block_durations";
     public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_FILE_SIZE
         = "admin_max_upload_file_size";
-    public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_IMAGE_FILE_SIZE =
-        "admin_max_upload_image_file_size";
-    public static final String SETTING_NAME_ADMIN_ALLOW_REDUCE_MEDIA_FILE_SIZE =
-        "admin_allow_media_file_size_reduction";
+    public static final String SETTING_NAME_ADMIN_MAX_UPLOAD_IMAGE_FILE_SIZE
+        = "admin_max_upload_image_file_size";
+    public static final String SETTING_NAME_ADMIN_ALLOW_REDUCE_MEDIA_FILE_SIZE
+        = "admin_allow_media_file_size_reduction";
+    public static final String SETTING_NAME_ADMIN_ALLOW_PERMANENTLY_DELETE_MEDIA
+        = "admin_allow_permanently_delete_media";
     public static final String SETTING_NAME_ADMIN_TOKEN_EXPIRED_IN_DAY
         = "admin_token_expired_in_day";
     public static final String SETTING_NAME_ADMIN_ACCEPTED_MEDIA_MIME_TYPES
@@ -224,10 +226,10 @@ public final class CommonConstants {
         = "admin_access_token_http_only";
     public static final String SETTING_NAME_ADMIN_RESET_PASSWORD_TOKEN_EXPIRED_IN_DAY
         = "admin_reset_password_token_expired_in_day";
-    public static final String SETTING_NAME_ADMIN_SSO_ALLOWED_ORIGINS =
-        "admin_sso_allowed_origins";
-    public static final String SETTING_NAME_ADMIN_LANGUAGE_MESSAGES_MAP =
-        "admin_language_messages_map";
+    public static final String SETTING_NAME_ADMIN_SSO_ALLOWED_ORIGINS
+        = "admin_sso_allowed_origins";
+    public static final String SETTING_NAME_ADMIN_LANGUAGE_MESSAGES_MAP
+        = "admin_language_messages_map";
     public static final String SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY
         = "user_token_expired_in_day";
     public static final String SETTING_NAME_USER_MAX_LOGIN_FAILURES
@@ -250,10 +252,16 @@ public final class CommonConstants {
         = "web_default_language";
     public static final String SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE
         = "web_max_upload_file_size";
-    public static final String SETTING_NAME_WEB_MAX_UPLOAD_IMAGE_FILE_SIZE =
-        "web_max_upload_image_file_size";
+    public static final String SETTING_NAME_WEB_MAX_UPLOAD_IMAGE_FILE_SIZE
+        = "web_max_upload_image_file_size";
     public static final String SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES
         = "web_accepted_media_mime_types";
+    public static final String SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA =
+        "web_allow_media_replacement";
+    public static final String SETTING_NAME_WEB_ALLOW_REDUCE_MEDIA_FILE_SIZE =
+        "web_allow_media_file_size_reduction";
+    public static final String SETTING_NAME_WEB_ALLOW_PERMANENTLY_DELETE_MEDIA
+        = "web_allow_permanently_delete_media";
     public static final String SETTING_NAME_WEB_SITE_NAME
         = "web_site_name";
     public static final String SETTING_NAME_WEB_SITE_TITLE
@@ -266,12 +274,12 @@ public final class CommonConstants {
         = "web_page_title_separator";
     public static final String SETTING_NAME_WEB_AUTO_PASS_MANAGEMENT_URIS
         = "web_auto_pass_management_uris";
-    public static final String SETTING_NAME_WEB_ALLOW_SEARCH_USER_BY_LIKE_OPERATOR =
-        "web_allow_search_user_by_like_operator";
-    public static final String SETTING_NAME_WEB_ALLOW_SEARCH_MEDIA_BY_LIKE_OPERATOR =
-        "web_allow_search_media_by_like_operator";
-    public static final String SETTING_NAME_WEB_LANGUAGE_MESSAGES_MAP =
-        "web_language_messages_map";
+    public static final String SETTING_NAME_WEB_ALLOW_SEARCH_USER_BY_LIKE_OPERATOR
+        = "web_allow_search_user_by_like_operator";
+    public static final String SETTING_NAME_WEB_ALLOW_SEARCH_MEDIA_BY_LIKE_OPERATOR
+        = "web_allow_search_media_by_like_operator";
+    public static final String SETTING_NAME_WEB_LANGUAGE_MESSAGES_MAP
+        = "web_language_messages_map";
     public static final String SETTING_NAME_WEB_SITE_ICON_URL = "web_site_icon_url";
     public static final String SETTING_NAME_WEB_SITE_LOGO_URL = "web_site_logo_url";
     public static final String SETTING_NAME_ADMIN_URL = "admin_url";
@@ -300,10 +308,6 @@ public final class CommonConstants {
         "web_additional_script";
     public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
         "web_additional_foot";
-    public static final String SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA =
-        "web_allow_media_replacement";
-    public static final String SETTING_NAME_WEB_ALLOW_REDUCE_MEDIA_FILE_SIZE =
-        "web_allow_media_file_size_reduction";
     public static final String SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES =
         "javascript_service_bean_names";
 

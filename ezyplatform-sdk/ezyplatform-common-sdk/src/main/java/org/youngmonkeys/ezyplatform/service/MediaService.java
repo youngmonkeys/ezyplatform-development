@@ -105,6 +105,8 @@ public interface MediaService {
 
     MediaModel removeMedia(String mediaName);
 
+    void removeMediaPermanently(long mediaId);
+
     MediaModel getMediaById(long mediaId);
 
     default MediaNameModel getMediaNameById(

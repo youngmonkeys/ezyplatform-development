@@ -35,6 +35,11 @@ public interface DataRecordCountService {
         long value
     );
 
+    long incrementRecordCountAndGet(
+        String dataType,
+        long value
+    );
+
     default void decrementRecordCount(
         String dataType,
         long value
@@ -42,7 +47,20 @@ public interface DataRecordCountService {
         incrementRecordCount(dataType,  -value);
     }
 
+    default long decrementRecordCountAndGet(
+        String dataType,
+        long value
+    ) {
+        return incrementRecordCountAndGet(dataType,  -value);
+    }
+
     void incrementRecordCountByDataNameAndRecordType(
+        String dataName,
+        String recordType,
+        long value
+    );
+
+    long incrementRecordCountByDataNameAndRecordTypeAndGet(
         String dataName,
         String recordType,
         long value
@@ -54,6 +72,18 @@ public interface DataRecordCountService {
         long value
     ) {
         incrementRecordCountByDataNameAndRecordType(
+            dataName,
+            recordType,
+            -value
+        );
+    }
+
+    default long decrementRecordCountByDataNameAndRecordTypeAndGet(
+        String dataName,
+        String recordType,
+        long value
+    ) {
+        return incrementRecordCountByDataNameAndRecordTypeAndGet(
             dataName,
             recordType,
             -value
