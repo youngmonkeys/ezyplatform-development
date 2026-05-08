@@ -409,15 +409,16 @@ public class DefaultDataMetaService implements DataMetaService {
     }
 
     @Override
-    public Map<Long, List<DataMetaModel>> getDataMetasByDataTypeAndDataIds(
+    public Map<Long, List<DataMetaModel>> getDataMetasMapByDataTypeAndDataIdsAndMetaKey(
         String dataType,
-        Collection<Long> dataIds
+        Collection<Long> dataIds,
+        String metaKey
     ) {
         if (dataIds.isEmpty()) {
             return Collections.emptyMap();
         }
         return dataMetaRepository
-            .findByDataTypeAndDataIdIn(dataType, dataIds)
+            .findByDataTypeAndDataIdInAndMetaKey(dataType, dataIds, metaKey)
             .stream()
             .collect(
                 Collectors.groupingBy(

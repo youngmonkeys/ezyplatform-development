@@ -370,19 +370,17 @@ public interface UserMetaService {
         );
     }
 
-    Map<String, String> getUserMetaValues(long userId);
-
-    Map<String, String> getUserMetaTextValues(long userId);
-
-    Map<Long, List<UserMetaModel>> getUserMetasByUserIds(
-        Collection<Long> userIds
+    Map<Long, List<UserMetaModel>> getUserMetasMapByUserIdsAndMetaKey(
+        Collection<Long> userIds,
+        String metaKey
     );
 
-    default <T> Map<Long, List<T>> getUserMetaValuesByUserIds(
+    default <T> Map<Long, List<T>> getUserMetaValuesMapByUserIdsAndMetaKey(
         Collection<Long> userIds,
+        String metaKey,
         Function<UserMetaModel, T> converter
     ) {
-        return getUserMetasByUserIds(userIds)
+        return getUserMetasMapByUserIdsAndMetaKey(userIds, metaKey)
             .entrySet()
             .stream()
             .collect(
@@ -394,41 +392,6 @@ public interface UserMetaService {
                         .map(converter)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList())
-                )
-            );
-    }
-
-    Map<Long, Map<String, UserMetaModel>> getUserMetaValueMapsByUserIds(
-        Collection<Long> userIds
-    );
-
-    default  <T> Map<Long, Map<String, T>> getUserMetaValueMapsByUserIds(
-        Collection<Long> userIds,
-        Function<UserMetaModel, T> converter
-    ) {
-        return getUserMetaValueMapsByUserIds(userIds)
-            .entrySet()
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    Map.Entry::getKey,
-                    e -> e
-                        .getValue()
-                        .entrySet()
-                        .stream()
-                        .map(it ->
-                            EzyEntry.of(
-                                it.getKey(),
-                                converter.apply(it.getValue())
-                            )
-                        )
-                        .filter(it -> it.getValue() != null)
-                        .collect(
-                            Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue
-                            )
-                        )
                 )
             );
     }

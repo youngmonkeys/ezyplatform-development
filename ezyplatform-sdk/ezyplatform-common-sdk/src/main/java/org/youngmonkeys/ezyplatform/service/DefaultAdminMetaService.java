@@ -246,42 +246,9 @@ public class DefaultAdminMetaService implements AdminMetaService {
     }
 
     @Override
-    public Map<String, String> getAdminMetaValues(long adminId) {
-        return adminMetaRepository.findByAdminId(
-            adminId
-        )
-            .stream()
-            .filter(it -> it.getMetaValue() != null)
-            .collect(
-                Collectors.toMap(
-                    AdminMeta::getMetaKey,
-                    AdminMeta::getMetaValue,
-                    (o, n) -> n
-                )
-            );
-    }
-
-    @Override
-    public Map<String, String> getAdminMetaTextValues(
-        long adminId
-    ) {
-        return adminMetaRepository.findByAdminId(
-                adminId
-            )
-            .stream()
-            .filter(it -> it.getMetaTextValue() != null)
-            .collect(
-                Collectors.toMap(
-                    AdminMeta::getMetaKey,
-                    AdminMeta::getMetaTextValue,
-                    (o, n) -> n
-                )
-            );
-    }
-
-    @Override
-    public Map<Long, List<AdminMetaModel>> getAdminMetasByAdminIds(
-        Collection<Long> adminIds
+    public Map<Long, List<AdminMetaModel>> getAdminMetasMapByAdminIdsAndMetaKey(
+        Collection<Long> adminIds,
+        String metaKey
     ) {
         if (adminIds.isEmpty()) {
             return Collections.emptyMap();
@@ -295,28 +262,6 @@ public class DefaultAdminMetaService implements AdminMetaService {
                     Collectors.mapping(
                         entityToModelConverter::toModel,
                         Collectors.toList()
-                    )
-                )
-            );
-    }
-
-    @Override
-    public Map<Long, Map<String, AdminMetaModel>> getAdminMetaValueMapsByAdminIds(
-        Collection<Long> adminIds
-    ) {
-        if (adminIds.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return adminMetaRepository
-            .findByAdminIdIn(adminIds)
-            .stream()
-            .collect(
-                Collectors.groupingBy(
-                    AdminMeta::getAdminId,
-                    Collectors.toMap(
-                        AdminMeta::getMetaKey,
-                        entityToModelConverter::toModel,
-                        (o, n) -> n
                     )
                 )
             );

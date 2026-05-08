@@ -34,7 +34,9 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DESCRIPTION;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_JOB_TITLE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.util.Strings.emptyIfNull;
 import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
@@ -360,19 +362,17 @@ public interface AdminMetaService {
         );
     }
 
-    Map<String, String> getAdminMetaValues(long adminId);
-
-    Map<String, String> getAdminMetaTextValues(long adminId);
-
-    Map<Long, List<AdminMetaModel>> getAdminMetasByAdminIds(
-        Collection<Long> adminIds
+    Map<Long, List<AdminMetaModel>> getAdminMetasMapByAdminIdsAndMetaKey(
+        Collection<Long> adminIds,
+        String metaKey
     );
 
-    default <T> Map<Long, List<T>> getAdminMetaValuesByAdminIds(
+    default <T> Map<Long, List<T>> getAdminMetaValuesMapByAdminIdsAndMetaKey(
         Collection<Long> adminIds,
+        String metaKey,
         Function<AdminMetaModel, T> converter
     ) {
-        return getAdminMetasByAdminIds(adminIds)
+        return getAdminMetasMapByAdminIdsAndMetaKey(adminIds, metaKey)
             .entrySet()
             .stream()
             .collect(
@@ -384,41 +384,6 @@ public interface AdminMetaService {
                         .map(converter)
                         .filter(Objects::nonNull)
                         .collect(Collectors.toList())
-                )
-            );
-    }
-
-    Map<Long, Map<String, AdminMetaModel>> getAdminMetaValueMapsByAdminIds(
-        Collection<Long> adminIds
-    );
-
-    default  <T> Map<Long, Map<String, T>> getAdminMetaValueMapsByAdminIds(
-        Collection<Long> adminIds,
-        Function<AdminMetaModel, T> converter
-    ) {
-        return getAdminMetaValueMapsByAdminIds(adminIds)
-            .entrySet()
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    Map.Entry::getKey,
-                    e -> e
-                        .getValue()
-                        .entrySet()
-                        .stream()
-                        .map(it ->
-                            EzyEntry.of(
-                                it.getKey(),
-                                converter.apply(it.getValue())
-                            )
-                        )
-                        .filter(it -> it.getValue() != null)
-                        .collect(
-                            Collectors.toMap(
-                                Map.Entry::getKey,
-                                Map.Entry::getValue
-                            )
-                        )
                 )
             );
     }

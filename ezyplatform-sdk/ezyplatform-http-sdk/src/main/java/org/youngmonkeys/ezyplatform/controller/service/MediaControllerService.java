@@ -53,6 +53,7 @@ import org.youngmonkeys.ezyplatform.event.MediaReplacedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
+import org.youngmonkeys.ezyplatform.event.ValidateMediaOwnerEvent;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.io.FolderProxy;
@@ -969,6 +970,7 @@ public class MediaControllerService extends EzyLoggable {
 
     public void getMediaByName(
         RequestArguments requestArguments,
+        Long userId,
         String name,
         boolean exposePrivateMedia,
         Predicate<MediaModel> validMediaCondition
@@ -983,6 +985,7 @@ public class MediaControllerService extends EzyLoggable {
             mediaUpDownloader.download(
                 MediaDownloadArguments.builder()
                     .requestArguments(requestArguments)
+                    .userId(userId)
                     .name(name)
                     .exposePrivateMedia(exposePrivateMedia)
                     .validMediaCondition(validMediaCondition)
@@ -1002,7 +1005,10 @@ public class MediaControllerService extends EzyLoggable {
             throw new MediaNotFoundException(name);
         }
         eventHandlerManager.handleEvent(
-            new MediaDownloadEvent(media)
+            new ValidateMediaOwnerEvent(userId, media)
+        );
+        eventHandlerManager.handleEvent(
+            new MediaDownloadEvent(userId, media)
         );
         MediaType mediaType = media.getType();
         String mediaName = media.getName();
@@ -1025,6 +1031,7 @@ public class MediaControllerService extends EzyLoggable {
     }
 
     public MediaDetailsModel getMediaDetailsById(
+        Long userId,
         long mediaId,
         Predicate<MediaModel> validMediaCondition
     ) {
@@ -1032,10 +1039,11 @@ public class MediaControllerService extends EzyLoggable {
         if (media == null || !validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaId);
         }
-        return getMediaDetailsAnyway(media);
+        return getMediaDetailsAnyway(userId, media);
     }
 
     public MediaDetailsModel getMediaDetailsByName(
+        Long userId,
         String mediaName,
         Predicate<MediaModel> validMediaCondition
     ) {
@@ -1043,23 +1051,28 @@ public class MediaControllerService extends EzyLoggable {
         if (media == null || !validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaName);
         }
-        return getMediaDetailsAnyway(media);
+        return getMediaDetailsAnyway(userId, media);
     }
 
     public MediaDetailsModel getMediaDetailsAnyway(
+        Long userId,
         MediaModel media
     ) {
+        eventHandlerManager.handleEvent(
+            new ValidateMediaOwnerEvent(userId, media)
+        );
         String mediaUploaderName = settingService
             .getMediaUpDownloaderName();
         MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
             .getMediaUpDownloaderByName(mediaUploaderName);
         MediaDetailsModel mediaDetails = null;
         if (mediaUpDownloader != null) {
-            mediaDetails = mediaUpDownloader.getMediaDetails(media);
+            mediaDetails = mediaUpDownloader
+                .getMediaDetails(userId, media);
         }
         if (mediaDetails == null) {
             mediaDetails = eventHandlerManager.handleEvent(
-                new GetMediaDetailsEvent(media)
+                new GetMediaDetailsEvent(userId, media)
             );
         }
         if (mediaDetails == null) {
