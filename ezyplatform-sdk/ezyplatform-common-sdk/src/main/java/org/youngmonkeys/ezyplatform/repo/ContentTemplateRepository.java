@@ -21,6 +21,7 @@ import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
 import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.SimpleContentTemplateResult;
 import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
 
@@ -84,6 +85,16 @@ public interface ContentTemplateRepository
     ContentTemplate findByCreatorTypeAndCreatorIdAndTemplateTypeAndTemplateName(
         String creatorType,
         long creatorId,
+        String templateType,
+        String templateName
+    );
+
+    @EzyQuery(
+        "SELECT e.id FROM ContentTemplate e " +
+            "WHERE e.templateType = ?0 " +
+            "AND e.templateName = ?1"
+    )
+    IdResult findIdByTemplateTypeAndTemplateName(
         String templateType,
         String templateName
     );

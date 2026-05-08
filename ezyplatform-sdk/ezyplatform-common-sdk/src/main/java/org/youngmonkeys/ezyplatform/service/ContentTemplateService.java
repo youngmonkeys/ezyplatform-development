@@ -54,6 +54,11 @@ public interface ContentTemplateService {
         String templateName
     );
 
+    long getTemplateIdByTypeAndName(
+        String templateType,
+        String templateName
+    );
+
     List<ContentTemplateModel> getTemplatesByType(
         String templateType,
         int limit
