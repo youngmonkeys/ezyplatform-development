@@ -347,7 +347,7 @@ public class MediaControllerService extends EzyLoggable {
         );
         MediaModel media = mediaService.addMedia(uploadFrom, model);
         eventHandlerManager.handleEvent(
-            new MediaAddedEvent(media.getId())
+            new MediaAddedEvent(media)
         );
         return media;
     }

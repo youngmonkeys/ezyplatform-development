@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.event;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -126,8 +127,19 @@ public class EventSchema {
                 return this;
             }
 
+            public Builder field(DataSchema field) {
+                if (this.fields == null) {
+                    this.fields = new ArrayList<>();
+                }
+                this.fields.add(field);
+                return this;
+            }
+
             public Builder fields(List<DataSchema> fields) {
-                this.fields = fields;
+                if (this.fields == null) {
+                    this.fields = new ArrayList<>();
+                }
+                this.fields.addAll(fields);
                 return this;
             }
 
