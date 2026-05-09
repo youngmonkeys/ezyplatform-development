@@ -24,7 +24,7 @@ public abstract class AbstractEventHandler<D, R>
     implements EventHandler<D, R> {
 
     @Override
-    public final R handleEventData(D data) {
+    public R handleEventData(D data) {
         try {
             return doHandleEventData(data);
         } catch (Exception e) {
