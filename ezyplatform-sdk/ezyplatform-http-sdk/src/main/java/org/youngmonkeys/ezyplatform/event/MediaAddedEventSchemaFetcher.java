@@ -19,7 +19,6 @@ package org.youngmonkeys.ezyplatform.event;
 import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
-import java.util.Arrays;
 import java.util.Collections;
 
 @EzySingleton
