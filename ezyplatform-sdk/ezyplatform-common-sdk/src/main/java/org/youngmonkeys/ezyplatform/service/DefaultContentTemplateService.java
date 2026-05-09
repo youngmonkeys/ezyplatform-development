@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.data.TitleContent;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
+import org.youngmonkeys.ezyplatform.model.ContentTemplateIdAndNameModel;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
 import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 import org.youngmonkeys.ezyplatform.repo.ContentTemplateRepository;
@@ -169,6 +170,37 @@ public class DefaultContentTemplateService
         }
         return newArrayList(
             contentTemplateRepository.findTemplatesByTypeIn(
+                templateTypes,
+                Next.limit(limit)
+            ),
+            resultToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<ContentTemplateIdAndNameModel> getTemplateIdAndNamesByType(
+        String templateType,
+        int limit
+    ) {
+        return newArrayList(
+            contentTemplateRepository.findTemplateIdAndNamesByType(
+                templateType,
+                Next.limit(limit)
+            ),
+            resultToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<ContentTemplateIdAndNameModel> getTemplateIdAndNamesByTypes(
+        Collection<String> templateTypes,
+        int limit
+    ) {
+        if (templateTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return newArrayList(
+            contentTemplateRepository.findTemplateIdAndNamesByTypeIn(
                 templateTypes,
                 Next.limit(limit)
             ),

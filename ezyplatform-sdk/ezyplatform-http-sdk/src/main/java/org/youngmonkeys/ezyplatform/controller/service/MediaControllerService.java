@@ -100,6 +100,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
@@ -108,6 +109,7 @@ import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.ge
 import static org.youngmonkeys.ezyplatform.util.Strings.from;
 import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidExternalUrl;
 
+@SuppressWarnings("MethodCount")
 public class MediaControllerService extends EzyLoggable {
 
     private final HttpClient httpClient;
@@ -970,6 +972,21 @@ public class MediaControllerService extends EzyLoggable {
 
     public void getMediaByName(
         RequestArguments requestArguments,
+        String name,
+        boolean exposePrivateMedia,
+        Predicate<MediaModel> validMediaCondition
+    ) throws Exception {
+        getMediaByName(
+            requestArguments,
+            NULL_LONG,
+            name,
+            exposePrivateMedia,
+            validMediaCondition
+        );
+    }
+
+    public void getMediaByName(
+        RequestArguments requestArguments,
         Long userId,
         String name,
         boolean exposePrivateMedia,
@@ -1031,6 +1048,17 @@ public class MediaControllerService extends EzyLoggable {
     }
 
     public MediaDetailsModel getMediaDetailsById(
+        long mediaId,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        return getMediaDetailsById(
+            NULL_LONG,
+            mediaId,
+            validMediaCondition
+        );
+    }
+
+    public MediaDetailsModel getMediaDetailsById(
         Long userId,
         long mediaId,
         Predicate<MediaModel> validMediaCondition
@@ -1040,6 +1068,17 @@ public class MediaControllerService extends EzyLoggable {
             throw new MediaNotFoundException(mediaId);
         }
         return getMediaDetailsAnyway(userId, media);
+    }
+
+    public MediaDetailsModel getMediaDetailsByName(
+        String mediaName,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        return getMediaDetailsByName(
+            NULL_LONG,
+            mediaName,
+            validMediaCondition
+        );
     }
 
     public MediaDetailsModel getMediaDetailsByName(

@@ -17,8 +17,14 @@
 package org.youngmonkeys.ezyplatform.converter;
 
 import lombok.AllArgsConstructor;
-import org.youngmonkeys.ezyplatform.model.*;
+import org.youngmonkeys.ezyplatform.model.AdminNameModel;
+import org.youngmonkeys.ezyplatform.model.AvatarCoverImageIdsModel;
+import org.youngmonkeys.ezyplatform.model.ContentTemplateIdAndNameModel;
+import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
+import org.youngmonkeys.ezyplatform.model.UserNameModel;
+import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import org.youngmonkeys.ezyplatform.result.AvatarCoverImageIdsResult;
+import org.youngmonkeys.ezyplatform.result.ContentTemplateIdAndNameResult;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.result.SimpleContentTemplateResult;
@@ -68,6 +74,18 @@ public class DefaultResultToModelConverter {
             .status(result.getStatus())
             .createdAt(toTimestamp(result.getCreatedAt()))
             .updatedAt(toTimestamp(result.getUpdatedAt()))
+            .build();
+    }
+
+    public ContentTemplateIdAndNameModel toModel(
+        ContentTemplateIdAndNameResult result
+    ) {
+        if (result == null) {
+            return null;
+        }
+        return ContentTemplateIdAndNameModel.builder()
+            .id(result.getId())
+            .name(result.getTemplateName())
             .build();
     }
 

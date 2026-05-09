@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.data.TitleContent;
+import org.youngmonkeys.ezyplatform.model.ContentTemplateIdAndNameModel;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
 import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 
@@ -65,6 +66,16 @@ public interface ContentTemplateService {
     );
 
     List<ContentTemplateModel> getTemplatesByTypes(
+        Collection<String> templateTypes,
+        int limit
+    );
+
+    List<ContentTemplateIdAndNameModel> getTemplateIdAndNamesByType(
+        String templateType,
+        int limit
+    );
+
+    List<ContentTemplateIdAndNameModel> getTemplateIdAndNamesByTypes(
         Collection<String> templateTypes,
         int limit
     );
