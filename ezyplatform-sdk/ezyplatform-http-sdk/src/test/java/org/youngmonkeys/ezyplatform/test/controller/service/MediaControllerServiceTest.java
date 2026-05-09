@@ -3055,7 +3055,7 @@ public class MediaControllerServiceTest {
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
 
         Asserts.assertEquals(actual, media);
-        Asserts.assertEquals(eventCaptor.getValue(), 909L);
+        Asserts.assertEquals(eventCaptor.getValue().getMedia(), media);
 
         InOrder inOrder = inOrder(
             mediaValidator,
