@@ -53,6 +53,7 @@ public class EventHandlerManager {
                 .getSingletonsOf(EventSchemaFetcher.class)
             )
                 .stream()
+                .sorted(Comparator.comparingInt(EventSchemaFetcher::getPriority))
                 .collect(
                     Collectors.toMap(
                         EventSchemaFetcher::getEventName,

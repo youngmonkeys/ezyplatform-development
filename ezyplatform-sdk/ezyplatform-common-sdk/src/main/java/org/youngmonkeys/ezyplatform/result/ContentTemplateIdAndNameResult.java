@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 youngmonkeys.org
+ * Copyright 2022 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.event;
+package org.youngmonkeys.ezyplatform.result;
 
-import lombok.AllArgsConstructor;
+import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
 import lombok.Getter;
-import org.youngmonkeys.ezyplatform.model.MediaModel;
+import lombok.Setter;
+import lombok.ToString;
 
 @Getter
-@AllArgsConstructor
-public class MediaAddedEvent {
-    private MediaModel media;
+@Setter
+@ToString
+@EzyQueryResult
+public class ContentTemplateIdAndNameResult {
+    private long id;
+    private String templateName;
 }

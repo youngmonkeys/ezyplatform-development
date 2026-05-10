@@ -61,6 +61,7 @@ public interface MediaUpDownloader {
     }
 
     default MediaDetailsModel getMediaDetails(
+        Long userId,
         MediaModel media
     ) {
         return null;

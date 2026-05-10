@@ -27,6 +27,7 @@ import java.util.function.Predicate;
 @Builder
 public class MediaDownloadArguments {
     private RequestArguments requestArguments;
+    private Long userId;
     private String name;
     private boolean exposePrivateMedia;
     private Predicate<MediaModel> validMediaCondition;

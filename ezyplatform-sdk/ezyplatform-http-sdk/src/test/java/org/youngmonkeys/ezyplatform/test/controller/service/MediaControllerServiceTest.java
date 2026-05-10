@@ -2532,7 +2532,7 @@ public class MediaControllerServiceTest {
         verify(mediaValidator).validateMediaName("private-video.mp4");
         verify(mediaService).getMediaByName("private-video.mp4");
         verify(validMediaCondition).test(media);
-        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
         verify(fileSystemManager).getMediaFilePath(
             MediaType.VIDEO.getFolder(),
             "private-video.mp4"
@@ -2571,7 +2571,7 @@ public class MediaControllerServiceTest {
         inOrder.verify(mediaValidator).validateMediaName("private-video.mp4");
         inOrder.verify(mediaService).getMediaByName("private-video.mp4");
         inOrder.verify(validMediaCondition).test(media);
-        inOrder.verify(eventHandlerManager).handleEvent(any(MediaDownloadEvent.class));
+        inOrder.verify(eventHandlerManager, times(2)).handleEvent(any(MediaDownloadEvent.class));
         inOrder.verify(fileSystemManager).getMediaFilePath(
             MediaType.VIDEO.getFolder(),
             "private-video.mp4"
@@ -2624,7 +2624,7 @@ public class MediaControllerServiceTest {
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
-        when(mediaUpDownloader.getMediaDetails(media)).thenReturn(null);
+        when(mediaUpDownloader.getMediaDetails(null, media)).thenReturn(null);
         when(eventHandlerManager.handleEvent(any(GetMediaDetailsEvent.class)))
             .thenReturn(null);
         when(mediaService.getMediaFileLengthOrNegative(
@@ -2643,8 +2643,8 @@ public class MediaControllerServiceTest {
         verify(validMediaCondition).test(media);
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        verify(mediaUpDownloader).getMediaDetails(media);
-        verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
+        verify(mediaUpDownloader).getMediaDetails(null, media);
+        verify(eventHandlerManager, times(2)).handleEvent(any());
         verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.VIDEO,
             "video-detail.mp4"
@@ -2685,7 +2685,7 @@ public class MediaControllerServiceTest {
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(settingService).getMediaUpDownloaderName();
         inOrder.verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        inOrder.verify(mediaUpDownloader).getMediaDetails(media);
+        inOrder.verify(mediaUpDownloader).getMediaDetails(null, media);
         inOrder.verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
         inOrder.verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.VIDEO,
@@ -2725,7 +2725,7 @@ public class MediaControllerServiceTest {
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
-        when(mediaUpDownloader.getMediaDetails(media)).thenReturn(null);
+        when(mediaUpDownloader.getMediaDetails(null, media)).thenReturn(null);
         when(eventHandlerManager.handleEvent(any(GetMediaDetailsEvent.class)))
             .thenReturn(null);
         when(mediaService.getMediaFileLengthOrNegative(
@@ -2744,8 +2744,8 @@ public class MediaControllerServiceTest {
         verify(validMediaCondition).test(media);
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        verify(mediaUpDownloader).getMediaDetails(media);
-        verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
+        verify(mediaUpDownloader).getMediaDetails(null, media);
+        verify(eventHandlerManager, times(2)).handleEvent(any());
         verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.AUDIO,
             "audio-detail.mp3"
@@ -2786,7 +2786,7 @@ public class MediaControllerServiceTest {
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(settingService).getMediaUpDownloaderName();
         inOrder.verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        inOrder.verify(mediaUpDownloader).getMediaDetails(media);
+        inOrder.verify(mediaUpDownloader).getMediaDetails(null, media);
         inOrder.verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
         inOrder.verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.AUDIO,
@@ -3055,7 +3055,7 @@ public class MediaControllerServiceTest {
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
 
         Asserts.assertEquals(actual, media);
-        Asserts.assertEquals(eventCaptor.getValue().getMediaId(), 909L);
+        Asserts.assertEquals(eventCaptor.getValue().getMedia(), media);
 
         InOrder inOrder = inOrder(
             mediaValidator,

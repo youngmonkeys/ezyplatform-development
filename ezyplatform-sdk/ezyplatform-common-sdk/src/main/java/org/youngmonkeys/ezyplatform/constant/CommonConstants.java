@@ -49,6 +49,7 @@ public final class CommonConstants {
     public static final String DELETED = "DELETED";
     public static final String UNKNOWN = "UNKNOWN";
     public static final String UNKNOWN_LOWERCASE = "unknown";
+    public static final Void VOID = null;
 
     public static final String HTTPS = "https";
     public static final String LOCALHOST = "localhost";

@@ -25,7 +25,11 @@ import org.youngmonkeys.ezyplatform.repo.UserMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.UserMetaTransactionalRepository;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -258,48 +262,15 @@ public class DefaultUserMetaService implements UserMetaService {
     }
 
     @Override
-    public Map<String, String> getUserMetaValues(long userId) {
-        return userMetaRepository.findByUserId(
-            userId
-        )
-            .stream()
-            .filter(it -> it.getMetaValue() != null)
-            .collect(
-                Collectors.toMap(
-                    UserMeta::getMetaKey,
-                    UserMeta::getMetaValue,
-                    (o, n) -> n
-                )
-            );
-    }
-
-    @Override
-    public Map<String, String> getUserMetaTextValues(
-        long userId
-    ) {
-        return userMetaRepository.findByUserId(
-                userId
-            )
-            .stream()
-            .filter(it -> it.getMetaTextValue() != null)
-            .collect(
-                Collectors.toMap(
-                    UserMeta::getMetaKey,
-                    UserMeta::getMetaTextValue,
-                    (o, n) -> n
-                )
-            );
-    }
-
-    @Override
-    public Map<Long, List<UserMetaModel>> getUserMetasByUserIds(
-        Collection<Long> userIds
+    public Map<Long, List<UserMetaModel>> getUserMetasMapByUserIdsAndMetaKey(
+        Collection<Long> userIds,
+        String metaKey
     ) {
         if (userIds.isEmpty()) {
             return Collections.emptyMap();
         }
         return userMetaRepository
-            .findByUserIdIn(userIds)
+            .findByUserIdInAndMetaKey(userIds, metaKey)
             .stream()
             .collect(
                 Collectors.groupingBy(
@@ -307,28 +278,6 @@ public class DefaultUserMetaService implements UserMetaService {
                     Collectors.mapping(
                         entityToModelConverter::toModel,
                         Collectors.toList()
-                    )
-                )
-            );
-    }
-
-    @Override
-    public Map<Long, Map<String, UserMetaModel>> getUserMetaValueMapsByUserIds(
-        Collection<Long> userIds
-    ) {
-        if (userIds.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return userMetaRepository
-            .findByUserIdIn(userIds)
-            .stream()
-            .collect(
-                Collectors.groupingBy(
-                    UserMeta::getUserId,
-                    Collectors.toMap(
-                        UserMeta::getMetaKey,
-                        entityToModelConverter::toModel,
-                        (o, n) -> n
                     )
                 )
             );

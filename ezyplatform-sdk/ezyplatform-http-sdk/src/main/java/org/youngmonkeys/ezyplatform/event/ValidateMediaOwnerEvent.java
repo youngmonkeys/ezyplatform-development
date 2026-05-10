@@ -22,6 +22,7 @@ import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 @Getter
 @AllArgsConstructor
-public class MediaAddedEvent {
+public class ValidateMediaOwnerEvent {
+    private Long userId;
     private MediaModel media;
 }

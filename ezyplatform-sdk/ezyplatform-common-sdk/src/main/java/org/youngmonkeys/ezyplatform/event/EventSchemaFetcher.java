@@ -21,4 +21,8 @@ public interface EventSchemaFetcher {
     EventSchema getSchema();
 
     String getEventName();
+
+    default int getPriority() {
+        return 0;
+    }
 }

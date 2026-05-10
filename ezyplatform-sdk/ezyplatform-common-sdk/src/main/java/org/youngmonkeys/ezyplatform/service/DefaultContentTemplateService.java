@@ -25,10 +25,12 @@ import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.data.TitleContent;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
+import org.youngmonkeys.ezyplatform.model.ContentTemplateIdAndNameModel;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
 import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 import org.youngmonkeys.ezyplatform.repo.ContentTemplateRepository;
 import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
 
 import java.util.Collection;
@@ -38,6 +40,8 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 public class DefaultContentTemplateService
@@ -130,6 +134,19 @@ public class DefaultContentTemplateService
     }
 
     @Override
+    public long getTemplateIdByTypeAndName(
+        String templateType,
+        String templateName
+    ) {
+        IdResult result = contentTemplateRepository
+            .findIdByTemplateTypeAndTemplateName(
+                templateType,
+                templateName
+            );
+        return result != null ? result.getId() : ZERO_LONG;
+    }
+
+    @Override
     public List<ContentTemplateModel> getTemplatesByType(
         String templateType,
         int limit
@@ -153,6 +170,37 @@ public class DefaultContentTemplateService
         }
         return newArrayList(
             contentTemplateRepository.findTemplatesByTypeIn(
+                templateTypes,
+                Next.limit(limit)
+            ),
+            resultToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<ContentTemplateIdAndNameModel> getTemplateIdAndNamesByType(
+        String templateType,
+        int limit
+    ) {
+        return newArrayList(
+            contentTemplateRepository.findTemplateIdAndNamesByType(
+                templateType,
+                Next.limit(limit)
+            ),
+            resultToModelConverter::toModel
+        );
+    }
+
+    @Override
+    public List<ContentTemplateIdAndNameModel> getTemplateIdAndNamesByTypes(
+        Collection<String> templateTypes,
+        int limit
+    ) {
+        if (templateTypes.isEmpty()) {
+            return Collections.emptyList();
+        }
+        return newArrayList(
+            contentTemplateRepository.findTemplateIdAndNamesByTypeIn(
                 templateTypes,
                 Next.limit(limit)
             ),
@@ -222,7 +270,7 @@ public class DefaultContentTemplateService
         return contentTemplateRepository.countByTemplateTypeAndTemplateName(
             templateType,
             templateName
-        ) > 0;
+        ) > ZERO;
     }
 
     @Override

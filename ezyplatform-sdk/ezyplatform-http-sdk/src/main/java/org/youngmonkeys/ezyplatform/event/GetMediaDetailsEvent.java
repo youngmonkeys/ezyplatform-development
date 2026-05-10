@@ -23,5 +23,6 @@ import org.youngmonkeys.ezyplatform.model.MediaModel;
 @Getter
 @AllArgsConstructor
 public class GetMediaDetailsEvent {
+    private Long userId;
     private MediaModel media;
 }

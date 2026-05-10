@@ -20,7 +20,9 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
+import org.youngmonkeys.ezyplatform.result.ContentTemplateIdAndNameResult;
 import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.SimpleContentTemplateResult;
 import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
 
@@ -44,12 +46,11 @@ public interface ContentTemplateRepository
     List<TemplateTypeResult> findAllTemplateTypes();
 
     @EzyQuery(
-        "SELECT" +
-            " e.id, e.templateName, e.titleTemplate," +
-            " e.creatorId, e.status, e.createdAt, e.updatedAt" +
-            " FROM ContentTemplate e" +
-            " WHERE e.templateType = ?0" +
-            " ORDER BY e.id DESC"
+        "SELECT e.id, e.templateName, e.titleTemplate, " +
+            "e.creatorId, e.status, e.createdAt, e.updatedAt " +
+            "FROM ContentTemplate e " +
+            "WHERE e.templateType = ?0 " +
+            "ORDER BY e.id DESC"
     )
     List<SimpleContentTemplateResult> findTemplatesByType(
         String templateType,
@@ -57,14 +58,35 @@ public interface ContentTemplateRepository
     );
 
     @EzyQuery(
-        "SELECT" +
-            " e.id, e.templateName, e.titleTemplate," +
-            " e.creatorId, e.status, e.createdAt, e.updatedAt" +
-            " FROM ContentTemplate e" +
-            " WHERE e.templateType IN ?0" +
-            " ORDER BY e.id DESC"
+        "SELECT e.id, e.templateName, e.titleTemplate, " +
+            "e.creatorId, e.status, e.createdAt, e.updatedAt " +
+            "FROM ContentTemplate e " +
+            "WHERE e.templateType IN ?0 " +
+            "ORDER BY e.id DESC"
     )
     List<SimpleContentTemplateResult> findTemplatesByTypeIn(
+        Collection<String> templateTypes,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT e.id, e.templateName " +
+            "FROM ContentTemplate e " +
+            "WHERE e.templateType = ?0 " +
+            "ORDER BY e.id DESC"
+    )
+    List<ContentTemplateIdAndNameResult> findTemplateIdAndNamesByType(
+        String templateType,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT e.id, e.templateName " +
+            "FROM ContentTemplate e " +
+            "WHERE e.templateType IN ?0 " +
+            "ORDER BY e.id DESC"
+    )
+    List<ContentTemplateIdAndNameResult> findTemplateIdAndNamesByTypeIn(
         Collection<String> templateTypes,
         Next next
     );
@@ -84,6 +106,16 @@ public interface ContentTemplateRepository
     ContentTemplate findByCreatorTypeAndCreatorIdAndTemplateTypeAndTemplateName(
         String creatorType,
         long creatorId,
+        String templateType,
+        String templateName
+    );
+
+    @EzyQuery(
+        "SELECT e.id FROM ContentTemplate e " +
+            "WHERE e.templateType = ?0 " +
+            "AND e.templateName = ?1"
+    )
+    IdResult findIdByTemplateTypeAndTemplateName(
         String templateType,
         String templateName
     );

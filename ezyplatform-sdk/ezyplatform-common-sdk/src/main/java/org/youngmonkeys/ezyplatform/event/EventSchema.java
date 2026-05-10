@@ -18,10 +18,13 @@ package org.youngmonkeys.ezyplatform.event;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
+import lombok.ToString;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@ToString
 public class EventSchema {
     private final String description;
     private final DataSchema argumentSchema;
@@ -72,6 +75,7 @@ public class EventSchema {
     }
 
     @Getter
+    @ToString
     public static class DataSchema {
         private final Class<?> dataType;
         private final String name;
@@ -126,8 +130,19 @@ public class EventSchema {
                 return this;
             }
 
+            public Builder field(DataSchema field) {
+                if (this.fields == null) {
+                    this.fields = new ArrayList<>();
+                }
+                this.fields.add(field);
+                return this;
+            }
+
             public Builder fields(List<DataSchema> fields) {
-                this.fields = fields;
+                if (this.fields == null) {
+                    this.fields = new ArrayList<>();
+                }
+                this.fields.addAll(fields);
                 return this;
             }
 
