@@ -16,12 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.web.test.controller;
 
-import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import org.youngmonkeys.ezyplatform.web.controller.WebGlobalErrorHandler;
 
 public class MyWebGlobalErrorHandlerTest {
 
-    @EzySingleton
-    public static class MyWebGlobalErrorHandler extends WebGlobalErrorHandler {
-    }
+    public static class MyWebGlobalErrorHandler
+        extends WebGlobalErrorHandler {}
 }

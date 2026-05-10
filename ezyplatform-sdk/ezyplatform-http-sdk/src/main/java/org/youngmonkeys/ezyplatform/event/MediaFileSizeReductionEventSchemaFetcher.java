@@ -16,14 +16,12 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import com.tvd12.ezyfox.bean.annotation.EzySingleton;
 import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
-import java.io.File;
 
+import java.io.File;
 import java.util.Arrays;
 
-@EzySingleton
 public class MediaFileSizeReductionEventSchemaFetcher
     implements EventSchemaFetcher {
 
