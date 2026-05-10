@@ -196,6 +196,37 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
+    public void updateMediaPublicIfExists(
+        long mediaId,
+        boolean isPublic
+    ) {
+        Media entity = mediaRepository.findById(mediaId);
+        if (entity != null) {
+            entity.setPublicMedia(isPublic);
+            modelToEntityConverter.mergeUpdatedAtToEntity(entity);
+            mediaRepository.save(entity);
+        }
+    }
+
+    @Override
+    public void updateMediasPublicIfExists(
+        Collection<Long> mediaIds,
+        boolean isPublic
+    ) {
+        if (mediaIds == null) {
+            return;
+        }
+        mediaIds
+            .parallelStream()
+            .forEach(it ->
+                updateMediaPublicIfExists(
+                    it,
+                    isPublic
+                )
+            );
+    }
+
+    @Override
     public MediaModel removeMedia(long mediaId) {
         Media entity = getMediaEntityByIdOrThrow(mediaId);
         removeMediaEntity(entity);

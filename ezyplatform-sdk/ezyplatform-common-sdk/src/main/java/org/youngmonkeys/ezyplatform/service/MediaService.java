@@ -70,6 +70,16 @@ public interface MediaService {
         String status
     );
 
+    void updateMediaPublicIfExists(
+        long mediaId,
+        boolean isPublic
+    );
+
+    void updateMediasPublicIfExists(
+        Collection<Long> mediaIds,
+        boolean isPublic
+    );
+
     default void saveMediaDurationInSeconds(
         long mediaId,
         BigDecimal duration
