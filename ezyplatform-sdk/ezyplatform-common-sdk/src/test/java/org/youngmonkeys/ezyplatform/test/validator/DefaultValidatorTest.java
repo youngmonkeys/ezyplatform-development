@@ -236,7 +236,7 @@ public class DefaultValidatorTest {
     public void isValidExternalUrlTest() {
         Asserts.assertTrue(isValidExternalUrl("https://allowed.com"));
         Asserts.assertTrue(isValidExternalUrl("https://sub.allowed.com"));
-        Asserts.assertTrue(isValidExternalUrl("https://trusted-site.org"));
+        Asserts.assertTrue(isValidExternalUrl("https://tvd12.com"));
         Asserts.assertTrue(isValidExternalUrl("https://deep.sub.trusted-site.org/path?query=1"));
 
         // invalid scheme

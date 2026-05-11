@@ -78,6 +78,9 @@ public class EventSchema {
     @ToString
     public static class DataSchema {
         private final Class<?> dataType;
+        private final Class<?> itemType;
+        private final Class<?> keyType;
+        private final Class<?> valueType;
         private final String name;
         private final boolean required;
         private final String description;
@@ -86,6 +89,9 @@ public class EventSchema {
 
         public DataSchema(DataSchema.Builder builder) {
             this.dataType = builder.dataType;
+            this.itemType = builder.itemType;
+            this.keyType = builder.keyType;
+            this.valueType = builder.valueType;
             this.name = builder.name;
             this.required = builder.required;
             this.description = builder.description;
@@ -99,6 +105,9 @@ public class EventSchema {
 
         public static class Builder implements EzyBuilder<DataSchema> {
             private Class<?> dataType;
+            private Class<?> itemType;
+            private Class<?> keyType;
+            private Class<?> valueType;
             private String name;
             private boolean required;
             private String description;
@@ -107,6 +116,21 @@ public class EventSchema {
 
             public Builder dataType(Class<?> dataType) {
                 this.dataType = dataType;
+                return this;
+            }
+
+            public Builder itemType(Class<?> itemType) {
+                this.itemType = itemType;
+                return this;
+            }
+
+            public Builder keyType(Class<?> keyType) {
+                this.keyType = keyType;
+                return this;
+            }
+
+            public Builder valueType(Class<?> valueType) {
+                this.valueType = valueType;
                 return this;
             }
 
