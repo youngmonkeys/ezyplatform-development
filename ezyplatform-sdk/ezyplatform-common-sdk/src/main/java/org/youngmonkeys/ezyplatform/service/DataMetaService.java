@@ -45,6 +45,15 @@ public interface DataMetaService {
         long dataId,
         String metaKey,
         String metaValue,
+        BigInteger numberValue,
+        String metaTextValue
+    );
+
+    void saveDataMeta(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue,
         String metaTextValue
     );
 
@@ -695,6 +704,13 @@ public interface DataMetaService {
             BigInteger::new
         );
     }
+
+    DataMetaModel getDataMetaByDataTypeAndDataIdAndMetaKeyAndMetaValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue
+    );
 
     List<DataMetaModel> getMetaListByDataTypeAndDataIdAndMetaKeys(
         String dataType,

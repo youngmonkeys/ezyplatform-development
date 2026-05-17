@@ -49,6 +49,25 @@ public class DefaultDataMetaService implements DataMetaService {
         long dataId,
         String metaKey,
         String metaValue,
+        BigInteger numberValue,
+        String metaTextValue
+    ) {
+        DataMeta entity = new DataMeta();
+        entity.setDataType(dataType);
+        entity.setDataId(dataId);
+        entity.setMetaKey(metaKey);
+        entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(numberValue);
+        entity.setMetaTextValue(metaTextValue);
+        dataMetaRepository.save(entity);
+    }
+
+    @Override
+    public void saveDataMeta(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue,
         String metaTextValue
     ) {
         DataMeta entity = new DataMeta();
@@ -594,6 +613,23 @@ public class DefaultDataMetaService implements DataMetaService {
                     (o, n) -> n
                 )
             );
+    }
+
+    @Override
+    public DataMetaModel getDataMetaByDataTypeAndDataIdAndMetaKeyAndMetaValue(
+        String dataType,
+        long dataId,
+        String metaKey,
+        String metaValue
+    ) {
+        return dataMetaRepository.findByDataTypeAndDataIdAndMetaKeyAndMetaValue(
+            dataType,
+            dataId,
+            metaKey,
+            metaValue
+        )
+            .map(entityToModelConverter::toModel)
+            .orElse(null);
     }
 
     @Override

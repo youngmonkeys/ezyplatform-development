@@ -47,6 +47,14 @@ public interface AdminMetaService {
         long adminId,
         String metaKey,
         String metaValue,
+        BigInteger numberValue,
+        String metaTextValue
+    );
+
+    void saveAdminMeta(
+        long adminId,
+        String metaKey,
+        String metaValue,
         String metaTextValue
     );
 
@@ -516,6 +524,12 @@ public interface AdminMetaService {
             BigInteger::new
         );
     }
+
+    AdminMetaModel getAdminMetaByAdminIdAndMetaKeyAndMetaValue(
+        long adminId,
+        String metaKey,
+        String metaValue
+    );
 
     List<AdminMetaModel> getMetaListByAdminIdAndMetaKeys(
         long adminId,
