@@ -47,6 +47,22 @@ public class DefaultUserMetaService implements UserMetaService {
     public void saveUserMeta(
         long userId,
         String metaKey,
+        String metaValue,
+        String metaTextValue
+    ) {
+        UserMeta entity = new UserMeta();
+        entity.setUserId(userId);
+        entity.setMetaKey(metaKey);
+        entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+        entity.setMetaTextValue(metaTextValue);
+        userMetaRepository.save(entity);
+    }
+
+    @Override
+    public void saveUserMeta(
+        long userId,
+        String metaKey,
         String metaValue
     ) {
         UserMeta entity = new UserMeta();

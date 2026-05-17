@@ -46,6 +46,13 @@ public interface AdminMetaService {
     void saveAdminMeta(
         long adminId,
         String metaKey,
+        String metaValue,
+        String metaTextValue
+    );
+
+    void saveAdminMeta(
+        long adminId,
+        String metaKey,
         String metaValue
     );
 

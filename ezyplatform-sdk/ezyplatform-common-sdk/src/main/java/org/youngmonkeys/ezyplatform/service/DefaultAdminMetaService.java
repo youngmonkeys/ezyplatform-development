@@ -45,6 +45,22 @@ public class DefaultAdminMetaService implements AdminMetaService {
     public void saveAdminMeta(
         long adminId,
         String metaKey,
+        String metaValue,
+        String metaTextValue
+    ) {
+        AdminMeta entity = new AdminMeta();
+        entity.setAdminId(adminId);
+        entity.setMetaKey(metaKey);
+        entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+        entity.setMetaTextValue(metaTextValue);
+        adminMetaRepository.save(entity);
+    }
+
+    @Override
+    public void saveAdminMeta(
+        long adminId,
+        String metaKey,
         String metaValue
     ) {
         AdminMeta entity = new AdminMeta();

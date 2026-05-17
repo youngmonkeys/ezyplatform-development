@@ -48,6 +48,24 @@ public class DefaultDataMetaService implements DataMetaService {
         String dataType,
         long dataId,
         String metaKey,
+        String metaValue,
+        String metaTextValue
+    ) {
+        DataMeta entity = new DataMeta();
+        entity.setDataType(dataType);
+        entity.setDataId(dataId);
+        entity.setMetaKey(metaKey);
+        entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+        entity.setMetaTextValue(metaTextValue);
+        dataMetaRepository.save(entity);
+    }
+
+    @Override
+    public void saveDataMeta(
+        String dataType,
+        long dataId,
+        String metaKey,
         String metaValue
     ) {
         DataMeta entity = new DataMeta();

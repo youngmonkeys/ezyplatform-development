@@ -40,6 +40,13 @@ public interface UserMetaService {
     void saveUserMeta(
         long userId,
         String metaKey,
+        String metaValue,
+        String metaTextValue
+    );
+
+    void saveUserMeta(
+        long userId,
+        String metaKey,
         String metaValue
     );
 

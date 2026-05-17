@@ -44,6 +44,14 @@ public interface DataMetaService {
         String dataType,
         long dataId,
         String metaKey,
+        String metaValue,
+        String metaTextValue
+    );
+
+    void saveDataMeta(
+        String dataType,
+        long dataId,
+        String metaKey,
         String metaValue
     );
 

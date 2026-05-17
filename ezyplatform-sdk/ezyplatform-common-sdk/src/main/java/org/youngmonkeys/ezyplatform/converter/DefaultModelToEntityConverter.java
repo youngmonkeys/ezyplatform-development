@@ -705,20 +705,23 @@ public class DefaultModelToEntityConverter {
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
-    protected String valueToJsonOrEmpty(Object value) {
+    public String valueToJsonOrEmpty(Object value) {
         String answer = valueToJsonOrNull(value);
         return answer != null ? answer : EMPTY_STRING;
     }
 
-    protected String valueToJsonOrNull(Object value) {
-        return valueToJson(value, false);
+    public String valueToJsonOrNull(Object value) {
+        return valueToJson(value, Boolean.FALSE);
     }
 
-    protected String valueToJson(Object value) {
-        return valueToJson(value, true);
+    public String valueToJson(Object value) {
+        return valueToJson(value, Boolean.TRUE);
     }
 
-    private String valueToJson(Object value, boolean throwException) {
+    public String valueToJson(
+        Object value,
+        boolean throwException
+    ) {
         if (value == null) {
             return null;
         }
@@ -729,7 +732,10 @@ public class DefaultModelToEntityConverter {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
             if (throwException) {
-                throw new IllegalArgumentException("can not convert value to json", e);
+                throw new IllegalArgumentException(
+                    "can not convert value to json",
+                    e
+                );
             }
             return null;
         }
