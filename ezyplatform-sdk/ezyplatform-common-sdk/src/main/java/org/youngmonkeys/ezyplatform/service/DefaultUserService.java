@@ -34,11 +34,19 @@ import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import org.youngmonkeys.ezyplatform.repo.UserAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRepository;
-import org.youngmonkeys.ezyplatform.result.*;
+import org.youngmonkeys.ezyplatform.result.IdNameResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -114,8 +122,32 @@ public class DefaultUserService implements UserService {
         userRepository.save(user);
     }
 
-    public void removeUserAccessToken(long userId) {
+    public void removeUserAccessToken(
+        long userId
+    ) {
         accessTokenRepository.deleteByUserId(userId);
+    }
+
+    public void removeUserAccessToken(
+        String accessToken
+    ) {
+        if (accessToken == null) {
+            return;
+        }
+        accessTokenRepository.delete(accessToken);
+    }
+
+    public void removeUserAccessToken(
+        long userId,
+        String accessToken
+    ) {
+        if (accessToken == null) {
+            return;
+        }
+        accessTokenRepository.deleteByIdAndUserId(
+            accessToken,
+            userId
+        );
     }
 
     public List<String> getAllUserStatuses() {

@@ -24,9 +24,18 @@ import java.util.Collection;
 public interface UserAccessTokenRepository
     extends EzyDatabaseRepository<String, UserAccessToken> {
 
-    void deleteByUserId(long userId);
+    void deleteByIdAndUserId(
+        String accessToken,
+        long userId
+    );
 
-    void deleteByUserIdIn(Collection<Long> userIds);
+    void deleteByUserId(
+        long userId
+    );
+
+    void deleteByUserIdIn(
+        Collection<Long> userIds
+    );
 
     UserAccessToken findByUserIdAndTokenType(
         long userId,
