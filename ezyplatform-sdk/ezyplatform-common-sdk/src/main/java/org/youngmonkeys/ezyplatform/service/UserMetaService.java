@@ -260,6 +260,11 @@ public interface UserMetaService {
     
     void deleteUserMetaByMetaKey(String metaKey);
 
+    void deleteUserMetaByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    );
+
     void deleteUserMetaByUserIdInAndMetaKeyIn(
         Collection<Long> userIds,
         Collection<String> metaKeys

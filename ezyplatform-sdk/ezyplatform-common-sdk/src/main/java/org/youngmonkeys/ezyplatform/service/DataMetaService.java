@@ -320,6 +320,12 @@ public interface DataMetaService {
         String metaKey
     );
 
+    void deleteByDataTypeAndDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    );
+
     void deleteByDataTypeAndDataIdInAndMetaKeyIn(
         String dataType,
         Collection<Long> dataIds,

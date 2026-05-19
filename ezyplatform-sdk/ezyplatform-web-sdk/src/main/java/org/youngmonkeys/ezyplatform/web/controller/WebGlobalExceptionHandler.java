@@ -46,6 +46,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 
 @Setter
@@ -108,7 +109,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(Collections.singletonMap("token", "invalid"))
                 .build();
         }
-        return WebViews.redirectToLogin(request, true);
+        return WebViews.redirectToLogin(request, Boolean.TRUE);
     }
 
     @TryCatch(UserAccessTokenExpiredException.class)
@@ -126,7 +127,7 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(Collections.singletonMap("token", "expired"))
                 .build();
         }
-        return WebViews.redirectToLogin(request, true);
+        return WebViews.redirectToLogin(request, Boolean.TRUE);
     }
 
     @TryCatch(IncorrectPasswordException.class)
@@ -385,12 +386,12 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
             ""
         );
         tokenCookie.setPath("/");
-        tokenCookie.setMaxAge(0);
+        tokenCookie.setMaxAge(ZERO);
         Cookie tokenCookieExpiredAt = new Cookie(
             COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT,
             "0"
         );
-        tokenCookieExpiredAt.setMaxAge(0);
+        tokenCookieExpiredAt.setMaxAge(ZERO);
         tokenCookieExpiredAt.setPath("/");
         String adminLoginUri = settingService.getAdminUrl() +
             "/sso-web" +

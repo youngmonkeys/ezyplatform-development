@@ -217,15 +217,28 @@ public class DefaultDataMetaService implements DataMetaService {
     }
 
     @Override
+    public void deleteByDataTypeAndDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    ) {
+        dataMetaRepository.deleteByDataTypeAndDataIdAndMetaKey(
+            dataType,
+            dataId,
+            metaKey
+        );
+    }
+
+    @Override
     public void deleteByDataTypeAndDataIdInAndMetaKeyIn(
         String dataType,
-        Collection<Long> productIds,
+        Collection<Long> dataIds,
         Collection<String> metaKeys
     ) {
-        if (!productIds.isEmpty() && !metaKeys.isEmpty()) {
+        if (!dataIds.isEmpty() && !metaKeys.isEmpty()) {
             dataMetaRepository.deleteByDataTypeAndDataIdInAndMetaKeyIn(
                 dataType,
-                productIds,
+                dataIds,
                 metaKeys
             );
         }

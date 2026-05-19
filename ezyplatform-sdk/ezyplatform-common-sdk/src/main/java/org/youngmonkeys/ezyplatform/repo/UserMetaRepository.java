@@ -38,6 +38,11 @@ public interface UserMetaRepository
 
     void deleteByMetaKey(String metaKey);
 
+    void deleteByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    );
+
     void deleteByUserIdInAndMetaKeyIn(
         Collection<Long> userIds,
         Collection<String> metaKeys

@@ -38,6 +38,11 @@ public interface AdminMetaRepository
 
     void deleteByMetaKey(String metaKey);
 
+    void deleteByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    );
+
     void deleteByAdminIdInAndMetaKeyIn(
         Collection<Long> adminIds,
         Collection<String> metaKeys
