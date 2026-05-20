@@ -94,12 +94,12 @@ public class DefaultUserServiceTest {
         UserAccessToken userAccessToken = instanceRandom
             .randomObject(UserAccessToken.class);
         userAccessToken.setUserId(userId);
-        userAccessToken.setId(accessToken);
+        userAccessToken.setToken(accessToken);
         userAccessToken.setTokenType(AccessTokenType.ACCESS_TOKEN.toString());
         userAccessToken.setStatus(AccessTokenStatus.ACTIVATED.toString());
         userAccessToken.setExpiredAt(now.plusDays(1));
         when(
-            userAccessTokenRepository.findById(accessToken)
+            userAccessTokenRepository.findByToken(accessToken)
         ).thenReturn(userAccessToken);
 
         when(
@@ -116,7 +116,7 @@ public class DefaultUserServiceTest {
 
         verify(
             userAccessTokenRepository, times(1)
-        ).findById(accessToken);
+        ).findByToken(accessToken);
 
         verify(
             userAccessTokenService, times(1)

@@ -395,7 +395,7 @@ public class DefaultModelToEntityConverter {
         LocalDateTime expiredAt
     ) {
         UserAccessToken userAccessToken = new UserAccessToken();
-        userAccessToken.setId(token);
+        userAccessToken.setToken(token);
         userAccessToken.setUserId(userId);
         userAccessToken.setTokenType(tokenType);
         userAccessToken.setStatus(status);

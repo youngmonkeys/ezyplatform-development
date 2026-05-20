@@ -22,9 +22,13 @@ import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 import java.util.Collection;
 
 public interface UserAccessTokenRepository
-    extends EzyDatabaseRepository<String, UserAccessToken> {
+    extends EzyDatabaseRepository<Long, UserAccessToken> {
 
-    void deleteByIdAndUserId(
+    void deleteByToken(
+        String accessToken
+    );
+
+    void deleteByTokenAndUserId(
         String accessToken,
         long userId
     );
@@ -40,5 +44,9 @@ public interface UserAccessTokenRepository
     UserAccessToken findByUserIdAndTokenType(
         long userId,
         String tokenType
+    );
+
+    UserAccessToken findByToken(
+        String accessToken
     );
 }

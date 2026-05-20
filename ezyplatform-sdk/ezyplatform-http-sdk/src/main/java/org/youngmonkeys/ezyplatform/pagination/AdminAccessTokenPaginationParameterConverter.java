@@ -50,7 +50,7 @@ public class AdminAccessTokenPaginationParameterConverter
         map.put(
             AdminAccessTokenPaginationSortOrder.ID_DESC.toString(),
             model -> new IdDescAdminAccessTokenPaginationParameter(
-                model.getAccessToken()
+                model.getId()
             )
         );
     }

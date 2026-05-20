@@ -30,7 +30,7 @@ public class PaginationUserAccessTokenService
         UserAccessTokenModel,
         UserAccessTokenFilter,
         UserAccessTokenPaginationParameter,
-        String,
+        Long,
         UserAccessToken> {
 
     private final DefaultEntityToModelConverter entityToModelConverter;

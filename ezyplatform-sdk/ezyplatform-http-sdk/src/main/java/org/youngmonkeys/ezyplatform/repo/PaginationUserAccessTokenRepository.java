@@ -24,7 +24,7 @@ public class PaginationUserAccessTokenRepository
     extends CommonPaginationRepository<
         UserAccessTokenFilter,
         UserAccessTokenPaginationParameter,
-        String,
+        Long,
         UserAccessToken> {
 
     @Override

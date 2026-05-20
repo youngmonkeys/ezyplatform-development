@@ -106,8 +106,9 @@ public class DefaultEntityToModelConverter {
             return null;
         }
         return AdminAccessTokenModel.builder()
+            .id(entity.getId())
             .adminId(entity.getAdminId())
-            .accessToken(entity.getId())
+            .accessToken(entity.getToken())
             .renewalCount(entity.getRenewalCount())
             .tokenType(entity.getTokenType())
             .status(entity.getStatus())
@@ -181,8 +182,9 @@ public class DefaultEntityToModelConverter {
             return null;
         }
         return UserAccessTokenModel.builder()
+            .id(entity.getId())
             .userId(entity.getUserId())
-            .accessToken(entity.getId())
+            .accessToken(entity.getToken())
             .renewalCount(entity.getRenewalCount())
             .tokenType(entity.getTokenType())
             .status(entity.getStatus())

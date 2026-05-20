@@ -28,7 +28,7 @@ import lombok.Setter;
 public class IdDescAdminAccessTokenPaginationParameter
     implements AdminAccessTokenPaginationParameter {
 
-    public String id;
+    public Long id;
 
     @Override
     public String paginationCondition(boolean nextPage) {

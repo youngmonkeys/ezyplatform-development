@@ -20,9 +20,13 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
 
 public interface AdminAccessTokenRepository
-    extends EzyDatabaseRepository<String, AdminAccessToken> {
+    extends EzyDatabaseRepository<Long, AdminAccessToken> {
 
-    void deleteByIdAndAdminId(
+    void deleteByToken(
+        String accessToken
+    );
+
+    void deleteByTokenAndAdminId(
         String accessToken,
         long adminId
     );
@@ -34,5 +38,9 @@ public interface AdminAccessTokenRepository
     AdminAccessToken findByAdminIdAndTokenType(
         long adminId,
         String tokenType
+    );
+
+    AdminAccessToken findByToken(
+        String accessToken
     );
 }

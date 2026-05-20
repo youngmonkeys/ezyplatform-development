@@ -134,7 +134,7 @@ public class DefaultUserService implements UserService {
         if (accessToken == null) {
             return;
         }
-        accessTokenRepository.delete(accessToken);
+        accessTokenRepository.deleteByToken(accessToken);
     }
 
     public void removeUserAccessToken(
@@ -144,7 +144,7 @@ public class DefaultUserService implements UserService {
         if (accessToken == null) {
             return;
         }
-        accessTokenRepository.deleteByIdAndUserId(
+        accessTokenRepository.deleteByTokenAndUserId(
             accessToken,
             userId
         );
@@ -413,7 +413,7 @@ public class DefaultUserService implements UserService {
     ) {
         if (accessToken != null) {
             UserAccessToken entity =
-                accessTokenRepository.findById(accessToken);
+                accessTokenRepository.findByToken(accessToken);
             if (entity != null
                 && tokenTypes.contains(entity.getTokenType())
             ) {
@@ -440,7 +440,7 @@ public class DefaultUserService implements UserService {
         String accessToken
     ) {
         return entityToModelConverter.toModel(
-            accessTokenRepository.findById(
+            accessTokenRepository.findByToken(
                 accessToken
             )
         );
@@ -473,7 +473,7 @@ public class DefaultUserService implements UserService {
         if (userId <= ZERO_LONG) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
-        UserAccessToken entity = accessTokenRepository.findById(
+        UserAccessToken entity = accessTokenRepository.findByToken(
             accessToken
         );
         if (entity == null) {
