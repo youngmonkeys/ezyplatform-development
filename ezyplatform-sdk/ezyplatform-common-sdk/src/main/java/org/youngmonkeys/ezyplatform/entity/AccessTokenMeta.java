@@ -92,6 +92,7 @@ public class AccessTokenMeta {
 
     private String audience;
 
+    // The time when the token becomes effective
     @Column(name = "not_before")
     private LocalDateTime notBefore;
 

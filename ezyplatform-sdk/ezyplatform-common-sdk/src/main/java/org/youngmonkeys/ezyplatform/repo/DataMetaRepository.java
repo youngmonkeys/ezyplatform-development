@@ -124,6 +124,14 @@ public interface DataMetaRepository
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId = ?1 " +
+            "AND e.metaKey = ?2 " +
+            "AND e.metaValue = ?3 " +
+            "ORDER BY e.id DESC"
+    )
     Optional<DataMeta> findByDataTypeAndDataIdAndMetaKeyAndMetaValue(
         String dataType,
         long dataId,

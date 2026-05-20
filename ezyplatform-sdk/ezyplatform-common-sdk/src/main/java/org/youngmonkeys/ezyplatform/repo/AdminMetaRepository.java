@@ -82,6 +82,13 @@ public interface AdminMetaRepository
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.adminId = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "AND e.metaValue = ?2 " +
+            "ORDER BY e.id DESC"
+    )
     Optional<AdminMeta> findByAdminIdAndMetaKeyAndMetaValue(
         long adminId,
         String metaKey,

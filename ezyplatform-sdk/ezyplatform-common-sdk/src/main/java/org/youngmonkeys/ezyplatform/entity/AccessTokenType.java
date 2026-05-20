@@ -34,4 +34,8 @@ public enum AccessTokenType {
     public boolean equalsValue(String value) {
         return toString().equals(value);
     }
+
+    public boolean equalsValueIgnoreCase(String value) {
+        return toString().equalsIgnoreCase(value);
+    }
 }

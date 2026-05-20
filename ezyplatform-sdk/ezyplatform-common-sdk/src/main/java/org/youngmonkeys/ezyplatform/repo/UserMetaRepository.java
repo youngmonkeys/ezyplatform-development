@@ -82,6 +82,13 @@ public interface UserMetaRepository
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.userId = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "AND e.metaValue = ?2 " +
+            "ORDER BY e.id DESC"
+    )
     Optional<UserMeta> findByUserIdAndMetaKeyAndMetaValue(
         long userId,
         String metaKey,
