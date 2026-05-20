@@ -55,6 +55,7 @@ public final class CommonConstants {
     public static final String UNKNOWN_LOWERCASE = "unknown";
     public static final Void VOID = null;
 
+    public static final String HTTP = "http";
     public static final String HTTPS = "https";
     public static final String LOCALHOST = "localhost";
 
