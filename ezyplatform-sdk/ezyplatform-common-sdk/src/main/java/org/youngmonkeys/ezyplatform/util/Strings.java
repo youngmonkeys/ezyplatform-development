@@ -28,10 +28,17 @@ import java.time.LocalTime;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static com.tvd12.ezyfox.io.EzyStrings.*;
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.lang.Character.isWhitespace;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_META_VALUE_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PARAMETER_TYPE_NAME_DATE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PARAMETER_TYPE_NAME_DATETIME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PARAMETER_TYPE_NAME_TIME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 
+@SuppressWarnings("MethodCount")
 public final class Strings {
 
     public static final String SPECIAL_CHARACTERS =
@@ -567,5 +574,22 @@ public final class Strings {
             return EMPTY_STRING;
         }
         return value;
+    }
+
+    public static boolean containsControlCharacter(
+        String value
+    ) {
+        for (int i = 0; i < value.length(); ++i) {
+            if (Character.isISOControl(value.charAt(i))) {
+                return Boolean.TRUE;
+            }
+        }
+        return Boolean.FALSE;
+    }
+
+    public static String toStringOrNull(
+        Object value
+    ) {
+        return value != null ? value.toString() : null;
     }
 }

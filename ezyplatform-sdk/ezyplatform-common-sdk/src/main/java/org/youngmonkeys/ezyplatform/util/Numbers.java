@@ -86,6 +86,17 @@ public final class Numbers {
         }
     }
 
+    private long toLongOrZeroFromObject(Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        try {
+            return Long.parseLong(value.toString());
+        } catch (Exception e) {
+            return ZERO_LONG;
+        }
+    }
+
     public static String toPaddedValueLong(
         BigInteger value
     ) {
