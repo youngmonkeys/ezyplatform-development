@@ -191,7 +191,7 @@ public class DefaultAdminService implements AdminService {
     ) {
         if (accessToken != null) {
             AdminAccessToken entity = accessTokenRepository
-                .findById(accessToken);
+                .findByToken(accessToken);
             if (entity != null
                 && tokenTypes.contains(entity.getTokenType())
             ) {
@@ -292,7 +292,7 @@ public class DefaultAdminService implements AdminService {
         String accessToken
     ) {
         return entityToModelConverter.toModel(
-            accessTokenRepository.findById(accessToken)
+            accessTokenRepository.findByToken(accessToken)
         );
     }
 
@@ -323,7 +323,7 @@ public class DefaultAdminService implements AdminService {
         if (adminId <= ZERO_LONG) {
             throw new AdminInvalidAccessTokenException(accessToken);
         }
-        AdminAccessToken entity = accessTokenRepository.findById(
+        AdminAccessToken entity = accessTokenRepository.findByToken(
             accessToken
         );
         if (entity == null) {

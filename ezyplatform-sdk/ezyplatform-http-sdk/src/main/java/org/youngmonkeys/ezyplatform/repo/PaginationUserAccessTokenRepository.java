@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,37 +16,19 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
-import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
+import org.youngmonkeys.ezyplatform.pagination.UserAccessTokenFilter;
+import org.youngmonkeys.ezyplatform.pagination.UserAccessTokenPaginationParameter;
 
-import java.util.Collection;
+public class PaginationUserAccessTokenRepository
+    extends CommonPaginationRepository<
+        UserAccessTokenFilter,
+        UserAccessTokenPaginationParameter,
+        Long,
+        UserAccessToken> {
 
-public interface UserAccessTokenRepository
-    extends EzyDatabaseRepository<Long, UserAccessToken> {
-
-    void deleteByToken(
-        String accessToken
-    );
-
-    void deleteByTokenAndUserId(
-        String accessToken,
-        long userId
-    );
-
-    void deleteByUserId(
-        long userId
-    );
-
-    void deleteByUserIdIn(
-        Collection<Long> userIds
-    );
-
-    UserAccessToken findByUserIdAndTokenType(
-        long userId,
-        String tokenType
-    );
-
-    UserAccessToken findByToken(
-        String accessToken
-    );
+    @Override
+    protected Class<UserAccessToken> getEntityType() {
+        return UserAccessToken.class;
+    }
 }

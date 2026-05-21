@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.repo.UserMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.UserMetaTransactionalRepository;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -42,6 +43,39 @@ public class DefaultUserMetaService implements UserMetaService {
     private final UserMetaRepository userMetaRepository;
     private final UserMetaTransactionalRepository userMetaTransactionalRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+
+    @Override
+    public void saveUserMeta(
+        long userId,
+        String metaKey,
+        String metaValue,
+        BigInteger numberValue,
+        String metaTextValue
+    ) {
+        UserMeta entity = new UserMeta();
+        entity.setUserId(userId);
+        entity.setMetaKey(metaKey);
+        entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(numberValue);
+        entity.setMetaTextValue(metaTextValue);
+        userMetaRepository.save(entity);
+    }
+
+    @Override
+    public void saveUserMeta(
+        long userId,
+        String metaKey,
+        String metaValue,
+        String metaTextValue
+    ) {
+        UserMeta entity = new UserMeta();
+        entity.setUserId(userId);
+        entity.setMetaKey(metaKey);
+        entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+        entity.setMetaTextValue(metaTextValue);
+        userMetaRepository.save(entity);
+    }
 
     @Override
     public void saveUserMeta(
@@ -139,6 +173,16 @@ public class DefaultUserMetaService implements UserMetaService {
     
     public void deleteUserMetaByMetaKey(String metaKey) {
         userMetaRepository.deleteByMetaKey(metaKey);
+    }
+
+    public void deleteUserMetaByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    ) {
+        userMetaRepository.deleteByUserIdAndMetaKey(
+            userId,
+            metaKey
+        );
     }
 
     public void deleteUserMetaByUserIdInAndMetaKeyIn(
@@ -395,6 +439,21 @@ public class DefaultUserMetaService implements UserMetaService {
                     (o, n) -> n
                 )
             );
+    }
+
+    @Override
+    public UserMetaModel getUserMetaByUserIdAndMetaKeyAndMetaValue(
+        long userId,
+        String metaKey,
+        String metaValue
+    ) {
+        return userMetaRepository.findByUserIdAndMetaKeyAndMetaValue(
+            userId,
+            metaKey,
+            metaValue
+        )
+            .map(entityToModelConverter::toModel)
+            .orElse(null);
     }
 
     @Override

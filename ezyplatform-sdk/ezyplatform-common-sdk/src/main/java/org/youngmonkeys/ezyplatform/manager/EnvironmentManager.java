@@ -23,6 +23,8 @@ public interface EnvironmentManager {
 
     boolean isDebugMode();
 
+    boolean isWithoutProxy();
+
     String getEnvironment();
 
     String getPlatformVersion();

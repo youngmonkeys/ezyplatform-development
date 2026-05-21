@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,8 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.model;
+package org.youngmonkeys.ezyplatform.pagination;
 
-import lombok.Builder;
-import lombok.Getter;
-
-import java.time.LocalDateTime;
-
-@Getter
-@Builder
-public class AdminAccessTokenModel
-    implements AccessTokenModel {
-    private long id;
-    private long adminId;
-    private String accessToken;
-    private long renewalCount;
-    private String tokenType;
-    private String status;
-    private LocalDateTime createdAt;
-    private LocalDateTime expiredAt;
-    private long createdAtTimestamp;
-    private long expiredAtTimestamp;
+public enum UserAccessTokenPaginationSortOrder {
+    ID_DESC
 }

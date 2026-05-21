@@ -175,7 +175,7 @@ public class DefaultModelToEntityConverterTest {
 
         // then
         UserAccessToken userAccessToken = new UserAccessToken();
-        userAccessToken.setId(accessToken);
+        userAccessToken.setToken(accessToken);
         userAccessToken.setUserId(userId);
         userAccessToken.setTokenType(tokenType);
         userAccessToken.setStatus(AccessTokenStatus.ACTIVATED.toString());

@@ -18,7 +18,6 @@ package org.youngmonkeys.ezyplatform.constant;
 
 public final class CommonTableNames {
 
-    public static final String TABLE_NAME_ACCESS_TOKEN_META = "ezy_access_token_meta";
     public static final String TABLE_NAME_ADMIN = "ezy_admins";
     public static final String TABLE_NAME_ADMIN_ACCESS_TOKEN = "ezy_admin_access_tokens";
     public static final String TABLE_NAME_ADMIN_ACTIVITY_HISTORY = "ezy_admin_activity_histories";

@@ -996,6 +996,72 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void containsControlCharacterTest() {
+        // given
+        // when
+        // then
+        Asserts.assertFalse(
+            containsControlCharacter("hello world")
+        );
+        Asserts.assertFalse(
+            containsControlCharacter("")
+        );
+        Asserts.assertFalse(
+            containsControlCharacter("Xin chào Việt Nam")
+        );
+        Asserts.assertFalse(
+            containsControlCharacter("你好世界")
+        );
+        Asserts.assertFalse(
+            containsControlCharacter("hello 世界, tiếng Việt")
+        );
+        Asserts.assertFalse(
+            containsControlCharacter("emoji 😀")
+        );
+        Asserts.assertTrue(
+            containsControlCharacter("hello\nworld")
+        );
+        Asserts.assertTrue(
+            containsControlCharacter("hello\tworld")
+        );
+        Asserts.assertTrue(
+            containsControlCharacter("hello\u0000world")
+        );
+        Asserts.assertTrue(
+            containsControlCharacter("hello\u007Fworld")
+        );
+    }
+
+    @Test
+    public void toStringOrNullTest() {
+        // given
+        Object object = new Object() {
+            @Override
+            public String toString() {
+                return "hello";
+            }
+        };
+
+        // when
+        // then
+        Asserts.assertEquals(
+            toStringOrNull("hello"),
+            "hello"
+        );
+        Asserts.assertEquals(
+            toStringOrNull(10),
+            "10"
+        );
+        Asserts.assertEquals(
+            toStringOrNull(object),
+            "hello"
+        );
+        Asserts.assertNull(
+            toStringOrNull(null)
+        );
+    }
+
+    @Test
     public void toMetaValueTest() {
         // given
         String metaValue = RandomUtil.randomShortAlphabetString();

@@ -32,7 +32,8 @@ public enum AccessTokenStatus {
     REFRESHING,
     BLOCKED,
     DELETED,
-    WAITING_2FA;
+    WAITING_2FA,
+    LOGGED_OUT;
 
     private static final Map<String, AccessTokenStatus> MAP_BY_NAME =
         EzyEnums.enumMap(AccessTokenStatus.class, AccessTokenStatus::toString);

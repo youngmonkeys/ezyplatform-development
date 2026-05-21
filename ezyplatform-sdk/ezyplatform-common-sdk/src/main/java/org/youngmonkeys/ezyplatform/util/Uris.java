@@ -21,8 +21,10 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.URLEncoder;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
+import static com.tvd12.ezyfox.io.EzyStrings.UTF_8;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_FILE_EXTENSION_LENGTH;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTPS_URL;
@@ -199,5 +201,29 @@ public final class Uris {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public static String addQueryParameter(
+        String uri,
+        String name,
+        String value
+    ) throws Exception {
+        if (isBlank(value)) {
+            return uri;
+        }
+        return uri
+            + querySeparator(uri)
+            + URLEncoder.encode(name, UTF_8)
+            + "="
+            + URLEncoder.encode(value, UTF_8);
+    }
+
+    public static String querySeparator(
+        String uri
+    ) {
+        if (uri.endsWith("?") || uri.endsWith("&")) {
+            return "";
+        }
+        return uri.contains("?") ? "&" : "?";
     }
 }

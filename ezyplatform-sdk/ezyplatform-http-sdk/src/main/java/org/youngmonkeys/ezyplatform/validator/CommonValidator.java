@@ -46,7 +46,10 @@ public class CommonValidator {
         }
     }
 
-    public void validateSearchText(String textName, String textValue) {
+    public void validateSearchText(
+        String textName,
+        String textValue
+    ) {
         validateSearchText(
             textName,
             textValue,

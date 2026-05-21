@@ -25,12 +25,17 @@ public enum AccessTokenType {
     ID_TOKEN,
     JWT_TOKEN,
     WEB_MANAGEMENT_TOKEN,
-    SOCKET_TOKEN;
+    SOCKET_TOKEN,
+    API_KEY;
 
     public static final Set<String> ACCESS_TOKEN_SINGLE_SET =
         Collections.singleton(ACCESS_TOKEN.toString());
 
     public boolean equalsValue(String value) {
         return toString().equals(value);
+    }
+
+    public boolean equalsValueIgnoreCase(String value) {
+        return toString().equalsIgnoreCase(value);
     }
 }

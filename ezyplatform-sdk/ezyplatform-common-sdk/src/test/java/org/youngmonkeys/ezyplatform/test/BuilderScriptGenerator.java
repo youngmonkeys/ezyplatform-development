@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.tool.EzyBuilderCreator;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
 
 public class BuilderScriptGenerator {
+
     public static void main(String[] args) throws Exception {
         EzyBuilderCreator creator = new EzyBuilderCreator();
         System.out.println(

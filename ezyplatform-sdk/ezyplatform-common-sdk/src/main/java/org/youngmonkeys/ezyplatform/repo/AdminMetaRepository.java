@@ -38,6 +38,11 @@ public interface AdminMetaRepository
 
     void deleteByMetaKey(String metaKey);
 
+    void deleteByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    );
+
     void deleteByAdminIdInAndMetaKeyIn(
         Collection<Long> adminIds,
         Collection<String> metaKeys
@@ -77,6 +82,13 @@ public interface AdminMetaRepository
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.adminId = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "AND e.metaValue = ?2 " +
+            "ORDER BY e.id DESC"
+    )
     Optional<AdminMeta> findByAdminIdAndMetaKeyAndMetaValue(
         long adminId,
         String metaKey,

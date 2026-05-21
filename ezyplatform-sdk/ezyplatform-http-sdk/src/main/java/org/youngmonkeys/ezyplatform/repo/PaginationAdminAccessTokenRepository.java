@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
-import com.tvd12.ezydata.database.EzyDatabaseRepository;
-import org.youngmonkeys.ezyplatform.entity.AccessTokenMeta;
+import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
+import org.youngmonkeys.ezyplatform.pagination.AdminAccessTokenFilter;
+import org.youngmonkeys.ezyplatform.pagination.AdminAccessTokenPaginationParameter;
 
-public interface AccessTokenMetaRepository
-    extends EzyDatabaseRepository<Long, AccessTokenMeta> {
+public class PaginationAdminAccessTokenRepository
+    extends CommonPaginationRepository<
+        AdminAccessTokenFilter,
+        AdminAccessTokenPaginationParameter,
+        Long,
+        AdminAccessToken> {
 
-    void deleteByTargetAndAccessToken(
-        String target,
-        String accessToken
-    );
-
-    AccessTokenMeta findByTargetAndAccessToken(
-        String target,
-        String accessToken
-    );
+    @Override
+    protected Class<AdminAccessToken> getEntityType() {
+        return AdminAccessToken.class;
+    }
 }

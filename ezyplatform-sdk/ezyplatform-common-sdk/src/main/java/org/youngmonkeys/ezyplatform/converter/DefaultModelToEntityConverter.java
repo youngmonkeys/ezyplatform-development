@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.constant.CommonConstants;
-import org.youngmonkeys.ezyplatform.entity.AccessTokenMeta;
 import org.youngmonkeys.ezyplatform.entity.AdminActivityHistory;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
 import org.youngmonkeys.ezyplatform.entity.DataI18n;
@@ -49,7 +48,6 @@ import org.youngmonkeys.ezyplatform.model.AddNotificationReceiverModel;
 import org.youngmonkeys.ezyplatform.model.AddUserKeywordModel;
 import org.youngmonkeys.ezyplatform.model.DataI18nModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
-import org.youngmonkeys.ezyplatform.model.SaveAccessTokenMetaModel;
 import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
 import org.youngmonkeys.ezyplatform.model.SaveDataMappingModel;
@@ -347,16 +345,6 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
-    public AccessTokenMeta toEntity(
-        SaveAccessTokenMetaModel model
-    ) {
-        AccessTokenMeta entity = new AccessTokenMeta();
-        entity.setTarget(model.getTarget());
-        entity.setAccessToken(model.getAccessToken());
-        mergeToEntity(model, entity);
-        return entity;
-    }
-
     public UserAccessToken toUserAccessTokenEntity(
         long userId,
         String token,
@@ -407,7 +395,7 @@ public class DefaultModelToEntityConverter {
         LocalDateTime expiredAt
     ) {
         UserAccessToken userAccessToken = new UserAccessToken();
-        userAccessToken.setId(token);
+        userAccessToken.setToken(token);
         userAccessToken.setUserId(userId);
         userAccessToken.setTokenType(tokenType);
         userAccessToken.setStatus(status);
@@ -653,32 +641,6 @@ public class DefaultModelToEntityConverter {
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
-    public void mergeToEntity(
-        SaveAccessTokenMetaModel model,
-        AccessTokenMeta entity
-    ) {
-        entity.setAccessTokenFull(model.getAccessTokenFull());
-        entity.setParentId(model.getParentId());
-        entity.setTokenType(model.getTokenType());
-        entity.setAlgorithm(model.getAlgorithm());
-        entity.setScope(model.getScope());
-        entity.setIssuer(model.getIssuer());
-        entity.setTenantId(model.getTenantId());
-        entity.setClientId(model.getClientId());
-        entity.setDeviceId(model.getDeviceId());
-        entity.setClientSecret(model.getClientSecret());
-        entity.setGrantType(model.getGrantType());
-        entity.setKid(model.getKid());
-        entity.setJwksUri(model.getJwksUri());
-        entity.setPublicKey(model.getPublicKey());
-        entity.setPrivateKey(model.getPrivateKey());
-        entity.setAudience(model.getAudience());
-        entity.setNotBefore(
-            clock.toLocalDateTimeOrNull(model.getNotBefore())
-        );
-        entity.setUpdatedAt(clock.nowDateTime());
-    }
-
     public void mergeUpdatedAtToEntity(
         Media entity
     ) {
@@ -705,20 +667,23 @@ public class DefaultModelToEntityConverter {
         entity.setUpdatedAt(clock.nowDateTime());
     }
 
-    protected String valueToJsonOrEmpty(Object value) {
+    public String valueToJsonOrEmpty(Object value) {
         String answer = valueToJsonOrNull(value);
         return answer != null ? answer : EMPTY_STRING;
     }
 
-    protected String valueToJsonOrNull(Object value) {
-        return valueToJson(value, false);
+    public String valueToJsonOrNull(Object value) {
+        return valueToJson(value, Boolean.FALSE);
     }
 
-    protected String valueToJson(Object value) {
-        return valueToJson(value, true);
+    public String valueToJson(Object value) {
+        return valueToJson(value, Boolean.TRUE);
     }
 
-    private String valueToJson(Object value, boolean throwException) {
+    public String valueToJson(
+        Object value,
+        boolean throwException
+    ) {
         if (value == null) {
             return null;
         }
@@ -729,7 +694,10 @@ public class DefaultModelToEntityConverter {
             return objectMapper.writeValueAsString(value);
         } catch (JsonProcessingException e) {
             if (throwException) {
-                throw new IllegalArgumentException("can not convert value to json", e);
+                throw new IllegalArgumentException(
+                    "can not convert value to json",
+                    e
+                );
             }
             return null;
         }

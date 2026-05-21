@@ -46,6 +46,21 @@ public interface AdminMetaService {
     void saveAdminMeta(
         long adminId,
         String metaKey,
+        String metaValue,
+        BigInteger numberValue,
+        String metaTextValue
+    );
+
+    void saveAdminMeta(
+        long adminId,
+        String metaKey,
+        String metaValue,
+        String metaTextValue
+    );
+
+    void saveAdminMeta(
+        long adminId,
+        String metaKey,
         String metaValue
     );
 
@@ -247,6 +262,11 @@ public interface AdminMetaService {
     );
     
     void deleteAdminMetaByMetaKey(String metaKey);
+
+    void deleteAdminMetaByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    );
 
     void deleteAdminMetaByAdminIdInAndMetaKeyIn(
         Collection<Long> adminIds,
@@ -509,6 +529,12 @@ public interface AdminMetaService {
             BigInteger::new
         );
     }
+
+    AdminMetaModel getAdminMetaByAdminIdAndMetaKeyAndMetaValue(
+        long adminId,
+        String metaKey,
+        String metaValue
+    );
 
     List<AdminMetaModel> getMetaListByAdminIdAndMetaKeys(
         long adminId,

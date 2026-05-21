@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.repo.AdminMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaTransactionalRepository;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -40,6 +41,39 @@ public class DefaultAdminMetaService implements AdminMetaService {
     private final AdminMetaRepository adminMetaRepository;
     private final AdminMetaTransactionalRepository adminMetaTransactionalRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+
+    @Override
+    public void saveAdminMeta(
+        long adminId,
+        String metaKey,
+        String metaValue,
+        BigInteger numberValue,
+        String metaTextValue
+    ) {
+        AdminMeta entity = new AdminMeta();
+        entity.setAdminId(adminId);
+        entity.setMetaKey(metaKey);
+        entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(numberValue);
+        entity.setMetaTextValue(metaTextValue);
+        adminMetaRepository.save(entity);
+    }
+
+    @Override
+    public void saveAdminMeta(
+        long adminId,
+        String metaKey,
+        String metaValue,
+        String metaTextValue
+    ) {
+        AdminMeta entity = new AdminMeta();
+        entity.setAdminId(adminId);
+        entity.setMetaKey(metaKey);
+        entity.setMetaValue(metaValue);
+        entity.setMetaNumberValue(toBigIntegerOrZero(metaValue));
+        entity.setMetaTextValue(metaTextValue);
+        adminMetaRepository.save(entity);
+    }
 
     @Override
     public void saveAdminMeta(
@@ -137,6 +171,16 @@ public class DefaultAdminMetaService implements AdminMetaService {
     
     public void deleteAdminMetaByMetaKey(String metaKey) {
         adminMetaRepository.deleteByMetaKey(metaKey);
+    }
+
+    public void deleteAdminMetaByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    ) {
+        adminMetaRepository.deleteByAdminIdAndMetaKey(
+            adminId,
+            metaKey
+        );
     }
 
     public void deleteAdminMetaByAdminIdInAndMetaKeyIn(
@@ -379,6 +423,21 @@ public class DefaultAdminMetaService implements AdminMetaService {
                     (o, n) -> n
                 )
             );
+    }
+
+    @Override
+    public AdminMetaModel getAdminMetaByAdminIdAndMetaKeyAndMetaValue(
+        long adminId,
+        String metaKey,
+        String metaValue
+    ) {
+        return adminMetaRepository.findByAdminIdAndMetaKeyAndMetaValue(
+            adminId,
+            metaKey,
+            metaValue
+        )
+            .map(entityToModelConverter::toModel)
+            .orElse(null);
     }
 
     @Override

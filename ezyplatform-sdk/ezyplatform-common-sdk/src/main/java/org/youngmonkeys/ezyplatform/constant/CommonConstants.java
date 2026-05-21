@@ -37,8 +37,12 @@ public final class CommonConstants {
     public static final int ONE = 1;
     public static final long ZERO_LONG = 0L;
 
+    public static final BigDecimal ONE_HUNDRED_BIG_DECIMAL =
+        BigDecimal.valueOf(100);
     public static final BigDecimal NULL_BIG_DECIMAL = null;
     public static final BigInteger NULL_BIG_INTEGER = null;
+    public static final BigInteger ONE_HUNDRED_BIG_INTEGER =
+        BigInteger.valueOf(100);
     public static final File NULL_FILE = null;
     public static final Integer NULL_INTEGER = null;
     public static final Long NULL_LONG = null;
@@ -51,6 +55,7 @@ public final class CommonConstants {
     public static final String UNKNOWN_LOWERCASE = "unknown";
     public static final Void VOID = null;
 
+    public static final String HTTP = "http";
     public static final String HTTPS = "https";
     public static final String LOCALHOST = "localhost";
 
@@ -89,6 +94,8 @@ public final class CommonConstants {
     public static final String PREFIX_HTTP_URL = "http://";
     public static final String PREFIX_HTTPS_URL = "https://";
     public static final String PREFIX_BEARER_TOKEN = "Bearer ";
+
+    public static final String TOKEN_TYPE_BEARER = "Bearer";
 
     public static final int MAX_FETCH_ROUND = 3;
     public static final int MAX_LENGTH_UUID = 128;

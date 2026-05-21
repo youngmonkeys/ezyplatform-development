@@ -24,7 +24,11 @@ import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -36,6 +40,21 @@ import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
 @SuppressWarnings("MethodCount")
 public interface UserMetaService {
+
+    void saveUserMeta(
+        long userId,
+        String metaKey,
+        String metaValue,
+        BigInteger numberValue,
+        String metaTextValue
+    );
+
+    void saveUserMeta(
+        long userId,
+        String metaKey,
+        String metaValue,
+        String metaTextValue
+    );
 
     void saveUserMeta(
         long userId,
@@ -240,6 +259,11 @@ public interface UserMetaService {
     );
     
     void deleteUserMetaByMetaKey(String metaKey);
+
+    void deleteUserMetaByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    );
 
     void deleteUserMetaByUserIdInAndMetaKeyIn(
         Collection<Long> userIds,
@@ -517,6 +541,12 @@ public interface UserMetaService {
             BigInteger::new
         );
     }
+
+    UserMetaModel getUserMetaByUserIdAndMetaKeyAndMetaValue(
+        long userId,
+        String metaKey,
+        String metaValue
+    );
 
     List<UserMetaModel> getMetaListByUserIdAndMetaKeys(
         long userId,

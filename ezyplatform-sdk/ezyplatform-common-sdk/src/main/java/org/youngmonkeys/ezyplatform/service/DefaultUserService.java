@@ -34,11 +34,19 @@ import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import org.youngmonkeys.ezyplatform.repo.UserAccessTokenRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRepository;
-import org.youngmonkeys.ezyplatform.result.*;
+import org.youngmonkeys.ezyplatform.result.IdNameResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -114,8 +122,32 @@ public class DefaultUserService implements UserService {
         userRepository.save(user);
     }
 
-    public void removeUserAccessToken(long userId) {
+    public void removeUserAccessToken(
+        long userId
+    ) {
         accessTokenRepository.deleteByUserId(userId);
+    }
+
+    public void removeUserAccessToken(
+        String accessToken
+    ) {
+        if (accessToken == null) {
+            return;
+        }
+        accessTokenRepository.deleteByToken(accessToken);
+    }
+
+    public void removeUserAccessToken(
+        long userId,
+        String accessToken
+    ) {
+        if (accessToken == null) {
+            return;
+        }
+        accessTokenRepository.deleteByTokenAndUserId(
+            accessToken,
+            userId
+        );
     }
 
     public List<String> getAllUserStatuses() {
@@ -381,7 +413,7 @@ public class DefaultUserService implements UserService {
     ) {
         if (accessToken != null) {
             UserAccessToken entity =
-                accessTokenRepository.findById(accessToken);
+                accessTokenRepository.findByToken(accessToken);
             if (entity != null
                 && tokenTypes.contains(entity.getTokenType())
             ) {
@@ -408,7 +440,7 @@ public class DefaultUserService implements UserService {
         String accessToken
     ) {
         return entityToModelConverter.toModel(
-            accessTokenRepository.findById(
+            accessTokenRepository.findByToken(
                 accessToken
             )
         );
@@ -441,7 +473,7 @@ public class DefaultUserService implements UserService {
         if (userId <= ZERO_LONG) {
             throw new UserInvalidAccessTokenException(accessToken);
         }
-        UserAccessToken entity = accessTokenRepository.findById(
+        UserAccessToken entity = accessTokenRepository.findByToken(
             accessToken
         );
         if (entity == null) {

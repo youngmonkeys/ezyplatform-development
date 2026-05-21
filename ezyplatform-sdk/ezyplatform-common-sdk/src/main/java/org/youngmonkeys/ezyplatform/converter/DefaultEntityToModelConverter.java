@@ -17,7 +17,6 @@
 package org.youngmonkeys.ezyplatform.converter;
 
 import lombok.AllArgsConstructor;
-import org.youngmonkeys.ezyplatform.entity.AccessTokenMeta;
 import org.youngmonkeys.ezyplatform.entity.Admin;
 import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
@@ -41,7 +40,6 @@ import org.youngmonkeys.ezyplatform.entity.UserKeyword;
 import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
 import org.youngmonkeys.ezyplatform.entity.UserRoleName;
-import org.youngmonkeys.ezyplatform.model.AccessTokenMetaModel;
 import org.youngmonkeys.ezyplatform.model.AdminAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.AdminMetaModel;
 import org.youngmonkeys.ezyplatform.model.AdminModel;
@@ -108,8 +106,9 @@ public class DefaultEntityToModelConverter {
             return null;
         }
         return AdminAccessTokenModel.builder()
+            .id(entity.getId())
             .adminId(entity.getAdminId())
-            .accessToken(entity.getId())
+            .accessToken(entity.getToken())
             .renewalCount(entity.getRenewalCount())
             .tokenType(entity.getTokenType())
             .status(entity.getStatus())
@@ -183,8 +182,9 @@ public class DefaultEntityToModelConverter {
             return null;
         }
         return UserAccessTokenModel.builder()
+            .id(entity.getId())
             .userId(entity.getUserId())
-            .accessToken(entity.getId())
+            .accessToken(entity.getToken())
             .renewalCount(entity.getRenewalCount())
             .tokenType(entity.getTokenType())
             .status(entity.getStatus())
@@ -517,35 +517,6 @@ public class DefaultEntityToModelConverter {
             .metaValue(entity.getMetaValue())
             .metaNumberValue(entity.getMetaNumberValue())
             .metaTextValue(entity.getMetaTextValue())
-            .build();
-    }
-
-    public AccessTokenMetaModel toModel(AccessTokenMeta entity) {
-        if (entity == null) {
-            return null;
-        }
-        return AccessTokenMetaModel.builder()
-            .id(entity.getId())
-            .target(entity.getTarget())
-            .accessToken(entity.getAccessToken())
-            .accessTokenFull(entity.getAccessTokenFull())
-            .parentId(entity.getParentId())
-            .tokenType(entity.getTokenType())
-            .algorithm(entity.getAlgorithm())
-            .scope(entity.getScope())
-            .issuer(entity.getIssuer())
-            .tenantId(entity.getTenantId())
-            .clientId(entity.getClientId())
-            .deviceId(entity.getDeviceId())
-            .clientSecret(entity.getClientSecret())
-            .grantType(entity.getGrantType())
-            .kid(entity.getKid())
-            .jwksUri(entity.getJwksUri())
-            .publicKey(entity.getPublicKey())
-            .privateKey(entity.getPrivateKey())
-            .audience(entity.getAudience())
-            .notBefore(toTimestamp(entity.getNotBefore()))
-            .updatedAt(toTimestamp(entity.getUpdatedAt()))
             .build();
     }
 
