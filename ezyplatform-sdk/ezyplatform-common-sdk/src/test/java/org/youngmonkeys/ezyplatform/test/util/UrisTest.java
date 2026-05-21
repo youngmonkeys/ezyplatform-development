@@ -125,4 +125,70 @@ public class UrisTest {
         Asserts.assertFalse(isSslDomain("https://[2001:db8::1]"));
         Asserts.assertFalse(isSslDomain(null));
     }
+
+    @Test
+    public void addQueryParameterTest() throws Exception {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello", "name", "value"),
+            "/hello?name=value"
+        );
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello?foo=bar", "name", "value"),
+            "/hello?foo=bar&name=value"
+        );
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello?", "name", "value"),
+            "/hello?name=value"
+        );
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello?foo=bar&", "name", "value"),
+            "/hello?foo=bar&name=value"
+        );
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello", "full name", "hello world"),
+            "/hello?full+name=hello+world"
+        );
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello", "redirect", "https://youngmonkeys.org/a?b=c&d=e"),
+            "/hello?redirect=https%3A%2F%2Fyoungmonkeys.org%2Fa%3Fb%3Dc%26d%3De"
+        );
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello", "name", null),
+            "/hello"
+        );
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello", "name", ""),
+            "/hello"
+        );
+        Asserts.assertEquals(
+            Uris.addQueryParameter("/hello", "name", " "),
+            "/hello"
+        );
+    }
+
+    @Test
+    public void querySeparatorTest() {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            Uris.querySeparator("/hello"),
+            "?"
+        );
+        Asserts.assertEquals(
+            Uris.querySeparator("/hello?foo=bar"),
+            "&"
+        );
+        Asserts.assertEquals(
+            Uris.querySeparator("/hello?"),
+            ""
+        );
+        Asserts.assertEquals(
+            Uris.querySeparator("/hello?foo=bar&"),
+            ""
+        );
+    }
 }

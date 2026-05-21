@@ -21,6 +21,8 @@ import com.tvd12.test.performance.Performance;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.util.Numbers;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
@@ -51,6 +53,43 @@ public class NumbersTest {
         Asserts.assertEquals(toLongOrZero(null), 0L);
         Asserts.assertEquals(toLongOrZero("10"), 10L);
         Asserts.assertEquals(toLongOrZero("10a"), 0L);
+    }
+
+    @Test
+    public void toLongOrZeroFromObjectTest() throws Exception {
+        // given
+        Constructor<Numbers> constructor = Numbers.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+        Numbers numbers = constructor.newInstance();
+
+        Method method = Numbers.class.getDeclaredMethod(
+            "toLongOrZeroFromObject",
+            Object.class
+        );
+        method.setAccessible(true);
+
+        // when
+        // then
+        Asserts.assertEquals(
+            method.invoke(numbers, 10L),
+            10L
+        );
+        Asserts.assertEquals(
+            method.invoke(numbers, 10),
+            10L
+        );
+        Asserts.assertEquals(
+            method.invoke(numbers, "10"),
+            10L
+        );
+        Asserts.assertEquals(
+            method.invoke(numbers, "10a"),
+            0L
+        );
+        Asserts.assertEquals(
+            method.invoke(numbers, (Object) null),
+            0L
+        );
     }
 
     @Test
