@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.util;
 
 import com.tvd12.ezyfox.io.EzyStrings;
 
+import javax.servlet.http.HttpServletRequest;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
@@ -26,8 +27,10 @@ import java.net.URLEncoder;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.UTF_8;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.HTTPS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_FILE_EXTENSION_LENGTH;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTPS_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 
 public final class Uris {
 
@@ -225,5 +228,50 @@ public final class Uris {
             return "";
         }
         return uri.contains("?") ? "&" : "?";
+    }
+
+    public static boolean isSameOriginOrRelative(
+        HttpServletRequest request,
+        String url
+    ) {
+        if (url.startsWith("/")) {
+            return Boolean.TRUE;
+        }
+        try {
+            URI uri = new URI(url);
+            return request.getScheme().equalsIgnoreCase(uri.getScheme())
+                && request.getServerName().equalsIgnoreCase(uri.getHost())
+                && request.getServerPort() == getPort(uri);
+        } catch (Exception e) {
+            return Boolean.FALSE;
+        }
+    }
+
+    public static String toRelativeUrl(
+        String url
+    ) {
+        if (url.startsWith("/")) {
+            return url;
+        }
+        try {
+            URI uri = new URI(url);
+            String path = uri.getRawPath();
+            String query = uri.getRawQuery();
+            return (isBlank(path) ? "/" : path) +
+                (isBlank(query) ? "" : "?" + query);
+        } catch (Exception e) {
+            return "/";
+        }
+    }
+
+    public static int getPort(
+        URI uri
+    ) {
+        int port = uri.getPort();
+        if (port > ZERO) {
+            return port;
+        }
+        String scheme = uri.getScheme();
+        return HTTPS.equalsIgnoreCase(scheme) ? 443 : 80;
     }
 }
