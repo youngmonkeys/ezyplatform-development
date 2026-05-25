@@ -49,6 +49,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_WEB_
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1_000_000_RECORDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTPS_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTP_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_ACCESS_TOKEN_HTTP_ONLY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_DATETIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_DATE_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_DATE_MINUTE_FORMAT;
@@ -478,6 +479,13 @@ public interface SettingService {
     default boolean isUserAccessTokenHttpOnly() {
         return getBooleanValue(
             SETTING_NAME_USER_ACCESS_TOKEN_HTTP_ONLY
+        );
+    }
+
+    default boolean isAdminAccessTokenHttpOnly() {
+        return getBooleanValue(
+            SETTING_NAME_ADMIN_ACCESS_TOKEN_HTTP_ONLY,
+            Boolean.TRUE
         );
     }
 
