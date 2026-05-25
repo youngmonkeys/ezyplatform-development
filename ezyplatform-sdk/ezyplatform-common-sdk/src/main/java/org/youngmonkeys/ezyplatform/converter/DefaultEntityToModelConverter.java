@@ -129,6 +129,7 @@ public class DefaultEntityToModelConverter {
             .name(entity.getName())
             .url(entity.getUrl())
             .originalName(entity.getOriginalName())
+            .groupName(entity.getGroupName())
             .type(MediaType.ofName(type))
             .typeText(type)
             .mimeType(entity.getMimeType())

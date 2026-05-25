@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 @Setter
 public class UpdateMediaIncludeUrlRequest {
     private String type;
+    private String groupName;
     private String alternativeText;
     private String title;
     private String caption;

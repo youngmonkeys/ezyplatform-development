@@ -26,6 +26,7 @@ public class MediaResponse {
     private String name;
     private String url;
     private String originalName;
+    private String groupName;
     private String uploadFrom;
     private String type;
     private String mimeType;
