@@ -274,4 +274,10 @@ public final class Uris {
         String scheme = uri.getScheme();
         return HTTPS.equalsIgnoreCase(scheme) ? 443 : 80;
     }
+
+    public static String normalizeUrl(String url) {
+        return url.endsWith("/")
+            ? url.substring(0, url.length() - 1)
+            : url;
+    }
 }
