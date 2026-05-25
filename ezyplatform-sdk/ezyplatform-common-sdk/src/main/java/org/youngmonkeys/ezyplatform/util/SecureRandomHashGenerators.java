@@ -14,7 +14,7 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.security;
+package org.youngmonkeys.ezyplatform.util;
 
 import com.tvd12.ezyfox.security.EzySHA256;
 
@@ -24,7 +24,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
-final class SecureRandomHashGenerators {
+public final class SecureRandomHashGenerators {
 
     private static final int RANDOM_BYTES_LENGTH = 32;
     private static final char[] HEX_DIGITS = "0123456789abcdef"

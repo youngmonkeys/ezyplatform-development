@@ -26,6 +26,9 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class AccessTokensTest {
 
+    private static final int ACCESS_TOKEN_HEADER_LENGTH = 44;
+    private static final int ACCESS_TOKEN_LENGTH = 108;
+
     public static void main(String[] args) {
         byte[] key = EzyAesCrypt.randomKey();
         long time = Performance.create()
@@ -38,7 +41,7 @@ public class AccessTokensTest {
                     sourceId,
                     key
                 );
-                assert token.length() == 108;
+                assert token.length() == ACCESS_TOKEN_LENGTH;
                 long extractedSourceId = AccessTokens.extractSourceId(
                     token,
                     key
@@ -63,13 +66,22 @@ public class AccessTokensTest {
             sourceId,
             key
         );
+        String secondToken = AccessTokens.generateAccessToken(
+            "admin",
+            sourceId,
+            key
+        );
         long extractedSourceId = AccessTokens.extractSourceId(
             token,
             key
         );
 
         // then
-        assert token.length() == 108;
+        assert token.length() == ACCESS_TOKEN_LENGTH;
+        assert token
+            .substring(ACCESS_TOKEN_HEADER_LENGTH)
+            .matches("[0-9a-f]{64}");
+        assert !token.equals(secondToken);
         assert sourceId == extractedSourceId;
     }
 
