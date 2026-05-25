@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 public class DefaultMediaFilter implements MediaFilter {
     public final String groupName;
@@ -63,6 +64,15 @@ public class DefaultMediaFilter implements MediaFilter {
         this.createdAtStartInclusive = builder.createdAtStartInclusive;
         this.createdAtEndExclusive = builder.createdAtEndExclusive;
         this.createdAtEndInclusive = builder.createdAtEndInclusive;
+    }
+
+    @Override
+    public void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {
+        if (prefixKeyword != null) {
+            queryString.append(" INNER JOIN DataIndex k ON e.id = k.dataId");
+        }
     }
 
     @Override
@@ -107,22 +117,22 @@ public class DefaultMediaFilter implements MediaFilter {
         if (exclusiveStatuses != null) {
             answer.and("e.status NOT IN :exclusiveStatuses");
         }
-        if (prefixKeyword != null) {
-            answer.and("e.originalName LIKE CONCAT(:prefixKeyword,'%')");
-        }
-        if (likeKeyword != null) {
-            answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
-        }
         if (this.createdAtStartInclusive != null) {
             answer.and("e.createdAt >= :createdAtStartInclusive");
         }
-
         if (this.createdAtEndExclusive != null) {
             answer.and("e.createdAt < :createdAtEndExclusive");
         }
-
         if (this.createdAtEndInclusive != null) {
             answer.and("e.createdAt <= :createdAtEndInclusive");
+        }
+        if (prefixKeyword != null) {
+            answer
+                .and("k.dataType = '" + TABLE_NAME_MEDIA + "'")
+                .and("k.keyword LIKE CONCAT(:prefixKeyword,'%')");
+        }
+        if (likeKeyword != null) {
+            answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
         }
         return answer.build();
     }
@@ -254,12 +264,14 @@ public class DefaultMediaFilter implements MediaFilter {
         @Override
         public DefaultMediaFilter build() {
             if (allowSearchByLikeOperator) {
-                prefixKeyword = NULL_STRING;
+                if (likeKeyword != null) {
+                    prefixKeyword = NULL_STRING;
+                }
             } else {
                 if (likeKeyword != null) {
                     prefixKeyword = likeKeyword;
+                    likeKeyword = NULL_STRING;
                 }
-                likeKeyword = NULL_STRING;
             }
             return new DefaultMediaFilter(this);
         }
