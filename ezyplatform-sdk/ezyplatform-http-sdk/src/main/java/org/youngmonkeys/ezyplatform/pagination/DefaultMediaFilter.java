@@ -25,6 +25,9 @@ import java.util.Collection;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 
 public class DefaultMediaFilter implements MediaFilter {
+    public final String groupName;
+    public final String groupNamePrefix;
+    public final transient Boolean ungrouped;
     public final String uploadFrom;
     public final String type;
     public final Collection<String> types;
@@ -42,6 +45,9 @@ public class DefaultMediaFilter implements MediaFilter {
     public final LocalDateTime createdAtEndInclusive;
 
     protected DefaultMediaFilter(Builder<?> builder) {
+        this.groupName = builder.groupName;
+        this.groupNamePrefix = builder.groupNamePrefix;
+        this.ungrouped = builder.ungrouped;
         this.type = builder.type;
         this.uploadFrom = builder.uploadFrom;
         this.types = builder.types;
@@ -62,6 +68,15 @@ public class DefaultMediaFilter implements MediaFilter {
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
+        if (groupName != null) {
+            answer.and("e.groupName = :groupName");
+        }
+        if (groupNamePrefix != null) {
+            answer.and("e.groupName LIKE CONCAT(:groupNamePrefix,'%')");
+        }
+        if (ungrouped != null && ungrouped) {
+            answer.and("(e.groupName IS NULL OR e.groupName = '')");
+        }
         if (ownerAdminId != null) {
             answer.and("e.ownerAdminId = :ownerAdminId");
         }
@@ -119,6 +134,9 @@ public class DefaultMediaFilter implements MediaFilter {
     @SuppressWarnings("unchecked")
     public static class Builder<T extends Builder<T>>
         implements EzyBuilder<DefaultMediaFilter> {
+        private String groupName;
+        private String groupNamePrefix;
+        private Boolean ungrouped;
         private String type;
         private String uploadFrom;
         private Collection<String> types;
@@ -135,6 +153,21 @@ public class DefaultMediaFilter implements MediaFilter {
         private LocalDateTime createdAtStartInclusive;
         private LocalDateTime createdAtEndExclusive;
         private LocalDateTime createdAtEndInclusive;
+
+        public T groupName(String groupName) {
+            this.groupName = groupName;
+            return (T) this;
+        }
+
+        public T groupNamePrefix(String groupNamePrefix) {
+            this.groupNamePrefix = groupNamePrefix;
+            return (T) this;
+        }
+
+        public T ungrouped(Boolean ungrouped) {
+            this.ungrouped = ungrouped;
+            return (T) this;
+        }
 
         public T type(String type) {
             this.type = type;
