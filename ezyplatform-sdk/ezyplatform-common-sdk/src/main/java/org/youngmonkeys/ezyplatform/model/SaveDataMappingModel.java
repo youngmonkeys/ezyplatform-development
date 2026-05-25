@@ -28,7 +28,7 @@ public class SaveDataMappingModel {
     private String mappingName;
     private long fromDataId;
     private long toDataId;
-    private int displayOrder;
+    private long displayOrder;
     private BigInteger quantity;
     private BigInteger remainingQuantity;
     private BigInteger numberData;

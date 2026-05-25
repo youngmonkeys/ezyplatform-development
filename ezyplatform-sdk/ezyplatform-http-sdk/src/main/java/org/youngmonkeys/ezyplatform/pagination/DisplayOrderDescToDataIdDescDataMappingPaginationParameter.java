@@ -32,7 +32,7 @@ import static org.youngmonkeys.ezyplatform.util.Values.isAllNull;
 public class DisplayOrderDescToDataIdDescDataMappingPaginationParameter
     implements DataMappingPaginationParameter {
 
-    public int displayOrder;
+    public long displayOrder;
     public Long toDataId;
 
     @Override
