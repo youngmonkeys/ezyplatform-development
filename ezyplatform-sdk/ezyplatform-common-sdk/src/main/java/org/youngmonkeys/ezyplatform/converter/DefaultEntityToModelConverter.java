@@ -452,7 +452,7 @@ public class DefaultEntityToModelConverter {
             .toDataId(entity.getToDataId())
             .displayOrder(entity.getDisplayOrder())
             .quantity(entity.getQuantity())
-            .remainingQuantity(entity.getQuantity())
+            .remainingQuantity(entity.getRemainingQuantity())
             .numberData(entity.getNumberData())
             .decimalData(entity.getDecimalData())
             .textData(entity.getTextData())
