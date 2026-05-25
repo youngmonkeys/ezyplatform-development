@@ -118,7 +118,8 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
     );
 
     @EzyQuery(
-        "SELECT e.updatedAt FROM Media e ORDER BY e.updatedAt ASC"
+        "SELECT e.updatedAt FROM Media e " +
+            "ORDER BY e.updatedAt ASC"
     )
     UpdatedAtValueResult findFirstUpdatedAt();
 }
