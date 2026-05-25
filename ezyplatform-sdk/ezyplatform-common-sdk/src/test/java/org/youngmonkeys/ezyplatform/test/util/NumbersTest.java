@@ -79,8 +79,28 @@ public class NumbersTest {
             10L
         );
         Asserts.assertEquals(
+            method.invoke(numbers, BigInteger.valueOf(10L)),
+            10L
+        );
+        Asserts.assertEquals(
+            method.invoke(numbers, BigDecimal.valueOf(10.9D)),
+            10L
+        );
+        Asserts.assertEquals(
+            method.invoke(numbers, -10),
+            -10L
+        );
+        Asserts.assertEquals(
             method.invoke(numbers, "10"),
             10L
+        );
+        Asserts.assertEquals(
+            method.invoke(numbers, "-10"),
+            -10L
+        );
+        Asserts.assertEquals(
+            method.invoke(numbers, ""),
+            0L
         );
         Asserts.assertEquals(
             method.invoke(numbers, "10a"),
