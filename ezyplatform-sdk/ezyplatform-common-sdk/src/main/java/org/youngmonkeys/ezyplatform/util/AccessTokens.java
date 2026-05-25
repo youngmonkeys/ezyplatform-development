@@ -65,14 +65,20 @@ public final class AccessTokens {
         byte[] encryptionKey
     ) {
         if (encryptionKey == null) {
-            throw new IllegalStateException("server's not ready yet");
+            throw new IllegalStateException(
+                "server's not ready yet"
+            );
         }
-        if (accessToken == null || accessToken.length() < HEADER_LENGTH) {
+        if (accessToken == null
+            || accessToken.length() < HEADER_LENGTH
+        ) {
             return ZERO_LONG;
         }
         try {
-            String base64Header = accessToken.substring(0, HEADER_LENGTH);
-            byte[] encryptedSourceIdBytes = EzyBase64.decode(base64Header);
+            String base64Header = accessToken
+                .substring(ZERO, HEADER_LENGTH);
+            byte[] encryptedSourceIdBytes = EzyBase64
+                .decode(base64Header);
             byte[] sourceIdBytes = EzyAesCrypt.getDefault()
                 .decrypt(
                     encryptedSourceIdBytes,
@@ -84,14 +90,17 @@ public final class AccessTokens {
         }
     }
 
-    public static String extractBearerToken(String text) {
+    public static String extractBearerToken(
+        String text
+    ) {
         if (isBlank(text)) {
             return NULL_STRING;
         }
         int index = text.indexOf(PREFIX_BEARER_TOKEN);
         String accessToken = text;
-        if (index >= 0) {
-            accessToken = text.substring(PREFIX_BEARER_TOKEN.length());
+        if (index >= ZERO) {
+            accessToken = text
+                .substring(PREFIX_BEARER_TOKEN.length());
         }
         return accessToken;
     }
