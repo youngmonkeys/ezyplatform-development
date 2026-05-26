@@ -16,9 +16,17 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.IdClass;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -47,7 +55,7 @@ public class DataMapping {
     private long toDataId;
 
     @Column(name = "display_order")
-    private int displayOrder;
+    private long displayOrder;
 
     private BigInteger quantity;
 

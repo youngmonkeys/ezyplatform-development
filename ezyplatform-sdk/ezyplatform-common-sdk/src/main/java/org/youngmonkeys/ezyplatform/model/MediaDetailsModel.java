@@ -29,6 +29,7 @@ public class MediaDetailsModel {
     private long id;
     private String name;
     private String originalName;
+    private String groupName;
     private String originalSizeFileName;
     private String url;
     private String uploadFrom;
@@ -53,6 +54,7 @@ public class MediaDetailsModel {
             .size(info.getFileSize())
             .name(info.getName())
             .originalName(info.getOriginalName())
+            .groupName(info.getGroupName())
             .url(info.getUrl())
             .uploadFrom(info.getUploadFrom())
             .type(info.getTypeText())

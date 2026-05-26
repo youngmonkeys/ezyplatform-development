@@ -27,6 +27,7 @@ public class HttpModelToResponseConverter extends DefaultModelToResponseConverte
             .name(model.getName())
             .url(model.getUrl())
             .originalName(model.getOriginalName())
+            .groupName(model.getGroupName())
             .uploadFrom(model.getUploadFrom())
             .type(model.getTypeText())
             .mimeType(model.getMimeType())

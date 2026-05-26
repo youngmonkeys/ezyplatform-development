@@ -32,6 +32,7 @@ public class MediaModel {
     private String name;
     private String url;
     private String originalName;
+    private String groupName;
     private String uploadFrom;
     private MediaType type;
     private String typeText;

@@ -26,6 +26,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 @Setter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UpdateMediaRequest {
+    private String groupName;
     private String alternativeText;
     private String title;
     private String caption;

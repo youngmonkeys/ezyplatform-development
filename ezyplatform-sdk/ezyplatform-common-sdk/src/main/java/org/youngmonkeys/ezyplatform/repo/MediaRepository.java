@@ -18,12 +18,14 @@ package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
+import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.Media;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
 import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
@@ -102,4 +104,22 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
     UpdatedAtValueResult findUpdatedAtByNameOrOriginalName(
         String mediaName
     );
+
+    @EzyQuery(
+        "SELECT e FROM Media e " +
+            "WHERE e.updatedAt > ?0 " +
+            "OR (e.updatedAt = ?0 AND e.id > ?1)" +
+            "ORDER BY e.updatedAt ASC, e.id ASC"
+    )
+    List<Media> findMediaByUpdatedAtAndIdPaginationAsc(
+        LocalDateTime updatedAtInclusive,
+        long idExclusive,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT e.updatedAt FROM Media e " +
+            "ORDER BY e.updatedAt ASC"
+    )
+    UpdatedAtValueResult findFirstUpdatedAt();
 }

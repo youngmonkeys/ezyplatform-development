@@ -16,9 +16,18 @@
 
 package org.youngmonkeys.ezyplatform.entity;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
@@ -42,6 +51,9 @@ public class Media {
 
     @Column(name = "original_name")
     private String originalName;
+
+    @Column(name = "group_name")
+    private String groupName;
 
     @Column(name = "upload_from")
     private String uploadFrom;

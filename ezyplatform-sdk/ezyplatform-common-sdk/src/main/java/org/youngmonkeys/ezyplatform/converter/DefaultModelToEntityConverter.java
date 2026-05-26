@@ -562,6 +562,7 @@ public class DefaultModelToEntityConverter {
             }
         }
         entity.setAlternativeText(model.getAlternativeText());
+        entity.setGroupName(model.getGroupName());
         entity.setTitle(model.getTitle());
         entity.setCaption(model.getCaption());
         entity.setDescription(model.getDescription());

@@ -20,6 +20,11 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.util.Uris;
 
+import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Constructor;
+import java.net.URI;
+
+import static org.mockito.Mockito.*;
 import static org.youngmonkeys.ezyplatform.util.Uris.isSslDomain;
 import static org.youngmonkeys.ezyplatform.util.Uris.uriStartsWith;
 
@@ -43,10 +48,18 @@ public class UrisTest {
             Uris.resolveUrl("x", "/a/b/c/"),
             "x/a/b/c/"
         );
+        Asserts.assertEquals(
+            Uris.resolveUrl("x/", "/"),
+            "x/"
+        );
     }
 
     @Test
     public void getSiteName() {
+        Asserts.assertEquals(
+            Uris.getSiteName("http://youngmonkeys.org"),
+            "Youngmonkeys"
+        );
         Asserts.assertEquals(
             Uris.getSiteName("", "Admin"),
             "Admin"
@@ -122,7 +135,10 @@ public class UrisTest {
         Asserts.assertTrue(isSslDomain("https://admin.youngmonkeys.org/path"));
         Asserts.assertFalse(isSslDomain("http://youngmonkeys.org"));
         Asserts.assertFalse(isSslDomain("https://127.0.0.1"));
+        Asserts.assertFalse(isSslDomain("https://127.0.0.256"));
         Asserts.assertFalse(isSslDomain("https://[2001:db8::1]"));
+        Asserts.assertFalse(isSslDomain("https://[2001:db8::zzzz]"));
+        Asserts.assertFalse(isSslDomain("https:///youngmonkeys.org"));
         Asserts.assertFalse(isSslDomain(null));
     }
 
@@ -190,5 +206,136 @@ public class UrisTest {
             Uris.querySeparator("/hello?foo=bar&"),
             ""
         );
+    }
+
+    @Test
+    public void isSameOriginOrRelativeTest() {
+        // given
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        when(request.getScheme()).thenReturn("https");
+        when(request.getServerName()).thenReturn("youngmonkeys.org");
+        when(request.getServerPort()).thenReturn(443);
+
+        // when
+        // then
+        Asserts.assertTrue(
+            Uris.isSameOriginOrRelative(request, "/hello")
+        );
+        Asserts.assertTrue(
+            Uris.isSameOriginOrRelative(
+                request,
+                "https://youngmonkeys.org/hello"
+            )
+        );
+        Asserts.assertTrue(
+            Uris.isSameOriginOrRelative(
+                request,
+                "HTTPS://YOUNGMONKEYS.ORG/hello"
+            )
+        );
+        Asserts.assertFalse(
+            Uris.isSameOriginOrRelative(
+                request,
+                "http://youngmonkeys.org/hello"
+            )
+        );
+        Asserts.assertFalse(
+            Uris.isSameOriginOrRelative(
+                request,
+                "https://admin.youngmonkeys.org/hello"
+            )
+        );
+        Asserts.assertFalse(
+            Uris.isSameOriginOrRelative(
+                request,
+                "https://youngmonkeys.org:8443/hello"
+            )
+        );
+        Asserts.assertFalse(
+            Uris.isSameOriginOrRelative(request, "://invalid")
+        );
+
+        verify(request, times(5)).getScheme();
+        verify(request, times(4)).getServerName();
+        verify(request, times(3)).getServerPort();
+        verifyNoMoreInteractions(request);
+    }
+
+    @Test
+    public void toRelativeUrlTest() {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            Uris.toRelativeUrl("/hello?name=value"),
+            "/hello?name=value"
+        );
+        Asserts.assertEquals(
+            Uris.toRelativeUrl("https://youngmonkeys.org/hello?name=value"),
+            "/hello?name=value"
+        );
+        Asserts.assertEquals(
+            Uris.toRelativeUrl("https://youngmonkeys.org"),
+            "/"
+        );
+        Asserts.assertEquals(
+            Uris.toRelativeUrl("https://youngmonkeys.org?name=value"),
+            "/?name=value"
+        );
+        Asserts.assertEquals(
+            Uris.toRelativeUrl("://invalid"),
+            "/"
+        );
+    }
+
+    @Test
+    public void getPortTest() throws Exception {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            Uris.getPort(new URI("https://youngmonkeys.org")),
+            443
+        );
+        Asserts.assertEquals(
+            Uris.getPort(new URI("http://youngmonkeys.org")),
+            80
+        );
+        Asserts.assertEquals(
+            Uris.getPort(new URI("https://youngmonkeys.org:8443")),
+            8443
+        );
+        Asserts.assertEquals(
+            Uris.getPort(new URI("ftp://youngmonkeys.org")),
+            80
+        );
+    }
+
+    @Test
+    public void normalizeUrlTest() {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            Uris.normalizeUrl("https://youngmonkeys.org/"),
+            "https://youngmonkeys.org"
+        );
+        Asserts.assertEquals(
+            Uris.normalizeUrl("https://youngmonkeys.org"),
+            "https://youngmonkeys.org"
+        );
+    }
+
+    @Test
+    public void constructorTest() throws Exception {
+        // given
+        Constructor<Uris> constructor = Uris.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        // when
+        Uris actual = constructor.newInstance();
+
+        // then
+        Asserts.assertNotNull(actual);
     }
 }

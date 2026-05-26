@@ -20,14 +20,13 @@ import com.tvd12.ezyfox.io.EzyBytes;
 import com.tvd12.ezyfox.io.EzyLongs;
 import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
-import com.tvd12.ezyfox.security.EzySHA256;
-
-import java.util.UUID;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
 
 public final class AccessTokens {
+
+    private static final int HEADER_LENGTH = 44;
 
     private AccessTokens() {}
 
@@ -53,10 +52,10 @@ public final class AccessTokens {
             );
         }
         String header = EzyBase64.encode2utf(encryptedSourceIdBytes);
-        String body = EzySHA256.cryptUtfToLowercase(
-            String.valueOf(sourceId) + '-'
-                + UUID.randomUUID() + '-'
-                + System.currentTimeMillis()
+        String body = SecureRandomHashGenerators.generate(
+            "accessToken",
+            source,
+            String.valueOf(sourceId)
         );
         return header + body;
     }
@@ -66,11 +65,20 @@ public final class AccessTokens {
         byte[] encryptionKey
     ) {
         if (encryptionKey == null) {
-            throw new IllegalStateException("server's not ready yet");
+            throw new IllegalStateException(
+                "server's not ready yet"
+            );
+        }
+        if (accessToken == null
+            || accessToken.length() < HEADER_LENGTH
+        ) {
+            return ZERO_LONG;
         }
         try {
-            String base64Header = accessToken.substring(0, 44);
-            byte[] encryptedSourceIdBytes = EzyBase64.decode(base64Header);
+            String base64Header = accessToken
+                .substring(ZERO, HEADER_LENGTH);
+            byte[] encryptedSourceIdBytes = EzyBase64
+                .decode(base64Header);
             byte[] sourceIdBytes = EzyAesCrypt.getDefault()
                 .decrypt(
                     encryptedSourceIdBytes,
@@ -82,14 +90,17 @@ public final class AccessTokens {
         }
     }
 
-    public static String extractBearerToken(String text) {
+    public static String extractBearerToken(
+        String text
+    ) {
         if (isBlank(text)) {
             return NULL_STRING;
         }
         int index = text.indexOf(PREFIX_BEARER_TOKEN);
         String accessToken = text;
-        if (index >= 0) {
-            accessToken = text.substring(PREFIX_BEARER_TOKEN.length());
+        if (index >= ZERO) {
+            accessToken = text
+                .substring(PREFIX_BEARER_TOKEN.length());
         }
         return accessToken;
     }

@@ -23,8 +23,12 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 public class DefaultMediaFilter implements MediaFilter {
+    public final String groupName;
+    public final String groupNamePrefix;
+    public final transient Boolean ungrouped;
     public final String uploadFrom;
     public final String type;
     public final Collection<String> types;
@@ -42,6 +46,9 @@ public class DefaultMediaFilter implements MediaFilter {
     public final LocalDateTime createdAtEndInclusive;
 
     protected DefaultMediaFilter(Builder<?> builder) {
+        this.groupName = builder.groupName;
+        this.groupNamePrefix = builder.groupNamePrefix;
+        this.ungrouped = builder.ungrouped;
         this.type = builder.type;
         this.uploadFrom = builder.uploadFrom;
         this.types = builder.types;
@@ -60,8 +67,26 @@ public class DefaultMediaFilter implements MediaFilter {
     }
 
     @Override
+    public void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {
+        if (prefixKeyword != null) {
+            queryString.append(" INNER JOIN DataIndex k ON e.id = k.dataId");
+        }
+    }
+
+    @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
+        if (groupName != null) {
+            answer.and("e.groupName = :groupName");
+        }
+        if (groupNamePrefix != null) {
+            answer.and("e.groupName LIKE CONCAT(:groupNamePrefix,'%')");
+        }
+        if (ungrouped != null && ungrouped) {
+            answer.and("(e.groupName IS NULL OR e.groupName = '')");
+        }
         if (ownerAdminId != null) {
             answer.and("e.ownerAdminId = :ownerAdminId");
         }
@@ -92,22 +117,22 @@ public class DefaultMediaFilter implements MediaFilter {
         if (exclusiveStatuses != null) {
             answer.and("e.status NOT IN :exclusiveStatuses");
         }
-        if (prefixKeyword != null) {
-            answer.and("e.originalName LIKE CONCAT(:prefixKeyword,'%')");
-        }
-        if (likeKeyword != null) {
-            answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
-        }
         if (this.createdAtStartInclusive != null) {
             answer.and("e.createdAt >= :createdAtStartInclusive");
         }
-
         if (this.createdAtEndExclusive != null) {
             answer.and("e.createdAt < :createdAtEndExclusive");
         }
-
         if (this.createdAtEndInclusive != null) {
             answer.and("e.createdAt <= :createdAtEndInclusive");
+        }
+        if (prefixKeyword != null) {
+            answer
+                .and("k.dataType = '" + TABLE_NAME_MEDIA + "'")
+                .and("k.keyword LIKE CONCAT(:prefixKeyword,'%')");
+        }
+        if (likeKeyword != null) {
+            answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
         }
         return answer.build();
     }
@@ -119,6 +144,9 @@ public class DefaultMediaFilter implements MediaFilter {
     @SuppressWarnings("unchecked")
     public static class Builder<T extends Builder<T>>
         implements EzyBuilder<DefaultMediaFilter> {
+        private String groupName;
+        private String groupNamePrefix;
+        private Boolean ungrouped;
         private String type;
         private String uploadFrom;
         private Collection<String> types;
@@ -135,6 +163,21 @@ public class DefaultMediaFilter implements MediaFilter {
         private LocalDateTime createdAtStartInclusive;
         private LocalDateTime createdAtEndExclusive;
         private LocalDateTime createdAtEndInclusive;
+
+        public T groupName(String groupName) {
+            this.groupName = groupName;
+            return (T) this;
+        }
+
+        public T groupNamePrefix(String groupNamePrefix) {
+            this.groupNamePrefix = groupNamePrefix;
+            return (T) this;
+        }
+
+        public T ungrouped(Boolean ungrouped) {
+            this.ungrouped = ungrouped;
+            return (T) this;
+        }
 
         public T type(String type) {
             this.type = type;
@@ -221,12 +264,14 @@ public class DefaultMediaFilter implements MediaFilter {
         @Override
         public DefaultMediaFilter build() {
             if (allowSearchByLikeOperator) {
-                prefixKeyword = NULL_STRING;
+                if (likeKeyword != null) {
+                    prefixKeyword = NULL_STRING;
+                }
             } else {
                 if (likeKeyword != null) {
                     prefixKeyword = likeKeyword;
+                    likeKeyword = NULL_STRING;
                 }
-                likeKeyword = NULL_STRING;
             }
             return new DefaultMediaFilter(this);
         }

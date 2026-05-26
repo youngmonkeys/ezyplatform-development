@@ -26,6 +26,7 @@ import java.math.BigDecimal;
 public class UpdateMediaModel {
     private long mediaId;
     private String mediaName;
+    private String groupName;
     private boolean updateType;
     private String type;
     private String alternativeText;
