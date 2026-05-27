@@ -47,6 +47,14 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
     List<StatusResult> findAllMediaStatuses();
 
     @EzyQuery(
+        "SELECT e.id FROM Media e " +
+            "WHERE e.name = ?0 OR e.originalName = ?0"
+    )
+    IdResult findIdByNameOrOriginalName(
+        String name
+    );
+
+    @EzyQuery(
         "SELECT e FROM Media e " +
             "WHERE e.name = ?0 OR e.originalName = ?0"
     )

@@ -37,6 +37,7 @@ public final class CommonConstants {
     public static final int ONE = 1;
     public static final long ZERO_LONG = 0L;
 
+    public static final int ONE_HUNDRED = 100;
     public static final BigDecimal ONE_HUNDRED_BIG_DECIMAL =
         BigDecimal.valueOf(100);
     public static final BigDecimal NULL_BIG_DECIMAL = null;

@@ -263,10 +263,8 @@ public class DefaultMediaService implements MediaService {
 
     @Override
     public boolean containsMedia(String mediaName) {
-        return mediaRepository.containsByField(
-            "name",
-            mediaName
-        );
+        return mediaRepository
+            .findIdByNameOrOriginalName(mediaName) != null;
     }
 
     @Override
