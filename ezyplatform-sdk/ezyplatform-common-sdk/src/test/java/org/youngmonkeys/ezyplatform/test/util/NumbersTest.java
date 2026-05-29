@@ -19,14 +19,22 @@ package org.youngmonkeys.ezyplatform.test.util;
 import com.tvd12.test.assertion.Asserts;
 import com.tvd12.test.performance.Performance;
 import org.testng.annotations.Test;
-import org.youngmonkeys.ezyplatform.util.Numbers;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import static org.youngmonkeys.ezyplatform.util.Numbers.*;
+import static org.youngmonkeys.ezyplatform.util.Numbers.formatToUnitString;
+import static org.youngmonkeys.ezyplatform.util.Numbers.fromRandomText;
+import static org.youngmonkeys.ezyplatform.util.Numbers.isFloatingPointText;
+import static org.youngmonkeys.ezyplatform.util.Numbers.roundUpOrDownToInt;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toIntOrZero;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toIntValue;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrZero;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrZeroFromObject;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toNoTrailingZerosString;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toPaddedValueLong;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toPaddedValueUint256;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toRandomText;
 
 public class NumbersTest {
 
@@ -58,56 +66,46 @@ public class NumbersTest {
     @Test
     public void toLongOrZeroFromObjectTest() throws Exception {
         // given
-        Constructor<Numbers> constructor = Numbers.class.getDeclaredConstructor();
-        constructor.setAccessible(true);
-        Numbers numbers = constructor.newInstance();
-
-        Method method = Numbers.class.getDeclaredMethod(
-            "toLongOrZeroFromObject",
-            Object.class
-        );
-        method.setAccessible(true);
-
         // when
         // then
         Asserts.assertEquals(
-            method.invoke(numbers, 10L),
+            toLongOrZeroFromObject(10L),
             10L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, 10),
+            toLongOrZeroFromObject(10),
             10L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, BigInteger.valueOf(10L)),
+            toLongOrZeroFromObject(BigInteger.valueOf(10L)),
             10L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, BigDecimal.valueOf(10.9D)),
+            toLongOrZeroFromObject(BigDecimal.valueOf(10.9D)),
             10L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, -10),
+            toLongOrZeroFromObject(-10),
             -10L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, "10"),
+            toLongOrZeroFromObject("10"),
             10L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, "-10"),
+            toLongOrZeroFromObject("-10"),
             -10L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, ""),
+            toLongOrZeroFromObject(""),
             0L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, "10a"),
+            toLongOrZeroFromObject("10a"),
             0L
         );
         Asserts.assertEquals(
-            method.invoke(numbers, (Object) null),
+            toLongOrZeroFromObject((Object) null),
             0L
         );
     }
