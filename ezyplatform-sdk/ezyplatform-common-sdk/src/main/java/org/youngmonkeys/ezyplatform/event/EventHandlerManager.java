@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.event;
 import com.tvd12.ezyfox.bean.EzySingletonFactory;
 import com.tvd12.ezyfox.concurrent.EzyLazyInitializer;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -91,6 +92,12 @@ public class EventHandlerManager {
         return eventSchemaFetcherByName
             .get()
             .get(eventName);
+    }
+
+    public List<EventSchemaFetcher> getEventSchemaFetchers() {
+        return new ArrayList<>(
+            eventSchemaFetcherByName.get().values()
+        );
     }
 
     public Map<String, EventSchemaFetcher> getEventSchemaFetcherMap() {

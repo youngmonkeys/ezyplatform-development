@@ -208,6 +208,40 @@ public class EventHandlerManagerTest {
     }
 
     @Test
+    public void getEventSchemaFetchersReturnCopy() {
+        // given
+        String eventName = "test_event";
+        TestEventSchemaFetcher lowPriorityFetcher = new TestEventSchemaFetcher(
+            eventName,
+            -1
+        );
+        TestEventSchemaFetcher highPriorityFetcher = new TestEventSchemaFetcher(
+            eventName,
+            1
+        );
+        TestEventSchemaFetcher otherFetcher = new TestEventSchemaFetcher(
+            "other_event",
+            0
+        );
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.emptyList(),
+            Arrays.asList(lowPriorityFetcher, otherFetcher, highPriorityFetcher)
+        );
+
+        // when
+        List<EventSchemaFetcher> actual = sut.getEventSchemaFetchers();
+        actual.clear();
+
+        // then
+        Asserts.assertEquals(actual.size(), 0);
+        List<EventSchemaFetcher> remainingFetchers = sut.getEventSchemaFetchers();
+        Asserts.assertEquals(remainingFetchers.size(), 2);
+        Asserts.assertTrue(remainingFetchers.contains(highPriorityFetcher));
+        Asserts.assertTrue(remainingFetchers.contains(otherFetcher));
+        Asserts.assertFalse(remainingFetchers.contains(lowPriorityFetcher));
+    }
+
+    @Test
     public void getEventSchemaFetcherMapReturnCopy() {
         // given
         String eventName = "test_event";
