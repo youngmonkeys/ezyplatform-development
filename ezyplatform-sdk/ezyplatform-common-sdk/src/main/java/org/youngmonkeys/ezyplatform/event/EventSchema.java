@@ -19,8 +19,8 @@ package org.youngmonkeys.ezyplatform.event;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import lombok.ToString;
+import org.youngmonkeys.ezyplatform.data.CommonDataSchema;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -76,99 +76,17 @@ public class EventSchema {
 
     @Getter
     @ToString
-    public static class DataSchema {
-        private final Class<?> dataType;
-        private final Class<?> itemType;
-        private final Class<?> keyType;
-        private final Class<?> valueType;
-        private final String name;
-        private final boolean required;
-        private final String description;
-        private final String example;
-        private final List<DataSchema> fields;
+    public static class DataSchema extends CommonDataSchema {
 
         public DataSchema(DataSchema.Builder builder) {
-            this.dataType = builder.dataType;
-            this.itemType = builder.itemType;
-            this.keyType = builder.keyType;
-            this.valueType = builder.valueType;
-            this.name = builder.name;
-            this.required = builder.required;
-            this.description = builder.description;
-            this.example = builder.example;
-            this.fields = builder.fields;
+            super(builder);
         }
 
         public static Builder builder() {
             return new Builder();
         }
 
-        public static class Builder implements EzyBuilder<DataSchema> {
-            private Class<?> dataType;
-            private Class<?> itemType;
-            private Class<?> keyType;
-            private Class<?> valueType;
-            private String name;
-            private boolean required;
-            private String description;
-            private String example;
-            private List<DataSchema> fields;
-
-            public Builder dataType(Class<?> dataType) {
-                this.dataType = dataType;
-                return this;
-            }
-
-            public Builder itemType(Class<?> itemType) {
-                this.itemType = itemType;
-                return this;
-            }
-
-            public Builder keyType(Class<?> keyType) {
-                this.keyType = keyType;
-                return this;
-            }
-
-            public Builder valueType(Class<?> valueType) {
-                this.valueType = valueType;
-                return this;
-            }
-
-            public Builder name(String name) {
-                this.name = name;
-                return this;
-            }
-
-            public Builder required(boolean required) {
-                this.required = required;
-                return this;
-            }
-
-            public Builder description(String description) {
-                this.description = description;
-                return this;
-            }
-
-            public Builder example(String example) {
-                this.example = example;
-                return this;
-            }
-
-            public Builder field(DataSchema field) {
-                if (this.fields == null) {
-                    this.fields = new ArrayList<>();
-                }
-                this.fields.add(field);
-                return this;
-            }
-
-            public Builder fields(List<DataSchema> fields) {
-                if (this.fields == null) {
-                    this.fields = new ArrayList<>();
-                }
-                this.fields.addAll(fields);
-                return this;
-            }
+        public static class Builder extends CommonDataSchema.Builder<Builder> {
 
             @Override
             public DataSchema build() {
