@@ -14,14 +14,14 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test.fetcher;
+package org.youngmonkeys.ezyplatform.test.manager;
 
 import com.tvd12.ezyfox.bean.EzySingletonFactory;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.data.TemplateParametersSchema;
 import org.youngmonkeys.ezyplatform.fetcher.TemplateParametersSchemaFetcher;
-import org.youngmonkeys.ezyplatform.fetcher.TemplateParametersSchemaFetcherManager;
+import org.youngmonkeys.ezyplatform.manager.TemplateParametersSchemaFetcherManager;
 
 import java.util.Arrays;
 import java.util.Collections;

@@ -14,10 +14,11 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.fetcher;
+package org.youngmonkeys.ezyplatform.manager;
 
 import com.tvd12.ezyfox.bean.EzySingletonFactory;
 import com.tvd12.ezyfox.concurrent.EzyLazyInitializer;
+import org.youngmonkeys.ezyplatform.fetcher.TemplateParametersSchemaFetcher;
 
 import java.util.Collections;
 import java.util.List;
