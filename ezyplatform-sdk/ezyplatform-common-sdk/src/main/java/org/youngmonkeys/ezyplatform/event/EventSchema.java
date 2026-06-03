@@ -74,8 +74,6 @@ public class EventSchema {
         }
     }
 
-    @Getter
-    @ToString
     public static class DataSchema extends CommonDataSchema {
 
         public DataSchema(DataSchema.Builder builder) {
