@@ -19,7 +19,6 @@ package org.youngmonkeys.ezyplatform.data;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import lombok.ToString;
-import org.youngmonkeys.ezyplatform.event.EventSchema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,7 @@ public class CommonDataSchema {
     protected final boolean required;
     protected final String description;
     protected final String example;
-    protected final List<EventSchema.DataSchema> fields;
+    protected final List<CommonDataSchema> fields;
 
     public CommonDataSchema(Builder<?> builder) {
         this.dataType = builder.dataType;
@@ -63,7 +62,7 @@ public class CommonDataSchema {
         protected boolean required = Boolean.TRUE;
         protected String description;
         protected String example;
-        protected List<EventSchema.DataSchema> fields;
+        protected List<CommonDataSchema> fields;
 
         public T dataType(Class<?> dataType) {
             this.dataType = dataType;
@@ -110,7 +109,7 @@ public class CommonDataSchema {
             return (T) this;
         }
 
-        public T field(EventSchema.DataSchema field) {
+        public T field(CommonDataSchema field) {
             if (this.fields == null) {
                 this.fields = new ArrayList<>();
             }
@@ -118,7 +117,7 @@ public class CommonDataSchema {
             return (T) this;
         }
 
-        public T fields(List<EventSchema.DataSchema> fields) {
+        public T fields(List<CommonDataSchema> fields) {
             if (this.fields == null) {
                 this.fields = new ArrayList<>();
             }
