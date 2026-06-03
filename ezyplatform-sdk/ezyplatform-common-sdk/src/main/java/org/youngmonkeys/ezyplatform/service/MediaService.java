@@ -20,13 +20,22 @@ import com.tvd12.ezyfox.security.EzySHA256;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
-import org.youngmonkeys.ezyplatform.model.*;
+import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaNameModel;
+import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
+import org.youngmonkeys.ezyplatform.model.SimpleMediaModel;
+import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
@@ -223,7 +232,7 @@ public interface MediaService {
     ) {
         String uniqueFileName = EzySHA256.cryptUtfToLowercase(
             submittedFileName
-                + System.currentTimeMillis()
+                + System.nanoTime()
                 + UUID.randomUUID()
         );
         return isBlank(extension)

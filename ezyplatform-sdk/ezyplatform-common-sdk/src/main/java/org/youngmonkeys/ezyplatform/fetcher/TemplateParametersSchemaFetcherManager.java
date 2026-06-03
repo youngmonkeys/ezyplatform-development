@@ -44,9 +44,9 @@ public class TemplateParametersSchemaFetcherManager {
                     .stream()
                     .collect(
                         Collectors.groupingBy(
-                            TemplateParametersSchemaFetcher::getTemplateName,
+                            TemplateParametersSchemaFetcher::getTemplateType,
                             Collectors.toMap(
-                                TemplateParametersSchemaFetcher::getTemplateType,
+                                TemplateParametersSchemaFetcher::getTemplateName,
                                 it -> it,
                                 (o, n) -> n
                             )
