@@ -84,7 +84,8 @@ public class EventSchema {
             return new Builder();
         }
 
-        public static class Builder extends CommonDataSchema.Builder<Builder> {
+        public static class Builder
+            extends CommonDataSchema.Builder<Builder> {
 
             @Override
             public DataSchema build() {

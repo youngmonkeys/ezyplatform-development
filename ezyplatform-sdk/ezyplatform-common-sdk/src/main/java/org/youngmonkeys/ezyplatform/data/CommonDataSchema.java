@@ -22,6 +22,7 @@ import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 @ToString
@@ -36,6 +37,7 @@ public class CommonDataSchema {
     protected final String description;
     protected final String example;
     protected final List<CommonDataSchema> fields;
+    protected final Map<String, Object> properties;
 
     public CommonDataSchema(Builder<?> builder) {
         this.dataType = builder.dataType;
@@ -48,6 +50,11 @@ public class CommonDataSchema {
         this.description = builder.description;
         this.example = builder.example;
         this.fields = builder.fields;
+        this.properties = builder.properties;
+    }
+
+    public static Builder<?> builder() {
+        return new Builder<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -63,6 +70,7 @@ public class CommonDataSchema {
         protected String description;
         protected String example;
         protected List<CommonDataSchema> fields;
+        protected Map<String, Object> properties;
 
         public T dataType(Class<?> dataType) {
             this.dataType = dataType;
@@ -117,11 +125,18 @@ public class CommonDataSchema {
             return (T) this;
         }
 
-        public T fields(List<CommonDataSchema> fields) {
+        public <D extends CommonDataSchema> T fields(
+            List<D> fields
+        ) {
             if (this.fields == null) {
                 this.fields = new ArrayList<>();
             }
             this.fields.addAll(fields);
+            return (T) this;
+        }
+
+        public T properties(Map<String, Object> properties) {
+            this.properties = properties;
             return (T) this;
         }
 
