@@ -357,18 +357,29 @@ public final class DefaultValidator {
         return str != null && str.matches(PATTERN_SHA256_STRING);
     }
 
-    public static boolean isCommonString(String str, int maxLength) {
+    public static boolean isCommonString(
+        String str,
+        int maxLength
+    ) {
         return isCommonString(str, 1, maxLength);
     }
 
-    public static boolean isCommonString(String str, int minLength, int maxLength) {
+    public static boolean isCommonString(
+        String str,
+        int minLength,
+        int maxLength
+    ) {
         return isNotBlank(str)
             && str.length() >= minLength
             && str.length() <= maxLength
             && str.matches(PATTERN_COMMON_STRING);
     }
 
-    public static boolean isPackageName(String str, int minLength, int maxLength) {
+    public static boolean isPackageName(
+        String str,
+        int minLength,
+        int maxLength
+    ) {
         return isNotBlank(str)
             && str.length() >= minLength
             && str.length() <= maxLength
@@ -399,7 +410,10 @@ public final class DefaultValidator {
     }
 
     public static boolean containsSqlComment(String str) {
-        return str.contains("--");
+        return str.contains("--")
+            || str.contains("/*")
+            || str.contains("*/")
+            || str.contains("#");
     }
 
     public static boolean containsOperation(String str) {
@@ -408,21 +422,23 @@ public final class DefaultValidator {
             || str.contains("<");
     }
 
-    public static boolean containsParentheses(String str) {
+    public static boolean containsSingleQuote(String str) {
         return str.contains("'");
     }
 
     public static boolean maybeContainsSqlInjection(String str) {
         return containsSqlComment(str)
             || containsOperation(str)
-            || containsParentheses(str);
+            || containsSingleQuote(str);
     }
 
     public static boolean isValidPageSize(int pageSize) {
         return pageSize >= MIN_PAGE_SIZE && pageSize <= MAX_PAGE_SIZE;
     }
 
-    public static boolean isValidCollectionSize(Collection<?> collection) {
+    public static boolean isValidCollectionSize(
+        Collection<?> collection
+    ) {
         return !collection.isEmpty()
             && collection.size() <= MAX_PAGE_SIZE;
     }
