@@ -17,10 +17,12 @@
 package org.youngmonkeys.ezyplatform.test.validator;
 
 import com.tvd12.test.assertion.Asserts;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.validator.DefaultValidator;
 
 import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidExternalUrl;
+import static org.youngmonkeys.ezyplatform.validator.DefaultValidator.isValidReturnUrl;
 
 public class DefaultValidatorTest {
 
@@ -262,5 +264,56 @@ public class DefaultValidatorTest {
         Asserts.assertTrue(isValidExternalUrl("https://allowed.com."));
         Asserts.assertTrue(isValidExternalUrl("https://sub.ALLOWED.COM"));
         Asserts.assertTrue(isValidExternalUrl("https://allowed.com"));
+    }
+
+    @Test(dataProvider = "returnUrls")
+    public void isValidReturnUrlTest(
+        String returnUrl,
+        boolean expected
+    ) {
+        // when
+        boolean actual = isValidReturnUrl(returnUrl);
+
+        // then
+        Asserts.assertEquals(actual, expected);
+    }
+
+    @DataProvider
+    public Object[][] returnUrls() {
+        return new Object[][] {
+            {null, false},
+            {"", false},
+            {" ", false},
+            {"/", true},
+            {"/products", true},
+            {"/products?category=phone", true},
+            {"/san-pham/dien-thoai", true},
+            {"/san-pham/điện-thoại?q=mới", true},
+            {"/検索?q=カメラ", true},
+            {"//evil.com", false},
+            {"/\\evil.com", false},
+            {"/%2fevil.com", false},
+            {"/%2Fevil.com", false},
+            {"/%5cevil.com", false},
+            {"/%5Cevil.com", false},
+            {"/products\nLocation: https://evil.com", false},
+            {"/products\r\nLocation: https://evil.com", false},
+            {"/products\tcategory=phone", false},
+            {"http://example.com/products", true},
+            {"https://example.com/products", true},
+            {"HTTPS://example.com/products", true},
+            {"http://localhost:3000/products", true},
+            {"http://127.0.0.1:8080/products", true},
+            {"https://example.com/san-pham/điện-thoại?q=mới", true},
+            {"ftp://example.com/products", false},
+            {"javascript:alert(1)", false},
+            {"data:text/html,<script>alert(1)</script>", false},
+            {"https://user@example.com/products", false},
+            {"https://example.com/products#token", false},
+            {"https:///products", false},
+            {"https://[invalid", false},
+            {"example.com/products", false},
+            {"\\evil.com", false}
+        };
     }
 }

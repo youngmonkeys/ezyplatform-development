@@ -20,26 +20,19 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.List;
 import java.util.Map;
 
 @Getter
 @ToString
-public class ViewSchema {
-    private final String moduleName;
-    private final String template;
-    private final String pageFragmentPageName;
-    private final List<String> pageFragmentNames;
-    private final List<DataSchema> variables;
+public class WorkflowHandlerSchema {
+    private final DataSchema argumentSchema;
+    private final DataSchema resultSchema;
     private final String description;
     private final Map<String, Object> properties;
 
-    public ViewSchema(Builder builder) {
-        this.moduleName = builder.moduleName;
-        this.template = builder.template;
-        this.pageFragmentPageName = builder.pageFragmentPageName;
-        this.pageFragmentNames = builder.pageFragmentNames;
-        this.variables = builder.variables;
+    public WorkflowHandlerSchema(Builder builder) {
+        this.argumentSchema = builder.argumentSchema;
+        this.resultSchema = builder.resultSchema;
         this.description = builder.description;
         this.properties = builder.properties;
     }
@@ -48,37 +41,19 @@ public class ViewSchema {
         return new Builder();
     }
 
-    public static class Builder implements EzyBuilder<ViewSchema> {
-        private String moduleName;
-        private String template;
-        private String pageFragmentPageName;
-        private List<String> pageFragmentNames;
-        private List<DataSchema> variables;
+    public static class Builder implements EzyBuilder<WorkflowHandlerSchema> {
+        private DataSchema argumentSchema;
+        private DataSchema resultSchema;
         private String description;
         private Map<String, Object> properties;
 
-        public Builder moduleName(String moduleName) {
-            this.moduleName = moduleName;
+        public Builder argumentSchema(DataSchema argumentSchema) {
+            this.argumentSchema = argumentSchema;
             return this;
         }
 
-        public Builder template(String template) {
-            this.template = template;
-            return this;
-        }
-
-        public Builder pageFragmentPageName(String pageFragmentPageName) {
-            this.pageFragmentPageName = pageFragmentPageName;
-            return this;
-        }
-
-        public Builder pageFragmentNames(List<String> pageFragmentNames) {
-            this.pageFragmentNames = pageFragmentNames;
-            return this;
-        }
-
-        public Builder variables(List<DataSchema> variables) {
-            this.variables = variables;
+        public Builder resultSchema(DataSchema resultSchema) {
+            this.resultSchema = resultSchema;
             return this;
         }
 
@@ -93,8 +68,8 @@ public class ViewSchema {
         }
 
         @Override
-        public ViewSchema build() {
-            return new ViewSchema(this);
+        public WorkflowHandlerSchema build() {
+            return new WorkflowHandlerSchema(this);
         }
     }
 

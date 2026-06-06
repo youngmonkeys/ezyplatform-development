@@ -86,7 +86,12 @@ public final class Numbers {
         }
     }
 
-    public static long toLongOrZeroFromObject(Object value) {
+    public static long toLongOrZeroFromObject(
+        Object value
+    ) {
+        if (value == null) {
+            return ZERO_LONG;
+        }
         if (value instanceof Number) {
             return ((Number) value).longValue();
         }

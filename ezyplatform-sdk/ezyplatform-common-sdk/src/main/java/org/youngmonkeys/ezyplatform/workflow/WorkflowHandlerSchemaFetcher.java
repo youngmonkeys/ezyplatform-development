@@ -16,11 +16,13 @@
 
 package org.youngmonkeys.ezyplatform.workflow;
 
-public interface WorkflowHandler<T, R> {
+import org.youngmonkeys.ezyplatform.data.WorkflowHandlerSchema;
 
-    R handle(T result);
+public interface WorkflowHandlerSchemaFetcher {
 
-    String getName();
+    WorkflowHandlerSchema getSchema();
+
+    String getWorkflowName();
 
     default int getPriority() {
         return 0;
