@@ -26,7 +26,6 @@ import java.util.Map;
 @Getter
 @ToString
 public class ViewSchema {
-    private final String moduleName;
     private final String template;
     private final String pageFragmentPageName;
     private final List<String> pageFragmentNames;
@@ -35,7 +34,6 @@ public class ViewSchema {
     private final Map<String, Object> properties;
 
     public ViewSchema(Builder builder) {
-        this.moduleName = builder.moduleName;
         this.template = builder.template;
         this.pageFragmentPageName = builder.pageFragmentPageName;
         this.pageFragmentNames = builder.pageFragmentNames;
@@ -49,18 +47,12 @@ public class ViewSchema {
     }
 
     public static class Builder implements EzyBuilder<ViewSchema> {
-        private String moduleName;
         private String template;
         private String pageFragmentPageName;
         private List<String> pageFragmentNames;
         private List<DataSchema> variables;
         private String description;
         private Map<String, Object> properties;
-
-        public Builder moduleName(String moduleName) {
-            this.moduleName = moduleName;
-            return this;
-        }
 
         public Builder template(String template) {
             this.template = template;
