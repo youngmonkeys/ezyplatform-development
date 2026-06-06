@@ -159,6 +159,56 @@ public class WorkflowHandlerManagerTest {
     }
 
     @Test
+    public void shouldGetSortedWorkflowHandlerNames() {
+        // given
+        TestWorkflowHandlerSchemaFetcher smsFetcher =
+            new TestWorkflowHandlerSchemaFetcher("send-sms", "Send sms");
+        TestWorkflowHandlerSchemaFetcher emailFetcher =
+            new TestWorkflowHandlerSchemaFetcher("send-email", "Send email");
+        TestWorkflowHandlerSchemaFetcher pushFetcher =
+            new TestWorkflowHandlerSchemaFetcher("send-push", "Send push");
+
+        EzySingletonFactory singletonFactory = mock(EzySingletonFactory.class);
+        when(singletonFactory.getSingletonsOf(WorkflowHandler.class))
+            .thenReturn(Collections.emptyList());
+        when(singletonFactory.getSingletonsOf(WorkflowHandlerSchemaFetcher.class))
+            .thenReturn(Arrays.asList(smsFetcher, emailFetcher, pushFetcher));
+
+        WorkflowHandlerManager manager = new WorkflowHandlerManager(
+            singletonFactory
+        );
+
+        // when
+        List<String> actualNames = manager.getSortedWorkflowHandlerNames();
+
+        // then
+        Asserts.assertEquals(actualNames.size(), 3);
+        Asserts.assertEquals(actualNames.get(0), "send-email");
+        Asserts.assertEquals(actualNames.get(1), "send-push");
+        Asserts.assertEquals(actualNames.get(2), "send-sms");
+    }
+
+    @Test
+    public void shouldGetSortedWorkflowHandlerNamesWhenEmpty() {
+        // given
+        EzySingletonFactory singletonFactory = mock(EzySingletonFactory.class);
+        when(singletonFactory.getSingletonsOf(WorkflowHandler.class))
+            .thenReturn(Collections.emptyList());
+        when(singletonFactory.getSingletonsOf(WorkflowHandlerSchemaFetcher.class))
+            .thenReturn(Collections.emptyList());
+
+        WorkflowHandlerManager manager = new WorkflowHandlerManager(
+            singletonFactory
+        );
+
+        // when
+        List<String> actualNames = manager.getSortedWorkflowHandlerNames();
+
+        // then
+        Asserts.assertEquals(actualNames.size(), 0);
+    }
+
+    @Test
     public void shouldOverrideLowerPriorityHandlerWithHigherPriority() {
         // given
         TestWorkflowHandler defaultHandler = new TestWorkflowHandler(
@@ -244,6 +294,7 @@ public class WorkflowHandlerManagerTest {
         manager.getWorkflowHandlerSchemaFetcherByWorkflowName("send-email");
         manager.getWorkflowHandlerSchemaFetchers();
         manager.getWorkflowHandlerSchemaFetcherMap();
+        manager.getSortedWorkflowHandlerNames();
 
         // then
         verify(singletonFactory, times(1))
