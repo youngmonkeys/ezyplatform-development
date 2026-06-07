@@ -29,6 +29,7 @@ import java.util.TreeSet;
  * ConExpression (Cron Expression) — a recurring schedule expression.
  *
  * <h2>Expression format</h2>
+ *
  * <p>Two forms are supported:
  * <pre>
  * 5 fields:  MINUTE  HOUR  DAY-OF-MONTH  MONTH  DAY-OF-WEEK
@@ -119,13 +120,15 @@ import java.util.TreeSet;
  *     .seconds(new TreeSet<>(List.of(0)))
  *     .minutes(new TreeSet<>(List.of(0)))
  *     .hours(hours)
- *     .daysOfMonth(new TreeSet<>(IntStream.rangeClosed(1, 31).boxed().collect(Collectors.toList())))
+ *     .daysOfMonth(new TreeSet<>(
+ *         IntStream.rangeClosed(1, 31).boxed().collect(Collectors.toList())))
  *     .months(new TreeSet<>(IntStream.rangeClosed(1, 12).boxed().collect(Collectors.toList())))
  *     .daysOfWeek(new TreeSet<>(IntStream.rangeClosed(0, 6).boxed().collect(Collectors.toList())))
  *     .build();
  * }</pre>
  *
  * <h2>Return value of nextTimeOf</h2>
+ *
  * <p>Returns {@code null} if no trigger time is found within 4 years
  * (e.g. a calendar-impossible expression like "0 8 31 2 *" — February 31st).
  */
