@@ -18,6 +18,7 @@ package org.youngmonkeys.ezyplatform.data;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
+import lombok.ToString;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
@@ -133,7 +134,8 @@ import java.util.TreeSet;
  * (e.g. a calendar-impossible expression like "0 8 31 2 *" — February 31st).
  */
 @Getter
-public class ConExpression {
+@ToString
+public class CronExpression {
     private final String expression;
     private final TreeSet<Integer> seconds;
     private final TreeSet<Integer> minutes;
@@ -142,7 +144,7 @@ public class ConExpression {
     private final TreeSet<Integer> months;
     private final TreeSet<Integer> daysOfWeek;
 
-    private ConExpression(Builder builder) {
+    private CronExpression(Builder builder) {
         this.expression = builder.expression;
         this.seconds = builder.seconds;
         this.minutes = builder.minutes;
@@ -153,13 +155,13 @@ public class ConExpression {
     }
 
     /**
-     * Parses a cron expression string into a {@link ConExpression}.
+     * Parses a cron expression string into a {@link CronExpression}.
      *
      * @param expression a whitespace-separated string with 5 or 6 fields
-     * @return the parsed {@link ConExpression}
+     * @return the parsed {@link CronExpression}
      * @throws IllegalArgumentException if the expression does not have 5 or 6 fields
      */
-    public static ConExpression parse(String expression) {
+    public static CronExpression parse(String expression) {
         String[] parts = expression.trim().split("\\s+");
         if (parts.length == 5) {
             // minute hour day-of-month month day-of-week (no seconds)
@@ -370,7 +372,7 @@ public class ConExpression {
         return new Builder();
     }
 
-    public static class Builder implements EzyBuilder<ConExpression> {
+    public static class Builder implements EzyBuilder<CronExpression> {
         private String expression;
         private TreeSet<Integer> seconds;
         private TreeSet<Integer> minutes;
@@ -415,8 +417,8 @@ public class ConExpression {
         }
 
         @Override
-        public ConExpression build() {
-            return new ConExpression(this);
+        public CronExpression build() {
+            return new CronExpression(this);
         }
     }
 }

@@ -19,13 +19,13 @@ package org.youngmonkeys.ezyplatform.test.data;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-import org.youngmonkeys.ezyplatform.data.ConExpression;
+import org.youngmonkeys.ezyplatform.data.CronExpression;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.TreeSet;
 
-public class ConExpressionTest {
+public class CronExpressionTest {
 
     @Test
     public void parseFiveFieldUnixExpressionTest() {
@@ -33,7 +33,7 @@ public class ConExpressionTest {
         String expression = "30 8 1,15 1-3 1-5";
 
         // when
-        ConExpression actual = ConExpression.parse(expression);
+        CronExpression actual = CronExpression.parse(expression);
 
         // then
         Asserts.assertEquals(actual.getExpression(), expression);
@@ -51,7 +51,7 @@ public class ConExpressionTest {
         String expression = "15 30 8 * */3 0,6";
 
         // when
-        ConExpression actual = ConExpression.parse(expression);
+        CronExpression actual = CronExpression.parse(expression);
 
         // then
         Asserts.assertEquals(actual.getExpression(), expression);
@@ -66,7 +66,7 @@ public class ConExpressionTest {
     @Test
     public void fiveFieldExpressionUsesZeroSecondTest() {
         // given
-        ConExpression expression = ConExpression.parse("* * * * *");
+        CronExpression expression = CronExpression.parse("* * * * *");
         LocalDateTime time = LocalDateTime.of(
             2026,
             1,
@@ -89,7 +89,7 @@ public class ConExpressionTest {
     @Test
     public void sixFieldExpressionUsesSecondFieldTest() {
         // given
-        ConExpression expression = ConExpression.parse("15 30 8 * * *");
+        CronExpression expression = CronExpression.parse("15 30 8 * * *");
         LocalDateTime time = LocalDateTime.of(
             2026,
             1,
@@ -112,7 +112,7 @@ public class ConExpressionTest {
     @Test
     public void dayOfWeekZeroMeansSundayTest() {
         // given
-        ConExpression expression = ConExpression.parse("0 0 0 * * 0");
+        CronExpression expression = CronExpression.parse("0 0 0 * * 0");
         LocalDateTime time = LocalDateTime.of(
             2026,
             1,
@@ -135,7 +135,7 @@ public class ConExpressionTest {
     @Test
     public void dayOfWeekSevenIsNotSundayTest() {
         // given
-        ConExpression expression = ConExpression.parse("0 0 0 * * 7");
+        CronExpression expression = CronExpression.parse("0 0 0 * * 7");
         LocalDateTime time = LocalDateTime.of(
             2026,
             1,
@@ -155,7 +155,7 @@ public class ConExpressionTest {
     @Test
     public void rangeWithStepExpressionTest() {
         // given
-        ConExpression expression = ConExpression.parse(
+        CronExpression expression = CronExpression.parse(
             "0 0 9-17/2 * */3 1-5"
         );
         LocalDateTime time = LocalDateTime.of(
@@ -186,7 +186,7 @@ public class ConExpressionTest {
 
         // when
         try {
-            ConExpression.parse(expression);
+            CronExpression.parse(expression);
         } catch (Exception e) {
             exception = e;
         }
@@ -202,7 +202,7 @@ public class ConExpressionTest {
 
         // when
         try {
-            ConExpression.parse(expression);
+            CronExpression.parse(expression);
         } catch (Exception e) {
             exception = e;
         }
