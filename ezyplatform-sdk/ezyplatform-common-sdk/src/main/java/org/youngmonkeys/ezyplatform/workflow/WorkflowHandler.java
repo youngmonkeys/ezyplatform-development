@@ -18,7 +18,7 @@ package org.youngmonkeys.ezyplatform.workflow;
 
 public interface WorkflowHandler<T, R> {
 
-    R handle(T result);
+    R handle(T input);
 
     String getName();
 
