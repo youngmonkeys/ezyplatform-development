@@ -21,7 +21,9 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.data.CronExpression;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.TreeSet;
 
@@ -283,6 +285,113 @@ public class CronExpressionTest {
             {"0 0 0 0"},
             {"0 0 0 0 0 0 0"}
         };
+    }
+
+    @Test(dataProvider = "nextTimeOfTimestampCases")
+    public void nextTimeOfTimestampTest(
+        String expression,
+        LocalDateTime inputTime,
+        LocalDateTime expectedTime
+    ) {
+        // given
+        CronExpression cron = CronExpression.parse(expression);
+        long timestamp = toEpochMilli(inputTime);
+
+        // when
+        long actual = cron.nextTimeOf(timestamp);
+
+        // then
+        Asserts.assertEquals(fromEpochMilli(actual), expectedTime);
+    }
+
+    @Test
+    public void nextTimeOfTimestamp_impossibleExpression_returnsMinusOneTest() {
+        // given
+        CronExpression cron = CronExpression.parse("0 8 31 2 *");
+        long timestamp = toEpochMilli(LocalDateTime.of(2026, 6, 9, 0, 0, 0));
+
+        // when
+        long actual = cron.nextTimeOf(timestamp);
+
+        // then
+        Asserts.assertEquals(actual, -1L);
+    }
+
+    @DataProvider
+    public Object[][] nextTimeOfTimestampCases() {
+        return new Object[][] {
+            // second ceiling = null → advance to next minute
+            {
+                "0/30 * * * * *",
+                LocalDateTime.of(2026, 6, 9, 17, 16, 30),
+                LocalDateTime.of(2026, 6, 9, 17, 17, 0)
+            },
+            // immediate next second matches
+            {
+                "0/30 * * * * *",
+                LocalDateTime.of(2026, 6, 9, 17, 16, 29),
+                LocalDateTime.of(2026, 6, 9, 17, 16, 30)
+            },
+            // every minute (5-field, seconds fixed at 0)
+            {
+                "* * * * *",
+                LocalDateTime.of(2026, 1, 5, 8, 30, 0),
+                LocalDateTime.of(2026, 1, 5, 8, 31, 0)
+            },
+            // specific hour not yet reached → fires today
+            {
+                "0 8 * * *",
+                LocalDateTime.of(2026, 6, 9, 7, 59, 59),
+                LocalDateTime.of(2026, 6, 9, 8, 0, 0)
+            },
+            // specific hour already passed → advance to next day
+            {
+                "0 8 * * *",
+                LocalDateTime.of(2026, 6, 9, 8, 0, 0),
+                LocalDateTime.of(2026, 6, 10, 8, 0, 0)
+            },
+            // minute ceiling = null → advance to next hour
+            {
+                "0 45 * * *",
+                LocalDateTime.of(2026, 6, 9, 17, 46, 0),
+                LocalDateTime.of(2026, 6, 9, 18, 45, 0)
+            },
+            // hour ceiling = null → advance to next day (6-field)
+            {
+                "0 0 8 * * *",
+                LocalDateTime.of(2026, 6, 9, 9, 0, 0),
+                LocalDateTime.of(2026, 6, 10, 8, 0, 0)
+            },
+            // crosses month boundary
+            {
+                "0 0 1 7 *",
+                LocalDateTime.of(2026, 6, 9, 0, 0, 0),
+                LocalDateTime.of(2026, 7, 1, 0, 0, 0)
+            },
+            // crosses year boundary (no later matching month in same year)
+            {
+                "0 0 1 1 *",
+                LocalDateTime.of(2026, 6, 9, 0, 0, 0),
+                LocalDateTime.of(2027, 1, 1, 0, 0, 0)
+            },
+            // day-of-week constraint: Jan 4, 2026 is Sunday (cron 0)
+            {
+                "0 0 0 * * 0",
+                LocalDateTime.of(2026, 1, 3, 23, 59, 59),
+                LocalDateTime.of(2026, 1, 4, 0, 0, 0)
+            },
+        };
+    }
+
+    private static long toEpochMilli(LocalDateTime ldt) {
+        return ldt.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+    }
+
+    private static LocalDateTime fromEpochMilli(long epochMilli) {
+        return LocalDateTime.ofInstant(
+            Instant.ofEpochMilli(epochMilli),
+            ZoneId.systemDefault()
+        );
     }
 
     private static TreeSet<Integer> range(int start, int end) {
