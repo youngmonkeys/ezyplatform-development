@@ -179,6 +179,62 @@ public class CronExpressionTest {
         );
     }
 
+    @Test(dataProvider = "toStringCases")
+    public void toStringTest(String expression, String expected) {
+        Asserts.assertEquals(CronExpression.parse(expression).toString(), expected);
+    }
+
+    @DataProvider
+    public Object[][] toStringCases() {
+        return new Object[][] {
+            // high-frequency
+            {"* * * * * *",       "every second"},
+            {"0/30 * * * * *",    "every 30 seconds"},
+            {"0/10 * * * * *",    "every 10 seconds"},
+            {"* * * * *",         "every minute"},
+            {"*/5 * * * *",       "every 5 minutes"},
+            {"*/15 * * * *",      "every 15 minutes"},
+            {"*/30 * * * *",      "every 30 minutes"},
+            {"0 * * * *",         "every hour"},
+            {"0 */2 * * *",       "every 2 hours"},
+            // hours in a range with step
+            {"0 9-17/2 * * *",    "every 2 hours from 09:00 to 17:00"},
+            // specific times — every day
+            {"0 8 * * *",         "at 08:00, every day"},
+            {"30 8 * * *",        "at 08:30, every day"},
+            {"0 0 * * *",         "at 00:00, every day"},
+            // multiple hours/minutes
+            {"0 8,17 * * *",      "at 08:00 and 17:00, every day"},
+            {"0,30 8 * * *",      "at 08:00 and 08:30, every day"},
+            {"0 8,12,18 * * *",   "at 08:00, 12:00, and 18:00, every day"},
+            // day-of-week constraints
+            {"0 8 * * 1",         "at 08:00, every Monday"},
+            {"0 8 * * 0",         "at 08:00, every Sunday"},
+            {"0 8 * * 1-5",       "at 08:00, every weekday"},
+            {"0 8 * * 0,6",       "at 08:00, on weekends"},
+            {"0 8 * * 1,3,5",     "at 08:00, every Monday, Wednesday, and Friday"},
+            {"0 8 * * 0-2",       "at 08:00, every Sunday through Tuesday"},
+            // day-of-month constraints
+            {"0 8 1 * *",         "at 08:00, on the 1st of every month"},
+            {"0 8 15 * *",        "at 08:00, on the 15th of every month"},
+            {"0 8 1,15 * *",      "at 08:00, on the 1st and 15th of every month"},
+            {"0 0 1,10,20 * *",   "at 00:00, on the 1st, 10th, and 20th of every month"},
+            // month constraints
+            {"0 8 * 1,7 *",       "at 08:00, every day in January and July"},
+            {"0 8 * 3-6 *",       "at 08:00, every day in March through June"},
+            {"0 8 * */3 *",       "at 08:00, every day in January, April, July, and October"},
+            // combined month + DOM
+            {"0 0 1 1 *",         "at 00:00, on the 1st of January"},
+            {"0 0 1 1,4,7,10 *",  "at 00:00, on the 1st of January, April, July, and October"},
+            // 6-field with seconds
+            {"0 0 8 * * *",       "at 08:00, every day"},
+            {"0 30 8 * * 1-5",    "at 08:30, every weekday"},
+            {"0 0 0 1 * *",       "at 00:00, on the 1st of every month"},
+            {"0 0 0 * * 0",       "at 00:00, every Sunday"},
+            {"15 30 8 * * 0,6",   "at 08:30:15, on weekends"},
+        };
+    }
+
     @Test(dataProvider = "unsupportedQuartzExpressions")
     public void unsupportedQuartzExpressionTest(String expression) {
         // given

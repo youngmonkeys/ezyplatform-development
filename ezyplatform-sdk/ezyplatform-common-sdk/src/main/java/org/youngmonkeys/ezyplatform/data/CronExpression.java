@@ -18,12 +18,14 @@ package org.youngmonkeys.ezyplatform.data;
 
 import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
-import lombok.ToString;
 
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.TreeSet;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
@@ -136,7 +138,6 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
  * (e.g. a calendar-impossible expression like "0 8 31 2 *" — February 31st).
  */
 @Getter
-@ToString
 public class CronExpression {
     private final String expression;
     private final TreeSet<Integer> seconds;
@@ -371,6 +372,280 @@ public class CronExpression {
             .withDayOfMonth(1)
             .withHour(0).withMinute(0).withSecond(0)
             .plusYears(1);
+    }
+
+    private static final String[] DAY_NAMES = {
+        "Sunday", "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday"
+    };
+    private static final String[] MONTH_NAMES = {
+        "", "January", "February", "March", "April",
+        "May", "June", "July", "August",
+        "September", "October", "November", "December"
+    };
+
+    @Override
+    public String toString() {
+        boolean allSec = isAllRange(seconds, 0, 59);
+        boolean allMin = isAllRange(minutes, 0, 59);
+        boolean allHrs = isAllRange(hours, 0, 23);
+        boolean allDom = isAllRange(daysOfMonth, 1, 31);
+        boolean allMon = isAllRange(months, 1, 12);
+        boolean allDow = isAllRange(daysOfWeek, 0, 6);
+        boolean onlySec0 = isSingleValue(seconds);
+        boolean onlyMin0 = isSingleValue(minutes);
+
+        // every second
+        if (allSec && allMin && allHrs && allDom && allMon && allDow) {
+            return "every second";
+        }
+
+        // every N seconds
+        if (allMin && allHrs && allDom && allMon && allDow) {
+            Integer step = getStep(seconds, 60);
+            if (step != null && seconds.first() == 0) {
+                return "every " + plural(step, "second");
+            }
+        }
+
+        // every minute / every N minutes
+        if (onlySec0 && allHrs && allDom && allMon && allDow) {
+            if (allMin) {
+                return "every minute";
+            }
+            Integer step = getStep(minutes, 60);
+            if (step != null && minutes.first() == 0) {
+                return "every " + plural(step, "minute");
+            }
+        }
+
+        // every hour / every N hours (optionally in a range)
+        if (onlySec0 && onlyMin0 && allDom && allMon && allDow) {
+            if (allHrs) {
+                return "every hour";
+            }
+            Integer step = getStep(hours, 24);
+            if (step != null) {
+                if (hours.first() == 0) {
+                    return "every " + plural(step, "hour");
+                }
+                return "every " + plural(step, "hour")
+                    + " from " + String.format("%02d:00", hours.first())
+                    + " to " + String.format("%02d:00", hours.last());
+            }
+        }
+
+        // at TIME[, DAY-CONSTRAINT]
+        List<String> times = buildTimeList(onlySec0);
+        if (!times.isEmpty()) {
+            String timePart = "at " + joinEnglish(times);
+            String dayPart = buildDayConstraint(allDom, allMon, allDow);
+            return timePart + ", " + dayPart;
+        }
+
+        return expression;
+    }
+
+    private List<String> buildTimeList(boolean onlySec0) {
+        List<String> times = new ArrayList<>();
+        boolean showSec = !onlySec0;
+        int limit = showSec
+            ? hours.size() * minutes.size() * seconds.size()
+            : hours.size() * minutes.size();
+        if (limit > 8) {
+            return times;
+        }
+        if (showSec) {
+            for (int h : hours) {
+                for (int m : minutes) {
+                    for (int s : seconds) {
+                        times.add(String.format("%02d:%02d:%02d", h, m, s));
+                    }
+                }
+            }
+        } else {
+            for (int h : hours) {
+                for (int m : minutes) {
+                    times.add(String.format("%02d:%02d", h, m));
+                }
+            }
+        }
+        return times;
+    }
+
+    private String buildDayConstraint(
+        boolean allDom,
+        boolean allMon,
+        boolean allDow
+    ) {
+        TreeSet<Integer> weekdays = new TreeSet<>(Arrays.asList(1, 2, 3, 4, 5));
+        TreeSet<Integer> weekends = new TreeSet<>(Arrays.asList(0, 6));
+
+        if (allDom && allMon && allDow) {
+            return "every day";
+        }
+        if (allDom && allMon) {
+            if (daysOfWeek.equals(weekdays)) {
+                return "every weekday";
+            }
+            if (daysOfWeek.equals(weekends)) {
+                return "on weekends";
+            }
+            return describeDow();
+        }
+        if (allDow && allMon) {
+            return "on the " + describeDom() + " of every month";
+        }
+        if (allDow && allDom) {
+            return "every day in " + describeMonths();
+        }
+        if (allDow) {
+            return "on the " + describeDom() + " of " + describeMonths();
+        }
+        if (allDom) {
+            return describeDow() + " in " + describeMonths();
+        }
+        // both DOW and DOM constrained (AND semantics)
+        return describeDow() + " on the " + describeDom() + " of " +
+            (allMon ? "every month" : describeMonths());
+    }
+
+    private String describeDow() {
+        if (daysOfWeek.size() == 1) {
+            return "every " + DAY_NAMES[daysOfWeek.first()];
+        }
+        if (isConsecutiveRange(daysOfWeek, 7)) {
+            return "every " + DAY_NAMES[daysOfWeek.first()]
+                + " through " + DAY_NAMES[daysOfWeek.last()];
+        }
+        List<String> names = new ArrayList<>();
+        for (int d : daysOfWeek) {
+            names.add(DAY_NAMES[d]);
+        }
+        return "every " + joinEnglish(names);
+    }
+
+    private String describeDom() {
+        if (daysOfMonth.size() == 1) {
+            return ordinal(daysOfMonth.first());
+        }
+        if (isConsecutiveRange(daysOfMonth, 30)) {
+            return ordinal(daysOfMonth.first()) +
+                " through " + ordinal(daysOfMonth.last());
+        }
+        List<String> ords = new ArrayList<>();
+        for (int d : daysOfMonth) {
+            ords.add(ordinal(d));
+        }
+        return joinEnglish(ords);
+    }
+
+    private String describeMonths() {
+        if (months.size() == 1) {
+            return MONTH_NAMES[months.first()];
+        }
+        if (isConsecutiveRange(months, 12)) {
+            return MONTH_NAMES[months.first()] +
+                " through " + MONTH_NAMES[months.last()];
+        }
+        List<String> names = new ArrayList<>();
+        for (int m : months) {
+            names.add(MONTH_NAMES[m]);
+        }
+        return joinEnglish(names);
+    }
+
+    private static boolean isAllRange(
+        TreeSet<Integer> set,
+        int min,
+        int max
+    ) {
+        return set.size() == (max - min + 1)
+            && set.first() == min
+            && set.last() == max;
+    }
+
+    private static boolean isSingleValue(
+        TreeSet<Integer> set
+    ) {
+        return set.size() == 1 && set.first() == 0;
+    }
+
+    private static boolean isConsecutiveRange(
+        TreeSet<Integer> set,
+        int maxValueCount
+    ) {
+        Integer step = getStep(set, maxValueCount);
+        return step != null && step == 1;
+    }
+
+    private static Integer getStep(
+        TreeSet<Integer> set,
+        int maxValueCount
+    ) {
+        if (set.size() < 2) {
+            return null;
+        }
+        int[] arr = set.stream().mapToInt(Integer::intValue).toArray();
+        int step = arr[1] - arr[0];
+        if (step <= 0 || maxValueCount % step != 0) {
+            return null;
+        }
+        for (int i = 2; i < arr.length; i++) {
+            if (arr[i] - arr[i - 1] != step) {
+                return null;
+            }
+        }
+        return step;
+    }
+
+    private static String plural(int n, String unit) {
+        return n + " " + unit + (n == 1 ? "" : "s");
+    }
+
+    private static String ordinal(int n) {
+        String suffix;
+        if (n % 100 >= 11 && n % 100 <= 13) {
+            suffix = "th";
+        } else {
+            switch (n % 10) {
+                case 1: {
+                    suffix = "st";
+                    break;
+                }
+                case 2: {
+                    suffix = "nd";
+                    break;
+                }
+                case 3: {
+                    suffix = "rd";
+                    break;
+                }
+                default: {
+                    suffix = "th";
+                }
+            }
+        }
+        return n + suffix;
+    }
+
+    private static String joinEnglish(List<String> items) {
+        int size = items.size();
+        if (size == 0) {
+            return "";
+        }
+        if (size == 1) {
+            return items.get(0);
+        }
+        if (size == 2) {
+            return items.get(0) + " and " + items.get(1);
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < size - 1; i++) {
+            sb.append(items.get(i)).append(", ");
+        }
+        sb.append("and ").append(items.get(size - 1));
+        return sb.toString();
     }
 
     public static Builder builder() {
