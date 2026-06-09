@@ -68,7 +68,7 @@ public class WorkflowHandlerManager {
     }
 
     public List<String> getSortedWorkflowHandlerNames() {
-        return workflowHandlerSchemaFetcherByName
+        return workflowHandlersByName
             .get()
             .keySet()
             .stream()

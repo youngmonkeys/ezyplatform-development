@@ -26,6 +26,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.TreeSet;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+
 /**
  * ConExpression (Cron Expression) — a recurring schedule expression.
  *
@@ -162,6 +164,9 @@ public class CronExpression {
      * @throws IllegalArgumentException if the expression does not have 5 or 6 fields
      */
     public static CronExpression parse(String expression) {
+        if (isBlank(expression)) {
+            return null;
+        }
         String[] parts = expression.trim().split("\\s+");
         if (parts.length == 5) {
             // minute hour day-of-month month day-of-week (no seconds)

@@ -161,18 +161,16 @@ public class WorkflowHandlerManagerTest {
     @Test
     public void shouldGetSortedWorkflowHandlerNames() {
         // given
-        TestWorkflowHandlerSchemaFetcher smsFetcher =
-            new TestWorkflowHandlerSchemaFetcher("send-sms", "Send sms");
-        TestWorkflowHandlerSchemaFetcher emailFetcher =
-            new TestWorkflowHandlerSchemaFetcher("send-email", "Send email");
-        TestWorkflowHandlerSchemaFetcher pushFetcher =
-            new TestWorkflowHandlerSchemaFetcher("send-push", "Send push");
+        TestWorkflowHandler smsHandler =
+            new TestWorkflowHandler("send-sms");
+        TestWorkflowHandler emailHandler =
+            new TestWorkflowHandler("send-email");
+        TestWorkflowHandler pushHandler =
+            new TestWorkflowHandler("send-push");
 
         EzySingletonFactory singletonFactory = mock(EzySingletonFactory.class);
         when(singletonFactory.getSingletonsOf(WorkflowHandler.class))
-            .thenReturn(Collections.emptyList());
-        when(singletonFactory.getSingletonsOf(WorkflowHandlerSchemaFetcher.class))
-            .thenReturn(Arrays.asList(smsFetcher, emailFetcher, pushFetcher));
+            .thenReturn(Arrays.asList(smsHandler, emailHandler, pushHandler));
 
         WorkflowHandlerManager manager = new WorkflowHandlerManager(
             singletonFactory
