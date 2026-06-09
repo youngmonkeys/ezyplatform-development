@@ -352,7 +352,7 @@ public class CronExpressionTest {
             },
             // minute ceiling = null → advance to next hour
             {
-                "0 45 * * *",
+                "45 * * * *",
                 LocalDateTime.of(2026, 6, 9, 17, 46, 0),
                 LocalDateTime.of(2026, 6, 9, 18, 45, 0)
             },
