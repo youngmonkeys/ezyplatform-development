@@ -22,10 +22,13 @@ import lombok.Getter;
 import java.time.DayOfWeek;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.ZoneId;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.TreeSet;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
@@ -374,16 +377,6 @@ public class CronExpression {
             .plusYears(1);
     }
 
-    private static final String[] DAY_NAMES = {
-        "Sunday", "Monday", "Tuesday", "Wednesday",
-        "Thursday", "Friday", "Saturday"
-    };
-    private static final String[] MONTH_NAMES = {
-        "", "January", "February", "March", "April",
-        "May", "June", "July", "August",
-        "September", "October", "November", "December"
-    };
-
     @Override
     public String toString() {
         boolean allSec = isAllRange(seconds, 0, 59);
@@ -512,15 +505,15 @@ public class CronExpression {
 
     private String describeDow() {
         if (daysOfWeek.size() == 1) {
-            return "every " + DAY_NAMES[daysOfWeek.first()];
+            return "every " + getDayNameByIndex(daysOfWeek.first());
         }
         if (isConsecutiveRange(daysOfWeek, 7)) {
-            return "every " + DAY_NAMES[daysOfWeek.first()]
-                + " through " + DAY_NAMES[daysOfWeek.last()];
+            return "every " + getDayNameByIndex(daysOfWeek.first())
+                + " through " + getDayNameByIndex(daysOfWeek.last());
         }
         List<String> names = new ArrayList<>();
         for (int d : daysOfWeek) {
-            names.add(DAY_NAMES[d]);
+            names.add(getDayNameByIndex(d));
         }
         return "every " + joinEnglish(names);
     }
@@ -542,15 +535,15 @@ public class CronExpression {
 
     private String describeMonths() {
         if (months.size() == 1) {
-            return MONTH_NAMES[months.first()];
+            return getMonthNameByIndex(months.first());
         }
         if (isConsecutiveRange(months, 12)) {
-            return MONTH_NAMES[months.first()] +
-                " through " + MONTH_NAMES[months.last()];
+            return getMonthNameByIndex(months.first()) +
+                " through " + getMonthNameByIndex(months.last());
         }
         List<String> names = new ArrayList<>();
         for (int m : months) {
-            names.add(MONTH_NAMES[m]);
+            names.add(getMonthNameByIndex(m));
         }
         return joinEnglish(names);
     }
@@ -646,6 +639,26 @@ public class CronExpression {
         }
         sb.append("and ").append(items.get(size - 1));
         return sb.toString();
+    }
+
+    private static String getDayNameByIndex(
+        int index
+    ) {
+        // DayOfWeek.of(): 1=Monday..7=Sunday; cron: 0=Sunday, 1=Monday..6=Saturday
+        return DayOfWeek.of(index == 0 ? 7 : index).getDisplayName(
+            TextStyle.FULL,
+            Locale.ENGLISH
+        );
+    }
+
+    private static String getMonthNameByIndex(
+        int index
+    ) {
+        // Month.of(): 1=January..12=December — matches cron month range
+        return Month.of(index).getDisplayName(
+            TextStyle.FULL,
+            Locale.ENGLISH
+        );
     }
 
     public static Builder builder() {
