@@ -69,6 +69,10 @@ public class NumbersTest {
         // when
         // then
         Asserts.assertEquals(
+            toLongOrZeroFromObject(null),
+            0L
+        );
+        Asserts.assertEquals(
             toLongOrZeroFromObject(10L),
             10L
         );

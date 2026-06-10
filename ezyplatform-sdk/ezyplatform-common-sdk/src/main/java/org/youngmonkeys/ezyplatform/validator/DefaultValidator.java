@@ -26,8 +26,35 @@ import java.util.Locale;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.properties.file.util.PropertiesUtil.getKeysFromVariableName;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.HTTP;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.HTTPS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LOCALHOST;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_LENGTH_EMAIL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_LENGTH_PASSWORD;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_LENGTH_PHONE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_LENGTH_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_LENGTH_UUID;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_PAGE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MIN_LENGTH_PASSWORD;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MIN_LENGTH_PHONE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MIN_LENGTH_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MIN_PAGE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_COMMON_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_EMAIL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_HTTP_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_IP;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_MEDIA_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_PACKAGE_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_PHONE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_SHA256_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_USERNAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_U_INT_NUMBER;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_VERSION;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_WEBSOCKET_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.WEB_MAX_PAGE_SIZE;
+import static org.youngmonkeys.ezyplatform.util.Strings.containsControlCharacter;
 
+@SuppressWarnings("MethodCount")
 public final class DefaultValidator {
 
     private DefaultValidator() {}
@@ -126,7 +153,52 @@ public final class DefaultValidator {
         }
     }
 
-    private static String normalizeHost(String host) {
+    public static boolean isValidReturnUrl(
+        String returnUrl
+    ) {
+        if (isBlank(returnUrl)) {
+            return Boolean.FALSE;
+        }
+        if (containsControlCharacter(returnUrl)) {
+            return Boolean.FALSE;
+        }
+        if (returnUrl.startsWith("/")) {
+            return isValidRelativeReturnUrl(returnUrl);
+        }
+        try {
+            URI uri = new URI(returnUrl);
+            String scheme = uri.getScheme();
+            return uri.isAbsolute()
+                && (HTTP.equalsIgnoreCase(scheme)
+                || HTTPS.equalsIgnoreCase(scheme))
+                && isValidAbsoluteReturnUrl(uri);
+        } catch (Exception e) {
+            // do nothing
+        }
+        return Boolean.FALSE;
+    }
+
+    public static boolean isValidRelativeReturnUrl(
+        String returnUrl
+    ) {
+        String lowerCaseReturnUrl = returnUrl
+            .toLowerCase(Locale.ROOT);
+        return !returnUrl.startsWith("//")
+            && !returnUrl.startsWith("/\\")
+            && !lowerCaseReturnUrl.startsWith("/%2f")
+            && !lowerCaseReturnUrl.startsWith("/%5c");
+    }
+
+    public static boolean isValidAbsoluteReturnUrl(
+        URI uri
+    ) {
+        String host = uri.getHost();
+        return host != null
+            && uri.getRawUserInfo() == null
+            && uri.getRawFragment() == null;
+    }
+
+    public static String normalizeHost(String host) {
         String normalizedHost = host.trim().toLowerCase(Locale.ROOT);
         while (normalizedHost.endsWith(".")) {
             normalizedHost = normalizedHost.substring(
@@ -285,18 +357,29 @@ public final class DefaultValidator {
         return str != null && str.matches(PATTERN_SHA256_STRING);
     }
 
-    public static boolean isCommonString(String str, int maxLength) {
+    public static boolean isCommonString(
+        String str,
+        int maxLength
+    ) {
         return isCommonString(str, 1, maxLength);
     }
 
-    public static boolean isCommonString(String str, int minLength, int maxLength) {
+    public static boolean isCommonString(
+        String str,
+        int minLength,
+        int maxLength
+    ) {
         return isNotBlank(str)
             && str.length() >= minLength
             && str.length() <= maxLength
             && str.matches(PATTERN_COMMON_STRING);
     }
 
-    public static boolean isPackageName(String str, int minLength, int maxLength) {
+    public static boolean isPackageName(
+        String str,
+        int minLength,
+        int maxLength
+    ) {
         return isNotBlank(str)
             && str.length() >= minLength
             && str.length() <= maxLength
@@ -327,7 +410,10 @@ public final class DefaultValidator {
     }
 
     public static boolean containsSqlComment(String str) {
-        return str.contains("--");
+        return str.contains("--")
+            || str.contains("/*")
+            || str.contains("*/")
+            || str.contains("#");
     }
 
     public static boolean containsOperation(String str) {
@@ -336,21 +422,23 @@ public final class DefaultValidator {
             || str.contains("<");
     }
 
-    public static boolean containsParentheses(String str) {
+    public static boolean containsSingleQuote(String str) {
         return str.contains("'");
     }
 
     public static boolean maybeContainsSqlInjection(String str) {
         return containsSqlComment(str)
             || containsOperation(str)
-            || containsParentheses(str);
+            || containsSingleQuote(str);
     }
 
     public static boolean isValidPageSize(int pageSize) {
         return pageSize >= MIN_PAGE_SIZE && pageSize <= MAX_PAGE_SIZE;
     }
 
-    public static boolean isValidCollectionSize(Collection<?> collection) {
+    public static boolean isValidCollectionSize(
+        Collection<?> collection
+    ) {
         return !collection.isEmpty()
             && collection.size() <= MAX_PAGE_SIZE;
     }
