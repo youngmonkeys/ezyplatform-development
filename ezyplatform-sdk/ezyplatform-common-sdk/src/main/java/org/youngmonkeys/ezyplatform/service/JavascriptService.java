@@ -16,10 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.bean.EzyBeanContext;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import lombok.AllArgsConstructor;
+import org.mozilla.javascript.BaseFunction;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
@@ -28,12 +28,9 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,43 +38,16 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.mozilla.javascript.Context.jsToJava;
 import static org.mozilla.javascript.ScriptableObject.getProperty;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 
 public class JavascriptService extends EzyLoggable {
 
     private final EzyBeanContext beanContext;
-    private final SettingService settingService;
-    private final Map<String, String> jsBeanNameByJavaBeanName;
 
     public JavascriptService(
-        EzyBeanContext beanContext,
-        ObjectMapper objectMapper,
-        SettingService settingService
+        EzyBeanContext beanContext
     ) {
         this.beanContext = beanContext;
-        this.settingService = settingService;
-        this.jsBeanNameByJavaBeanName = new ConcurrentHashMap<>();
-        settingService.addValueConverter(
-            SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-            it -> objectMapper.readValue(
-                it,
-                Map.class
-            )
-        );
-        settingService.watchLastUpdatedTimeAndCache(
-            SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES
-        );
-    }
-
-    public void includeBeanName(
-        String javaBeanName,
-        String jsBeanName
-    ) {
-        jsBeanNameByJavaBeanName.put(
-            javaBeanName,
-            jsBeanName
-        );
     }
 
     public Object execute(
@@ -85,53 +55,38 @@ public class JavascriptService extends EzyLoggable {
         Map<String, Object> parameters
     ) {
         return execute(
-            script,
             parameters,
-            getAllJsBeanNameByJavaBeanName()
-        );
-    }
-
-    public Object execute(
-        Map<String, Object> parameters,
-        JavascriptFunction func
-    ) {
-        return execute(
-            parameters,
-            getAllJsBeanNameByJavaBeanName(),
-            func
-        );
-    }
-
-    public Object execute(
-        String script,
-        Map<String, Object> parameters,
-        Map<String, String> jsBeanNameByJavaBeanName
-    ) {
-        return execute(
-            parameters,
-            jsBeanNameByJavaBeanName,
             new DefaultJavascriptFunction(script)
         );
     }
 
     /**
-     * Executes JavaScript in a Rhino context with selected Java objects exposed
+     * Executes JavaScript in a Rhino context with application objects exposed
      * to the script scope.
      *
      * <p>The script and function passed to this method must come from trusted
      * application configuration or code. Do not pass user-controlled JavaScript
-     * here because exposed parameters, properties, logger, and configured beans
+     * here because exposed parameters, properties, logger, and bean context
      * can allow access to application internals.</p>
      */
     public Object execute(
         Map<String, Object> parameters,
-        Map<String, String> jsBeanNameByJavaBeanName,
         JavascriptFunction func
     ) {
         try (Context context = Context.enter()) {
             Scriptable scope = context.initStandardObjects();
             scope.put("console", scope, Console.getInstance());
             scope.put("logger", scope, logger);
+            ScriptableObject.putProperty(
+                scope,
+                "beanContext",
+                Context.javaToJS(beanContext, scope)
+            );
+            ScriptableObject.putProperty(
+                scope,
+                "getBean",
+                new GetBeanFunction(beanContext)
+            );
             for (Map.Entry<String, Object> e : parameters.entrySet()) {
                 scope.put(e.getKey(), scope, e.getValue());
             }
@@ -140,38 +95,38 @@ public class JavascriptService extends EzyLoggable {
                 scope,
                 beanContext.getProperties()
             );
-            for (Map.Entry<String, String> e
-                : jsBeanNameByJavaBeanName.entrySet()
-            ) {
-                Object bean = beanContext
-                    .getBean(e.getKey(), Object.class);
-                if (bean != null) {
-                    ScriptableObject.putProperty(
-                        scope,
-                        e.getValue(),
-                        Context.javaToJS(bean, scope)
-                    );
-                }
-            }
             return func.run(context, scope);
         }
-    }
-
-    public Map<String, String> getAllJsBeanNameByJavaBeanName() {
-        Map<String, String> beanNameMap = new HashMap<>();
-        beanNameMap.putAll(jsBeanNameByJavaBeanName);
-        beanNameMap.putAll(
-            settingService.getCachedValue(
-                SETTING_NAME_JAVASCRIPT_SERVICE_BEAN_NAMES,
-                Collections.emptyMap()
-            )
-        );
-        return beanNameMap;
     }
 
     public interface JavascriptFunction {
 
         Object run(Object context, Object scope);
+    }
+
+    @AllArgsConstructor
+    public static class GetBeanFunction extends BaseFunction {
+
+        private final EzyBeanContext beanContext;
+
+        @Override
+        public Object call(
+            Context context,
+            Scriptable scope,
+            Scriptable thisObj,
+            Object[] args
+        ) {
+            if (args.length == 0 || args[0] == null) {
+                return null;
+            }
+            Object bean = beanContext.getBean(
+                String.valueOf(args[0]),
+                Object.class
+            );
+            return bean == null
+                ? null
+                : Context.javaToJS(bean, scope);
+        }
     }
 
     public static class Console {
