@@ -116,7 +116,7 @@ public class JavascriptService extends EzyLoggable {
             Scriptable thisObj,
             Object[] args
         ) {
-            if (args.length == 0 || args[0] == null) {
+            if (args.length == ZERO || args[0] == null) {
                 return null;
             }
             Object bean = beanContext.getBean(
