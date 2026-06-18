@@ -145,6 +145,55 @@ public class JavascriptServiceTest {
     }
 
     @Test
+    public void executeWithIncludedBeanNameTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        when(beanContext.getBean("sumBean", Object.class))
+            .thenReturn(new SumBean());
+        JavascriptService instance = new JavascriptService(
+            beanContext
+        );
+        instance.includeBeanName("sumBean", "calculator");
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("a", 3);
+        parameters.put("b", 9);
+
+        // when
+        Object actual = instance.execute(
+            "calculator.sum(a, b)",
+            parameters
+        );
+
+        // then
+        Asserts.assertEquals(actual, "12");
+        verify(beanContext, times(1)).getProperties();
+        verify(beanContext, times(1)).getBean("sumBean", Object.class);
+    }
+
+    @Test
+    public void executeWithIncludedMissingBeanNameTest() {
+        // given
+        when(beanContext.getProperties()).thenReturn(new Properties());
+        when(beanContext.getBean("missingBean", Object.class))
+            .thenReturn(null);
+        JavascriptService instance = new JavascriptService(
+            beanContext
+        );
+        instance.includeBeanName("missingBean", "missing");
+
+        // when
+        Object actual = instance.execute(
+            "typeof missing",
+            Collections.emptyMap()
+        );
+
+        // then
+        Asserts.assertEquals(actual, "undefined");
+        verify(beanContext, times(1)).getProperties();
+        verify(beanContext, times(1)).getBean("missingBean", Object.class);
+    }
+
+    @Test
     public void executeUndefinedResultTest() {
         // given
         when(beanContext.getProperties()).thenReturn(new Properties());

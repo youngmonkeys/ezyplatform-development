@@ -28,6 +28,7 @@ import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,11 +44,23 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 public class JavascriptService extends EzyLoggable {
 
     private final EzyBeanContext beanContext;
+    private final Map<String, String> jsBeanNameByJavaBeanName;
 
     public JavascriptService(
         EzyBeanContext beanContext
     ) {
         this.beanContext = beanContext;
+        this.jsBeanNameByJavaBeanName = new HashMap<>();
+    }
+
+    public void includeBeanName(
+        String javaBeanName,
+        String jsBeanName
+    ) {
+        jsBeanNameByJavaBeanName.put(
+            javaBeanName,
+            jsBeanName
+        );
     }
 
     public Object execute(
@@ -95,6 +108,19 @@ public class JavascriptService extends EzyLoggable {
                 scope,
                 beanContext.getProperties()
             );
+            for (Map.Entry<String, String> e
+                : jsBeanNameByJavaBeanName.entrySet()
+            ) {
+                Object bean = beanContext
+                    .getBean(e.getKey(), Object.class);
+                if (bean != null) {
+                    ScriptableObject.putProperty(
+                        scope,
+                        e.getValue(),
+                        Context.javaToJS(bean, scope)
+                    );
+                }
+            }
             return func.run(context, scope);
         }
     }
