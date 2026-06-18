@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.pagination;
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
+import java.math.BigInteger;
 import java.util.Collection;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_ADMIN;
@@ -39,6 +40,9 @@ public class DefaultAdminFilter implements AdminFilter {
     public final Collection<Long> exclusiveRoleIds;
     public final String exclusiveRoleName;
     public final Collection<String> exclusiveRoleNames;
+    public final String metaKey;
+    public final String metaValue;
+    public final BigInteger metaNumberValue;
 
     protected DefaultAdminFilter(Builder<?> builder) {
         this.ids = builder.ids;
@@ -56,6 +60,9 @@ public class DefaultAdminFilter implements AdminFilter {
         this.exclusiveRoleIds = builder.exclusiveRoleIds;
         this.exclusiveRoleName = builder.exclusiveRoleName;
         this.exclusiveRoleNames = builder.exclusiveRoleNames;
+        this.metaKey = builder.metaKey;
+        this.metaValue = builder.metaValue;
+        this.metaNumberValue = builder.metaNumberValue;
     }
 
     @Override
@@ -103,6 +110,12 @@ public class DefaultAdminFilter implements AdminFilter {
                 }
             }
         }
+        if (metaKey != null
+            || metaValue != null
+            || metaNumberValue != null
+        ) {
+            queryString.append(" INNER JOIN AdminMeta n ON e.id = n.adminId");
+        }
     }
 
     @SuppressWarnings("MethodLength")
@@ -138,6 +151,15 @@ public class DefaultAdminFilter implements AdminFilter {
         }
         if (exclusiveRoleName != null || exclusiveRoleNames != null) {
             answer.and("m.id IS NULL");
+        }
+        if (metaKey != null) {
+            answer.and("n.metaKey = :metaKey");
+        }
+        if (metaValue != null) {
+            answer.and("n.metaValue = :metaValue");
+        }
+        if (metaNumberValue != null) {
+            answer.and("n.metaNumberValue = :metaNumberValue");
         }
         if (uniqueKeyword != null) {
             answer.and(
@@ -190,6 +212,9 @@ public class DefaultAdminFilter implements AdminFilter {
         private Collection<Long> exclusiveRoleIds;
         private String exclusiveRoleName;
         private Collection<String> exclusiveRoleNames;
+        private String metaKey;
+        private String metaValue;
+        private BigInteger metaNumberValue;
 
         public T ids(Collection<Long> ids) {
             this.ids = ids;
@@ -263,6 +288,21 @@ public class DefaultAdminFilter implements AdminFilter {
 
         public T exclusiveRoleNames(Collection<String> exclusiveRoleNames) {
             this.exclusiveRoleNames = exclusiveRoleNames;
+            return (T) this;
+        }
+
+        public T metaKey(String metaKey) {
+            this.metaKey = metaKey;
+            return (T) this;
+        }
+
+        public T metaValue(String metaValue) {
+            this.metaValue = metaValue;
+            return (T) this;
+        }
+
+        public T metaNumberValue(BigInteger metaNumberValue) {
+            this.metaNumberValue = metaNumberValue;
             return (T) this;
         }
 

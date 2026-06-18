@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.pagination;
 import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
 import com.tvd12.ezyfox.builder.EzyBuilder;
 
+import java.math.BigInteger;
 import java.util.Collection;
 
 public class DefaultUserFilter implements UserFilter {
@@ -36,6 +37,9 @@ public class DefaultUserFilter implements UserFilter {
     public final Collection<Long> exclusiveRoleIds;
     public final String exclusiveRoleName;
     public final Collection<String> exclusiveRoleNames;
+    public final String metaKey;
+    public final String metaValue;
+    public final BigInteger metaNumberValue;
 
     protected DefaultUserFilter(Builder<?> builder) {
         this.status = builder.status;
@@ -52,6 +56,9 @@ public class DefaultUserFilter implements UserFilter {
         this.exclusiveRoleIds = builder.exclusiveRoleIds;
         this.exclusiveRoleName = builder.exclusiveRoleName;
         this.exclusiveRoleNames = builder.exclusiveRoleNames;
+        this.metaKey = builder.metaKey;
+        this.metaValue = builder.metaValue;
+        this.metaNumberValue = builder.metaNumberValue;
     }
 
     @Override
@@ -97,6 +104,12 @@ public class DefaultUserFilter implements UserFilter {
                 }
             }
         }
+        if (metaKey != null
+            || metaValue != null
+            || metaNumberValue != null
+        ) {
+            queryString.append(" INNER JOIN UserMeta n ON e.id = n.userId");
+        }
     }
 
     @SuppressWarnings("MethodLength")
@@ -126,6 +139,15 @@ public class DefaultUserFilter implements UserFilter {
         }
         if (exclusiveRoleName != null || exclusiveRoleNames != null) {
             answer.and("m.id IS NULL");
+        }
+        if (metaKey != null) {
+            answer.and("n.metaKey = :metaKey");
+        }
+        if (metaValue != null) {
+            answer.and("n.metaValue = :metaValue");
+        }
+        if (metaNumberValue != null) {
+            answer.and("n.metaNumberValue = :metaNumberValue");
         }
         if (uniqueKeyword != null) {
             answer.and(
@@ -179,6 +201,9 @@ public class DefaultUserFilter implements UserFilter {
         private Collection<Long> exclusiveRoleIds;
         private String exclusiveRoleName;
         private Collection<String> exclusiveRoleNames;
+        private String metaKey;
+        private String metaValue;
+        private BigInteger metaNumberValue;
 
         public T status(String status) {
             this.status = status;
@@ -247,6 +272,21 @@ public class DefaultUserFilter implements UserFilter {
 
         public T exclusiveRoleNames(Collection<String> exclusiveRoleNames) {
             this.exclusiveRoleNames = exclusiveRoleNames;
+            return (T) this;
+        }
+
+        public T metaKey(String metaKey) {
+            this.metaKey = metaKey;
+            return (T) this;
+        }
+
+        public T metaValue(String metaValue) {
+            this.metaValue = metaValue;
+            return (T) this;
+        }
+
+        public T metaNumberValue(BigInteger metaNumberValue) {
+            this.metaNumberValue = metaNumberValue;
             return (T) this;
         }
 
