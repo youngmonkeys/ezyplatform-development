@@ -23,6 +23,7 @@ import lombok.Getter;
 @Builder
 @SuppressWarnings("AbbreviationAsWordInName")
 public class ViewMetadata {
+    private String currentOpen;
     private String currentMenu;
     private String currentParentTitle;
     private String currentParentURL;
