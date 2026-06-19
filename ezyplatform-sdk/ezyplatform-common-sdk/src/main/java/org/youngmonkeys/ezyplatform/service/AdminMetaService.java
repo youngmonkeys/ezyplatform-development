@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
 import com.tvd12.reflections.util.Predicates;
 import org.youngmonkeys.ezyplatform.model.AdminMetaModel;
+import org.youngmonkeys.ezyplatform.model.SaveMetaModel;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -42,6 +43,16 @@ import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
 @SuppressWarnings("MethodCount")
 public interface AdminMetaService {
+
+    long addAdminMeta(
+        long adminId,
+        SaveMetaModel model
+    );
+
+    void updateAdminMeta(
+        long id,
+        SaveMetaModel model
+    );
 
     void saveAdminMeta(
         long adminId,
@@ -382,32 +393,6 @@ public interface AdminMetaService {
         );
     }
 
-    Map<Long, List<AdminMetaModel>> getAdminMetasMapByAdminIdsAndMetaKey(
-        Collection<Long> adminIds,
-        String metaKey
-    );
-
-    default <T> Map<Long, List<T>> getAdminMetaValuesMapByAdminIdsAndMetaKey(
-        Collection<Long> adminIds,
-        String metaKey,
-        Function<AdminMetaModel, T> converter
-    ) {
-        return getAdminMetasMapByAdminIdsAndMetaKey(adminIds, metaKey)
-            .entrySet()
-            .stream()
-            .collect(
-                Collectors.toMap(
-                    Map.Entry::getKey,
-                    e -> e
-                        .getValue()
-                        .stream()
-                        .map(converter)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList())
-                )
-            );
-    }
-
     Map<String, Long> getAdminIdMapByMetaValues(
         String metaKey,
         Collection<String> metaValues
@@ -500,6 +485,11 @@ public interface AdminMetaService {
                 )
             );
     }
+
+    Map<String, String> getAdminMetaTextValueMapByAdminIdAndMetaKeys(
+        long adminId,
+        Collection<String> metaKeys
+    );
 
     Map<Long, String> getAdminMetaTextValueMapByAdminIds(
         Collection<Long> adminIds,

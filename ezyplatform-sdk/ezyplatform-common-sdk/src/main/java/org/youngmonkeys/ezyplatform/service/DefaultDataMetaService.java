@@ -19,8 +19,10 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.DataMeta;
 import org.youngmonkeys.ezyplatform.model.DataMetaModel;
+import org.youngmonkeys.ezyplatform.model.SaveMetaModel;
 import org.youngmonkeys.ezyplatform.repo.DataMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.DataMetaTransactionalRepository;
 
@@ -33,6 +35,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @SuppressWarnings("MethodCount")
@@ -42,6 +45,32 @@ public class DefaultDataMetaService implements DataMetaService {
     private final DataMetaRepository dataMetaRepository;
     private final DataMetaTransactionalRepository dataMetaTransactionalRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+    private final DefaultModelToEntityConverter modelToEntityConverter;
+
+    @Override
+    public long addDataMeta(
+        String dataType,
+        long dataId,
+        SaveMetaModel model
+    ) {
+        DataMeta entity = modelToEntityConverter
+            .toDataMetaEntity(dataType, dataId, model);
+        dataMetaRepository.save(entity);
+        return entity.getId();
+    }
+
+    @Override
+    public void updateDataMeta(
+        long id,
+        SaveMetaModel model
+    ) {
+        DataMeta entity = dataMetaRepository
+            .findById(id);
+        if (entity != null) {
+            modelToEntityConverter.mergeToEntity(model, entity);
+            dataMetaRepository.save(entity);
+        }
+    }
 
     @Override
     public void saveDataMeta(
@@ -352,7 +381,7 @@ public class DefaultDataMetaService implements DataMetaService {
             metaKey
         )
             .map(DataMeta::getMetaValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -367,7 +396,7 @@ public class DefaultDataMetaService implements DataMetaService {
             metaKey
         )
             .map(DataMeta::getMetaValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -382,7 +411,7 @@ public class DefaultDataMetaService implements DataMetaService {
                 metaKey
             )
             .map(DataMeta::getMetaTextValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -397,7 +426,7 @@ public class DefaultDataMetaService implements DataMetaService {
                 metaKey
             )
             .map(DataMeta::getMetaTextValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -554,6 +583,7 @@ public class DefaultDataMetaService implements DataMetaService {
             );
     }
     
+    @Override
     public Map<String, String> getDataMetaTextValueMapByDataTypeAndDataIdAndMetaKeys(
         String dataType,
         long dataId,

@@ -19,7 +19,9 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.UserMeta;
+import org.youngmonkeys.ezyplatform.model.SaveMetaModel;
 import org.youngmonkeys.ezyplatform.model.UserMetaModel;
 import org.youngmonkeys.ezyplatform.repo.UserMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.UserMetaTransactionalRepository;
@@ -35,14 +37,41 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzySets.newHashSet;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @AllArgsConstructor
+@SuppressWarnings("MethodCount")
 public class DefaultUserMetaService implements UserMetaService {
 
     private final UserMetaRepository userMetaRepository;
     private final UserMetaTransactionalRepository userMetaTransactionalRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+    private final DefaultModelToEntityConverter modelToEntityConverter;
+
+    @Override
+    public long addUserMeta(
+        long userId,
+        SaveMetaModel model
+    ) {
+        UserMeta entity = modelToEntityConverter
+            .toUserMetaEntity(userId, model);
+        userMetaRepository.save(entity);
+        return entity.getId();
+    }
+
+    @Override
+    public void updateUserMeta(
+        long id,
+        SaveMetaModel model
+    ) {
+        UserMeta entity = userMetaRepository
+            .findById(id);
+        if (entity != null) {
+            modelToEntityConverter.mergeToEntity(model, entity);
+            userMetaRepository.save(entity);
+        }
+    }
 
     @Override
     public void saveUserMeta(
@@ -247,7 +276,7 @@ public class DefaultUserMetaService implements UserMetaService {
             metaKey
         )
             .map(UserMeta::getMetaValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -260,7 +289,7 @@ public class DefaultUserMetaService implements UserMetaService {
                 metaKey
             )
             .map(UserMeta::getMetaValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -273,7 +302,7 @@ public class DefaultUserMetaService implements UserMetaService {
                 metaKey
             )
             .map(UserMeta::getMetaTextValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -286,7 +315,7 @@ public class DefaultUserMetaService implements UserMetaService {
                 metaKey
             )
             .map(UserMeta::getMetaTextValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -395,7 +424,8 @@ public class DefaultUserMetaService implements UserMetaService {
                 )
             );
     }
-    
+
+    @Override
     public Map<String, String> getUserMetaTextValueMapByUserIdAndMetaKeys(
         long userId,
         Collection<String> metaKeys

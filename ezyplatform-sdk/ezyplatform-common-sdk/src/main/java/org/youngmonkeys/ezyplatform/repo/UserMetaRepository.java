@@ -48,24 +48,34 @@ public interface UserMetaRepository
         Collection<String> metaKeys
     );
 
-    List<UserMeta> findByUserId(
-        long userId
-    );
-
-    List<UserMeta> findByUserIdIn(
-        Collection<Long> userIds
-    );
-
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.metaKey = ?0 " +
+            "AND e.metaValue = ?1 " +
+            "ORDER BY e.id DESC"
+    )
     Optional<UserMeta> findByMetaKeyAndMetaValue(
         String metaKey,
         String metaValue
     );
 
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.userId = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "ORDER BY e.id ASC"
+    )
     Optional<UserMeta> findByUserIdAndMetaKey(
         long userId,
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.userId = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<UserMeta> findByUserIdAndMetaKey(
         long userId,
         String metaKey,
@@ -104,16 +114,34 @@ public interface UserMetaRepository
         String metaValue
     );
 
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.metaKey = ?0 " +
+            "AND e.metaValue IN ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<UserMeta> findByMetaKeyAndMetaValueIn(
         String metaKey,
         Collection<String> metaValues
     );
 
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.userId IN ?0 " +
+            "AND e.metaKey = ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<UserMeta> findByUserIdInAndMetaKey(
         Collection<Long> userIds,
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM UserMeta e " +
+            "WHERE e.userId = ?0 " +
+            "AND e.metaKey IN ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<UserMeta> findByUserIdAndMetaKeyIn(
         long userId,
         Collection<String> metaKeys
