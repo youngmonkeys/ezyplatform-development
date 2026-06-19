@@ -148,7 +148,9 @@ public interface DataMetaRepository
 
     @EzyQuery(
         "SELECT e FROM DataMeta e " +
-            "WHERE e.dataType = ?0 AND e.dataId = ?1 AND e.metaKey = ?2 " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId = ?1 " +
+            "AND e.metaKey = ?2 " +
             "ORDER BY e.id DESC"
     )
     Optional<DataMeta> findByDataTypeDataIdAndMetaKeyOrderByIdDesc(
