@@ -83,7 +83,11 @@ public class DefaultAdminMetaService implements AdminMetaService {
         entity.setAdminId(adminId);
         entity.setMetaKey(metaKey);
         entity.setMetaValue(metaValue);
-        entity.setMetaNumberValue(numberValue);
+        entity.setMetaNumberValue(
+            numberValue != null
+                ? numberValue
+                : toBigIntegerOrZero(metaValue)
+        );
         entity.setMetaTextValue(metaTextValue);
         adminMetaRepository.save(entity);
     }

@@ -86,7 +86,11 @@ public class DefaultDataMetaService implements DataMetaService {
         entity.setDataId(dataId);
         entity.setMetaKey(metaKey);
         entity.setMetaValue(metaValue);
-        entity.setMetaNumberValue(numberValue);
+        entity.setMetaNumberValue(
+            numberValue != null
+                ? numberValue
+                : toBigIntegerOrZero(metaValue)
+        );
         entity.setMetaTextValue(metaTextValue);
         dataMetaRepository.save(entity);
     }

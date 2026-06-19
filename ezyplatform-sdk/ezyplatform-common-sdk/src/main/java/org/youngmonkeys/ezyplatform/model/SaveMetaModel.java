@@ -21,6 +21,8 @@ import lombok.Getter;
 
 import java.math.BigInteger;
 
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
+
 @Getter
 @Builder
 public class SaveMetaModel {
@@ -28,4 +30,10 @@ public class SaveMetaModel {
     private String metaValue;
     private BigInteger metaNumberValue;
     private String metaTextValue;
+
+    public BigInteger getMetaNumberValue() {
+        return metaNumberValue != null
+            ? metaNumberValue
+            : toBigIntegerOrZero(metaValue);
+    }
 }
