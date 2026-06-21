@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
 import com.tvd12.reflections.util.Predicates;
 import org.youngmonkeys.ezyplatform.model.DataMetaModel;
+import org.youngmonkeys.ezyplatform.model.SaveMetaModel;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
 import java.math.BigDecimal;
@@ -39,6 +40,17 @@ import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
 @SuppressWarnings("MethodCount")
 public interface DataMetaService {
+
+    long addDataMeta(
+        String dataType,
+        long dataId,
+        SaveMetaModel model
+    );
+
+    void updateDataMeta(
+        long id,
+        SaveMetaModel model
+    );
 
     void saveDataMeta(
         String dataType,
@@ -676,6 +688,12 @@ public interface DataMetaService {
                 )
             );
     }
+
+    Map<String, String> getDataMetaTextValueMapByDataTypeAndDataIdAndMetaKeys(
+        String dataType,
+        long dataId,
+        Collection<String> metaKeys
+    );
 
     Map<Long, String> getDataMetaTextValueMapByDataIds(
         String dataType,

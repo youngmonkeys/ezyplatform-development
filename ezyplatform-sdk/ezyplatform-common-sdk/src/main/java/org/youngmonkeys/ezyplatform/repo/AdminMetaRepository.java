@@ -48,24 +48,34 @@ public interface AdminMetaRepository
         Collection<String> metaKeys
     );
 
-    List<AdminMeta> findByAdminId(
-        long adminId
-    );
-
-    List<AdminMeta> findByAdminIdIn(
-        Collection<Long> adminId
-    );
-
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.metaKey = ?0 " +
+            "AND e.metaValue = ?1 " +
+            "ORDER BY e.id DESC"
+    )
     Optional<AdminMeta> findByMetaKeyAndMetaValue(
         String metaKey,
         String metaValue
     );
 
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.adminId = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "ORDER BY e.id ASC"
+    )
     Optional<AdminMeta> findByAdminIdAndMetaKey(
         long adminId,
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.adminId = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<AdminMeta> findByAdminIdAndMetaKey(
         long adminId,
         String metaKey,
@@ -95,16 +105,34 @@ public interface AdminMetaRepository
         String metaValue
     );
 
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.metaKey = ?0 " +
+            "AND e.metaValue IN ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<AdminMeta> findByMetaKeyAndMetaValueIn(
         String metaKey,
         Collection<String> metaValues
     );
 
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.adminId IN ?0 " +
+            "AND e.metaKey = ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<AdminMeta> findByAdminIdInAndMetaKey(
         Collection<Long> adminIds,
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM AdminMeta e " +
+            "WHERE e.adminId = ?0 " +
+            "AND e.metaKey IN ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<AdminMeta> findByAdminIdAndMetaKeyIn(
         long adminId,
         Collection<String> metaKeys

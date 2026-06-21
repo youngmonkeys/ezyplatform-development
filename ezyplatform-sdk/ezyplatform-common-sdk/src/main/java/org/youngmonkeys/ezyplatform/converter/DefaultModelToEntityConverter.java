@@ -37,7 +37,10 @@ import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
 import org.youngmonkeys.ezyplatform.entity.Setting;
 import org.youngmonkeys.ezyplatform.entity.UniqueData;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
+import org.youngmonkeys.ezyplatform.entity.AdminMeta;
+import org.youngmonkeys.ezyplatform.entity.DataMeta;
 import org.youngmonkeys.ezyplatform.entity.UserKeyword;
+import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
 import org.youngmonkeys.ezyplatform.model.AddAdminActivityHistoryModel;
 import org.youngmonkeys.ezyplatform.model.AddLetterModel;
@@ -52,6 +55,7 @@ import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
 import org.youngmonkeys.ezyplatform.model.SaveDataMappingModel;
 import org.youngmonkeys.ezyplatform.model.SaveLinkModel;
+import org.youngmonkeys.ezyplatform.model.SaveMetaModel;
 import org.youngmonkeys.ezyplatform.model.UniqueDataKeyValueModel;
 import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
@@ -194,7 +198,9 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
-    public UserKeyword toEntity(AddUserKeywordModel model) {
+    public UserKeyword toEntity(
+        AddUserKeywordModel model
+    ) {
         UserKeyword entity = new UserKeyword();
         entity.setUserId(model.getUserId());
         entity.setKeyword(model.getKeyword());
@@ -203,7 +209,9 @@ public class DefaultModelToEntityConverter {
         return entity;
     }
 
-    public AdminActivityHistory toEntity(AddAdminActivityHistoryModel model) {
+    public AdminActivityHistory toEntity(
+        AddAdminActivityHistoryModel model
+    ) {
         String parameters = valueToJsonOrNull(model.getParameters());
         if (parameters != null
             && parameters.length() > MAX_ACTIVITY_HISTORY_PARAMETERS_LENGTH
@@ -342,6 +350,38 @@ public class DefaultModelToEntityConverter {
         entity.setCreatorId(creatorId);
         mergeToEntity(model, entity);
         entity.setCreatedAt(entity.getUpdatedAt());
+        return entity;
+    }
+
+    public UserMeta toUserMetaEntity(
+        long userId,
+        SaveMetaModel model
+    ) {
+        UserMeta entity = new UserMeta();
+        entity.setUserId(userId);
+        mergeToEntity(model, entity);
+        return entity;
+    }
+
+    public AdminMeta toAdminMetaEntity(
+        long adminId,
+        SaveMetaModel model
+    ) {
+        AdminMeta entity = new AdminMeta();
+        entity.setAdminId(adminId);
+        mergeToEntity(model, entity);
+        return entity;
+    }
+
+    public DataMeta toDataMetaEntity(
+        String dataType,
+        long dataId,
+        SaveMetaModel model
+    ) {
+        DataMeta entity = new DataMeta();
+        entity.setDataType(dataType);
+        entity.setDataId(dataId);
+        mergeToEntity(model, entity);
         return entity;
     }
 
@@ -602,6 +642,36 @@ public class DefaultModelToEntityConverter {
         entity.setSourceId(model.getSourceId());
         entity.setStatus(model.getStatus());
         entity.setUpdatedAt(clock.nowDateTime());
+    }
+
+    public void mergeToEntity(
+        SaveMetaModel model,
+        UserMeta entity
+    ) {
+        entity.setMetaKey(model.getMetaKey());
+        entity.setMetaValue(model.getMetaValue());
+        entity.setMetaNumberValue(model.getMetaNumberValue());
+        entity.setMetaTextValue(model.getMetaTextValue());
+    }
+
+    public void mergeToEntity(
+        SaveMetaModel model,
+        AdminMeta entity
+    ) {
+        entity.setMetaKey(model.getMetaKey());
+        entity.setMetaValue(model.getMetaValue());
+        entity.setMetaNumberValue(model.getMetaNumberValue());
+        entity.setMetaTextValue(model.getMetaTextValue());
+    }
+
+    public void mergeToEntity(
+        SaveMetaModel model,
+        DataMeta entity
+    ) {
+        entity.setMetaKey(model.getMetaKey());
+        entity.setMetaValue(model.getMetaValue());
+        entity.setMetaNumberValue(model.getMetaNumberValue());
+        entity.setMetaTextValue(model.getMetaTextValue());
     }
 
     public void mergeToEntity(

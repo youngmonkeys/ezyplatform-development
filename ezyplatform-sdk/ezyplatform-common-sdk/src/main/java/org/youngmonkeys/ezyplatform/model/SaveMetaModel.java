@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 youngmonkeys.org
+ * Copyright 2022 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,26 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.data;
+package org.youngmonkeys.ezyplatform.model;
 
 import lombok.Builder;
 import lombok.Getter;
 
+import java.math.BigInteger;
+
+import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
+
 @Getter
 @Builder
-@SuppressWarnings("AbbreviationAsWordInName")
-public class ViewMetadata {
-    private String currentOpenParent;
-    private String currentMenu;
-    private String currentParentTitle;
-    private String currentParentURL;
+public class SaveMetaModel {
+    private String metaKey;
+    private String metaValue;
+    private BigInteger metaNumberValue;
+    private String metaTextValue;
+
+    public BigInteger getMetaNumberValue() {
+        return metaNumberValue != null
+            ? metaNumberValue
+            : toBigIntegerOrZero(metaValue);
+    }
 }

@@ -84,28 +84,61 @@ public interface DataMetaRepository
         BigInteger metaNumberValue
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId = ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<DataMeta> findByDataTypeAndDataId(
         String dataType,
         long dataId
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId IN ?1 " +
+            "ORDER BY e.id ASC"
+    )
     List<DataMeta> findByDataTypeAndDataIdIn(
         String dataType,
         Collection<Long> dataIds
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "AND e.metaValue = ?2 " +
+            "ORDER BY e.id DESC"
+    )
     Optional<DataMeta> findByDataTypeAndMetaKeyAndMetaValue(
         String dataType,
         String metaKey,
         String metaValue
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId = ?1 " +
+            "AND e.metaKey = ?2 " +
+            "ORDER BY e.id ASC"
+    )
     Optional<DataMeta> findByDataTypeAndDataIdAndMetaKey(
         String dataType,
         long dataId,
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId = ?1 " +
+            "AND e.metaKey = ?2 " +
+            "ORDER BY e.id ASC"
+    )
     List<DataMeta> findByDataTypeAndDataIdAndMetaKey(
         String dataType,
         long dataId,
@@ -115,7 +148,9 @@ public interface DataMetaRepository
 
     @EzyQuery(
         "SELECT e FROM DataMeta e " +
-            "WHERE e.dataType = ?0 AND e.dataId = ?1 AND e.metaKey = ?2 " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId = ?1 " +
+            "AND e.metaKey = ?2 " +
             "ORDER BY e.id DESC"
     )
     Optional<DataMeta> findByDataTypeDataIdAndMetaKeyOrderByIdDesc(
@@ -139,24 +174,52 @@ public interface DataMetaRepository
         String metaValue
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.metaKey = ?1 " +
+            "AND e.metaValue IN ?2 " +
+            "ORDER BY e.id ASC"
+    )
     List<DataMeta> findByDataTypeAndMetaKeyAndMetaValueIn(
         String dataType,
         String metaKey,
         Collection<String> metaValues
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId IN ?1 " +
+            "AND e.metaKey = ?2 " +
+            "ORDER BY e.id ASC"
+    )
     List<DataMeta> findByDataTypeAndDataIdInAndMetaKey(
         String dataType,
         Collection<Long> dataIds,
         String metaKey
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId = ?1 " +
+            "AND e.metaKey IN ?2 " +
+            "ORDER BY e.id ASC"
+    )
     List<DataMeta> findByDataTypeAndDataIdAndMetaKeyIn(
         String dataType,
         long dataId,
         Collection<String> metaKeys
     );
 
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.dataType = ?0 " +
+            "AND e.dataId IN ?1 " +
+            "AND e.metaKey IN ?2 " +
+            "ORDER BY e.id ASC"
+    )
     List<DataMeta> findByDataTypeAndDataIdInAndMetaKeyIn(
         String dataType,
         Collection<Long> dataIds,

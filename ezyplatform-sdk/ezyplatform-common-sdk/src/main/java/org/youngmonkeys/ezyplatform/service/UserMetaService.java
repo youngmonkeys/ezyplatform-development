@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.util.EzyEntry;
 import com.tvd12.reflections.util.Predicates;
+import org.youngmonkeys.ezyplatform.model.SaveMetaModel;
 import org.youngmonkeys.ezyplatform.model.UserMetaModel;
 import org.youngmonkeys.ezyplatform.util.Strings;
 
@@ -40,6 +41,16 @@ import static org.youngmonkeys.ezyplatform.util.Strings.toMetaValue;
 
 @SuppressWarnings("MethodCount")
 public interface UserMetaService {
+
+    long addUserMeta(
+        long userId,
+        SaveMetaModel model
+    );
+
+    void updateUserMeta(
+        long id,
+        SaveMetaModel model
+    );
 
     void saveUserMeta(
         long userId,
@@ -512,6 +523,11 @@ public interface UserMetaService {
                 )
             );
     }
+
+    Map<String, String> getUserMetaTextValueMapByUserIdAndMetaKeys(
+        long userId,
+        Collection<String> metaKeys
+    );
 
     Map<Long, String> getUserMetaTextValueMapByUserIds(
         Collection<Long> userIds,

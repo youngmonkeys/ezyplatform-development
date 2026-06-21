@@ -19,8 +19,10 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 import org.youngmonkeys.ezyplatform.model.AdminMetaModel;
+import org.youngmonkeys.ezyplatform.model.SaveMetaModel;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminMetaTransactionalRepository;
 
@@ -33,14 +35,42 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @AllArgsConstructor
+@SuppressWarnings("MethodCount")
 public class DefaultAdminMetaService implements AdminMetaService {
 
     private final AdminMetaRepository adminMetaRepository;
     private final AdminMetaTransactionalRepository adminMetaTransactionalRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+    private final DefaultModelToEntityConverter modelToEntityConverter;
+
+    @Override
+    public long addAdminMeta(
+        long adminId,
+        SaveMetaModel model
+    ) {
+        AdminMeta entity = modelToEntityConverter
+            .toAdminMetaEntity(adminId, model);
+        adminMetaRepository.save(entity);
+        return entity.getId();
+    }
+
+    @Override
+    public void updateAdminMeta(
+        long id,
+        SaveMetaModel model
+    ) {
+        AdminMeta entity = adminMetaRepository
+            .findById(id);
+        if (entity != null) {
+            modelToEntityConverter.mergeToEntity(model, entity);
+            adminMetaRepository.save(entity);
+        }
+    }
 
     @Override
     public void saveAdminMeta(
@@ -54,7 +84,11 @@ public class DefaultAdminMetaService implements AdminMetaService {
         entity.setAdminId(adminId);
         entity.setMetaKey(metaKey);
         entity.setMetaValue(metaValue);
-        entity.setMetaNumberValue(numberValue);
+        entity.setMetaNumberValue(
+            numberValue != null
+                ? numberValue
+                : toBigIntegerOrZero(metaValue)
+        );
         entity.setMetaTextValue(metaTextValue);
         adminMetaRepository.save(entity);
     }
@@ -169,10 +203,12 @@ public class DefaultAdminMetaService implements AdminMetaService {
         }
     }
     
+    @Override
     public void deleteAdminMetaByMetaKey(String metaKey) {
         adminMetaRepository.deleteByMetaKey(metaKey);
     }
 
+    @Override
     public void deleteAdminMetaByAdminIdAndMetaKey(
         long adminId,
         String metaKey
@@ -183,6 +219,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
         );
     }
 
+    @Override
     public void deleteAdminMetaByAdminIdInAndMetaKeyIn(
         Collection<Long> adminIds,
         Collection<String> metaKeys
@@ -218,7 +255,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
             metaValue
         )
             .map(AdminMeta::getAdminId)
-            .orElse(0L);
+            .orElse(ZERO_LONG);
     }
 
     @Override
@@ -231,7 +268,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
             metaKey
         )
             .map(AdminMeta::getMetaValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -244,7 +281,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
             metaKey
         )
             .map(AdminMeta::getMetaValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -257,7 +294,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
                 metaKey
             )
             .map(AdminMeta::getMetaTextValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -270,7 +307,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
                 metaKey
             )
             .map(AdminMeta::getMetaTextValue)
-            .orElse(null);
+            .orElse(NULL_STRING);
     }
 
     @Override
@@ -287,28 +324,6 @@ public class DefaultAdminMetaService implements AdminMetaService {
             ),
             AdminMeta::getMetaValue
         );
-    }
-
-    @Override
-    public Map<Long, List<AdminMetaModel>> getAdminMetasMapByAdminIdsAndMetaKey(
-        Collection<Long> adminIds,
-        String metaKey
-    ) {
-        if (adminIds.isEmpty()) {
-            return Collections.emptyMap();
-        }
-        return adminMetaRepository
-            .findByAdminIdIn(adminIds)
-            .stream()
-            .collect(
-                Collectors.groupingBy(
-                    AdminMeta::getAdminId,
-                    Collectors.mapping(
-                        entityToModelConverter::toModel,
-                        Collectors.toList()
-                    )
-                )
-            );
     }
 
     @Override
@@ -380,6 +395,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
             );
     }
     
+    @Override
     public Map<String, String> getAdminMetaTextValueMapByAdminIdAndMetaKeys(
         long adminId,
         Collection<String> metaKeys

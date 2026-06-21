@@ -153,6 +153,59 @@ public class DefaultModelToEntityConverterTest {
     }
 
     @Test
+    public void valueToJsonOrEmptyWhenValueIsNullTest() {
+        // when
+        String actual = sut.valueToJsonOrEmpty(null);
+
+        // then
+        Asserts.assertEquals(actual, "");
+    }
+
+    @Test
+    public void valueToJsonOrEmptyWhenValueIsStringTest() {
+        // given
+        String value = RandomUtil.randomShortAlphabetString();
+
+        // when
+        String actual = sut.valueToJsonOrEmpty(value);
+
+        // then
+        Asserts.assertEquals(actual, value);
+    }
+
+    @Test
+    public void toUserAccessTokenEntityWithDaysTest() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        when(clock.nowDateTime()).thenReturn(now);
+
+        long userId = RandomUtil.randomLong();
+        String accessToken = RandomUtil.randomShortAlphabetString();
+        String tokenType = RandomUtil.randomShortAlphabetString();
+        long tokenExpiredTimeInDay = RandomUtil.randomSmallInt();
+        String status = AccessTokenStatus.ACTIVATED.toString();
+
+        // when
+        UserAccessToken actual = sut.toUserAccessTokenEntity(
+            userId,
+            accessToken,
+            tokenType,
+            tokenExpiredTimeInDay,
+            status
+        );
+
+        // then
+        UserAccessToken expected = new UserAccessToken();
+        expected.setToken(accessToken);
+        expected.setUserId(userId);
+        expected.setTokenType(tokenType);
+        expected.setStatus(status);
+        expected.setCreatedAt(now);
+        expected.setExpiredAt(now.plusDays(tokenExpiredTimeInDay));
+        Asserts.assertEquals(actual, expected);
+    }
+
+    @Test
     public void toUserAccessTokenEntityTest() {
         // given
         LocalDateTime now = LocalDateTime.now();
