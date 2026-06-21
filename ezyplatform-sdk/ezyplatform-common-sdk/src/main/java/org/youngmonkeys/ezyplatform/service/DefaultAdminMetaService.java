@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.util.Strings.toBigIntegerOrZero;
 
 @AllArgsConstructor
@@ -254,7 +255,7 @@ public class DefaultAdminMetaService implements AdminMetaService {
             metaValue
         )
             .map(AdminMeta::getAdminId)
-            .orElse(0L);
+            .orElse(ZERO_LONG);
     }
 
     @Override
