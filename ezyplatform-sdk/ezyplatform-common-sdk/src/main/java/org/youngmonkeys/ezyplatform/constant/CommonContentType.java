@@ -22,6 +22,7 @@ public enum CommonContentType {
     MARKDOWN,
     JSON,
     JAVASCRIPT,
+    MOZILLA_RHINO_JAVASCRIPT,
     THYMELEAF;
 
     public boolean equalsValue(String value) {
