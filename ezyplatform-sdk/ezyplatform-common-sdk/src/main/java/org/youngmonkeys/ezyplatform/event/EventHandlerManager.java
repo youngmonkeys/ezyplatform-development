@@ -86,6 +86,32 @@ public class EventHandlerManager {
         return null;
     }
 
+    public Map<String, List<EventHandler>> getEventHandlersByEventName() {
+        return eventHandlersByName
+            .get()
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    it -> Collections.unmodifiableList(it.getValue())
+                )
+            );
+    }
+
+    public List<EventHandler> getEventHandlersByEventName(
+        String eventName
+    ) {
+        return Collections.unmodifiableList(
+            eventHandlersByName
+                .get()
+                .getOrDefault(
+                    eventName,
+                    Collections.emptyList()
+                )
+        );
+    }
+
     public EventSchemaFetcher getEventSchemaFetcherByEventName(
         String eventName
     ) {

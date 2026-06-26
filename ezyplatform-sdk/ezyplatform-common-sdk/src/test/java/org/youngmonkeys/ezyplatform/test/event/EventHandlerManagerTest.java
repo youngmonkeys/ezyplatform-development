@@ -162,6 +162,109 @@ public class EventHandlerManagerTest {
     }
 
     @Test
+    public void getEventHandlersByEventNameReturnGroupedHandlers() {
+        // given
+        String eventName = "test_event";
+        String otherEventName = "other_event";
+        List<String> calls = new ArrayList<>();
+        RecordingEventHandler lastHandler = new RecordingEventHandler(
+            eventName,
+            100,
+            "last",
+            "last_result",
+            calls
+        );
+        RecordingEventHandler firstHandler = new RecordingEventHandler(
+            eventName,
+            -100,
+            "first",
+            null,
+            calls
+        );
+        RecordingEventHandler otherHandler = new RecordingEventHandler(
+            otherEventName,
+            0,
+            "other",
+            null,
+            calls
+        );
+        EventHandlerManager sut = newEventHandlerManager(
+            Arrays.asList(lastHandler, otherHandler, firstHandler),
+            Collections.emptyList()
+        );
+
+        // when
+        Map<String, List<EventHandler>> actual =
+            sut.getEventHandlersByEventName();
+        Throwable throwable = Asserts.assertThrows(() ->
+            actual.get(eventName).clear()
+        );
+        actual.clear();
+
+        // then
+        Asserts.assertEqualsType(
+            throwable,
+            UnsupportedOperationException.class
+        );
+        Asserts.assertEquals(actual.size(), 0);
+        Map<String, List<EventHandler>> remaining =
+            sut.getEventHandlersByEventName();
+        Asserts.assertEquals(remaining.size(), 2);
+        Asserts.assertEquals(
+            remaining.get(eventName),
+            Arrays.asList(firstHandler, lastHandler),
+            false
+        );
+        Asserts.assertEquals(
+            remaining.get(otherEventName),
+            Collections.singletonList(otherHandler),
+            false
+        );
+    }
+
+    @Test
+    public void getEventHandlersByEventNameWithEventNameReturnHandlers() {
+        // given
+        String eventName = "test_event";
+        List<String> calls = new ArrayList<>();
+        RecordingEventHandler lastHandler = new RecordingEventHandler(
+            eventName,
+            100,
+            "last",
+            "last_result",
+            calls
+        );
+        RecordingEventHandler firstHandler = new RecordingEventHandler(
+            eventName,
+            -100,
+            "first",
+            null,
+            calls
+        );
+        EventHandlerManager sut = newEventHandlerManager(
+            Arrays.asList(lastHandler, firstHandler),
+            Collections.emptyList()
+        );
+
+        // when
+        List<EventHandler> actual = sut.getEventHandlersByEventName(
+            eventName
+        );
+        Throwable throwable = Asserts.assertThrows(actual::clear);
+
+        // then
+        Asserts.assertEqualsType(
+            throwable,
+            UnsupportedOperationException.class
+        );
+        Asserts.assertEquals(
+            actual,
+            Arrays.asList(firstHandler, lastHandler),
+            false
+        );
+    }
+
+    @Test
     public void getEventSchemaFetcherByEventNameReturnHighestPriorityFetcher() {
         // given
         TestEventSchemaFetcher lowPriorityFetcher = new TestEventSchemaFetcher(
