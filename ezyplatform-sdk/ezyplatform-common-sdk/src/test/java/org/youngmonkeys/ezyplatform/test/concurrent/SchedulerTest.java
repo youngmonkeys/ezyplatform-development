@@ -38,6 +38,7 @@ public class SchedulerTest {
         // given
         Runnable command = mock(Runnable.class);
         Scheduler scheduler = new Scheduler();
+        scheduler.start();
 
         // when
         scheduler.scheduleOneTime(command, 3, TimeUnit.MILLISECONDS);
@@ -65,6 +66,7 @@ public class SchedulerTest {
         RuntimeException exception = new RuntimeException("just test");
         doThrow(exception).when(command).run();
         Scheduler scheduler = new Scheduler(1);
+        scheduler.start();
 
         // when
         scheduler.scheduleOneTime(command, 3, TimeUnit.MILLISECONDS);
@@ -91,6 +93,7 @@ public class SchedulerTest {
         Runnable command1 = mock(Runnable.class);
         Runnable command2 = mock(Runnable.class);
         Scheduler scheduler = new Scheduler(2, true);
+        scheduler.start();
 
         // when
         scheduler.scheduleAtFixRate(command1, 0, 3, TimeUnit.MILLISECONDS);
@@ -123,6 +126,7 @@ public class SchedulerTest {
         // given
         Runnable command1 = mock(Runnable.class);
         Scheduler scheduler = new Scheduler(1, true);
+        scheduler.start();
 
         // when
         Throwable e = Asserts.assertThrows(() ->
@@ -157,6 +161,7 @@ public class SchedulerTest {
         Runnable command1 = mock(Runnable.class);
         Runnable command2 = mock(Runnable.class);
         Scheduler scheduler = new Scheduler(2, true);
+        scheduler.start();
 
         // when
         scheduler.scheduleAtFixRate(command1, 1000, 3, TimeUnit.MILLISECONDS);
@@ -186,6 +191,7 @@ public class SchedulerTest {
     public void stopFailedDueToUnstoppable() {
         // given
         Scheduler scheduler = new Scheduler(1);
+        scheduler.start();
 
         // when
         Throwable e = Asserts.assertThrows(scheduler::stop);
@@ -210,6 +216,7 @@ public class SchedulerTest {
         Runnable command1 = mock(Runnable.class);
         Runnable command2 = mock(Runnable.class);
         Scheduler scheduler = new Scheduler(2, true);
+        scheduler.start();
 
         ExecutorService executorService = mock(ExecutorService.class);
         RuntimeException exception = new RuntimeException("test");
@@ -236,7 +243,7 @@ public class SchedulerTest {
             scheduler,
             "runningTasks"
         );
-        Asserts.assertNotNull(runningTasks);
+        Asserts.assertEmpty(runningTasks);
         verify(command1, atLeast(0)).run();
         verify(command2, atLeast(0)).run();
         verify(executorService, atLeast(1)).execute(any());

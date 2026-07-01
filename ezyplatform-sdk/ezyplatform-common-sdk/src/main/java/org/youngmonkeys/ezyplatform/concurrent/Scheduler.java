@@ -23,14 +23,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class Scheduler extends EzyLoggable {
 
+    private final AtomicBoolean started;
     private final boolean stoppable;
     private final Set<Task> runningTasks;
     private final Map<Runnable, Task> tasks;
+    private final long periodInMillis;
     private final ExecutorService executorService;
     private final ScheduledExecutorService inspector;
     private final Map<Object, ScheduledExecutorService> executorServiceByName;
@@ -42,7 +49,7 @@ public class Scheduler extends EzyLoggable {
     }
 
     public Scheduler(int maxExecutionThread) {
-        this(maxExecutionThread, false);
+        this(maxExecutionThread, Boolean.FALSE);
     }
 
     public Scheduler(
@@ -62,6 +69,8 @@ public class Scheduler extends EzyLoggable {
         boolean stoppable
     ) {
         this.stoppable = stoppable;
+        this.periodInMillis = periodInMillis;
+        this.started = new AtomicBoolean();
         this.tasks = new ConcurrentHashMap<>();
         this.runningTasks = ConcurrentHashMap.newKeySet();
         this.executorServiceByName = new ConcurrentHashMap<>();
@@ -72,13 +81,17 @@ public class Scheduler extends EzyLoggable {
             maxExecutionThread,
             DefaultThreadFactory.create("scheduler-executor")
         );
-        List<Task> taskBuffer = new ArrayList<>();
-        this.inspector.scheduleAtFixedRate(
-            () -> run(taskBuffer),
-            periodInMillis,
-            periodInMillis,
-            TimeUnit.MILLISECONDS
-        );
+    }
+
+    public void start() {
+        if (started.compareAndSet(Boolean.FALSE, Boolean.TRUE)) {
+            this.inspector.scheduleAtFixedRate(
+                () -> run(new ArrayList<>()),
+                periodInMillis,
+                periodInMillis,
+                TimeUnit.MILLISECONDS
+            );
+        }
     }
 
     private void run(List<Task> taskBuffer) {
@@ -97,12 +110,17 @@ public class Scheduler extends EzyLoggable {
             if (currentTime >= task.nexRunTime.get()) {
                 task.calculateNextRunTime();
                 runningTasks.add(task);
-                executorService.execute(() -> {
-                    runTask(task);
-                    if (!task.runForever) {
-                        tasks.remove(task.command);
-                    }
-                });
+                try {
+                    executorService.execute(() -> {
+                        runTask(task);
+                        if (!task.runForever) {
+                            tasks.remove(task.command);
+                        }
+                    });
+                } catch (Throwable e) {
+                    runningTasks.remove(task);
+                    throw e;
+                }
             }
         } catch (Throwable e) {
             logger.warn("run task: {} error", task, e);
