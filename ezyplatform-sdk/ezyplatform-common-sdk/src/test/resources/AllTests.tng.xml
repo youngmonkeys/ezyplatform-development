@@ -24,6 +24,7 @@
 			<package name="org.youngmonkeys.ezyplatform.test.converter"/>
 			<package name="org.youngmonkeys.ezyplatform.test.data"/>
 			<package name="org.youngmonkeys.ezyplatform.test.extractor"/>
+			<package name="org.youngmonkeys.ezyplatform.test.event"/>
 			<package name="org.youngmonkeys.ezyplatform.test.io"/>
 			<package name="org.youngmonkeys.ezyplatform.test.manager"/>
 			<package name="org.youngmonkeys.ezyplatform.test.model"/>
