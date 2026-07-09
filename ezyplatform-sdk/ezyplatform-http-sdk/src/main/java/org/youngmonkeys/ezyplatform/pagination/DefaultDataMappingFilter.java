@@ -25,6 +25,7 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
     public final String mappingName;
     public final Long fromDataId;
     public final Long toDataId;
+    public final Long fromOrToDataId;
     public final String textData;
     public final LocalDateTime mappedAtGte;
     public final LocalDateTime mappedAtLt;
@@ -34,6 +35,7 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
         this.mappingName = builder.mappingName;
         this.fromDataId = builder.fromDataId;
         this.toDataId = builder.toDataId;
+        this.fromOrToDataId = builder.fromOrToDataId;
         this.textData = builder.textData;
         this.mappedAtGte = builder.mappedAtGte;
         this.mappedAtLt = builder.mappedAtLt;
@@ -51,6 +53,12 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
         }
         if (toDataId != null) {
             answer.and("e.toDataId = :toDataId");
+        }
+        if (fromOrToDataId != null) {
+            answer.and(
+                "(e.fromDataId = :fromOrToDataId " +
+                    "OR e.toDataId = :fromOrToDataId)"
+            );
         }
         if (textData != null) {
             answer.and("e.textData = :textData");
@@ -75,6 +83,7 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
         protected String mappingName;
         protected Long fromDataId;
         protected Long toDataId;
+        protected Long fromOrToDataId;
         protected String textData;
         protected LocalDateTime mappedAtGte;
         protected LocalDateTime mappedAtLt;
@@ -92,6 +101,11 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
 
         public Builder toDataId(Long toDataId) {
             this.toDataId = toDataId;
+            return this;
+        }
+
+        public Builder fromOrToDataId(Long fromOrToDataId) {
+            this.fromOrToDataId = fromOrToDataId;
             return this;
         }
 

@@ -34,6 +34,8 @@ public class EventHandlerManager {
         eventHandlersByName;
     private final EzyLazyInitializer<Map<String, EventSchemaFetcher>>
         eventSchemaFetcherByName;
+    private final EzyLazyInitializer<List<EventHandlerProvider>>
+        eventHandlerProviders;
 
     public EventHandlerManager(EzySingletonFactory singletonFactory) {
         this.eventHandlersByName = new EzyLazyInitializer<>(() ->
@@ -63,6 +65,9 @@ public class EventHandlerManager {
                     )
                 )
         );
+        this.eventHandlerProviders = new EzyLazyInitializer<>(() ->
+            singletonFactory.getSingletonsOf(EventHandlerProvider.class)
+        );
     }
 
     public <R> R handleEvent(Object data) {
@@ -83,26 +88,45 @@ public class EventHandlerManager {
                 return (R) result;
             }
         }
+        for (EventHandlerProvider provider : eventHandlerProviders.get()) {
+            handlers = provider.provideEventHandlers(eventName);
+            for (EventHandler handler : handlers) {
+                Object result = handler.handleEventData(data);
+                if (!voidEvent && result != null) {
+                    return (R) result;
+                }
+            }
+        }
         return null;
     }
 
     public Map<String, List<EventHandler>> getEventHandlersByEventName() {
-        return eventHandlersByName
+        Map<String, List<EventHandler>> answer = eventHandlersByName
             .get()
             .entrySet()
             .stream()
             .collect(
                 Collectors.toMap(
                     Map.Entry::getKey,
-                    it -> Collections.unmodifiableList(it.getValue())
+                    it -> new ArrayList<>(it.getValue())
                 )
             );
+        for (EventHandlerProvider provider : eventHandlerProviders.get()) {
+            Map<String, List<EventHandler>> map = provider
+                .getEventHandlersByEventName();
+            for (Map.Entry<String, List<EventHandler>> e : map.entrySet()) {
+                answer
+                    .computeIfAbsent(e.getKey(), k -> new ArrayList<>())
+                    .addAll(e.getValue());
+            }
+        }
+        return answer;
     }
 
     public List<EventHandler> getEventHandlersByEventName(
         String eventName
     ) {
-        return Collections.unmodifiableList(
+        List<EventHandler> answer = new ArrayList<>(
             eventHandlersByName
                 .get()
                 .getOrDefault(
@@ -110,23 +134,50 @@ public class EventHandlerManager {
                     Collections.emptyList()
                 )
         );
+        for (EventHandlerProvider provider : eventHandlerProviders.get()) {
+            List<EventHandler> list = provider
+                .provideEventHandlers(eventName);
+            if (list != null) {
+                answer.addAll(list);
+            }
+        }
+        return answer;
     }
 
     public EventSchemaFetcher getEventSchemaFetcherByEventName(
         String eventName
     ) {
-        return eventSchemaFetcherByName
+        EventSchemaFetcher answer = eventSchemaFetcherByName
             .get()
             .get(eventName);
+        if (answer == null) {
+            for (EventHandlerProvider provider : eventHandlerProviders.get()) {
+                answer = provider.provideEventSchemaFetcher(eventName);
+                if (answer != null) {
+                    break;
+                }
+            }
+        }
+        return answer;
     }
 
     public List<EventSchemaFetcher> getEventSchemaFetchers() {
-        return new ArrayList<>(
+        List<EventSchemaFetcher> answer = new ArrayList<>(
             eventSchemaFetcherByName.get().values()
         );
+        for (EventHandlerProvider provider : eventHandlerProviders.get()) {
+            answer.addAll(provider.provideEventSchemaFetchers());
+        }
+        return answer;
     }
 
     public Map<String, EventSchemaFetcher> getEventSchemaFetcherMap() {
-        return new HashMap<>(eventSchemaFetcherByName.get());
+        Map<String, EventSchemaFetcher> answer = new HashMap<>(
+            eventSchemaFetcherByName.get()
+        );
+        for (EventHandlerProvider provider : eventHandlerProviders.get()) {
+            answer.putAll(provider.getEventFetcherByEventName());
+        }
+        return answer;
     }
 }

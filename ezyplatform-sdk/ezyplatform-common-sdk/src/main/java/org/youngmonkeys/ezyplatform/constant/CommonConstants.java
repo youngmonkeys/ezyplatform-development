@@ -189,7 +189,6 @@ public final class CommonConstants {
     public static final String META_KEY_DESCRIPTION = "description";
     public static final String META_KEY_ORIGINAL_SIZE_FILE_NAME = "original_size_file_name";
 
-    public static final String SETTING_NODE_NAME = "ezyplatformNodeName";
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY
         = "ezyplatform_dictionary";
