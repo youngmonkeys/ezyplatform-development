@@ -21,6 +21,7 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.event.EventHandler;
 import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
+import org.youngmonkeys.ezyplatform.event.EventHandlerProvider;
 import org.youngmonkeys.ezyplatform.event.EventSchema;
 import org.youngmonkeys.ezyplatform.event.EventSchemaFetcher;
 import org.youngmonkeys.ezyplatform.event.VoidEvent;
@@ -28,10 +29,12 @@ import org.youngmonkeys.ezyplatform.event.VoidEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -196,16 +199,10 @@ public class EventHandlerManagerTest {
         // when
         Map<String, List<EventHandler>> actual =
             sut.getEventHandlersByEventName();
-        Throwable throwable = Asserts.assertThrows(() ->
-            actual.get(eventName).clear()
-        );
+        actual.get(eventName).clear();
         actual.clear();
 
         // then
-        Asserts.assertEqualsType(
-            throwable,
-            UnsupportedOperationException.class
-        );
         Asserts.assertEquals(actual.size(), 0);
         Map<String, List<EventHandler>> remaining =
             sut.getEventHandlersByEventName();
@@ -250,15 +247,23 @@ public class EventHandlerManagerTest {
         List<EventHandler> actual = sut.getEventHandlersByEventName(
             eventName
         );
-        Throwable throwable = Asserts.assertThrows(actual::clear);
 
         // then
-        Asserts.assertEqualsType(
-            throwable,
-            UnsupportedOperationException.class
-        );
         Asserts.assertEquals(
             actual,
+            Arrays.asList(firstHandler, lastHandler),
+            false
+        );
+
+        // when
+        actual.clear();
+
+        // then
+        List<EventHandler> remaining = sut.getEventHandlersByEventName(
+            eventName
+        );
+        Asserts.assertEquals(
+            remaining,
             Arrays.asList(firstHandler, lastHandler),
             false
         );
@@ -388,6 +393,339 @@ public class EventHandlerManagerTest {
         // then
         verify(singletonFactory).getSingletonsOf(EventHandler.class);
         verify(singletonFactory).getSingletonsOf(EventSchemaFetcher.class);
+        verify(singletonFactory).getSingletonsOf(EventHandlerProvider.class);
+        verifyNoMoreInteractions(singletonFactory);
+    }
+
+    @Test
+    public void handleEventFallsBackToProviderHandlerWhenDirectHandlerReturnsNull() {
+        // given
+        String eventName = "test_event";
+        List<String> calls = new ArrayList<>();
+        RecordingEventHandler directHandler = new RecordingEventHandler(
+            eventName,
+            0,
+            "direct",
+            null,
+            calls
+        );
+        RecordingEventHandler providerHandler = new RecordingEventHandler(
+            eventName,
+            0,
+            "provider",
+            "provider_result",
+            calls
+        );
+        EventHandlerProvider provider = mock(EventHandlerProvider.class);
+        when(provider.provideEventHandlers(eventName))
+            .thenReturn(Collections.singletonList(providerHandler));
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.singletonList(directHandler),
+            Collections.emptyList(),
+            Collections.singletonList(provider)
+        );
+
+        // when
+        String actual = sut.handleEvent(eventName, "data");
+
+        // then
+        Asserts.assertEquals(actual, "provider_result");
+        Asserts.assertEquals(
+            calls,
+            Arrays.asList("direct:data", "provider:data"),
+            false
+        );
+    }
+
+    @Test
+    public void handleVoidEventCallsProviderHandlersToo() {
+        // given
+        TestVoidEvent data = new TestVoidEvent();
+        List<String> calls = new ArrayList<>();
+        RecordingEventHandler directHandler = new RecordingEventHandler(
+            TestVoidEvent.class.getName(),
+            0,
+            "direct",
+            "direct_result",
+            calls
+        );
+        RecordingEventHandler providerHandler = new RecordingEventHandler(
+            TestVoidEvent.class.getName(),
+            0,
+            "provider",
+            "provider_result",
+            calls
+        );
+        EventHandlerProvider provider = mock(EventHandlerProvider.class);
+        when(provider.provideEventHandlers(TestVoidEvent.class.getName()))
+            .thenReturn(Collections.singletonList(providerHandler));
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.singletonList(directHandler),
+            Collections.emptyList(),
+            Collections.singletonList(provider)
+        );
+
+        // when
+        Object actual = sut.handleEvent(data);
+
+        // then
+        Asserts.assertNull(actual);
+        Asserts.assertEquals(
+            calls,
+            Arrays.asList("direct:" + data, "provider:" + data),
+            false
+        );
+    }
+
+    @Test
+    public void getEventHandlersByEventNameMergesProviderHandlersForExistingAndNewEventNames() {
+        // given
+        String eventName = "test_event";
+        String providerOnlyEventName = "provider_event";
+        List<String> calls = new ArrayList<>();
+        RecordingEventHandler directHandler = new RecordingEventHandler(
+            eventName,
+            0,
+            "direct",
+            null,
+            calls
+        );
+        RecordingEventHandler providerHandlerForExisting = new RecordingEventHandler(
+            eventName,
+            0,
+            "provider1",
+            null,
+            calls
+        );
+        RecordingEventHandler providerHandlerForNew = new RecordingEventHandler(
+            providerOnlyEventName,
+            0,
+            "provider2",
+            null,
+            calls
+        );
+        Map<String, List<EventHandler>> providerMap = new HashMap<>();
+        providerMap.put(
+            eventName,
+            Collections.singletonList(providerHandlerForExisting)
+        );
+        providerMap.put(
+            providerOnlyEventName,
+            Collections.singletonList(providerHandlerForNew)
+        );
+        EventHandlerProvider provider = mock(EventHandlerProvider.class);
+        when(provider.getEventHandlersByEventName()).thenReturn(providerMap);
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.singletonList(directHandler),
+            Collections.emptyList(),
+            Collections.singletonList(provider)
+        );
+
+        // when
+        Map<String, List<EventHandler>> actual =
+            sut.getEventHandlersByEventName();
+
+        // then
+        Asserts.assertEquals(actual.size(), 2);
+        Asserts.assertEquals(
+            actual.get(eventName),
+            Arrays.asList(directHandler, providerHandlerForExisting),
+            false
+        );
+        Asserts.assertEquals(
+            actual.get(providerOnlyEventName),
+            Collections.singletonList(providerHandlerForNew),
+            false
+        );
+    }
+
+    @Test
+    public void getEventHandlersByEventNameWithEventNameIncludesProviderHandlers() {
+        // given
+        String eventName = "test_event";
+        List<String> calls = new ArrayList<>();
+        RecordingEventHandler directHandler = new RecordingEventHandler(
+            eventName,
+            0,
+            "direct",
+            null,
+            calls
+        );
+        RecordingEventHandler providerHandler = new RecordingEventHandler(
+            eventName,
+            0,
+            "provider",
+            null,
+            calls
+        );
+        EventHandlerProvider provider = mock(EventHandlerProvider.class);
+        when(provider.provideEventHandlers(eventName))
+            .thenReturn(Collections.singletonList(providerHandler));
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.singletonList(directHandler),
+            Collections.emptyList(),
+            Collections.singletonList(provider)
+        );
+
+        // when
+        List<EventHandler> actual = sut.getEventHandlersByEventName(
+            eventName
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Arrays.asList(directHandler, providerHandler),
+            false
+        );
+    }
+
+    @Test
+    public void getEventHandlersByEventNameWithEventNameIgnoresNullProviderList() {
+        // given
+        String eventName = "test_event";
+        List<String> calls = new ArrayList<>();
+        RecordingEventHandler directHandler = new RecordingEventHandler(
+            eventName,
+            0,
+            "direct",
+            null,
+            calls
+        );
+        EventHandlerProvider provider = mock(EventHandlerProvider.class);
+        when(provider.provideEventHandlers(eventName)).thenReturn(null);
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.singletonList(directHandler),
+            Collections.emptyList(),
+            Collections.singletonList(provider)
+        );
+
+        // when
+        List<EventHandler> actual = sut.getEventHandlersByEventName(
+            eventName
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Collections.singletonList(directHandler),
+            false
+        );
+    }
+
+    @Test
+    public void getEventSchemaFetcherByEventNameFallsBackToFirstMatchingProvider() {
+        // given
+        String eventName = "test_event";
+        EventSchemaFetcher fetcherFromSecondProvider =
+            new TestEventSchemaFetcher(eventName, 0);
+        EventHandlerProvider firstProvider = mock(EventHandlerProvider.class);
+        when(firstProvider.provideEventSchemaFetcher(eventName))
+            .thenReturn(null);
+        EventHandlerProvider secondProvider = mock(EventHandlerProvider.class);
+        when(secondProvider.provideEventSchemaFetcher(eventName))
+            .thenReturn(fetcherFromSecondProvider);
+        EventHandlerProvider thirdProvider = mock(EventHandlerProvider.class);
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.emptyList(),
+            Collections.emptyList(),
+            Arrays.asList(firstProvider, secondProvider, thirdProvider)
+        );
+
+        // when
+        EventSchemaFetcher actual = sut.getEventSchemaFetcherByEventName(
+            eventName
+        );
+
+        // then
+        Asserts.assertEquals(actual, fetcherFromSecondProvider);
+        verify(thirdProvider, never()).provideEventSchemaFetcher(eventName);
+    }
+
+    @Test
+    public void getEventSchemaFetchersIncludesProviderFetchers() {
+        // given
+        String eventName = "test_event";
+        TestEventSchemaFetcher directFetcher = new TestEventSchemaFetcher(
+            eventName,
+            0
+        );
+        TestEventSchemaFetcher providerFetcher = new TestEventSchemaFetcher(
+            "provider_event",
+            0
+        );
+        EventHandlerProvider provider = mock(EventHandlerProvider.class);
+        when(provider.provideEventSchemaFetchers())
+            .thenReturn(Collections.singletonList(providerFetcher));
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.emptyList(),
+            Collections.singletonList(directFetcher),
+            Collections.singletonList(provider)
+        );
+
+        // when
+        List<EventSchemaFetcher> actual = sut.getEventSchemaFetchers();
+
+        // then
+        Asserts.assertEquals(actual.size(), 2);
+        Asserts.assertTrue(actual.contains(directFetcher));
+        Asserts.assertTrue(actual.contains(providerFetcher));
+    }
+
+    @Test
+    public void getEventSchemaFetcherMapProviderOverridesDirectEntryForSameEventName() {
+        // given
+        String eventName = "test_event";
+        TestEventSchemaFetcher directFetcher = new TestEventSchemaFetcher(
+            eventName,
+            0
+        );
+        TestEventSchemaFetcher providerFetcher = new TestEventSchemaFetcher(
+            eventName,
+            1
+        );
+        Map<String, EventSchemaFetcher> providerMap = new HashMap<>();
+        providerMap.put(eventName, providerFetcher);
+        EventHandlerProvider provider = mock(EventHandlerProvider.class);
+        when(provider.getEventFetcherByEventName()).thenReturn(providerMap);
+        EventHandlerManager sut = newEventHandlerManager(
+            Collections.emptyList(),
+            Collections.singletonList(directFetcher),
+            Collections.singletonList(provider)
+        );
+
+        // when
+        Map<String, EventSchemaFetcher> actual =
+            sut.getEventSchemaFetcherMap();
+
+        // then
+        Asserts.assertEquals(actual.get(eventName), providerFetcher);
+    }
+
+    @Test
+    public void lazyInitializeEventHandlerProvidersOnce() {
+        // given
+        EzySingletonFactory singletonFactory = mock(EzySingletonFactory.class);
+        when(singletonFactory.getSingletonsOf(EventHandler.class))
+            .thenReturn(Collections.emptyList());
+        when(singletonFactory.getSingletonsOf(EventSchemaFetcher.class))
+            .thenReturn(Collections.emptyList());
+        when(singletonFactory.getSingletonsOf(EventHandlerProvider.class))
+            .thenReturn(Collections.emptyList());
+        EventHandlerManager sut = new EventHandlerManager(singletonFactory);
+
+        // when
+        sut.handleEvent("event", "data");
+        sut.getEventHandlersByEventName();
+        sut.getEventHandlersByEventName("event");
+        sut.getEventSchemaFetcherByEventName("event");
+        sut.getEventSchemaFetchers();
+        sut.getEventSchemaFetcherMap();
+
+        // then
+        verify(singletonFactory).getSingletonsOf(EventHandler.class);
+        verify(singletonFactory).getSingletonsOf(EventSchemaFetcher.class);
+        verify(singletonFactory).getSingletonsOf(EventHandlerProvider.class);
         verifyNoMoreInteractions(singletonFactory);
     }
 
@@ -395,11 +733,25 @@ public class EventHandlerManagerTest {
         List<EventHandler> eventHandlers,
         List<EventSchemaFetcher> eventSchemaFetchers
     ) {
+        return newEventHandlerManager(
+            eventHandlers,
+            eventSchemaFetchers,
+            Collections.emptyList()
+        );
+    }
+
+    private EventHandlerManager newEventHandlerManager(
+        List<EventHandler> eventHandlers,
+        List<EventSchemaFetcher> eventSchemaFetchers,
+        List<EventHandlerProvider> eventHandlerProviders
+    ) {
         EzySingletonFactory singletonFactory = mock(EzySingletonFactory.class);
         when(singletonFactory.getSingletonsOf(EventHandler.class))
             .thenReturn(eventHandlers);
         when(singletonFactory.getSingletonsOf(EventSchemaFetcher.class))
             .thenReturn(eventSchemaFetchers);
+        when(singletonFactory.getSingletonsOf(EventHandlerProvider.class))
+            .thenReturn(eventHandlerProviders);
         return new EventHandlerManager(singletonFactory);
     }
 
