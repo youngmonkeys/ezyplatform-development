@@ -76,7 +76,6 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_SITE_TITLE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_URL;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NODE_NAME;
 import static org.youngmonkeys.ezyplatform.util.Randoms.randomEmailFromUrl;
 
 @SuppressWarnings("MethodCount")
@@ -363,10 +362,6 @@ public interface SettingService {
         } catch (Exception e) {
             return Collections.emptyList();
         }
-    }
-
-    default String getNodeName() {
-        return getTextValue(SETTING_NODE_NAME);
     }
 
     default int getPaginationCountLimit() {

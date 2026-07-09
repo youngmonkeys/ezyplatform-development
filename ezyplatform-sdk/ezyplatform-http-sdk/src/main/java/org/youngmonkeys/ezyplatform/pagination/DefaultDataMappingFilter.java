@@ -25,19 +25,47 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
     public final String mappingName;
     public final Long fromDataId;
     public final Long toDataId;
+    public final Long fromOrToDataId;
     public final String textData;
     public final LocalDateTime mappedAtGte;
     public final LocalDateTime mappedAtLt;
     public final LocalDateTime mappedAtLte;
+    public final transient String fromInnerJoinEntityName;
+    public final transient String fromInnerJoinOnFieldName;
+    public final transient String toInnerJoinEntityName;
+    public final transient String toInnerJoinOnFieldName;
 
     protected DefaultDataMappingFilter(Builder builder) {
         this.mappingName = builder.mappingName;
         this.fromDataId = builder.fromDataId;
         this.toDataId = builder.toDataId;
+        this.fromOrToDataId = builder.fromOrToDataId;
         this.textData = builder.textData;
         this.mappedAtGte = builder.mappedAtGte;
         this.mappedAtLt = builder.mappedAtLt;
         this.mappedAtLte = builder.mappedAtLte;
+        this.fromInnerJoinEntityName = builder.fromInnerJoinEntityName;
+        this.fromInnerJoinOnFieldName = builder.fromInnerJoinOnFieldName;
+        this.toInnerJoinEntityName = builder.toInnerJoinEntityName;
+        this.toInnerJoinOnFieldName = builder.toInnerJoinOnFieldName;
+    }
+
+    @Override
+    public void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {
+        if (fromInnerJoinEntityName != null) {
+            queryString.append(" INNER JOIN ")
+                .append(fromInnerJoinEntityName)
+                .append(" f ON e.fromDataId = f.")
+                .append(fromInnerJoinOnFieldName);
+        }
+        if (toInnerJoinEntityName != null) {
+            queryString.append(" INNER JOIN ")
+                .append(toInnerJoinEntityName)
+                .append(" t ON e.toDataId = t.")
+                .append(toInnerJoinOnFieldName);
+        }
     }
 
     @Override
@@ -51,6 +79,12 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
         }
         if (toDataId != null) {
             answer.and("e.toDataId = :toDataId");
+        }
+        if (fromOrToDataId != null) {
+            answer.and(
+                "(e.fromDataId = :fromOrToDataId " +
+                    "OR e.toDataId = :fromOrToDataId)"
+            );
         }
         if (textData != null) {
             answer.and("e.textData = :textData");
@@ -75,10 +109,15 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
         protected String mappingName;
         protected Long fromDataId;
         protected Long toDataId;
+        protected Long fromOrToDataId;
         protected String textData;
         protected LocalDateTime mappedAtGte;
         protected LocalDateTime mappedAtLt;
         protected LocalDateTime mappedAtLte;
+        protected String fromInnerJoinEntityName;
+        protected String fromInnerJoinOnFieldName;
+        protected String toInnerJoinEntityName;
+        protected String toInnerJoinOnFieldName;
 
         public Builder mappingName(String mappingName) {
             this.mappingName = mappingName;
@@ -92,6 +131,11 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
 
         public Builder toDataId(Long toDataId) {
             this.toDataId = toDataId;
+            return this;
+        }
+
+        public Builder fromOrToDataId(Long fromOrToDataId) {
+            this.fromOrToDataId = fromOrToDataId;
             return this;
         }
 
@@ -112,6 +156,26 @@ public class DefaultDataMappingFilter implements DataMappingFilter {
 
         public Builder mappedAtLte(LocalDateTime mappedAtLte) {
             this.mappedAtLte = mappedAtLte;
+            return this;
+        }
+
+        public Builder fromInnerJoinEntityName(String fromInnerJoinEntityName) {
+            this.fromInnerJoinEntityName = fromInnerJoinEntityName;
+            return this;
+        }
+
+        public Builder fromInnerJoinOnFieldName(String fromInnerJoinOnFieldName) {
+            this.fromInnerJoinOnFieldName = fromInnerJoinOnFieldName;
+            return this;
+        }
+
+        public Builder toInnerJoinEntityName(String toInnerJoinEntityName) {
+            this.toInnerJoinEntityName = toInnerJoinEntityName;
+            return this;
+        }
+
+        public Builder toInnerJoinOnFieldName(String toInnerJoinOnFieldName) {
+            this.toInnerJoinOnFieldName = toInnerJoinOnFieldName;
             return this;
         }
 
