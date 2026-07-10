@@ -19,13 +19,9 @@ package org.youngmonkeys.ezyplatform.web.view;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ACCESS_TOKEN;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.COOKIE_NAME_ACCESS_TOKEN_EXPIRED_AT;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 
 public final class WebViews {
@@ -36,22 +32,8 @@ public final class WebViews {
         HttpServletRequest request,
         boolean addCallbackUri
     ) {
-        Cookie tokenCookie = new Cookie(
-            COOKIE_NAME_ACCESS_TOKEN,
-            ""
-        );
-        tokenCookie.setMaxAge(ZERO);
-        tokenCookie.setPath("/");
-        Cookie tokenCookieExpiredAt = new Cookie(
-            COOKIE_NAME_ACCESS_TOKEN_EXPIRED_AT,
-            "0"
-        );
-        tokenCookieExpiredAt.setMaxAge(ZERO);
-        tokenCookieExpiredAt.setPath("/");
         Redirect.Builder builder = Redirect.builder()
-            .uri(addLanguageToUri(request, "/login"))
-            .addCookie(tokenCookie)
-            .addCookie(tokenCookieExpiredAt);
+            .uri(addLanguageToUri(request, "/login"));
         String method = request.getMethod();
         String requestUri = request.getRequestURI();
         if (addCallbackUri

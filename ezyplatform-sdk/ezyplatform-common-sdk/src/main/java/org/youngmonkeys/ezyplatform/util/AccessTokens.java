@@ -19,14 +19,15 @@ package org.youngmonkeys.ezyplatform.util;
 import com.tvd12.ezyfox.io.EzyBytes;
 import com.tvd12.ezyfox.io.EzyLongs;
 import com.tvd12.ezyfox.security.EzyAesCrypt;
-import com.tvd12.ezyfox.security.EzyBase64;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.util.Hexes.decodeLowercaseHex;
+import static org.youngmonkeys.ezyplatform.util.Hexes.toLowercaseHex;
 
 public final class AccessTokens {
 
-    private static final int HEADER_LENGTH = 44;
+    public static final int HEADER_LENGTH = 64;
 
     private AccessTokens() {}
 
@@ -51,7 +52,7 @@ public final class AccessTokens {
                 e
             );
         }
-        String header = EzyBase64.encode2utf(encryptedSourceIdBytes);
+        String header = toLowercaseHex(encryptedSourceIdBytes);
         String body = SecureRandomHashGenerators.generate(
             "accessToken",
             source,
@@ -75,10 +76,11 @@ public final class AccessTokens {
             return ZERO_LONG;
         }
         try {
-            String base64Header = accessToken
+            String hexHeader = accessToken
                 .substring(ZERO, HEADER_LENGTH);
-            byte[] encryptedSourceIdBytes = EzyBase64
-                .decode(base64Header);
+            byte[] encryptedSourceIdBytes = decodeLowercaseHex(
+                hexHeader
+            );
             byte[] sourceIdBytes = EzyAesCrypt.getDefault()
                 .decrypt(
                     encryptedSourceIdBytes,
@@ -96,9 +98,8 @@ public final class AccessTokens {
         if (isBlank(text)) {
             return NULL_STRING;
         }
-        int index = text.indexOf(PREFIX_BEARER_TOKEN);
         String accessToken = text;
-        if (index >= ZERO) {
+        if (text.startsWith(PREFIX_BEARER_TOKEN)) {
             accessToken = text
                 .substring(PREFIX_BEARER_TOKEN.length());
         }

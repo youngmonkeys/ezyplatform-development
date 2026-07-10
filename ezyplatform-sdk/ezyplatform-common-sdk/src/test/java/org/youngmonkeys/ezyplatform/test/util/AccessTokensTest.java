@@ -26,8 +26,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class AccessTokensTest {
 
-    private static final int ACCESS_TOKEN_HEADER_LENGTH = 44;
-    private static final int ACCESS_TOKEN_LENGTH = 108;
+    private static final int ACCESS_TOKEN_HEADER_LENGTH = 64;
+    private static final int ACCESS_TOKEN_LENGTH = 128;
 
     public static void main(String[] args) {
         byte[] key = EzyAesCrypt.randomKey();
@@ -78,6 +78,10 @@ public class AccessTokensTest {
 
         // then
         assert token.length() == ACCESS_TOKEN_LENGTH;
+        assert token.matches("[0-9a-f]{128}");
+        assert token
+            .substring(0, ACCESS_TOKEN_HEADER_LENGTH)
+            .matches("[0-9a-f]{64}");
         assert token
             .substring(ACCESS_TOKEN_HEADER_LENGTH)
             .matches("[0-9a-f]{64}");
@@ -93,5 +97,35 @@ public class AccessTokensTest {
         // when
         // then
         Asserts.assertZero(AccessTokens.extractSourceId("", key));
+    }
+
+    @Test
+    public void extractBearerTokenTest() {
+        // given
+        String accessToken = "123456";
+
+        // when
+        String tokenFromNull = AccessTokens.extractBearerToken(null);
+        String tokenFromBlank = AccessTokens.extractBearerToken("");
+        String tokenFromRawToken = AccessTokens.extractBearerToken(
+            accessToken
+        );
+        String tokenFromBearerToken = AccessTokens.extractBearerToken(
+            "Bearer " + accessToken
+        );
+        String tokenFromInvalidBearerValue =
+            AccessTokens.extractBearerToken(
+                "Authorization: Bearer " + accessToken
+            );
+
+        // then
+        Asserts.assertNull(tokenFromNull);
+        Asserts.assertNull(tokenFromBlank);
+        Asserts.assertEquals(tokenFromRawToken, accessToken);
+        Asserts.assertEquals(tokenFromBearerToken, accessToken);
+        Asserts.assertEquals(
+            tokenFromInvalidBearerValue,
+            "Authorization: Bearer " + accessToken
+        );
     }
 }
