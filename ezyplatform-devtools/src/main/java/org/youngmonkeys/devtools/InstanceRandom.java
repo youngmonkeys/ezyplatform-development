@@ -18,6 +18,10 @@ package org.youngmonkeys.devtools;
 
 import com.tvd12.ezyfox.tool.EzyObjectInstanceRandom;
 
+import java.util.Map;
+import java.util.Random;
+import java.util.function.Supplier;
+
 public class InstanceRandom extends EzyObjectInstanceRandom {
 
     public <T> T randomObject(Class<T> clazz) {
@@ -36,5 +40,29 @@ public class InstanceRandom extends EzyObjectInstanceRandom {
             instance,
             includeAllFields
         );
+    }
+
+    @Override
+    protected Map<Class<?>, Supplier<Object>> defaultValueRandoms() {
+        Map<Class<?>, Supplier<Object>> randoms =
+            super.defaultValueRandoms();
+        randoms.put(Integer.TYPE, () -> {
+            Random random = new Random();
+            return Math.abs(random.nextInt());
+        });
+        randoms.put(Long.TYPE, () -> {
+            Random random = new Random();
+            return Math.abs(random.nextInt());
+        });
+        randoms.put(String.class, () -> {
+            Random random = new Random();
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < 8; ++i) {
+                int index = random.nextInt(DEFAULT_STRINGS.length);
+                builder.append(DEFAULT_STRINGS[index]);
+            }
+            return builder.toString();
+        });
+        return randoms;
     }
 }
