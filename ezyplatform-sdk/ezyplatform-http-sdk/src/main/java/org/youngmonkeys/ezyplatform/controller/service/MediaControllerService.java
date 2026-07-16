@@ -873,6 +873,33 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
+    public void updateMediaPublic(
+        String mediaName,
+        boolean isPublic,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        MediaModel media = mediaValidator
+            .validateMediaNameAndGet(mediaName);
+        if (!validMediaCondition.test(media)) {
+            throw new MediaNotFoundException(mediaName);
+        }
+        MediaModel updatedMedia = mediaService
+            .updateMediaPublicIfExists(media.getId(), isPublic);
+        eventHandlerManager.handleEvent(updatedMedia);
+    }
+
+    public boolean isMediaPublic(
+        String mediaName,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        MediaModel media = mediaValidator
+            .validateMediaNameAndGet(mediaName);
+        if (!validMediaCondition.test(media)) {
+            throw new MediaNotFoundException(mediaName);
+        }
+        return media.isPublicMedia();
+    }
+
     public void saveMediaFileSizeReductionResult(
         long mediaId,
         MediaFileSizeReductionResult result,

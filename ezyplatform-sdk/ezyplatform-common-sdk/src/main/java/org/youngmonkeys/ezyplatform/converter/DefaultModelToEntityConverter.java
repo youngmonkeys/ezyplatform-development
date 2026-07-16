@@ -601,6 +601,10 @@ public class DefaultModelToEntityConverter {
                 entity.setType(type);
             }
         }
+        String originalName = model.getOriginalName();
+        if (isNotBlank(originalName)) {
+            entity.setOriginalName(originalName);
+        }
         entity.setAlternativeText(model.getAlternativeText());
         entity.setGroupName(model.getGroupName());
         entity.setTitle(model.getTitle());
