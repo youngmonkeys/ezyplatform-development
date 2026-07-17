@@ -70,7 +70,6 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATETIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATE_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_DATE_MINUTE_FORMAT;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_MANAGEMENT_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_MAX_UPLOAD_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_MAX_UPLOAD_IMAGE_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_SITE_TITLE;
@@ -442,6 +441,11 @@ public interface SettingService {
         );
     }
 
+    /**
+     * Get the shared admin URL path for all servers.
+     *
+     * @return the admin url
+     */
     default String getAdminUrl() {
         return getTextValue(
             SETTING_NAME_ADMIN_URL,
@@ -449,19 +453,46 @@ public interface SettingService {
         );
     }
 
+    /**
+     * Get the shared website URL path for all servers.
+     *
+     * @return the web url
+     */
     default String getWebUrl() {
-        return getTextValue(SETTING_NAME_WEB_URL, DEFAULT_WEB_URL);
-    }
-
-    default String getWebManagementUrl() {
         return getTextValue(
-            SETTING_NAME_WEB_MANAGEMENT_URL,
+            SETTING_NAME_WEB_URL,
             DEFAULT_WEB_URL
         );
     }
 
+    /**
+     * Get current server web url.
+     *
+     * @return the current server web url
+     */
+    default String getCurrentWebServerUrl() {
+        return getWebUrl();
+    }
+
+    /**
+     * Get the shared websocket URL path for all servers.
+     *
+     * @return the websocket url
+     */
     default String getWebsocketUrl() {
-        return getTextValue(SETTING_NAME_WEBSOCKET_URL, DEFAULT_WEBSOCKET_URL);
+        return getTextValue(
+            SETTING_NAME_WEBSOCKET_URL,
+            DEFAULT_WEBSOCKET_URL
+        );
+    }
+
+    /**
+     * Get current server websocket url.
+     *
+     * @return the current server websocket url
+     */
+    default String getCurrentServerWebSocketUrl() {
+        return getWebsocketUrl();
     }
 
     default long getUserTokenExpiredTimeInDay() {
@@ -551,8 +582,8 @@ public interface SettingService {
         return Uris.resolveUrl(getWebUrl(), uri);
     }
 
-    default String resolveWebManagementUri(String uri) {
-        return Uris.resolveUrl(getWebManagementUrl(), uri);
+    default String resolveCurrentWebServerUri(String uri) {
+        return Uris.resolveUrl(getCurrentWebServerUrl(), uri);
     }
 
     default String randomWebEmail() {

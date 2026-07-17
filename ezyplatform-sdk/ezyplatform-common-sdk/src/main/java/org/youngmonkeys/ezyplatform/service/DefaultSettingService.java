@@ -18,11 +18,13 @@ package org.youngmonkeys.ezyplatform.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tvd12.ezyfox.annotation.EzyProperty;
 import com.tvd12.ezyfox.function.EzyExceptionFunction;
 import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import lombok.Setter;
 import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.Setting;
@@ -47,6 +49,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 import static java.nio.file.Files.readAllLines;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
@@ -56,6 +59,14 @@ import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FOLDER_SETT
 public abstract class DefaultSettingService
     extends EzyLoggable
     implements SettingService {
+
+    @Setter
+    @EzyProperty("server.web_url")
+    protected String serverWebUrl;
+
+    @Setter
+    @EzyProperty("server.websocket_url")
+    protected String serverWebsocketUrl;
 
     private final Scheduler scheduler;
     private final ObjectMapper objectMapper;
@@ -195,6 +206,20 @@ public abstract class DefaultSettingService
             .map(TypeResult::getType)
             .filter(EzyStrings::isNotBlank)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getCurrentWebServerUrl() {
+        return isNotBlank(serverWebUrl)
+            ? serverWebUrl
+            : getWebUrl();
+    }
+
+    @Override
+    public String getCurrentServerWebSocketUrl() {
+        return isNotBlank(serverWebsocketUrl)
+            ? serverWebsocketUrl
+            : getWebsocketUrl();
     }
 
     @Override
