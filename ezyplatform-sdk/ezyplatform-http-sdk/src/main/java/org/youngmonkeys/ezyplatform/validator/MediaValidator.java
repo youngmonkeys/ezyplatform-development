@@ -247,6 +247,14 @@ public class MediaValidator {
 
     public void validate(UpdateMediaRequest request) {
         Map<String, String> errors = new HashMap<>();
+        String originalName = request.getOriginalName();
+        if (originalName != null) {
+            if (isBlank(originalName)) {
+                errors.put("originalName", "required");
+            } else if (originalName.length() > MAX_MEDIA_ORIGINAL_NAME_LENGTH) {
+                errors.put("originalName", "overLength");
+            }
+        }
         String alternativeText = request.getAlternativeText();
         if (alternativeText != null
             && alternativeText.length() > MAX_MEDIA_ALT_TEXT_LENGTH
@@ -278,6 +286,14 @@ public class MediaValidator {
 
     public void validate(UpdateMediaIncludeUrlRequest request) {
         Map<String, String> errors = new HashMap<>();
+        String originalName = request.getOriginalName();
+        if (originalName != null) {
+            if (isBlank(originalName)) {
+                errors.put("originalName", "required");
+            } else if (originalName.length() > MAX_MEDIA_ORIGINAL_NAME_LENGTH) {
+                errors.put("originalName", "overLength");
+            }
+        }
         String alternativeText = request.getAlternativeText();
         if (alternativeText != null
             && alternativeText.length() > MAX_MEDIA_ALT_TEXT_LENGTH

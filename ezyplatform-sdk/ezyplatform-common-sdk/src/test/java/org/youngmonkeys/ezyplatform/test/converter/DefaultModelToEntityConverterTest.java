@@ -24,10 +24,12 @@ import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.AccessTokenStatus;
 import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
+import org.youngmonkeys.ezyplatform.entity.Media;
 import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 import org.youngmonkeys.ezyplatform.model.AddLetterModel;
 import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
+import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
 import java.time.LocalDateTime;
@@ -84,6 +86,26 @@ public class DefaultModelToEntityConverterTest {
             false
         );
 
+        verify(clock, times(1)).nowDateTime();
+    }
+
+    @Test
+    public void mergeUpdateMediaModelToEntityWithOriginalName() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        Media entity = new Media();
+        entity.setOriginalName("old-name.png");
+        UpdateMediaModel model = UpdateMediaModel.builder()
+            .originalName("new-name.png")
+            .build();
+        when(clock.nowDateTime()).thenReturn(now);
+
+        // when
+        sut.mergeToEntity(model, entity);
+
+        // then
+        Asserts.assertEquals(entity.getOriginalName(), "new-name.png");
+        Asserts.assertEquals(entity.getUpdatedAt(), now);
         verify(clock, times(1)).nowDateTime();
     }
 

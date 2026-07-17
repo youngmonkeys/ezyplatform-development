@@ -30,6 +30,7 @@ import static org.youngmonkeys.ezyplatform.util.Numbers.roundUpOrDownToInt;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toIntOrZero;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toIntValue;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrZero;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrNullFromObject;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrZeroFromObject;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toNoTrailingZerosString;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toPaddedValueLong;
@@ -111,6 +112,53 @@ public class NumbersTest {
         Asserts.assertEquals(
             toLongOrZeroFromObject((Object) null),
             0L
+        );
+    }
+
+    @Test
+    public void toLongOrNullFromObjectTest() throws Exception {
+        // given
+        // when
+        // then
+        Asserts.assertNull(
+            toLongOrNullFromObject(null)
+        );
+        Asserts.assertEquals(
+            toLongOrNullFromObject(10L),
+            10L
+        );
+        Asserts.assertEquals(
+            toLongOrNullFromObject(10),
+            10L
+        );
+        Asserts.assertEquals(
+            toLongOrNullFromObject(BigInteger.valueOf(10L)),
+            10L
+        );
+        Asserts.assertEquals(
+            toLongOrNullFromObject(BigDecimal.valueOf(10.9D)),
+            10L
+        );
+        Asserts.assertEquals(
+            toLongOrNullFromObject(-10),
+            -10L
+        );
+        Asserts.assertEquals(
+            toLongOrNullFromObject("10"),
+            10L
+        );
+        Asserts.assertEquals(
+            toLongOrNullFromObject("-10"),
+            -10L
+        );
+        Asserts.assertNull(
+            toLongOrNullFromObject("")
+        );
+        Asserts.assertNull(
+            toLongOrNullFromObject("10a")
+        );
+        Asserts.assertNull(
+            toLongOrNullFromObject((Object) null)
         );
     }
 

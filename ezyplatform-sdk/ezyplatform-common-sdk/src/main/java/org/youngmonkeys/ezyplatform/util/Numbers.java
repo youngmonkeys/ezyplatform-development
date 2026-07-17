@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
@@ -99,6 +100,22 @@ public final class Numbers {
             return Long.parseLong(value.toString());
         } catch (Exception e) {
             return ZERO_LONG;
+        }
+    }
+
+    public static Long toLongOrNullFromObject(
+        Object value
+    ) {
+        if (value == null) {
+            return NULL_LONG;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        }
+        try {
+            return Long.parseLong(value.toString());
+        } catch (Exception e) {
+            return NULL_LONG;
         }
     }
 

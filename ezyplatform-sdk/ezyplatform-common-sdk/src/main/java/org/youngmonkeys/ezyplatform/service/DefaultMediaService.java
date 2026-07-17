@@ -196,7 +196,7 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public void updateMediaPublicIfExists(
+    public MediaModel updateMediaPublicIfExists(
         long mediaId,
         boolean isPublic
     ) {
@@ -206,6 +206,7 @@ public class DefaultMediaService implements MediaService {
             modelToEntityConverter.mergeUpdatedAtToEntity(entity);
             mediaRepository.save(entity);
         }
+        return entityToModelConverter.toModel(entity);
     }
 
     @Override

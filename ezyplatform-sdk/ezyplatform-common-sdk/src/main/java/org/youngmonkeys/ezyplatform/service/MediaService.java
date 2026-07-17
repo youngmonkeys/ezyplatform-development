@@ -79,7 +79,7 @@ public interface MediaService {
         String status
     );
 
-    void updateMediaPublicIfExists(
+    MediaModel updateMediaPublicIfExists(
         long mediaId,
         boolean isPublic
     );

@@ -80,7 +80,11 @@ public final class CommonConstants {
         "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.?[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
     public static final String PATTERN_WEBSOCKET_URL =
         "wss?:\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.?[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
-    public static final String PATTERN_MEDIA_NAME = "^[a-zA-Z0-9_-]+(\\.[a-zA-Z0-9_-]+)*$";
+    public static final String PATTERN_MEDIA_NAME_SEGMENT =
+        "\\p{L}\\p{M}0-9_()\\[\\]+~!@$%^&=\\- ";
+    public static final String PATTERN_MEDIA_NAME =
+        "^[" + PATTERN_MEDIA_NAME_SEGMENT + "]+"
+            + "(\\.[" + PATTERN_MEDIA_NAME_SEGMENT + "]+)*$";
     public static final String PATTERN_VERSION = "[0-9]+[\\.][0-9]+[\\.][0-9]+";
     public static final String PATTERN_PROPERTY_NAME = "[\\d\\w_\\-\\.\\+\\$]+";
     public static final String PATTERN_SHA256_STRING = "[a-fA-F0-9\\s]{64}";
@@ -292,7 +296,6 @@ public final class CommonConstants {
     public static final String SETTING_NAME_WEB_SITE_LOGO_URL = "web_site_logo_url";
     public static final String SETTING_NAME_ADMIN_URL = "admin_url";
     public static final String SETTING_NAME_WEB_URL = "web_url";
-    public static final String SETTING_NAME_WEB_MANAGEMENT_URL = "web_management_url";
     public static final String SETTING_NAME_WEBSOCKET_URL = "websocket_url";
     public static final String SETTING_NAME_ENABLE_SUFFIX = "_enable";
     public static final String SETTING_NAME_SOCKET_AUTO_RELOAD_SSL_ENABLE =

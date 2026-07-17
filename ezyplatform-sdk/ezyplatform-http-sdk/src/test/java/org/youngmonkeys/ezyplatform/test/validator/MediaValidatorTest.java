@@ -471,10 +471,21 @@ public class MediaValidatorTest {
     public void validateUpdateMediaRequestTest() {
         // given
         UpdateMediaRequest validRequest = new UpdateMediaRequest();
+        validRequest.setOriginalName("media-original-name");
         validRequest.setAlternativeText("alt-text");
         validRequest.setTitle("title");
         validRequest.setCaption("caption");
         validRequest.setDescription("description");
+
+        UpdateMediaRequest missingOriginalNameRequest =
+            new UpdateMediaRequest();
+        missingOriginalNameRequest.setOriginalName("");
+
+        UpdateMediaRequest overLengthOriginalNameRequest =
+            new UpdateMediaRequest();
+        overLengthOriginalNameRequest.setOriginalName(
+            randomString(MAX_MEDIA_ORIGINAL_NAME_LENGTH + 1)
+        );
 
         UpdateMediaRequest overLengthAlternativeTextRequest =
             new UpdateMediaRequest();
@@ -502,6 +513,12 @@ public class MediaValidatorTest {
 
         // when
         instance.validate(validRequest);
+        Throwable missingOriginalNameError = Asserts.assertThrows(() ->
+            instance.validate(missingOriginalNameRequest)
+        );
+        Throwable overLengthOriginalNameError = Asserts.assertThrows(() ->
+            instance.validate(overLengthOriginalNameRequest)
+        );
         Throwable overLengthAlternativeTextError = Asserts.assertThrows(() ->
             instance.validate(overLengthAlternativeTextRequest)
         );
@@ -516,6 +533,26 @@ public class MediaValidatorTest {
         );
 
         // then
+        Asserts.assertEqualsType(
+            missingOriginalNameError,
+            HttpBadRequestException.class
+        );
+        assertErrorData(
+            ((HttpBadRequestException) missingOriginalNameError).getData(),
+            "originalName",
+            "required"
+        );
+
+        Asserts.assertEqualsType(
+            overLengthOriginalNameError,
+            HttpBadRequestException.class
+        );
+        assertErrorData(
+            ((HttpBadRequestException) overLengthOriginalNameError).getData(),
+            "originalName",
+            "overLength"
+        );
+
         Asserts.assertEqualsType(
             overLengthAlternativeTextError,
             HttpBadRequestException.class
@@ -563,6 +600,7 @@ public class MediaValidatorTest {
         // given
         UpdateMediaIncludeUrlRequest validRequest =
             new UpdateMediaIncludeUrlRequest();
+        validRequest.setOriginalName("media-original-name");
         validRequest.setAlternativeText("alt-text");
         validRequest.setTitle("title");
         validRequest.setCaption("caption");
@@ -570,6 +608,16 @@ public class MediaValidatorTest {
         validRequest.setUrl("https://youngmonkeys.org/media/image.png");
         validRequest.setUpdateDuration(true);
         validRequest.setDurationInMinutes(BigDecimal.ZERO);
+
+        UpdateMediaIncludeUrlRequest missingOriginalNameRequest =
+            new UpdateMediaIncludeUrlRequest();
+        missingOriginalNameRequest.setOriginalName("");
+
+        UpdateMediaIncludeUrlRequest overLengthOriginalNameRequest =
+            new UpdateMediaIncludeUrlRequest();
+        overLengthOriginalNameRequest.setOriginalName(
+            randomString(MAX_MEDIA_ORIGINAL_NAME_LENGTH + 1)
+        );
 
         UpdateMediaIncludeUrlRequest overLengthAlternativeTextRequest =
             new UpdateMediaIncludeUrlRequest();
@@ -614,6 +662,12 @@ public class MediaValidatorTest {
 
         // when
         instance.validate(validRequest);
+        Throwable missingOriginalNameError = Asserts.assertThrows(() ->
+            instance.validate(missingOriginalNameRequest)
+        );
+        Throwable overLengthOriginalNameError = Asserts.assertThrows(() ->
+            instance.validate(overLengthOriginalNameRequest)
+        );
         Throwable overLengthAlternativeTextError = Asserts.assertThrows(() ->
             instance.validate(overLengthAlternativeTextRequest)
         );
@@ -637,6 +691,26 @@ public class MediaValidatorTest {
         );
 
         // then
+        Asserts.assertEqualsType(
+            missingOriginalNameError,
+            HttpBadRequestException.class
+        );
+        assertErrorData(
+            ((HttpBadRequestException) missingOriginalNameError).getData(),
+            "originalName",
+            "required"
+        );
+
+        Asserts.assertEqualsType(
+            overLengthOriginalNameError,
+            HttpBadRequestException.class
+        );
+        assertErrorData(
+            ((HttpBadRequestException) overLengthOriginalNameError).getData(),
+            "originalName",
+            "overLength"
+        );
+
         Asserts.assertEqualsType(
             overLengthAlternativeTextError,
             HttpBadRequestException.class
