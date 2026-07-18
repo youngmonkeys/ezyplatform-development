@@ -47,6 +47,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TOKE
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_WEBSOCKET_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_WEB_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1_000_000_RECORDS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTPS_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_HTTP_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_ACCESS_TOKEN_HTTP_ONLY;
@@ -146,6 +147,17 @@ public interface SettingService {
         throw new EzyNotImplementedException(
             "saveSetting has not implemented yet"
         );
+    }
+
+    default void saveSettingIfNotExists(
+        String name,
+        DataType dataType,
+        Object value
+    ) {
+        String existed = getTextValue(name);
+        if (existed == null) {
+            saveSetting(name, dataType, value);
+        }
     }
 
     String getDecryptionValue(String settingName);
@@ -288,7 +300,7 @@ public interface SettingService {
     }
 
     default String getTextValue(String settingName) {
-        return getTextValue(settingName, null);
+        return getTextValue(settingName, NULL_STRING);
     }
 
     default String getTextValue(String settingName, String defaultValue) {

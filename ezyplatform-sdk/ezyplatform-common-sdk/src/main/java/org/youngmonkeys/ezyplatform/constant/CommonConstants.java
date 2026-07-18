@@ -231,7 +231,7 @@ public final class CommonConstants {
     public static final String SETTING_NAME_ADMIN_ACCEPTED_MEDIA_MIME_TYPES
         = "admin_accepted_media_mime_types";
     public static final String SETTING_NAME_ADMIN_AUTO_PASS_MANAGEMENT_URIS
-        = "auto_pass_management_uris";
+        = "admin_auto_pass_management_uris";
     public static final String SETTING_NAME_ADMIN_ACCESS_TOKEN_ENCRYPTION_KEY
         = "admin_access_token_encryption_key";
     public static final String SETTING_NAME_ADMIN_ACCESS_TOKEN_HTTP_ONLY

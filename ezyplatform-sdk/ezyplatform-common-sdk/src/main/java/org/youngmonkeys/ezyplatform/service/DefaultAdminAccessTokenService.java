@@ -35,7 +35,7 @@ public class DefaultAdminAccessTokenService
     public DefaultAdminAccessTokenService(
         SettingService settingService
     ) {
-        if (WATCHED.compareAndSet(false, true)) {
+        if (WATCHED.compareAndSet(Boolean.FALSE, Boolean.TRUE)) {
             watchLastEncryptionKeyUpdatedTime(settingService);
         }
     }

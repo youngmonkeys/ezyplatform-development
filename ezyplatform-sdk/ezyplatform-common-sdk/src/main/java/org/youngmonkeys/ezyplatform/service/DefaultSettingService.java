@@ -154,7 +154,7 @@ public abstract class DefaultSettingService
             settingName,
             onLastUpdatedTimeChange
         );
-        func.run();
+        scheduler.onStarted(func);
         scheduler.scheduleAtFixRate(
             func,
             periodInSecond,

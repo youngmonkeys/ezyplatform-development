@@ -31,6 +31,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+
 public class Scheduler extends EzyLoggable {
 
     private final AtomicBoolean started;
@@ -41,6 +43,7 @@ public class Scheduler extends EzyLoggable {
     private final ExecutorService executorService;
     private final ScheduledExecutorService inspector;
     private final Map<Object, ScheduledExecutorService> executorServiceByName;
+    private List<Runnable> onStartedListeners;
 
     private static final int DEFAULT_PERIOD_IN_MILLIS = 5;
 
@@ -74,6 +77,7 @@ public class Scheduler extends EzyLoggable {
         this.tasks = new ConcurrentHashMap<>();
         this.runningTasks = ConcurrentHashMap.newKeySet();
         this.executorServiceByName = new ConcurrentHashMap<>();
+        this.onStartedListeners = new ArrayList<>();
         this.inspector = EzyExecutors.newSingleThreadScheduledExecutor(
             DefaultThreadFactory.create("scheduler")
         );
@@ -83,14 +87,38 @@ public class Scheduler extends EzyLoggable {
         );
     }
 
+    public boolean isStarted() {
+        return started.get();
+    }
+
+    public void onStarted(Runnable listener) {
+        if (onStartedListeners == null) {
+            runListener(listener);
+        } else {
+            onStartedListeners.add(listener);
+        }
+    }
+
     public void start() {
         if (started.compareAndSet(Boolean.FALSE, Boolean.TRUE)) {
+            for (Runnable listener : onStartedListeners) {
+                runListener(listener);
+            }
+            onStartedListeners = null;
             this.inspector.scheduleAtFixedRate(
                 () -> run(new ArrayList<>()),
                 periodInMillis,
                 periodInMillis,
                 TimeUnit.MILLISECONDS
             );
+        }
+    }
+
+    private void runListener(Runnable listener) {
+        try {
+            listener.run();
+        } catch (Throwable e) {
+            logger.error("notify listener: {} error", listener, e);
         }
     }
 
@@ -134,9 +162,9 @@ public class Scheduler extends EzyLoggable {
     ) {
         this.scheduleAtFixRate(
             command,
-            false,
+            Boolean.FALSE,
             delayTime,
-            0,
+            ZERO_LONG,
             unit
         );
     }
@@ -149,21 +177,21 @@ public class Scheduler extends EzyLoggable {
     ) {
         this.scheduleAtFixRate(
             command,
-            true,
+            Boolean.TRUE,
             initialDelay,
             period,
             unit
         );
     }
 
-    private void scheduleAtFixRate(
+    public void scheduleAtFixRate(
         Runnable command,
         boolean runForever,
         long initialDelay,
         long period,
         TimeUnit unit
     ) {
-        if (initialDelay < 0) {
+        if (initialDelay < ZERO_LONG) {
             throw new IllegalArgumentException("delay time must be >= 0");
         }
         Task task = new Task(

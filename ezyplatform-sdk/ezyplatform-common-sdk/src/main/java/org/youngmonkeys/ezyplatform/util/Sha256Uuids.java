@@ -27,7 +27,6 @@ public final class Sha256Uuids {
     public static String generateUuid(String uniqueString) {
         return EzySHA256.cryptUtfToLowercase(
             uniqueString +
-                System.currentTimeMillis() +
                 UUID.randomUUID()
         );
     }

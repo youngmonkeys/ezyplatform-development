@@ -35,7 +35,7 @@ public class DefaultUserAccessTokenService
     public DefaultUserAccessTokenService(
         SettingService settingService
     ) {
-        if (WATCHED.compareAndSet(false, true)) {
+        if (WATCHED.compareAndSet(Boolean.FALSE, Boolean.TRUE)) {
             watchLastEncryptionKeyUpdatedTime(settingService);
         }
     }
