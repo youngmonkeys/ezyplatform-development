@@ -25,6 +25,7 @@ public class HttpModelToResponseConverter extends DefaultModelToResponseConverte
 
     public ReplacedMediaFileResponse toResponse(DataMetaModel model) {
         return ReplacedMediaFileResponse.builder()
+            .id(model.getId())
             .mediaId(model.getDataId())
             .fileName(model.getMetaValue())
             .build();

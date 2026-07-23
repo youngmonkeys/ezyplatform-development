@@ -22,6 +22,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class ReplacedMediaFileResponse {
+    private long id;
     private long mediaId;
     private String fileName;
 }
