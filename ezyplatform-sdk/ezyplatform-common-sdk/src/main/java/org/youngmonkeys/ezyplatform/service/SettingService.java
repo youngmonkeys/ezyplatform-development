@@ -86,8 +86,35 @@ public interface SettingService {
     void watchLastUpdatedTime(
         String settingName,
         int periodInSecond,
-        Runnable onLastUpdatedTimeChange
+        Runnable onLastUpdatedTimeChange,
+        boolean callImmediately
     );
+
+    default void watchLastUpdatedTime(
+        String settingName,
+        int periodInSecond,
+        Runnable onLastUpdatedTimeChange
+    ) {
+        watchLastUpdatedTime(
+            settingName,
+            periodInSecond,
+            onLastUpdatedTimeChange,
+            Boolean.TRUE
+        );
+    }
+
+    default void watchLastUpdatedTime(
+        String settingName,
+        Runnable onLastUpdatedTimeChange,
+        boolean callImmediately
+    ) {
+        watchLastUpdatedTime(
+            settingName,
+            DEFAULT_CACHE_PERIOD_IN_SECOND,
+            onLastUpdatedTimeChange,
+            callImmediately
+        );
+    }
 
     default void watchLastUpdatedTime(
         String settingName,

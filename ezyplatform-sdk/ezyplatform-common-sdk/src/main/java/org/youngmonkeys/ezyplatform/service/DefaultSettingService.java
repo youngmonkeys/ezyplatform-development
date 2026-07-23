@@ -148,13 +148,23 @@ public abstract class DefaultSettingService
     public void watchLastUpdatedTime(
         String settingName,
         int periodInSecond,
-        Runnable onLastUpdatedTimeChange
+        Runnable onLastUpdatedTimeChange,
+        boolean callImmediately
     ) {
         Runnable func = () -> fetchAndUpdateLastUpdatedTime(
             settingName,
             onLastUpdatedTimeChange
         );
-        scheduler.onStarted(func);
+        if (callImmediately) {
+            scheduler.onStarted(func);
+        } else {
+            String key = settingName + LAST_UPDATE_TIME_SUFFIX;
+            long settingValue = getLongValue(key);
+            lastUpdatedTimeBySettingName.put(
+                settingName,
+                settingValue
+            );
+        }
         scheduler.scheduleAtFixRate(
             func,
             periodInSecond,
@@ -402,7 +412,7 @@ public abstract class DefaultSettingService
         }
     }
 
-    private void fetchAndUpdateLastUpdatedTime(
+    public void fetchAndUpdateLastUpdatedTime(
         String settingName,
         Runnable onLastUpdatedTimeChange
     ) {

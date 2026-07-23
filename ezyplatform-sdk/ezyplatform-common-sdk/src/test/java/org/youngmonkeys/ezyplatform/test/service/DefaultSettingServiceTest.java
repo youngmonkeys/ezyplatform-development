@@ -20,6 +20,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.test.assertion.Asserts;
+import com.tvd12.test.util.RandomUtil;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -28,15 +30,19 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.entity.Setting;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.repo.SettingRepository;
 import org.youngmonkeys.ezyplatform.service.DefaultSettingService;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -71,6 +77,10 @@ public class DefaultSettingServiceTest {
         when(
             fileSystemManager.concatWithEzyHome(encryptionKeysPath)
         ).thenReturn(encryptionKeysPath.toFile());
+        // force @InjectMocks to build a brand new sut via the constructor
+        // instead of reflecting fresh mocks into the instance from a
+        // previous test method (TestNG reuses one test class instance)
+        sut = null;
         MockitoAnnotations.initMocks(this);
     }
 
@@ -98,6 +108,105 @@ public class DefaultSettingServiceTest {
         verify(scheduler, times(0)).stop();
         verify(objectMapper, times(0)).writeValueAsString(any());
         verify(settingRepository, times(0)).findById(any());
+    }
+
+    @Test
+    public void watchLastUpdatedTimeWithCallImmediatelyNotifiesExistingChangeTest() {
+        // given
+        String settingName = RandomUtil.randomShortAlphabetString();
+        mockPersistedLastUpdatedTime(settingName, 100L);
+        Runnable onLastUpdatedTimeChange = mock(Runnable.class);
+        ArgumentCaptor<Runnable> onStartedCaptor =
+            ArgumentCaptor.forClass(Runnable.class);
+
+        // when
+        sut.watchLastUpdatedTime(
+            settingName,
+            5,
+            onLastUpdatedTimeChange,
+            true
+        );
+        verify(scheduler, times(1)).onStarted(onStartedCaptor.capture());
+        // simulates the scheduler firing the listener right at startup
+        onStartedCaptor.getValue().run();
+
+        // then: a change that already happened before watching is reported
+        // immediately, as the caller asked to be notified right away
+        verify(onLastUpdatedTimeChange, times(1)).run();
+    }
+
+    @Test
+    public void watchLastUpdatedTimeWithoutCallImmediatelyDoesNotReplayExistingChangeTest() {
+        // given
+        String settingName = RandomUtil.randomShortAlphabetString();
+        mockPersistedLastUpdatedTime(settingName, 100L);
+        Runnable onLastUpdatedTimeChange = mock(Runnable.class);
+        ArgumentCaptor<Runnable> scheduledCaptor =
+            ArgumentCaptor.forClass(Runnable.class);
+
+        // when
+        sut.watchLastUpdatedTime(
+            settingName,
+            5,
+            onLastUpdatedTimeChange,
+            false
+        );
+        verify(scheduler, times(0)).onStarted(any());
+        verify(scheduler, times(1)).scheduleAtFixRate(
+            scheduledCaptor.capture(),
+            eq(5L),
+            eq(5L),
+            eq(TimeUnit.SECONDS)
+        );
+        // simulates the first periodic tick, value is unchanged since watching started
+        scheduledCaptor.getValue().run();
+
+        // then: the pre-existing change must not be replayed, only changes
+        // happening after the watch was registered should be reported
+        verify(onLastUpdatedTimeChange, times(0)).run();
+    }
+
+    @Test
+    public void watchLastUpdatedTimeWithoutCallImmediatelyStillReportsFutureChangeTest() {
+        // given
+        String settingName = RandomUtil.randomShortAlphabetString();
+        mockPersistedLastUpdatedTime(settingName, 100L);
+        Runnable onLastUpdatedTimeChange = mock(Runnable.class);
+        ArgumentCaptor<Runnable> scheduledCaptor =
+            ArgumentCaptor.forClass(Runnable.class);
+        sut.watchLastUpdatedTime(
+            settingName,
+            5,
+            onLastUpdatedTimeChange,
+            false
+        );
+        verify(scheduler).scheduleAtFixRate(
+            scheduledCaptor.capture(),
+            eq(5L),
+            eq(5L),
+            eq(TimeUnit.SECONDS)
+        );
+
+        // when: the setting genuinely changes after the watch was registered
+        mockPersistedLastUpdatedTime(settingName, 200L);
+        scheduledCaptor.getValue().run();
+
+        // then
+        verify(onLastUpdatedTimeChange, times(1)).run();
+    }
+
+    private void mockPersistedLastUpdatedTime(
+        String settingName,
+        long lastUpdatedTime
+    ) {
+        Setting setting = new Setting();
+        setting.setValue(Long.toString(lastUpdatedTime));
+        when(
+            settingRepository.findByFieldOptional(
+                "name",
+                settingName + DefaultSettingService.LAST_UPDATE_TIME_SUFFIX
+            )
+        ).thenReturn(Optional.of(setting));
     }
 
     private static class InternalSettingService extends DefaultSettingService {

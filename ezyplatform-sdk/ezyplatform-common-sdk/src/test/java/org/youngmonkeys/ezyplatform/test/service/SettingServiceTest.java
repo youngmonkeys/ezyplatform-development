@@ -72,7 +72,8 @@ public class SettingServiceTest {
         public void watchLastUpdatedTime(
             String settingName,
             int periodInSecond,
-            Runnable onLastUpdatedTimeChange
+            Runnable onLastUpdatedTimeChange,
+            boolean callImmediately
         ) {}
 
         @Override
