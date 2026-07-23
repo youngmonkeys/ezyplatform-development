@@ -224,6 +224,8 @@ public final class CommonConstants {
         = "admin_max_upload_image_file_size";
     public static final String SETTING_NAME_ADMIN_ALLOW_REDUCE_MEDIA_FILE_SIZE
         = "admin_allow_media_file_size_reduction";
+    public static final String SETTING_NAME_ADMIN_ALLOW_KEEPING_REPLACED_MEDIA
+        = "admin_allow_keeping_replaced_media";
     public static final String SETTING_NAME_ADMIN_ALLOW_PERMANENTLY_DELETE_MEDIA
         = "admin_allow_permanently_delete_media";
     public static final String SETTING_NAME_ADMIN_TOKEN_EXPIRED_IN_DAY
@@ -268,10 +270,12 @@ public final class CommonConstants {
         = "web_max_upload_image_file_size";
     public static final String SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES
         = "web_accepted_media_mime_types";
-    public static final String SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA =
-        "web_allow_media_replacement";
-    public static final String SETTING_NAME_WEB_ALLOW_REDUCE_MEDIA_FILE_SIZE =
-        "web_allow_media_file_size_reduction";
+    public static final String SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA
+        = "web_allow_media_replacement";
+    public static final String SETTING_NAME_WEB_ALLOW_KEEPING_REPLACED_MEDIA
+        = "web_allow_keeping_replaced_media";
+    public static final String SETTING_NAME_WEB_ALLOW_REDUCE_MEDIA_FILE_SIZE
+        = "web_allow_media_file_size_reduction";
     public static final String SETTING_NAME_WEB_ALLOW_PERMANENTLY_DELETE_MEDIA
         = "web_allow_permanently_delete_media";
     public static final String SETTING_NAME_WEB_SITE_NAME

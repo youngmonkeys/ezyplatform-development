@@ -65,6 +65,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEBSOCKET_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ACCEPTED_MEDIA_MIME_TYPES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ALLOW_KEEPING_REPLACED_MEDIA;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ALLOW_PERMANENTLY_DELETE_MEDIA;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ALLOW_REDUCE_MEDIA_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA;
@@ -220,6 +221,12 @@ public interface SettingService {
     default boolean isWebAllowReplaceMedia() {
         return getBooleanValue(
             SETTING_NAME_WEB_ALLOW_REPLACE_MEDIA
+        );
+    }
+
+    default boolean isAllowKeepingReplacedMedia() {
+        return getBooleanValue(
+            SETTING_NAME_WEB_ALLOW_KEEPING_REPLACED_MEDIA
         );
     }
 
