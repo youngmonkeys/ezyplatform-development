@@ -195,6 +195,41 @@ public class DefaultSettingServiceTest {
         verify(onLastUpdatedTimeChange, times(1)).run();
     }
 
+    @Test
+    public void watchLastUpdatedTimeWithoutCallImmediatelyReportsFirstEverChangeTest() {
+        // given: the setting has never been changed before (fresh install,
+        // no "_last_updated_time" row exists yet)
+        String settingName = RandomUtil.randomShortAlphabetString();
+        when(
+            settingRepository.findByFieldOptional(
+                "name",
+                settingName + DefaultSettingService.LAST_UPDATE_TIME_SUFFIX
+            )
+        ).thenReturn(Optional.empty());
+        Runnable onLastUpdatedTimeChange = mock(Runnable.class);
+        ArgumentCaptor<Runnable> scheduledCaptor =
+            ArgumentCaptor.forClass(Runnable.class);
+        sut.watchLastUpdatedTime(
+            settingName,
+            5,
+            onLastUpdatedTimeChange,
+            false
+        );
+        verify(scheduler).scheduleAtFixRate(
+            scheduledCaptor.capture(),
+            eq(5L),
+            eq(5L),
+            eq(TimeUnit.SECONDS)
+        );
+
+        // when: the very first real change happens after the watch was registered
+        mockPersistedLastUpdatedTime(settingName, 50L);
+        scheduledCaptor.getValue().run();
+
+        // then: it must still be reported, even though the baseline was zero
+        verify(onLastUpdatedTimeChange, times(1)).run();
+    }
+
     private void mockPersistedLastUpdatedTime(
         String settingName,
         long lastUpdatedTime
