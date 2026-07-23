@@ -51,6 +51,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_SIZE_FILE_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_REPLACED_FILE_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
@@ -153,6 +154,21 @@ public class DefaultMediaService implements MediaService {
                 mediaId,
                 META_KEY_ORIGINAL_SIZE_FILE_NAME,
                 originalSizeFileName
+            );
+        }
+    }
+
+    @Override
+    public void saveMediaReplacedFileNameIfNotExists(
+        long mediaId,
+        String replacedFileName
+    ) {
+        if (isNotBlank(replacedFileName)) {
+            dataMetaService.saveDataMetaIfAbsent(
+                TABLE_NAME_MEDIA,
+                mediaId,
+                META_KEY_REPLACED_FILE_NAME,
+                replacedFileName
             );
         }
     }

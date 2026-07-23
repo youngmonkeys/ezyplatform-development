@@ -38,6 +38,7 @@ import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
+import org.youngmonkeys.ezyplatform.model.DataMetaModel;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
@@ -71,14 +72,18 @@ import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.SaveMediaFileFromUrlModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
+import org.youngmonkeys.ezyplatform.pagination.DataMetaPaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.pagination.DefaultDataMetaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
+import org.youngmonkeys.ezyplatform.response.ReplacedMediaFileResponse;
 import org.youngmonkeys.ezyplatform.service.MediaFileService;
 import org.youngmonkeys.ezyplatform.service.MediaService;
+import org.youngmonkeys.ezyplatform.service.PaginationDataMetaService;
 import org.youngmonkeys.ezyplatform.service.PaginationMediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 import org.youngmonkeys.ezyplatform.util.Uris;
@@ -93,6 +98,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.function.Predicate;
 
@@ -100,10 +106,14 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_REPLACED_FILE_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_REPLACED_MEDIA_FILE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.REPLACED_MEDIA_FILE_TIME_FORMATTER;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 import static org.youngmonkeys.ezyplatform.model.MediaDetailsModel.fromMediaModel;
 import static org.youngmonkeys.ezyplatform.pagination.PaginationModelFetchers.getPaginationModelBySortOrder;
 import static org.youngmonkeys.ezyplatform.util.Strings.from;
@@ -129,6 +139,8 @@ public class MediaControllerService extends EzyLoggable {
     private final HttpModelToResponseConverter modelToResponseConverter;
     private final HttpRequestToModelConverter requestToModelConverter;
     private final EzyLazyInitializer<FileUploader> fileUploaderWrapper;
+    private final PaginationDataMetaService paginationDataMetaService;
+    private final DataMetaPaginationParameterConverter dataMetaPaginationParameterConverter;
 
     private final EzyLazyInitializer<TikaConfig> tika =
         new EzyLazyInitializer<>(() ->
@@ -152,7 +164,9 @@ public class MediaControllerService extends EzyLoggable {
         MediaValidator mediaValidator,
         MediaPaginationParameterConverter mediaPaginationParameterConverter,
         HttpModelToResponseConverter modelToResponseConverter,
-        HttpRequestToModelConverter requestToModelConverter
+        HttpRequestToModelConverter requestToModelConverter,
+        PaginationDataMetaService paginationDataMetaService,
+        DataMetaPaginationParameterConverter dataMetaPaginationParameterConverter
     ) {
         this.httpClient = httpClient;
         this.mediaService = mediaService;
@@ -170,6 +184,8 @@ public class MediaControllerService extends EzyLoggable {
         this.mediaPaginationParameterConverter = mediaPaginationParameterConverter;
         this.modelToResponseConverter = modelToResponseConverter;
         this.requestToModelConverter = requestToModelConverter;
+        this.paginationDataMetaService = paginationDataMetaService;
+        this.dataMetaPaginationParameterConverter = dataMetaPaginationParameterConverter;
         this.fileUploaderWrapper = new EzyLazyInitializer<>(
             () -> singletonFactory.getSingletonCast(
                 FileUploader.class
@@ -454,11 +470,20 @@ public class MediaControllerService extends EzyLoggable {
             containerFolder,
             fileName
         );
-        if (settingService.isAllowKeepingReplacedMedia()) {
-            // TODO
-            mediaService.saveMediaSlugIfNotExists(
+        if (settingService.isAllowKeepingReplacedMedia()
+            && mediaFilePath.exists()
+        ) {
+            String replacedFileName = PREFIX_REPLACED_MEDIA_FILE
+                + REPLACED_MEDIA_FILE_TIME_FORMATTER.format(LocalDateTime.now())
+                + "_"
+                + fileName;
+            FolderProxy.copyFile(
+                mediaFilePath,
+                new File(mediaFilePath.getParentFile(), replacedFileName)
+            );
+            mediaService.saveMediaReplacedFileNameIfNotExists(
                 mediaId,
-                originalFileName
+                replacedFileName
             );
         }
         fileUploader.accept(
@@ -1213,6 +1238,37 @@ public class MediaControllerService extends EzyLoggable {
                 )
             )
             .build();
+    }
+
+    public PaginationModel<ReplacedMediaFileResponse> getMediaReplacedFileHistory(
+        long mediaId,
+        Predicate<MediaModel> validMediaCondition,
+        String sortOrder,
+        String nextPageToken,
+        String prevPageToken,
+        boolean lastPage,
+        int limit
+    ) {
+        MediaModel media = mediaService.getMediaById(mediaId);
+        if (media == null || !validMediaCondition.test(media)) {
+            throw new MediaNotFoundException(mediaId);
+        }
+        PaginationModel<DataMetaModel> pagination = getPaginationModelBySortOrder(
+            paginationDataMetaService,
+            dataMetaPaginationParameterConverter,
+            DefaultDataMetaFilter
+                .builder()
+                .dataType(TABLE_NAME_MEDIA)
+                .dataId(mediaId)
+                .metaKey(META_KEY_REPLACED_FILE_NAME)
+                .build(),
+            sortOrder,
+            nextPageToken,
+            prevPageToken,
+            lastPage,
+            limit
+        );
+        return pagination.map(modelToResponseConverter::toResponse);
     }
 
     public PaginationModel<MediaResponse> getMediaList(

@@ -72,6 +72,7 @@ import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.SaveMediaFileFromUrlModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
+import org.youngmonkeys.ezyplatform.pagination.DataMetaPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameterConverter;
 import org.youngmonkeys.ezyplatform.repo.PaginationMediaRepository;
@@ -81,6 +82,7 @@ import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
 import org.youngmonkeys.ezyplatform.service.MediaFileService;
 import org.youngmonkeys.ezyplatform.service.MediaService;
+import org.youngmonkeys.ezyplatform.service.PaginationDataMetaService;
 import org.youngmonkeys.ezyplatform.service.PaginationMediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 import org.youngmonkeys.ezyplatform.validator.CommonValidator;
@@ -136,6 +138,8 @@ public class MediaControllerServiceTest {
     private MediaPaginationParameterConverter mediaPaginationParameterConverter;
     private HttpModelToResponseConverter modelToResponseConverter;
     private HttpRequestToModelConverter requestToModelConverter;
+    private PaginationDataMetaService paginationDataMetaService;
+    private DataMetaPaginationParameterConverter dataMetaPaginationParameterConverter;
     private EzyLazyInitializer<FileUploader> fileUploaderWrapper;
     private EzyLazyInitializer<TikaConfig> tika;
     private Logger logger;
@@ -161,6 +165,8 @@ public class MediaControllerServiceTest {
         mediaPaginationParameterConverter = mock(MediaPaginationParameterConverter.class);
         modelToResponseConverter = mock(HttpModelToResponseConverter.class);
         requestToModelConverter = mock(HttpRequestToModelConverter.class);
+        paginationDataMetaService = mock(PaginationDataMetaService.class);
+        dataMetaPaginationParameterConverter = mock(DataMetaPaginationParameterConverter.class);
         fileUploaderWrapper = mock(EzyLazyInitializer.class);
         tika = mock(EzyLazyInitializer.class);
         logger = mock(Logger.class);
@@ -181,7 +187,9 @@ public class MediaControllerServiceTest {
             mediaValidator,
             mediaPaginationParameterConverter,
             modelToResponseConverter,
-            requestToModelConverter
+            requestToModelConverter,
+            paginationDataMetaService,
+            dataMetaPaginationParameterConverter
         );
     }
 
@@ -826,6 +834,7 @@ public class MediaControllerServiceTest {
             MediaType.IMAGE.getFolder(),
             "cover.png"
         );
+        verify(settingService).isAllowKeepingReplacedMedia();
         verify(settingService).getMaxUploadFileSize();
         verify(fileUploader).accept(
             same(asyncContext),
@@ -1044,6 +1053,7 @@ public class MediaControllerServiceTest {
             MediaType.IMAGE.getFolder(),
             "cover-fallback.png"
         );
+        verify(settingService).isAllowKeepingReplacedMedia();
         verify(settingService).getMaxUploadFileSize();
         verify(fileUploader).accept(
             same(asyncContext),
@@ -1208,6 +1218,7 @@ public class MediaControllerServiceTest {
             MediaType.IMAGE.getFolder(),
             "current-media.jpg"
         );
+        verify(settingService).isAllowKeepingReplacedMedia();
         verify(settingService).getMaxUploadFileSize();
         verify(fileUploader).accept(
             same(asyncContext),
@@ -2912,7 +2923,9 @@ public class MediaControllerServiceTest {
             mediaValidator,
             mediaPaginationParameterConverter,
             modelToResponseConverter,
-            requestToModelConverter
+            requestToModelConverter,
+            paginationDataMetaService,
+            dataMetaPaginationParameterConverter
         );
         org.youngmonkeys.ezyplatform.entity.Media mediaEntity =
             mock(org.youngmonkeys.ezyplatform.entity.Media.class);

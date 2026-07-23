@@ -24,6 +24,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.Set;
 
@@ -99,6 +100,10 @@ public final class CommonConstants {
     public static final String PREFIX_HTTP_URL = "http://";
     public static final String PREFIX_HTTPS_URL = "https://";
     public static final String PREFIX_BEARER_TOKEN = "Bearer ";
+    public static final String PREFIX_REPLACED_MEDIA_FILE = "replaced_";
+
+    public static final DateTimeFormatter REPLACED_MEDIA_FILE_TIME_FORMATTER =
+        DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
 
     public static final String TOKEN_TYPE_BEARER = "Bearer";
 
@@ -192,6 +197,7 @@ public final class CommonConstants {
     public static final String META_KEY_JOB_TITLE = "job_title";
     public static final String META_KEY_DESCRIPTION = "description";
     public static final String META_KEY_ORIGINAL_SIZE_FILE_NAME = "original_size_file_name";
+    public static final String META_KEY_REPLACED_FILE_NAME = "replaced_file_name";
 
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY

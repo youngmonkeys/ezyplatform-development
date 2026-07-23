@@ -120,6 +120,11 @@ public interface MediaService {
         String originalSizeFileName
     );
 
+    void saveMediaReplacedFileNameIfNotExists(
+        long mediaId,
+        String replacedFileName
+    );
+
     MediaModel removeMedia(long mediaId);
 
     MediaModel removeMedia(String mediaName);
