@@ -485,6 +485,10 @@ public class MediaControllerService extends EzyLoggable {
                 mediaId,
                 replacedFileName
             );
+            mediaService.saveMediaSlugIfNotExists(
+                mediaId,
+                replacedFileName
+            );
         }
         fileUploader.accept(
             asyncContext,
