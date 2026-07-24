@@ -663,6 +663,21 @@ public class DefaultDataMetaService implements DataMetaService {
     }
 
     @Override
+    public DataMetaModel getLatestDataMetaByDataTypeAndDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    ) {
+        return dataMetaRepository.findByDataTypeDataIdAndMetaKeyOrderByIdDesc(
+            dataType,
+            dataId,
+            metaKey
+        )
+            .map(entityToModelConverter::toModel)
+            .orElse(null);
+    }
+
+    @Override
     public DataMetaModel getDataMetaByDataTypeAndDataIdAndMetaKeyAndMetaValue(
         String dataType,
         long dataId,

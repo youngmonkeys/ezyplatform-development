@@ -520,6 +520,11 @@ public interface AdminMetaService {
         );
     }
 
+    AdminMetaModel getLatestAdminMetaByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    );
+
     AdminMetaModel getAdminMetaByAdminIdAndMetaKeyAndMetaValue(
         long adminId,
         String metaKey,
