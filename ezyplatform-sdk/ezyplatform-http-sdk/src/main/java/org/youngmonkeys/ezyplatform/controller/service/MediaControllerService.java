@@ -38,7 +38,6 @@ import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.data.MediaFileSizeReductionResult;
-import org.youngmonkeys.ezyplatform.model.DataMetaModel;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 import org.youngmonkeys.ezyplatform.entity.UploadFrom;
@@ -66,6 +65,7 @@ import org.youngmonkeys.ezyplatform.media.MediaUpDownloaderManager;
 import org.youngmonkeys.ezyplatform.media.MediaUploadArguments;
 import org.youngmonkeys.ezyplatform.media.MediaUploadFromUrlArguments;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.DataMetaModel;
 import org.youngmonkeys.ezyplatform.model.MediaDetailsModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
@@ -158,19 +158,20 @@ public class MediaControllerService extends EzyLoggable {
         EzySingletonFactory singletonFactory,
         MediaService mediaService,
         MediaFileService mediaFileService,
+        PaginationDataMetaService paginationDataMetaService,
         PaginationMediaService paginationMediaService,
         SettingService settingService,
         CommonValidator commonValidator,
         MediaValidator mediaValidator,
+        DataMetaPaginationParameterConverter dataMetaPaginationParameterConverter,
         MediaPaginationParameterConverter mediaPaginationParameterConverter,
         HttpModelToResponseConverter modelToResponseConverter,
-        HttpRequestToModelConverter requestToModelConverter,
-        PaginationDataMetaService paginationDataMetaService,
-        DataMetaPaginationParameterConverter dataMetaPaginationParameterConverter
+        HttpRequestToModelConverter requestToModelConverter
     ) {
         this.httpClient = httpClient;
         this.mediaService = mediaService;
         this.mediaFileService = mediaFileService;
+        this.paginationDataMetaService = paginationDataMetaService;
         this.paginationMediaService = paginationMediaService;
         this.settingService = settingService;
         this.objectMapper = objectMapper;
@@ -181,11 +182,10 @@ public class MediaControllerService extends EzyLoggable {
         this.fileSystemManager = fileSystemManager;
         this.mediaUpDownloaderManager = mediaUpDownloaderManager;
         this.resourceDownloadManager = resourceDownloadManager;
+        this.dataMetaPaginationParameterConverter = dataMetaPaginationParameterConverter;
         this.mediaPaginationParameterConverter = mediaPaginationParameterConverter;
         this.modelToResponseConverter = modelToResponseConverter;
         this.requestToModelConverter = requestToModelConverter;
-        this.paginationDataMetaService = paginationDataMetaService;
-        this.dataMetaPaginationParameterConverter = dataMetaPaginationParameterConverter;
         this.fileUploaderWrapper = new EzyLazyInitializer<>(
             () -> singletonFactory.getSingletonCast(
                 FileUploader.class

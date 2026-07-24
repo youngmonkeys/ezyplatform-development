@@ -181,15 +181,15 @@ public class MediaControllerServiceTest {
             singletonFactory,
             mediaService,
             mediaFileService,
+            paginationDataMetaService,
             paginationMediaService,
             settingService,
             commonValidator,
             mediaValidator,
+            dataMetaPaginationParameterConverter,
             mediaPaginationParameterConverter,
             modelToResponseConverter,
-            requestToModelConverter,
-            paginationDataMetaService,
-            dataMetaPaginationParameterConverter
+            requestToModelConverter
         );
     }
 
@@ -2917,15 +2917,15 @@ public class MediaControllerServiceTest {
             singletonFactory,
             mediaService,
             mediaFileService,
+            paginationDataMetaService,
             realPaginationMediaService,
             settingService,
             commonValidator,
             mediaValidator,
+            dataMetaPaginationParameterConverter,
             mediaPaginationParameterConverter,
             modelToResponseConverter,
-            requestToModelConverter,
-            paginationDataMetaService,
-            dataMetaPaginationParameterConverter
+            requestToModelConverter
         );
         org.youngmonkeys.ezyplatform.entity.Media mediaEntity =
             mock(org.youngmonkeys.ezyplatform.entity.Media.class);
