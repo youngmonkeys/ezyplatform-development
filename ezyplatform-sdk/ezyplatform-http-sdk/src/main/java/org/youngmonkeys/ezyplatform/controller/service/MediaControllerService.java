@@ -100,6 +100,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
@@ -146,6 +147,8 @@ public class MediaControllerService extends EzyLoggable {
         new EzyLazyInitializer<>(() ->
             EzyReturner.returnWithException(TikaConfig::new)
         );
+
+    private static final AtomicLong DUPLICATED_MEDIA_COUNT = new AtomicLong();
 
     public MediaControllerService(
         HttpClient httpClient,
@@ -308,7 +311,11 @@ public class MediaControllerService extends EzyLoggable {
                         .ownerAdminId(ownerAdminId)
                         .ownerUserId(ownerUserId)
                         .fileName(storedFileName)
-                        .originalFileName(submittedFileName)
+                        .originalFileName(
+                            generateNewMediaOriginalNameIfNeed(
+                                submittedFileName
+                            )
+                        )
                         .mediaType(fileMetadata.getMediaTypeText())
                         .mimeType(
                             reduceResult.getNewFileMimeTypeOrDefault(
@@ -354,6 +361,11 @@ public class MediaControllerService extends EzyLoggable {
             request.getUrl(),
             request.getType().toString().toLowerCase()
         );
+        request.setOriginalName(
+            generateNewMediaOriginalNameIfNeed(
+                request.getOriginalName()
+            )
+        );
         AddMediaModel model = requestToModelConverter.toModel(
             ownerAdminId,
             ownerUserId,
@@ -366,6 +378,21 @@ public class MediaControllerService extends EzyLoggable {
             new MediaAddedEvent(media)
         );
         return media;
+    }
+
+    public String generateNewMediaOriginalNameIfNeed(
+        String originalMediaName
+    ) {
+        boolean contains = mediaService
+            .containsMedia(originalMediaName);
+        String newName = originalMediaName;
+        if (contains) {
+            newName = System.currentTimeMillis() +
+                "_" +
+                DUPLICATED_MEDIA_COUNT.incrementAndGet() +
+                "_" + originalMediaName;
+        }
+        return newName;
     }
 
     public void replaceMedia(
