@@ -442,6 +442,19 @@ public class DefaultAdminMetaService implements AdminMetaService {
     }
 
     @Override
+    public AdminMetaModel getLatestAdminMetaByAdminIdAndMetaKey(
+        long adminId,
+        String metaKey
+    ) {
+        return adminMetaRepository.findByAdminIdAndMetaKeyOrderByIdDesc(
+            adminId,
+            metaKey
+        )
+            .map(entityToModelConverter::toModel)
+            .orElse(null);
+    }
+
+    @Override
     public AdminMetaModel getAdminMetaByAdminIdAndMetaKeyAndMetaValue(
         long adminId,
         String metaKey,

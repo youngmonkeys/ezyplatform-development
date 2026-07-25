@@ -477,6 +477,19 @@ public class DefaultUserMetaService implements UserMetaService {
     }
 
     @Override
+    public UserMetaModel getLatestUserMetaByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    ) {
+        return userMetaRepository.findByUserIdAndMetaKeyOrderByIdDesc(
+            userId,
+            metaKey
+        )
+            .map(entityToModelConverter::toModel)
+            .orElse(null);
+    }
+
+    @Override
     public UserMetaModel getUserMetaByUserIdAndMetaKeyAndMetaValue(
         long userId,
         String metaKey,

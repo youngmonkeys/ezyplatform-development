@@ -558,6 +558,11 @@ public interface UserMetaService {
         );
     }
 
+    UserMetaModel getLatestUserMetaByUserIdAndMetaKey(
+        long userId,
+        String metaKey
+    );
+
     UserMetaModel getUserMetaByUserIdAndMetaKeyAndMetaValue(
         long userId,
         String metaKey,

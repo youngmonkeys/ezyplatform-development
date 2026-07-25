@@ -53,6 +53,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_DE
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_ORIGINAL_NAME_LENGTH;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_TITLE_LENGTH;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_MEDIA_URL_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 public class MediaValidatorTest {
 
@@ -470,6 +471,7 @@ public class MediaValidatorTest {
     @Test
     public void validateUpdateMediaRequestTest() {
         // given
+        long mediaId = 1L;
         UpdateMediaRequest validRequest = new UpdateMediaRequest();
         validRequest.setOriginalName("media-original-name");
         validRequest.setAlternativeText("alt-text");
@@ -512,27 +514,31 @@ public class MediaValidatorTest {
         );
 
         // when
-        instance.validate(validRequest);
+        instance.validate(mediaId, validRequest);
         Throwable missingOriginalNameError = Asserts.assertThrows(() ->
-            instance.validate(missingOriginalNameRequest)
+            instance.validate(mediaId, missingOriginalNameRequest)
         );
         Throwable overLengthOriginalNameError = Asserts.assertThrows(() ->
-            instance.validate(overLengthOriginalNameRequest)
+            instance.validate(mediaId, overLengthOriginalNameRequest)
         );
         Throwable overLengthAlternativeTextError = Asserts.assertThrows(() ->
-            instance.validate(overLengthAlternativeTextRequest)
+            instance.validate(mediaId, overLengthAlternativeTextRequest)
         );
         Throwable overLengthTitleError = Asserts.assertThrows(() ->
-            instance.validate(overLengthTitleRequest)
+            instance.validate(mediaId, overLengthTitleRequest)
         );
         Throwable overLengthCaptionError = Asserts.assertThrows(() ->
-            instance.validate(overLengthCaptionRequest)
+            instance.validate(mediaId, overLengthCaptionRequest)
         );
         Throwable overLengthDescriptionError = Asserts.assertThrows(() ->
-            instance.validate(overLengthDescriptionRequest)
+            instance.validate(mediaId, overLengthDescriptionRequest)
         );
 
         // then
+        verify(mediaService).getMediaIdByNameOrOriginalName(
+            "media-original-name"
+        );
+
         Asserts.assertEqualsType(
             missingOriginalNameError,
             HttpBadRequestException.class
@@ -598,6 +604,7 @@ public class MediaValidatorTest {
     @Test
     public void validateUpdateMediaIncludeUrlRequestTest() {
         // given
+        long mediaId = 1L;
         UpdateMediaIncludeUrlRequest validRequest =
             new UpdateMediaIncludeUrlRequest();
         validRequest.setOriginalName("media-original-name");
@@ -661,36 +668,40 @@ public class MediaValidatorTest {
         invalidDurationRequest.setDurationInMinutes(BigDecimal.valueOf(-1));
 
         // when
-        instance.validate(validRequest);
+        instance.validate(mediaId, validRequest);
         Throwable missingOriginalNameError = Asserts.assertThrows(() ->
-            instance.validate(missingOriginalNameRequest)
+            instance.validate(mediaId, missingOriginalNameRequest)
         );
         Throwable overLengthOriginalNameError = Asserts.assertThrows(() ->
-            instance.validate(overLengthOriginalNameRequest)
+            instance.validate(mediaId, overLengthOriginalNameRequest)
         );
         Throwable overLengthAlternativeTextError = Asserts.assertThrows(() ->
-            instance.validate(overLengthAlternativeTextRequest)
+            instance.validate(mediaId, overLengthAlternativeTextRequest)
         );
         Throwable overLengthTitleError = Asserts.assertThrows(() ->
-            instance.validate(overLengthTitleRequest)
+            instance.validate(mediaId, overLengthTitleRequest)
         );
         Throwable overLengthCaptionError = Asserts.assertThrows(() ->
-            instance.validate(overLengthCaptionRequest)
+            instance.validate(mediaId, overLengthCaptionRequest)
         );
         Throwable overLengthDescriptionError = Asserts.assertThrows(() ->
-            instance.validate(overLengthDescriptionRequest)
+            instance.validate(mediaId, overLengthDescriptionRequest)
         );
         Throwable invalidUrlError = Asserts.assertThrows(() ->
-            instance.validate(invalidUrlRequest)
+            instance.validate(mediaId, invalidUrlRequest)
         );
         Throwable overLengthUrlError = Asserts.assertThrows(() ->
-            instance.validate(overLengthUrlRequest)
+            instance.validate(mediaId, overLengthUrlRequest)
         );
         Throwable invalidDurationError = Asserts.assertThrows(() ->
-            instance.validate(invalidDurationRequest)
+            instance.validate(mediaId, invalidDurationRequest)
         );
 
         // then
+        verify(mediaService).getMediaIdByNameOrOriginalName(
+            "media-original-name"
+        );
+
         Asserts.assertEqualsType(
             missingOriginalNameError,
             HttpBadRequestException.class
@@ -778,6 +789,60 @@ public class MediaValidatorTest {
             "durationInMinutes",
             "invalid"
         );
+    }
+
+    @Test
+    public void validateUpdateMediaRequestOriginalNameDuplicationTest() {
+        // given: media 1 is being updated
+        long mediaId = 1L;
+
+        // renaming to a name nobody uses yet must be allowed
+        UpdateMediaRequest newUniqueNameRequest = new UpdateMediaRequest();
+        newUniqueNameRequest.setOriginalName("brand-new-name.png");
+        when(
+            mediaService.getMediaIdByNameOrOriginalName("brand-new-name.png")
+        ).thenReturn(ZERO_LONG);
+
+        // "renaming" to the name the media itself already has must be
+        // allowed (no-op update)
+        UpdateMediaRequest sameMediaNameRequest = new UpdateMediaRequest();
+        sameMediaNameRequest.setOriginalName("current-name.png");
+        when(
+            mediaService.getMediaIdByNameOrOriginalName("current-name.png")
+        ).thenReturn(mediaId);
+
+        // renaming to a name owned by a different media must be rejected
+        UpdateMediaRequest otherMediaNameRequest = new UpdateMediaRequest();
+        otherMediaNameRequest.setOriginalName("other-media-name.png");
+        long otherMediaId = 2L;
+        when(
+            mediaService
+                .getMediaIdByNameOrOriginalName("other-media-name.png")
+        ).thenReturn(otherMediaId);
+
+        // when
+        instance.validate(mediaId, newUniqueNameRequest);
+        instance.validate(mediaId, sameMediaNameRequest);
+        Throwable duplicatedError = Asserts.assertThrows(() ->
+            instance.validate(mediaId, otherMediaNameRequest)
+        );
+
+        // then
+        Asserts.assertEqualsType(
+            duplicatedError,
+            HttpBadRequestException.class
+        );
+        assertErrorData(
+            ((HttpBadRequestException) duplicatedError).getData(),
+            "originalName",
+            "duplicated"
+        );
+        verify(mediaService)
+            .getMediaIdByNameOrOriginalName("brand-new-name.png");
+        verify(mediaService)
+            .getMediaIdByNameOrOriginalName("current-name.png");
+        verify(mediaService)
+            .getMediaIdByNameOrOriginalName("other-media-name.png");
     }
 
     @SuppressWarnings("unchecked")

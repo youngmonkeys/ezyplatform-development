@@ -729,6 +729,12 @@ public interface DataMetaService {
         );
     }
 
+    DataMetaModel getLatestDataMetaByDataTypeAndDataIdAndMetaKey(
+        String dataType,
+        long dataId,
+        String metaKey
+    );
+
     DataMetaModel getDataMetaByDataTypeAndDataIdAndMetaKeyAndMetaValue(
         String dataType,
         long dataId,

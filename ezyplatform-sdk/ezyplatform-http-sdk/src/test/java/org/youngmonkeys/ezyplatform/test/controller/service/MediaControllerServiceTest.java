@@ -66,21 +66,27 @@ import org.youngmonkeys.ezyplatform.media.MediaUpDownloaderManager;
 import org.youngmonkeys.ezyplatform.media.MediaUploadArguments;
 import org.youngmonkeys.ezyplatform.media.MediaUploadFromUrlArguments;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.DataMetaModel;
 import org.youngmonkeys.ezyplatform.model.MediaDetailsModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.model.PaginationModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.SaveMediaFileFromUrlModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
+import org.youngmonkeys.ezyplatform.pagination.DataMetaPaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.pagination.DefaultDataMetaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaFilter;
 import org.youngmonkeys.ezyplatform.pagination.MediaPaginationParameterConverter;
+import org.youngmonkeys.ezyplatform.repo.PaginationDataMetaRepository;
 import org.youngmonkeys.ezyplatform.repo.PaginationMediaRepository;
 import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
+import org.youngmonkeys.ezyplatform.response.ReplacedMediaFileResponse;
 import org.youngmonkeys.ezyplatform.service.MediaFileService;
 import org.youngmonkeys.ezyplatform.service.MediaService;
+import org.youngmonkeys.ezyplatform.service.PaginationDataMetaService;
 import org.youngmonkeys.ezyplatform.service.PaginationMediaService;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 import org.youngmonkeys.ezyplatform.validator.CommonValidator;
@@ -116,7 +122,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_REPLACED_FILE_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 public class MediaControllerServiceTest {
     private HttpClient httpClient;
@@ -136,6 +144,8 @@ public class MediaControllerServiceTest {
     private MediaPaginationParameterConverter mediaPaginationParameterConverter;
     private HttpModelToResponseConverter modelToResponseConverter;
     private HttpRequestToModelConverter requestToModelConverter;
+    private PaginationDataMetaService paginationDataMetaService;
+    private DataMetaPaginationParameterConverter dataMetaPaginationParameterConverter;
     private EzyLazyInitializer<FileUploader> fileUploaderWrapper;
     private EzyLazyInitializer<TikaConfig> tika;
     private Logger logger;
@@ -161,6 +171,8 @@ public class MediaControllerServiceTest {
         mediaPaginationParameterConverter = mock(MediaPaginationParameterConverter.class);
         modelToResponseConverter = mock(HttpModelToResponseConverter.class);
         requestToModelConverter = mock(HttpRequestToModelConverter.class);
+        paginationDataMetaService = mock(PaginationDataMetaService.class);
+        dataMetaPaginationParameterConverter = mock(DataMetaPaginationParameterConverter.class);
         fileUploaderWrapper = mock(EzyLazyInitializer.class);
         tika = mock(EzyLazyInitializer.class);
         logger = mock(Logger.class);
@@ -175,10 +187,12 @@ public class MediaControllerServiceTest {
             singletonFactory,
             mediaService,
             mediaFileService,
+            paginationDataMetaService,
             paginationMediaService,
             settingService,
             commonValidator,
             mediaValidator,
+            dataMetaPaginationParameterConverter,
             mediaPaginationParameterConverter,
             modelToResponseConverter,
             requestToModelConverter
@@ -316,6 +330,7 @@ public class MediaControllerServiceTest {
         when(filePart.getSubmittedFileName()).thenReturn("banner.png");
         when(mediaService.generateMediaFileName("banner.png", "png"))
             .thenReturn("stored-file.png");
+        when(mediaService.containsMedia("banner.png")).thenReturn(false);
         when(request.getAsyncContext()).thenReturn(asyncContext);
         when(
             fileSystemManager.getMediaFilePath(
@@ -377,6 +392,7 @@ public class MediaControllerServiceTest {
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(filePart).getSubmittedFileName();
         verify(mediaService).generateMediaFileName("banner.png", "png");
+        verify(mediaService).containsMedia("banner.png");
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -469,6 +485,165 @@ public class MediaControllerServiceTest {
     }
 
     @Test
+    public void addMediaFromRequestGeneratesNewOriginalNameWhenDuplicateTest()
+        throws Exception {
+        // given: an uploaded file whose original name already exists
+        HttpServletRequest request = mock(HttpServletRequest.class);
+        HttpServletResponse response = mock(HttpServletResponse.class);
+        AsyncContext asyncContext = mock(AsyncContext.class);
+        Part filePart = mock(Part.class);
+        FileUploader fileUploader = mock(FileUploader.class);
+        MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        CapturingServletOutputStream outputStream =
+            new CapturingServletOutputStream();
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.IMAGE)
+            .fileSize(123L)
+            .build();
+        MediaModel mediaModel = MediaModel.builder()
+            .id(98L)
+            .name("stored-duplicate.png")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "media-controller-duplicate-",
+            ".png"
+        );
+        long maxFileSize = 2048L;
+        String json = "{\"id\":98}";
+        mediaFilePath.deleteOnExit();
+
+        when(settingService.getMaxUploadFileSize()).thenReturn(maxFileSize);
+        when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
+        when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
+            .thenReturn(mediaUpDownloader);
+        when(singletonFactory.getSingletonCast(FileUploader.class))
+            .thenReturn(fileUploader);
+        when(mediaUpDownloader.isUploadSupported()).thenReturn(false);
+        when(settingService.isAllowReduceMediaFileSize()).thenReturn(true);
+        when(
+            mediaFileService.reduceMediaFileSize(
+                MediaType.IMAGE,
+                mediaFilePath,
+                ZERO_LONG
+            )
+        )
+            .thenReturn(MediaFileSizeReductionResult.NO);
+        when(request.getPart("file")).thenReturn(filePart);
+        when(mediaValidator.validateFilePart(filePart, false))
+            .thenReturn(fileMetadata);
+        when(filePart.getSubmittedFileName()).thenReturn("banner.png");
+        when(mediaService.generateMediaFileName("banner.png", "png"))
+            .thenReturn("stored-duplicate.png");
+        when(mediaService.containsMedia("banner.png")).thenReturn(true);
+        when(request.getAsyncContext()).thenReturn(asyncContext);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "stored-duplicate.png"
+            )
+        ).thenReturn(mediaFilePath);
+        when(mediaService.addMedia(eq("local"), any(AddMediaModel.class)))
+            .thenReturn(mediaModel);
+        when(objectMapper.writeValueAsString(mediaModel)).thenReturn(json);
+        when(response.getOutputStream()).thenReturn(outputStream);
+        doAnswer(answer -> {
+            Object[] arguments = answer.getArguments();
+            File outputFile = (File) arguments[2];
+            EzyExceptionVoid callback = (EzyExceptionVoid) arguments[4];
+            Files.write(
+                outputFile.toPath(),
+                "content".getBytes(StandardCharsets.UTF_8)
+            );
+            callback.apply();
+            return null;
+        })
+            .when(fileUploader)
+            .accept(
+                same(asyncContext),
+                same(filePart),
+                same(mediaFilePath),
+                eq(maxFileSize),
+                any(EzyExceptionVoid.class)
+            );
+
+        // when: uploading a file whose original name collides with an
+        // existing media
+        instance.addMedia(
+            request,
+            response,
+            "local",
+            101L,
+            202L,
+            false,
+            true
+        );
+
+        // then: the stored original name must be regenerated to a new
+        // unique one instead of colliding with the existing media
+        ArgumentCaptor<AddMediaModel> addMediaCaptor =
+            ArgumentCaptor.forClass(AddMediaModel.class);
+        ArgumentCaptor<Object> eventCaptor =
+            ArgumentCaptor.forClass(Object.class);
+
+        verify(settingService).getMaxUploadFileSize();
+        verify(settingService, times(2)).getMediaUpDownloaderName();
+        verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaUpDownloaderManager, times(2))
+            .getMediaUpDownloaderByName("cloud");
+        verify(singletonFactory).getSingletonCast(FileUploader.class);
+        verify(mediaUpDownloader).isUploadSupported();
+        verify(mediaUpDownloader).isReduceMediaSupported();
+        verify(request).getPart("file");
+        verify(mediaValidator).validateFilePart(filePart, false);
+        verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
+        verify(filePart).getSubmittedFileName();
+        verify(mediaService).generateMediaFileName("banner.png", "png");
+        verify(mediaService).containsMedia("banner.png");
+        verify(request).getAsyncContext();
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "stored-duplicate.png"
+        );
+        verify(fileUploader).accept(
+            same(asyncContext),
+            same(filePart),
+            same(mediaFilePath),
+            eq(maxFileSize),
+            any(EzyExceptionVoid.class)
+        );
+        verify(mediaFileService).reduceMediaFileSize(
+            MediaType.IMAGE,
+            mediaFilePath,
+            ZERO_LONG
+        );
+        verify(mediaService).addMedia(eq("local"), addMediaCaptor.capture());
+        verify(objectMapper).writeValueAsString(mediaModel);
+        verify(response).getOutputStream();
+
+        AddMediaModel addMediaModel = addMediaCaptor.getValue();
+        String newOriginalName = addMediaModel.getOriginalFileName();
+        Asserts.assertTrue(!"banner.png".equals(newOriginalName));
+        Asserts.assertTrue(newOriginalName.endsWith("-banner.png"));
+        Asserts.assertTrue(
+            newOriginalName.matches("\\d{17}Z-\\d+-banner\\.png")
+        );
+        verify(mediaService)
+            .saveMediaOriginalNameMetaIfNotExists(98L, "banner.png");
+
+        verifyNoMoreInteractions(
+            request,
+            response,
+            asyncContext,
+            filePart,
+            mediaUpDownloader,
+            fileUploader,
+            singletonFactory
+        );
+    }
+
+    @Test
     public void addMediaFromRequestShouldUseFirstPartWhenFilePartIsNullTest()
         throws Exception {
         // given
@@ -521,6 +696,7 @@ public class MediaControllerServiceTest {
         when(filePart.getSubmittedFileName()).thenReturn("first-part.png");
         when(mediaService.generateMediaFileName("first-part.png", "png"))
             .thenReturn("stored-first-part.png");
+        when(mediaService.containsMedia("first-part.png")).thenReturn(false);
         when(request.getAsyncContext()).thenReturn(asyncContext);
         when(
             fileSystemManager.getMediaFilePath(
@@ -583,6 +759,7 @@ public class MediaControllerServiceTest {
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(filePart).getSubmittedFileName();
         verify(mediaService).generateMediaFileName("first-part.png", "png");
+        verify(mediaService).containsMedia("first-part.png");
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -826,6 +1003,7 @@ public class MediaControllerServiceTest {
             MediaType.IMAGE.getFolder(),
             "cover.png"
         );
+        verify(settingService).isAllowKeepingReplacedMedia();
         verify(settingService).getMaxUploadFileSize();
         verify(fileUploader).accept(
             same(asyncContext),
@@ -1044,6 +1222,7 @@ public class MediaControllerServiceTest {
             MediaType.IMAGE.getFolder(),
             "cover-fallback.png"
         );
+        verify(settingService).isAllowKeepingReplacedMedia();
         verify(settingService).getMaxUploadFileSize();
         verify(fileUploader).accept(
             same(asyncContext),
@@ -1208,6 +1387,7 @@ public class MediaControllerServiceTest {
             MediaType.IMAGE.getFolder(),
             "current-media.jpg"
         );
+        verify(settingService).isAllowKeepingReplacedMedia();
         verify(settingService).getMaxUploadFileSize();
         verify(fileUploader).accept(
             same(asyncContext),
@@ -1825,6 +2005,7 @@ public class MediaControllerServiceTest {
             "stored-logo.png"
         );
         verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaService).containsMedia("logo.png");
         verify(mediaService).addMedia(
             eq("ADMIN"),
             addMediaCaptor.capture()
@@ -1955,7 +2136,7 @@ public class MediaControllerServiceTest {
         ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaUpdatedEvent.class);
 
-        verify(mediaValidator).validate(request);
+        verify(mediaValidator).validate(789L, request);
         verify(mediaValidator).validateMediaId(789L);
         verify(validMediaCondition).test(media);
         verify(fileSystemManager).getMediaFilePath(
@@ -1977,7 +2158,7 @@ public class MediaControllerServiceTest {
             mediaService,
             eventHandlerManager
         );
-        inOrder.verify(mediaValidator).validate(request);
+        inOrder.verify(mediaValidator).validate(789L, request);
         inOrder.verify(mediaValidator).validateMediaId(789L);
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(fileSystemManager).getMediaFilePath(
@@ -2046,7 +2227,7 @@ public class MediaControllerServiceTest {
         ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaUpdatedEvent.class);
 
-        verify(mediaValidator).validate(request);
+        verify(mediaValidator).validate(790L, request);
         verify(mediaValidator).validateMediaId(790L);
         verify(validMediaCondition).test(media);
         verify(fileSystemManager).getMediaFilePath(
@@ -2068,7 +2249,7 @@ public class MediaControllerServiceTest {
             mediaService,
             eventHandlerManager
         );
-        inOrder.verify(mediaValidator).validate(request);
+        inOrder.verify(mediaValidator).validate(790L, request);
         inOrder.verify(mediaValidator).validateMediaId(790L);
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(fileSystemManager).getMediaFilePath(
@@ -2135,8 +2316,8 @@ public class MediaControllerServiceTest {
         ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaUpdatedEvent.class);
 
-        verify(mediaValidator).validate(request);
         verify(mediaValidator).validateMediaNameAndGet("named-poster.png");
+        verify(mediaValidator).validate(791L, request);
         verify(validMediaCondition).test(media);
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -2157,8 +2338,9 @@ public class MediaControllerServiceTest {
             mediaService,
             eventHandlerManager
         );
-        inOrder.verify(mediaValidator).validate(request);
-        inOrder.verify(mediaValidator).validateMediaNameAndGet("named-poster.png");
+        inOrder.verify(mediaValidator)
+            .validateMediaNameAndGet("named-poster.png");
+        inOrder.verify(mediaValidator).validate(791L, request);
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -2196,6 +2378,138 @@ public class MediaControllerServiceTest {
         InOrder inOrder = inOrder(mediaService, eventHandlerManager);
         inOrder.verify(mediaService).updateMediaStatus(900L, "INACTIVE");
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaUpdatedEvent.class));
+    }
+
+    @Test
+    public void updateMediaPublicTest() {
+        // given: an existing, owned media becomes public
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(911L)
+            .name("visibility-media.png")
+            .publicMedia(false)
+            .build();
+        MediaModel updatedMedia = MediaModel.builder()
+            .id(911L)
+            .name("visibility-media.png")
+            .publicMedia(true)
+            .build();
+        when(mediaValidator.validateMediaNameAndGet("visibility-media.png"))
+            .thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(true);
+        when(mediaService.updateMediaPublicIfExists(911L, true))
+            .thenReturn(updatedMedia);
+
+        // when
+        instance.updateMediaPublic(
+            "visibility-media.png",
+            true,
+            validMediaCondition
+        );
+
+        // then: the media must actually become public, not just accepted
+        verify(mediaValidator).validateMediaNameAndGet("visibility-media.png");
+        verify(validMediaCondition).test(media);
+        verify(mediaService).updateMediaPublicIfExists(911L, true);
+        verify(eventHandlerManager).handleEvent(updatedMedia);
+
+        InOrder inOrder = inOrder(
+            mediaValidator,
+            validMediaCondition,
+            mediaService,
+            eventHandlerManager
+        );
+        inOrder.verify(mediaValidator).validateMediaNameAndGet("visibility-media.png");
+        inOrder.verify(validMediaCondition).test(media);
+        inOrder.verify(mediaService).updateMediaPublicIfExists(911L, true);
+        inOrder.verify(eventHandlerManager).handleEvent(updatedMedia);
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void updateMediaPublicShouldThrowWhenMediaConditionInvalidTest() {
+        // given: caller does not own/cannot access this media
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(912L)
+            .name("forbidden-media.png")
+            .build();
+        when(mediaValidator.validateMediaNameAndGet("forbidden-media.png"))
+            .thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(false);
+
+        // when: trying to change visibility of a media the caller cannot access
+        Throwable e = Asserts.assertThrows(() ->
+            instance.updateMediaPublic(
+                "forbidden-media.png",
+                true,
+                validMediaCondition
+            )
+        );
+
+        // then: the visibility must not be changed
+        Asserts.assertEqualsType(e, MediaNotFoundException.class);
+        verify(mediaValidator).validateMediaNameAndGet("forbidden-media.png");
+        verify(validMediaCondition).test(media);
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void isMediaPublicTest() {
+        // given: a media that is currently public
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(913L)
+            .name("public-check-media.png")
+            .publicMedia(true)
+            .build();
+        when(mediaValidator.validateMediaNameAndGet("public-check-media.png"))
+            .thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(true);
+
+        // when
+        boolean actual = instance.isMediaPublic(
+            "public-check-media.png",
+            validMediaCondition
+        );
+
+        // then: the reported visibility must reflect the media's own state
+        Asserts.assertTrue(actual);
+        verify(mediaValidator).validateMediaNameAndGet("public-check-media.png");
+        verify(validMediaCondition).test(media);
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void isMediaPublicShouldThrowWhenMediaConditionInvalidTest() {
+        // given: caller does not own/cannot access this media
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(914L)
+            .name("forbidden-check-media.png")
+            .build();
+        when(mediaValidator.validateMediaNameAndGet("forbidden-check-media.png"))
+            .thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(false);
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.isMediaPublic(
+                "forbidden-check-media.png",
+                validMediaCondition
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, MediaNotFoundException.class);
+        verify(mediaValidator).validateMediaNameAndGet("forbidden-check-media.png");
+        verify(validMediaCondition).test(media);
+        verifyNoMoreInteractions(validMediaCondition);
     }
 
     @Test
@@ -2318,6 +2632,78 @@ public class MediaControllerServiceTest {
     }
 
     @Test
+    public void removeMediaByIdPermanentlyDeletesFileWhenSettingAllowsTest()
+        throws Exception {
+        // given: the setting allows permanently deleting media files and
+        // the media has already been soft-deleted
+        MediaModel removedMedia = MediaModel.builder()
+            .id(906L)
+            .name("permanently-deleted-media.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "remove-media-by-id-setting-allow-",
+            ".png"
+        );
+        Files.write(
+            mediaFilePath.toPath(),
+            "deleted-media".getBytes(StandardCharsets.UTF_8)
+        );
+        Asserts.assertTrue(mediaFilePath.exists());
+
+        when(settingService.isAllowPermanentlyDeleteMedia())
+            .thenReturn(true);
+        when(mediaService.removeMedia(906L)).thenReturn(removedMedia);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "permanently-deleted-media.png"
+            )
+        ).thenReturn(mediaFilePath);
+
+        // when: removing by id without explicitly choosing deleteFile
+        instance.removeMediaById(906L);
+
+        // then: the setting is honored and the file is actually removed
+        // from disk
+        Asserts.assertFalse(mediaFilePath.exists());
+        verify(settingService).isAllowPermanentlyDeleteMedia();
+        verify(mediaService).removeMedia(906L);
+        verify(mediaService).removeMediaPermanently(906L);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "permanently-deleted-media.png"
+        );
+        verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
+    }
+
+    @Test
+    public void removeMediaByIdKeepsFileWhenSettingDisallowsTest() {
+        // given: the setting forbids permanently deleting media files,
+        // even though the media has already been soft-deleted
+        MediaModel removedMedia = MediaModel.builder()
+            .id(907L)
+            .name("kept-media.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+
+        when(settingService.isAllowPermanentlyDeleteMedia())
+            .thenReturn(false);
+        when(mediaService.removeMedia(907L)).thenReturn(removedMedia);
+
+        // when
+        instance.removeMediaById(907L);
+
+        // then: the media is only soft-removed, the file must not be
+        // touched at all
+        verify(settingService).isAllowPermanentlyDeleteMedia();
+        verify(mediaService).removeMedia(907L);
+        verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
+    }
+
+    @Test
     public void removeMediaByNameTest() {
         // given
         MediaModel removedMedia = MediaModel.builder()
@@ -2404,6 +2790,80 @@ public class MediaControllerServiceTest {
         inOrder.verify(eventHandlerManager).handleEvent(
             any(MediaRemovedEvent.class)
         );
+    }
+
+    @Test
+    public void removeMediaByNamePermanentlyDeletesFileWhenSettingAllowsTest()
+        throws Exception {
+        // given: the setting allows permanently deleting media files and
+        // the media has already been soft-deleted
+        MediaModel removedMedia = MediaModel.builder()
+            .id(908L)
+            .name("permanently-deleted-by-name.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "remove-media-by-name-setting-allow-",
+            ".png"
+        );
+        Files.write(
+            mediaFilePath.toPath(),
+            "deleted-media".getBytes(StandardCharsets.UTF_8)
+        );
+        Asserts.assertTrue(mediaFilePath.exists());
+
+        when(settingService.isAllowPermanentlyDeleteMedia())
+            .thenReturn(true);
+        when(mediaService.removeMedia("permanently-deleted-by-name.png"))
+            .thenReturn(removedMedia);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "permanently-deleted-by-name.png"
+            )
+        ).thenReturn(mediaFilePath);
+
+        // when: removing by name without explicitly choosing deleteFile
+        instance.removeMediaByName("permanently-deleted-by-name.png");
+
+        // then: the setting is honored and the file is actually removed
+        // from disk
+        Asserts.assertFalse(mediaFilePath.exists());
+        verify(settingService).isAllowPermanentlyDeleteMedia();
+        verify(mediaService).removeMedia("permanently-deleted-by-name.png");
+        verify(mediaService).removeMediaPermanently(908L);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "permanently-deleted-by-name.png"
+        );
+        verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
+    }
+
+    @Test
+    public void removeMediaByNameKeepsFileWhenSettingDisallowsTest() {
+        // given: the setting forbids permanently deleting media files,
+        // even though the media has already been soft-deleted
+        MediaModel removedMedia = MediaModel.builder()
+            .id(909L)
+            .name("kept-by-name.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+
+        when(settingService.isAllowPermanentlyDeleteMedia())
+            .thenReturn(false);
+        when(mediaService.removeMedia("kept-by-name.png"))
+            .thenReturn(removedMedia);
+
+        // when
+        instance.removeMediaByName("kept-by-name.png");
+
+        // then: the media is only soft-removed, the file must not be
+        // touched at all
+        verify(settingService).isAllowPermanentlyDeleteMedia();
+        verify(mediaService).removeMedia("kept-by-name.png");
+        verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
     }
 
     @Test
@@ -2882,6 +3342,167 @@ public class MediaControllerServiceTest {
     }
 
     @Test
+    public void getMediaReplacedFileHistoryTest() {
+        // given
+        PaginationDataMetaRepository paginationDataMetaRepository =
+            mock(PaginationDataMetaRepository.class);
+        DefaultEntityToModelConverter entityToModelConverter =
+            mock(DefaultEntityToModelConverter.class);
+        PaginationDataMetaService realPaginationDataMetaService =
+            new PaginationDataMetaService(
+                paginationDataMetaRepository,
+                entityToModelConverter,
+                dataMetaPaginationParameterConverter
+            );
+        MediaControllerService localInstance = new MediaControllerService(
+            httpClient,
+            eventHandlerManager,
+            fileSystemManager,
+            inputStreamLoader,
+            mediaUpDownloaderManager,
+            objectMapper,
+            resourceDownloadManager,
+            singletonFactory,
+            mediaService,
+            mediaFileService,
+            realPaginationDataMetaService,
+            paginationMediaService,
+            settingService,
+            commonValidator,
+            mediaValidator,
+            dataMetaPaginationParameterConverter,
+            mediaPaginationParameterConverter,
+            modelToResponseConverter,
+            requestToModelConverter
+        );
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(915L)
+            .name("history-media.png")
+            .build();
+        org.youngmonkeys.ezyplatform.entity.DataMeta dataMetaEntity =
+            mock(org.youngmonkeys.ezyplatform.entity.DataMeta.class);
+        DataMetaModel dataMetaModel = DataMetaModel.builder()
+            .id(1L)
+            .dataType(TABLE_NAME_MEDIA)
+            .dataId(915L)
+            .metaKey(META_KEY_REPLACED_FILE_NAME)
+            .metaTextValue("replaced-history.png")
+            .build();
+        ReplacedMediaFileResponse historyResponse =
+            ReplacedMediaFileResponse.builder()
+                .id(1L)
+                .mediaId(915L)
+                .fileName("replaced-history.png")
+                .build();
+
+        when(mediaService.getMediaById(915L)).thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(true);
+        when(
+            paginationDataMetaRepository.findNextElements(
+                any(),
+                any(),
+                eq(21)
+            )
+        ).thenReturn(Collections.singletonList(dataMetaEntity));
+        when(paginationDataMetaRepository.findSettingValue(any(String.class)))
+            .thenReturn(null);
+        when(
+            paginationDataMetaRepository.findFirstElements(
+                any(),
+                eq(1_000_000),
+                eq(1)
+            )
+        ).thenReturn(Collections.emptyList());
+        when(paginationDataMetaRepository.countElements(any())).thenReturn(1L);
+        when(entityToModelConverter.toModel(dataMetaEntity))
+            .thenReturn(dataMetaModel);
+        when(
+            dataMetaPaginationParameterConverter.serialize(
+                any(String.class),
+                eq(dataMetaModel)
+            )
+        ).thenReturn("history-page-token");
+        when(modelToResponseConverter.toResponse(dataMetaModel))
+            .thenReturn(historyResponse);
+
+        // when: fetching the replaced-file history of a specific media
+        PaginationModel<ReplacedMediaFileResponse> actual = localInstance
+            .getMediaReplacedFileHistory(
+                915L,
+                validMediaCondition,
+                null,
+                null,
+                null,
+                false,
+                20
+            );
+
+        // then: the query must be scoped to only this media's history
+        // records, not every media's replaced-file records
+        ArgumentCaptor<org.youngmonkeys.ezyplatform.pagination.DataMetaFilter>
+            filterCaptor = ArgumentCaptor.forClass(
+                org.youngmonkeys.ezyplatform.pagination.DataMetaFilter.class
+            );
+        verify(mediaService).getMediaById(915L);
+        verify(validMediaCondition).test(media);
+        verify(paginationDataMetaRepository).findNextElements(
+            filterCaptor.capture(),
+            any(),
+            eq(21)
+        );
+        verify(paginationDataMetaRepository).findSettingValue(any(String.class));
+        verify(paginationDataMetaRepository).findFirstElements(
+            any(),
+            eq(1_000_000),
+            eq(1)
+        );
+        verify(paginationDataMetaRepository).countElements(any());
+        verify(entityToModelConverter).toModel(dataMetaEntity);
+        verify(modelToResponseConverter).toResponse(dataMetaModel);
+
+        DefaultDataMetaFilter usedFilter =
+            (DefaultDataMetaFilter) filterCaptor.getValue();
+        Asserts.assertEquals(usedFilter.dataType, TABLE_NAME_MEDIA);
+        Asserts.assertEquals(usedFilter.dataId, 915L);
+        Asserts.assertEquals(usedFilter.metaKey, META_KEY_REPLACED_FILE_NAME);
+
+        Asserts.assertEquals(actual.getItems().size(), 1);
+        Asserts.assertEquals(actual.getItems().get(0), historyResponse);
+        Asserts.assertEquals(actual.getCount(), 1);
+        Asserts.assertEquals(actual.getTotal(), 1L);
+
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
+    public void getMediaReplacedFileHistoryMediaNotFoundTest() {
+        // given: no such media exists
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        when(mediaService.getMediaById(916L)).thenReturn(null);
+
+        // when: requesting the replace history of a non-existent media
+        Throwable e = Asserts.assertThrows(() ->
+            instance.getMediaReplacedFileHistory(
+                916L,
+                validMediaCondition,
+                null,
+                null,
+                null,
+                false,
+                20
+            )
+        );
+
+        // then: no history must be exposed for a media that does not exist
+        Asserts.assertEqualsType(e, MediaNotFoundException.class);
+        verify(mediaService).getMediaById(916L);
+        verifyNoMoreInteractions(validMediaCondition);
+    }
+
+    @Test
     public void getMediaListTest() {
         // given
         MediaFilter filter = mock(MediaFilter.class);
@@ -2906,10 +3527,12 @@ public class MediaControllerServiceTest {
             singletonFactory,
             mediaService,
             mediaFileService,
+            paginationDataMetaService,
             realPaginationMediaService,
             settingService,
             commonValidator,
             mediaValidator,
+            dataMetaPaginationParameterConverter,
             mediaPaginationParameterConverter,
             modelToResponseConverter,
             requestToModelConverter
@@ -3017,6 +3640,7 @@ public class MediaControllerServiceTest {
             "https://cdn.example.com/banner.png",
             "image"
         )).thenReturn("banner-generated.png");
+        when(mediaService.containsMedia((String) null)).thenReturn(false);
         when(requestToModelConverter.toModel(
             111L,
             222L,
@@ -3044,6 +3668,7 @@ public class MediaControllerServiceTest {
             "https://cdn.example.com/banner.png",
             "image"
         );
+        verify(mediaService).containsMedia((String) null);
         verify(requestToModelConverter).toModel(
             111L,
             222L,
@@ -3056,6 +3681,7 @@ public class MediaControllerServiceTest {
 
         Asserts.assertEquals(actual, media);
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), media);
+        Asserts.assertEquals(request.getOriginalName(), null);
 
         InOrder inOrder = inOrder(
             mediaValidator,
@@ -3068,6 +3694,7 @@ public class MediaControllerServiceTest {
             "https://cdn.example.com/banner.png",
             "image"
         );
+        inOrder.verify(mediaService).containsMedia((String) null);
         inOrder.verify(requestToModelConverter).toModel(
             111L,
             222L,
@@ -3077,6 +3704,121 @@ public class MediaControllerServiceTest {
         );
         inOrder.verify(mediaService).addMedia("ADMIN", addMediaModel);
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaAddedEvent.class));
+    }
+
+    @Test
+    public void addMediaFromUrlRequestGeneratesNewOriginalNameWhenDuplicateTest() {
+        // given: an original name that already belongs to another media
+        AddMediaFromUrlRequest request = new AddMediaFromUrlRequest();
+        request.setType(MediaType.IMAGE);
+        request.setUrl("https://cdn.example.com/banner.png");
+        request.setOriginalName("banner.png");
+        AddMediaModel addMediaModel = AddMediaModel.builder()
+            .ownerAdminId(111L)
+            .ownerUserId(222L)
+            .fileName("banner-generated.png")
+            .build();
+        MediaModel media = MediaModel.builder()
+            .id(910L)
+            .name("banner-generated.png")
+            .build();
+        when(mediaService.generateMediaFileName(
+            "https://cdn.example.com/banner.png",
+            "image"
+        )).thenReturn("banner-generated.png");
+        when(mediaService.containsMedia("banner.png")).thenReturn(true);
+        when(requestToModelConverter.toModel(
+            111L,
+            222L,
+            "banner-generated.png",
+            request,
+            true
+        )).thenReturn(addMediaModel);
+        when(mediaService.addMedia("ADMIN", addMediaModel)).thenReturn(media);
+
+        // when: adding a media whose original name already exists
+        MediaModel actual = instance.addMedia(
+            "ADMIN",
+            111L,
+            222L,
+            request,
+            true
+        );
+
+        // then: the original name must be regenerated to a new unique one
+        // instead of colliding with the existing media's name
+        verify(mediaValidator).validate(request);
+        verify(mediaService).generateMediaFileName(
+            "https://cdn.example.com/banner.png",
+            "image"
+        );
+        verify(mediaService).containsMedia("banner.png");
+        verify(requestToModelConverter).toModel(
+            111L,
+            222L,
+            "banner-generated.png",
+            request,
+            true
+        );
+        verify(mediaService).addMedia("ADMIN", addMediaModel);
+        verify(eventHandlerManager).handleEvent(any(MediaAddedEvent.class));
+        verify(mediaService)
+            .saveMediaOriginalNameMetaIfNotExists(910L, "banner.png");
+
+        Asserts.assertEquals(actual, media);
+        String newOriginalName = request.getOriginalName();
+        Asserts.assertTrue(!"banner.png".equals(newOriginalName));
+        Asserts.assertTrue(newOriginalName.endsWith("-banner.png"));
+        Asserts.assertTrue(
+            newOriginalName.matches("\\d{17}Z-\\d+-banner\\.png")
+        );
+    }
+
+    @Test
+    public void generateNewMediaOriginalNameIfNeedKeepsNameWhenNotDuplicateTest() {
+        // given: no other media is using this name
+        when(mediaService.containsMedia("unique.png")).thenReturn(false);
+
+        // when
+        String actual = instance.generateNewMediaOriginalNameIfNeed("unique.png");
+
+        // then: the original name is kept as is
+        Asserts.assertEquals(actual, "unique.png");
+        verify(mediaService).containsMedia("unique.png");
+    }
+
+    @Test
+    public void generateNewMediaOriginalNameIfNeedGeneratesNewNameWhenDuplicateTest() {
+        // given: another media is already using this name
+        when(mediaService.containsMedia("duplicate.png")).thenReturn(true);
+
+        // when
+        String actual = instance
+            .generateNewMediaOriginalNameIfNeed("duplicate.png");
+
+        // then: a new unique name is generated, keeping the original name
+        // as a suffix so it stays traceable
+        Asserts.assertTrue(!"duplicate.png".equals(actual));
+        Asserts.assertTrue(actual.endsWith("-duplicate.png"));
+        Asserts.assertTrue(actual.matches("\\d{17}Z-\\d+-duplicate\\.png"));
+        verify(mediaService).containsMedia("duplicate.png");
+    }
+
+    @Test
+    public void generateNewMediaOriginalNameIfNeedGeneratesDifferentNamesOnEachDuplicateCallTest() {
+        // given: two separate uploads with the same colliding name
+        when(mediaService.containsMedia("collision.png")).thenReturn(true);
+
+        // when
+        String first = instance
+            .generateNewMediaOriginalNameIfNeed("collision.png");
+        String second = instance
+            .generateNewMediaOriginalNameIfNeed("collision.png");
+
+        // then: each generated name must be unique so concurrent uploads
+        // never overwrite one another
+        Asserts.assertTrue(!first.equals(second));
+        verify(mediaService, times(2)).containsMedia("collision.png");
     }
 
     private static class CapturingServletOutputStream

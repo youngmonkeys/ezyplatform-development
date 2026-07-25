@@ -50,7 +50,9 @@ import java.util.stream.Collectors;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_SIZE_FILE_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_REPLACED_FILE_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
@@ -155,6 +157,32 @@ public class DefaultMediaService implements MediaService {
                 originalSizeFileName
             );
         }
+    }
+
+    @Override
+    public void saveMediaReplacedFileNameIfNotExists(
+        long mediaId,
+        String replacedFileName
+    ) {
+        dataMetaService.saveDataMetaIfAbsent(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_REPLACED_FILE_NAME,
+            replacedFileName
+        );
+    }
+
+    @Override
+    public void saveMediaOriginalNameMetaIfNotExists(
+        long mediaId,
+        String originalName
+    ) {
+        dataMetaService.saveDataMetaIfAbsent(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_ORIGINAL_NAME,
+            originalName
+        );
     }
 
     @Override
@@ -303,6 +331,15 @@ public class DefaultMediaService implements MediaService {
             entity = mediaRepository.findBySlug(mediaName);
         }
         return entityToModelConverter.toModel(entity);
+    }
+
+    @Override
+    public long getMediaIdByNameOrOriginalName(
+        String mediaName
+    ) {
+        IdResult result = mediaRepository
+            .findIdByNameOrOriginalName(mediaName);
+        return result != null ? result.getId() : ZERO_LONG;
     }
 
     @Override

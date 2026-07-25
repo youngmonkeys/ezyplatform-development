@@ -120,6 +120,16 @@ public interface MediaService {
         String originalSizeFileName
     );
 
+    void saveMediaReplacedFileNameIfNotExists(
+        long mediaId,
+        String replacedFileName
+    );
+
+    void saveMediaOriginalNameMetaIfNotExists(
+        long mediaId,
+        String originalName
+    );
+
     MediaModel removeMedia(long mediaId);
 
     MediaModel removeMedia(String mediaName);
@@ -145,6 +155,10 @@ public interface MediaService {
     }
 
     MediaModel getMediaByName(String mediaName);
+
+    long getMediaIdByNameOrOriginalName(
+        String mediaName
+    );
 
     boolean containsMedia(long mediaId);
 
@@ -232,7 +246,6 @@ public interface MediaService {
     ) {
         String uniqueFileName = EzySHA256.cryptUtfToLowercase(
             submittedFileName
-                + System.nanoTime()
                 + UUID.randomUUID()
         );
         return isBlank(extension)

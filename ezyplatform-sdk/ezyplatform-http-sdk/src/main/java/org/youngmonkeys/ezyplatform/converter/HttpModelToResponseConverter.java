@@ -16,10 +16,20 @@
 
 package org.youngmonkeys.ezyplatform.converter;
 
+import org.youngmonkeys.ezyplatform.model.DataMetaModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.response.MediaResponse;
+import org.youngmonkeys.ezyplatform.response.ReplacedMediaFileResponse;
 
 public class HttpModelToResponseConverter extends DefaultModelToResponseConverter {
+
+    public ReplacedMediaFileResponse toResponse(DataMetaModel model) {
+        return ReplacedMediaFileResponse.builder()
+            .id(model.getId())
+            .mediaId(model.getDataId())
+            .fileName(model.getMetaValue())
+            .build();
+    }
 
     public MediaResponse toResponse(MediaModel model) {
         return MediaResponse.builder()
