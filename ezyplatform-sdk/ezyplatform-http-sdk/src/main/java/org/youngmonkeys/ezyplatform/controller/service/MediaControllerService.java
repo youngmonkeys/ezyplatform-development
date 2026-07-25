@@ -100,6 +100,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
 
@@ -107,11 +108,11 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MEDIA_FILE_TIME_FORMATTER;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_REPLACED_FILE_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PREFIX_REPLACED_MEDIA_FILE;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.REPLACED_MEDIA_FILE_TIME_FORMATTER;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
@@ -305,17 +306,16 @@ public class MediaControllerService extends EzyLoggable {
                 File storedMediaFilePath = isBlank(reduceResult.getNewFileName())
                     ? mediaFilePath
                     : new File(mediaFilePath.getParentFile(), storedFileName);
+                String newOriginalFileName = generateNewMediaOriginalNameIfNeed(
+                    submittedFileName
+                );
                 MediaModel model = mediaService.addMedia(
                     uploadFrom,
                     AddMediaModel.builder()
                         .ownerAdminId(ownerAdminId)
                         .ownerUserId(ownerUserId)
                         .fileName(storedFileName)
-                        .originalFileName(
-                            generateNewMediaOriginalNameIfNeed(
-                                submittedFileName
-                            )
-                        )
+                        .originalFileName(newOriginalFileName)
                         .mediaType(fileMetadata.getMediaTypeText())
                         .mimeType(
                             reduceResult.getNewFileMimeTypeOrDefault(
@@ -330,10 +330,16 @@ public class MediaControllerService extends EzyLoggable {
                         .notPublic(notPublic)
                         .build()
                 );
+                long mediaId = model.getId();
                 saveMediaFileSizeReductionResult(
-                    model.getId(),
+                    mediaId,
                     reduceResult,
                     NULL_STRING
+                );
+                saveMediaOriginalNameIfNeed(
+                    mediaId,
+                    submittedFileName,
+                    newOriginalFileName
                 );
                 eventHandlerManager.handleEvent(
                     new MediaUploadedEvent(
@@ -361,11 +367,11 @@ public class MediaControllerService extends EzyLoggable {
             request.getUrl(),
             request.getType().toString().toLowerCase()
         );
-        request.setOriginalName(
-            generateNewMediaOriginalNameIfNeed(
-                request.getOriginalName()
-            )
+        String originalName = request.getOriginalName();
+        String newOriginalFileName = generateNewMediaOriginalNameIfNeed(
+            originalName
         );
+        request.setOriginalName(newOriginalFileName);
         AddMediaModel model = requestToModelConverter.toModel(
             ownerAdminId,
             ownerUserId,
@@ -374,25 +380,15 @@ public class MediaControllerService extends EzyLoggable {
             notPublic
         );
         MediaModel media = mediaService.addMedia(uploadFrom, model);
+        saveMediaOriginalNameIfNeed(
+            media.getId(),
+            originalName,
+            newOriginalFileName
+        );
         eventHandlerManager.handleEvent(
             new MediaAddedEvent(media)
         );
         return media;
-    }
-
-    public String generateNewMediaOriginalNameIfNeed(
-        String originalMediaName
-    ) {
-        boolean contains = mediaService
-            .containsMedia(originalMediaName);
-        String newName = originalMediaName;
-        if (contains) {
-            newName = System.currentTimeMillis() +
-                "_" +
-                DUPLICATED_MEDIA_COUNT.incrementAndGet() +
-                "_" + originalMediaName;
-        }
-        return newName;
     }
 
     public void replaceMedia(
@@ -475,10 +471,8 @@ public class MediaControllerService extends EzyLoggable {
                 filePart = parts.iterator().next();
             }
         }
-        FileMetadata fileMetadata = mediaValidator.validateFilePart(
-            filePart,
-            avatar
-        );
+        FileMetadata fileMetadata = mediaValidator
+            .validateFilePart(filePart, avatar);
         eventHandlerManager.handleEvent(
             MediaUploadEvent.builder()
                 .uploadFrom(uploadFrom)
@@ -501,7 +495,7 @@ public class MediaControllerService extends EzyLoggable {
             && mediaFilePath.exists()
         ) {
             String replacedFileName = PREFIX_REPLACED_MEDIA_FILE
-                + REPLACED_MEDIA_FILE_TIME_FORMATTER.format(LocalDateTime.now())
+                + MEDIA_FILE_TIME_FORMATTER.format(LocalDateTime.now())
                 + "_"
                 + fileName;
             FolderProxy.copyFile(
@@ -701,11 +695,15 @@ public class MediaControllerService extends EzyLoggable {
         Path storedMediaFilePath = isBlank(reduceResult.getNewFileName())
             ? mediaFilePath
             : mediaFilePath.resolveSibling(storedFileName);
+        String originalName = result.getOriginalFileName();
+        String newOriginalFileName = generateNewMediaOriginalNameIfNeed(
+            originalName
+        );
         MediaModel media = mediaService.addMedia(
             uploadFrom,
             AddMediaModel.builder()
                 .fileName(storedFileName)
-                .originalFileName(result.getOriginalFileName())
+                .originalFileName(newOriginalFileName)
                 .mediaType(mediaTypeText)
                 .mimeType(
                     reduceResult.getNewFileMimeTypeOrDefault(
@@ -722,10 +720,16 @@ public class MediaControllerService extends EzyLoggable {
                 .notPublic(isNotPublic)
                 .build()
         );
+        long mediaId = media.getId();
         saveMediaFileSizeReductionResult(
-            media.getId(),
+            mediaId,
             reduceResult,
             NULL_STRING
+        );
+        saveMediaOriginalNameIfNeed(
+            mediaId,
+            originalName,
+            newOriginalFileName
         );
         eventHandlerManager.handleEvent(
             new MediaUploadedEvent(
@@ -871,7 +875,7 @@ public class MediaControllerService extends EzyLoggable {
         UpdateMediaRequest request,
         Predicate<MediaModel> validMediaCondition
     ) {
-        mediaValidator.validate(request);
+        mediaValidator.validate(mediaId, request);
         MediaModel media = mediaValidator.validateMediaId(mediaId);
         if (!validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaId);
@@ -890,7 +894,7 @@ public class MediaControllerService extends EzyLoggable {
         UpdateMediaIncludeUrlRequest request,
         Predicate<MediaModel> validMediaCondition
     ) {
-        mediaValidator.validate(request);
+        mediaValidator.validate(mediaId, request);
         MediaModel media = mediaValidator.validateMediaId(mediaId);
         if (!validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaId);
@@ -909,10 +913,9 @@ public class MediaControllerService extends EzyLoggable {
         UpdateMediaRequest request,
         Predicate<MediaModel> validMediaCondition
     ) {
-        mediaValidator.validate(request);
-        MediaModel media = mediaValidator.validateMediaNameAndGet(
-            mediaName
-        );
+        MediaModel media = mediaValidator
+            .validateMediaNameAndGet(mediaName);
+        mediaValidator.validate(media.getId(), request);
         if (!validMediaCondition.test(media)) {
             throw new MediaNotFoundException(mediaName);
         }
@@ -987,6 +990,34 @@ public class MediaControllerService extends EzyLoggable {
             mediaService.saveMediaSlugIfNotExists(
                 mediaId,
                 mediaSlug
+            );
+        }
+    }
+
+    public String generateNewMediaOriginalNameIfNeed(
+        String originalMediaName
+    ) {
+        boolean contains = mediaService
+            .containsMedia(originalMediaName);
+        String newName = originalMediaName;
+        if (contains) {
+            newName = MEDIA_FILE_TIME_FORMATTER.format(LocalDateTime.now()) +
+                "-" +
+                DUPLICATED_MEDIA_COUNT.incrementAndGet() +
+                "-" + originalMediaName;
+        }
+        return newName;
+    }
+
+    public void saveMediaOriginalNameIfNeed(
+        long mediaId,
+        String actualOriginalName,
+        String newOriginalName
+    ) {
+        if (!Objects.equals(actualOriginalName, newOriginalName)) {
+            mediaService.saveMediaOriginalNameMetaIfNotExists(
+                mediaId,
+                actualOriginalName
             );
         }
     }

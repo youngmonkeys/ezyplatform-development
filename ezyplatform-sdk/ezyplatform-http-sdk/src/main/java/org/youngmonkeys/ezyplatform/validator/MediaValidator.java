@@ -245,7 +245,10 @@ public class MediaValidator {
         }
     }
 
-    public void validate(UpdateMediaRequest request) {
+    public void validate(
+        long mediaId,
+        UpdateMediaRequest request
+    ) {
         Map<String, String> errors = new HashMap<>();
         String originalName = request.getOriginalName();
         if (originalName != null) {
@@ -253,6 +256,12 @@ public class MediaValidator {
                 errors.put("originalName", "required");
             } else if (originalName.length() > MAX_MEDIA_ORIGINAL_NAME_LENGTH) {
                 errors.put("originalName", "overLength");
+            } else {
+                long existedId = mediaService
+                    .getMediaIdByNameOrOriginalName(originalName);
+                if (existedId > ZERO_LONG && existedId != mediaId) {
+                    errors.put("originalName", "duplicated");
+                }
             }
         }
         String alternativeText = request.getAlternativeText();
@@ -284,7 +293,10 @@ public class MediaValidator {
         }
     }
 
-    public void validate(UpdateMediaIncludeUrlRequest request) {
+    public void validate(
+        long mediaId,
+        UpdateMediaIncludeUrlRequest request
+    ) {
         Map<String, String> errors = new HashMap<>();
         String originalName = request.getOriginalName();
         if (originalName != null) {
@@ -292,6 +304,12 @@ public class MediaValidator {
                 errors.put("originalName", "required");
             } else if (originalName.length() > MAX_MEDIA_ORIGINAL_NAME_LENGTH) {
                 errors.put("originalName", "overLength");
+            } else {
+                long existedId = mediaService
+                    .getMediaIdByNameOrOriginalName(originalName);
+                if (existedId > ZERO_LONG && existedId != mediaId) {
+                    errors.put("originalName", "duplicated");
+                }
             }
         }
         String alternativeText = request.getAlternativeText();
