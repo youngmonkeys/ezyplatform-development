@@ -2632,6 +2632,78 @@ public class MediaControllerServiceTest {
     }
 
     @Test
+    public void removeMediaByIdPermanentlyDeletesFileWhenSettingAllowsTest()
+        throws Exception {
+        // given: the setting allows permanently deleting media files and
+        // the media has already been soft-deleted
+        MediaModel removedMedia = MediaModel.builder()
+            .id(906L)
+            .name("permanently-deleted-media.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "remove-media-by-id-setting-allow-",
+            ".png"
+        );
+        Files.write(
+            mediaFilePath.toPath(),
+            "deleted-media".getBytes(StandardCharsets.UTF_8)
+        );
+        Asserts.assertTrue(mediaFilePath.exists());
+
+        when(settingService.isAllowPermanentlyDeleteMedia())
+            .thenReturn(true);
+        when(mediaService.removeMedia(906L)).thenReturn(removedMedia);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "permanently-deleted-media.png"
+            )
+        ).thenReturn(mediaFilePath);
+
+        // when: removing by id without explicitly choosing deleteFile
+        instance.removeMediaById(906L);
+
+        // then: the setting is honored and the file is actually removed
+        // from disk
+        Asserts.assertFalse(mediaFilePath.exists());
+        verify(settingService).isAllowPermanentlyDeleteMedia();
+        verify(mediaService).removeMedia(906L);
+        verify(mediaService).removeMediaPermanently(906L);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "permanently-deleted-media.png"
+        );
+        verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
+    }
+
+    @Test
+    public void removeMediaByIdKeepsFileWhenSettingDisallowsTest() {
+        // given: the setting forbids permanently deleting media files,
+        // even though the media has already been soft-deleted
+        MediaModel removedMedia = MediaModel.builder()
+            .id(907L)
+            .name("kept-media.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+
+        when(settingService.isAllowPermanentlyDeleteMedia())
+            .thenReturn(false);
+        when(mediaService.removeMedia(907L)).thenReturn(removedMedia);
+
+        // when
+        instance.removeMediaById(907L);
+
+        // then: the media is only soft-removed, the file must not be
+        // touched at all
+        verify(settingService).isAllowPermanentlyDeleteMedia();
+        verify(mediaService).removeMedia(907L);
+        verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
+    }
+
+    @Test
     public void removeMediaByNameTest() {
         // given
         MediaModel removedMedia = MediaModel.builder()
@@ -2718,6 +2790,80 @@ public class MediaControllerServiceTest {
         inOrder.verify(eventHandlerManager).handleEvent(
             any(MediaRemovedEvent.class)
         );
+    }
+
+    @Test
+    public void removeMediaByNamePermanentlyDeletesFileWhenSettingAllowsTest()
+        throws Exception {
+        // given: the setting allows permanently deleting media files and
+        // the media has already been soft-deleted
+        MediaModel removedMedia = MediaModel.builder()
+            .id(908L)
+            .name("permanently-deleted-by-name.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+        File mediaFilePath = File.createTempFile(
+            "remove-media-by-name-setting-allow-",
+            ".png"
+        );
+        Files.write(
+            mediaFilePath.toPath(),
+            "deleted-media".getBytes(StandardCharsets.UTF_8)
+        );
+        Asserts.assertTrue(mediaFilePath.exists());
+
+        when(settingService.isAllowPermanentlyDeleteMedia())
+            .thenReturn(true);
+        when(mediaService.removeMedia("permanently-deleted-by-name.png"))
+            .thenReturn(removedMedia);
+        when(
+            fileSystemManager.getMediaFilePath(
+                MediaType.IMAGE.getFolder(),
+                "permanently-deleted-by-name.png"
+            )
+        ).thenReturn(mediaFilePath);
+
+        // when: removing by name without explicitly choosing deleteFile
+        instance.removeMediaByName("permanently-deleted-by-name.png");
+
+        // then: the setting is honored and the file is actually removed
+        // from disk
+        Asserts.assertFalse(mediaFilePath.exists());
+        verify(settingService).isAllowPermanentlyDeleteMedia();
+        verify(mediaService).removeMedia("permanently-deleted-by-name.png");
+        verify(mediaService).removeMediaPermanently(908L);
+        verify(fileSystemManager).getMediaFilePath(
+            MediaType.IMAGE.getFolder(),
+            "permanently-deleted-by-name.png"
+        );
+        verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
+    }
+
+    @Test
+    public void removeMediaByNameKeepsFileWhenSettingDisallowsTest() {
+        // given: the setting forbids permanently deleting media files,
+        // even though the media has already been soft-deleted
+        MediaModel removedMedia = MediaModel.builder()
+            .id(909L)
+            .name("kept-by-name.png")
+            .type(MediaType.IMAGE)
+            .status("DELETED")
+            .build();
+
+        when(settingService.isAllowPermanentlyDeleteMedia())
+            .thenReturn(false);
+        when(mediaService.removeMedia("kept-by-name.png"))
+            .thenReturn(removedMedia);
+
+        // when
+        instance.removeMediaByName("kept-by-name.png");
+
+        // then: the media is only soft-removed, the file must not be
+        // touched at all
+        verify(settingService).isAllowPermanentlyDeleteMedia();
+        verify(mediaService).removeMedia("kept-by-name.png");
+        verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
     }
 
     @Test
