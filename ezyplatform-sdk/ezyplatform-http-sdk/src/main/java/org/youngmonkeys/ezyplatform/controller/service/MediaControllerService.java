@@ -99,6 +99,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
@@ -495,7 +496,9 @@ public class MediaControllerService extends EzyLoggable {
             && mediaFilePath.exists()
         ) {
             String replacedFileName = PREFIX_REPLACED_MEDIA_FILE
-                + MEDIA_FILE_TIME_FORMATTER.format(LocalDateTime.now())
+                + MEDIA_FILE_TIME_FORMATTER.format(
+                    LocalDateTime.now(ZoneOffset.UTC)
+                )
                 + "_"
                 + fileName;
             FolderProxy.copyFile(
@@ -1001,7 +1004,9 @@ public class MediaControllerService extends EzyLoggable {
             .containsMedia(originalMediaName);
         String newName = originalMediaName;
         if (contains) {
-            newName = MEDIA_FILE_TIME_FORMATTER.format(LocalDateTime.now()) +
+            newName = MEDIA_FILE_TIME_FORMATTER.format(
+                LocalDateTime.now(ZoneOffset.UTC)
+            ) +
                 "-" +
                 DUPLICATED_MEDIA_COUNT.incrementAndGet() +
                 "-" + originalMediaName;

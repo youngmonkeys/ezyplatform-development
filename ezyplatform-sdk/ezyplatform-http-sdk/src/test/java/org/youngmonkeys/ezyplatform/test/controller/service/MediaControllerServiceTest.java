@@ -625,10 +625,12 @@ public class MediaControllerServiceTest {
         AddMediaModel addMediaModel = addMediaCaptor.getValue();
         String newOriginalName = addMediaModel.getOriginalFileName();
         Asserts.assertTrue(!"banner.png".equals(newOriginalName));
-        Asserts.assertTrue(newOriginalName.endsWith("_banner.png"));
+        Asserts.assertTrue(newOriginalName.endsWith("-banner.png"));
         Asserts.assertTrue(
-            newOriginalName.matches("\\d+_\\d+_banner\\.png")
+            newOriginalName.matches("\\d{17}Z-\\d+-banner\\.png")
         );
+        verify(mediaService)
+            .saveMediaOriginalNameMetaIfNotExists(98L, "banner.png");
 
         verifyNoMoreInteractions(
             request,
@@ -2003,6 +2005,7 @@ public class MediaControllerServiceTest {
             "stored-logo.png"
         );
         verify(settingService).isAllowReduceMediaFileSize();
+        verify(mediaService).containsMedia("logo.png");
         verify(mediaService).addMedia(
             eq("ADMIN"),
             addMediaCaptor.capture()
@@ -2133,7 +2136,7 @@ public class MediaControllerServiceTest {
         ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaUpdatedEvent.class);
 
-        verify(mediaValidator).validate(request);
+        verify(mediaValidator).validate(789L, request);
         verify(mediaValidator).validateMediaId(789L);
         verify(validMediaCondition).test(media);
         verify(fileSystemManager).getMediaFilePath(
@@ -2155,7 +2158,7 @@ public class MediaControllerServiceTest {
             mediaService,
             eventHandlerManager
         );
-        inOrder.verify(mediaValidator).validate(request);
+        inOrder.verify(mediaValidator).validate(789L, request);
         inOrder.verify(mediaValidator).validateMediaId(789L);
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(fileSystemManager).getMediaFilePath(
@@ -2224,7 +2227,7 @@ public class MediaControllerServiceTest {
         ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaUpdatedEvent.class);
 
-        verify(mediaValidator).validate(request);
+        verify(mediaValidator).validate(790L, request);
         verify(mediaValidator).validateMediaId(790L);
         verify(validMediaCondition).test(media);
         verify(fileSystemManager).getMediaFilePath(
@@ -2246,7 +2249,7 @@ public class MediaControllerServiceTest {
             mediaService,
             eventHandlerManager
         );
-        inOrder.verify(mediaValidator).validate(request);
+        inOrder.verify(mediaValidator).validate(790L, request);
         inOrder.verify(mediaValidator).validateMediaId(790L);
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(fileSystemManager).getMediaFilePath(
@@ -2313,8 +2316,8 @@ public class MediaControllerServiceTest {
         ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaUpdatedEvent.class);
 
-        verify(mediaValidator).validate(request);
         verify(mediaValidator).validateMediaNameAndGet("named-poster.png");
+        verify(mediaValidator).validate(791L, request);
         verify(validMediaCondition).test(media);
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -2335,8 +2338,9 @@ public class MediaControllerServiceTest {
             mediaService,
             eventHandlerManager
         );
-        inOrder.verify(mediaValidator).validate(request);
-        inOrder.verify(mediaValidator).validateMediaNameAndGet("named-poster.png");
+        inOrder.verify(mediaValidator)
+            .validateMediaNameAndGet("named-poster.png");
+        inOrder.verify(mediaValidator).validate(791L, request);
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -3612,13 +3616,15 @@ public class MediaControllerServiceTest {
         );
         verify(mediaService).addMedia("ADMIN", addMediaModel);
         verify(eventHandlerManager).handleEvent(any(MediaAddedEvent.class));
+        verify(mediaService)
+            .saveMediaOriginalNameMetaIfNotExists(910L, "banner.png");
 
         Asserts.assertEquals(actual, media);
         String newOriginalName = request.getOriginalName();
         Asserts.assertTrue(!"banner.png".equals(newOriginalName));
-        Asserts.assertTrue(newOriginalName.endsWith("_banner.png"));
+        Asserts.assertTrue(newOriginalName.endsWith("-banner.png"));
         Asserts.assertTrue(
-            newOriginalName.matches("\\d+_\\d+_banner\\.png")
+            newOriginalName.matches("\\d{17}Z-\\d+-banner\\.png")
         );
     }
 
@@ -3647,8 +3653,8 @@ public class MediaControllerServiceTest {
         // then: a new unique name is generated, keeping the original name
         // as a suffix so it stays traceable
         Asserts.assertTrue(!"duplicate.png".equals(actual));
-        Asserts.assertTrue(actual.endsWith("_duplicate.png"));
-        Asserts.assertTrue(actual.matches("\\d+_\\d+_duplicate\\.png"));
+        Asserts.assertTrue(actual.endsWith("-duplicate.png"));
+        Asserts.assertTrue(actual.matches("\\d{17}Z-\\d+-duplicate\\.png"));
         verify(mediaService).containsMedia("duplicate.png");
     }
 

@@ -103,7 +103,7 @@ public final class CommonConstants {
     public static final String PREFIX_REPLACED_MEDIA_FILE = "replaced_";
 
     public static final DateTimeFormatter MEDIA_FILE_TIME_FORMATTER =
-        DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS");
+        DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS'Z'");
 
     public static final String TOKEN_TYPE_BEARER = "Bearer";
 
