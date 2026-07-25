@@ -1111,6 +1111,7 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
+    @SuppressWarnings("MethodLength")
     public void getMediaByName(
         RequestArguments requestArguments,
         Long userId,
@@ -1157,8 +1158,14 @@ public class MediaControllerService extends EzyLoggable {
         String mediaName = media.getName();
         File resourcePath = fileSystemManager.getMediaFilePath(
             mediaType.getFolder(),
-            mediaName
+            name
         );
+        if (!resourcePath.exists()) {
+            resourcePath = fileSystemManager.getMediaFilePath(
+                mediaType.getFolder(),
+                mediaName
+            );
+        }
         if (!resourcePath.exists()) {
             throw new MediaNotFoundException(mediaName);
         }
