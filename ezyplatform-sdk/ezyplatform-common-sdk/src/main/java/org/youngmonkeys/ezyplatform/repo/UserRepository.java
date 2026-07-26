@@ -20,7 +20,12 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.User;
-import org.youngmonkeys.ezyplatform.result.*;
+import org.youngmonkeys.ezyplatform.result.IdNameResult;
+import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.IdUuidResult;
+import org.youngmonkeys.ezyplatform.result.PhoneResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -129,6 +134,12 @@ public interface UserRepository
             "WHERE e.uuid = ?0"
     )
     IdUuidNameResult findUserUuidNameByUuid(String uuid);
+
+    @EzyQuery(
+        "SELECT e.phone FROM User e " +
+            "WHERE e.id = ?0"
+    )
+    PhoneResult findPhoneByUserId(long userId);
 
     List<User> findByUsernameIn(Collection<String> usernames);
 

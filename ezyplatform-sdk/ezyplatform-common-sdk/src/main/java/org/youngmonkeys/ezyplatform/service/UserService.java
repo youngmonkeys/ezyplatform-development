@@ -106,6 +106,10 @@ public interface UserService {
         Set<String> tokenTypes
     );
 
+    String getPhoneByUserId(
+        long userId
+    );
+
     default long validateUserAccessToken(
         String accessToken
     ) {
