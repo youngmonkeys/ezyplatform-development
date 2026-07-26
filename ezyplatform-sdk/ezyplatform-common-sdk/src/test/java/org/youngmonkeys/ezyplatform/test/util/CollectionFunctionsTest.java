@@ -21,9 +21,11 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.youngmonkeys.ezyplatform.util.CollectionFunctions.distinctByField;
+import static org.youngmonkeys.ezyplatform.util.CollectionFunctions.normalizeList;
 
 public class CollectionFunctionsTest {
 
@@ -50,6 +52,48 @@ public class CollectionFunctionsTest {
         Asserts.assertEquals(
             actual,
             Arrays.asList(entry1, entry3),
+            false
+        );
+    }
+
+    @Test
+    public void normalizeListWithNullValueTest() {
+        // given
+        // when
+        List<String> actual = normalizeList(null);
+
+        // then
+        Asserts.assertEquals(actual, Collections.emptyList(), false);
+    }
+
+    @Test
+    public void normalizeListWithEmptyListTest() {
+        // given
+        // when
+        List<String> actual = normalizeList(Collections.emptyList());
+
+        // then
+        Asserts.assertEquals(actual, Collections.emptyList(), false);
+    }
+
+    @Test
+    public void normalizeListRemovesNullBlankAndTrimsItemsTest() {
+        // given
+        List<String> value = Arrays.asList(
+            "  hello  ",
+            null,
+            "",
+            "   ",
+            "world"
+        );
+
+        // when
+        List<String> actual = normalizeList(value);
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Arrays.asList("hello", "world"),
             false
         );
     }
