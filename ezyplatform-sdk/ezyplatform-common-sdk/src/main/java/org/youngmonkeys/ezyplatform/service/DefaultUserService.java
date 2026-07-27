@@ -38,6 +38,7 @@ import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidResult;
+import org.youngmonkeys.ezyplatform.result.PhoneResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
@@ -421,6 +422,17 @@ public class DefaultUserService implements UserService {
             }
         }
         return null;
+    }
+
+    @Override
+    public String getPhoneByUserId(
+        long userId
+    ) {
+        PhoneResult result = userRepository
+            .findPhoneByUserId(userId);
+        return result != null
+            ? result.getPhone()
+            : NULL_STRING;
     }
 
     @Override
