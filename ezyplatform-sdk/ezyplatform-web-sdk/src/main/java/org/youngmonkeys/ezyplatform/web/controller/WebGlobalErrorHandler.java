@@ -23,7 +23,6 @@ import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.response.ResponseEntity;
 import com.tvd12.ezyhttp.server.core.handler.UnhandledErrorHandler;
 import com.tvd12.ezyhttp.server.core.manager.RequestURIManager;
-import com.tvd12.ezyhttp.server.core.view.Redirect;
 import lombok.Setter;
 import org.youngmonkeys.ezyplatform.event.EventHandlerManager;
 import org.youngmonkeys.ezyplatform.manager.EnvironmentManager;
@@ -35,7 +34,6 @@ import static com.tvd12.ezyfox.io.EzyStrings.exceptionToSimpleString;
 import static com.tvd12.ezyhttp.server.core.constant.CoreConstants.ATTRIBUTE_MATCHED_URI;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.EVENT_NAME_HANDLE_GLOBAL_REQUEST_ERROR;
-import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 
 /**
  * Handle all errors happen in when handle client's requests.
@@ -50,7 +48,9 @@ import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
  * </pre>
  */
 @Setter
-public class WebGlobalErrorHandler implements UnhandledErrorHandler {
+public class WebGlobalErrorHandler
+    extends WebAbstractGlobalExceptionHandler
+    implements UnhandledErrorHandler {
 
     @EzyAutoBind
     protected EnvironmentManager environmentManager;
@@ -115,17 +115,36 @@ public class WebGlobalErrorHandler implements UnhandledErrorHandler {
                 .status(StatusCodes.NOT_ACCEPTABLE)
                 .build();
         } else if (errorStatusCode == StatusCodes.INTERNAL_SERVER_ERROR) {
-            return Redirect.builder()
-                .uri(addLanguageToUri(request, "/server-error"))
-                .addAttribute(
+            return newServerErrorViewBuilder()
+                .addVariable(
                     "exceptionMessage",
                     exceptionToSimpleString(exception)
                 )
                 .build();
         } else if (errorStatusCode == StatusCodes.BAD_REQUEST) {
-            return Redirect.to(addLanguageToUri(request, "/bad-request"));
+            return newBadRequestViewBuilder()
+                .addVariable(
+                    "errorData",
+                    EzyMapBuilder.mapBuilder()
+                        .put(
+                            "exceptionMessage",
+                            exceptionToSimpleString(exception)
+                        )
+                        .toMap()
+                )
+                .build();
         }
-        return Redirect.to(addLanguageToUri(request, "/not-found"));
+        return newNotFoundViewBuilder()
+            .addVariable(
+                "errorData",
+                EzyMapBuilder.mapBuilder()
+                    .put(
+                        "exceptionMessage",
+                        exceptionToSimpleString(exception)
+                    )
+                    .toMap()
+            )
+            .build();
     }
 
     protected Object postProcessError(

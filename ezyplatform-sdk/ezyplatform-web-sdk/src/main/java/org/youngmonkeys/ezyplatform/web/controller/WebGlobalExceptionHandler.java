@@ -19,7 +19,7 @@ package org.youngmonkeys.ezyplatform.web.controller;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
-import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.ezyfox.util.EzyMapBuilder;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.core.constant.StatusCodes;
 import com.tvd12.ezyhttp.core.exception.DeserializeBodyException;
@@ -54,6 +54,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.tvd12.ezyfox.io.EzyStrings.exceptionToSimpleString;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
@@ -61,7 +62,8 @@ import static org.youngmonkeys.ezyplatform.util.HttpResponses.clearAdminAccessTo
 import static org.youngmonkeys.ezyplatform.util.HttpResponses.clearUserAccessToken;
 
 @Setter
-public class WebGlobalExceptionHandler extends EzyLoggable {
+public class WebGlobalExceptionHandler
+    extends WebAbstractGlobalExceptionHandler {
 
     @EzyAutoBind
     protected SettingService settingService;
@@ -157,7 +159,6 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
 
     @TryCatch(BadRequestException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         BadRequestException e
     ) {
@@ -167,64 +168,46 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         if (requestUriManager.isApiURI(method, uriTemplate)) {
             return ResponseEntity.badRequest(e.getErrors());
         }
-        return Redirect.to(addLanguageToUri(request, "/bad-request"));
+        return newBadRequestViewBuilder()
+            .addVariable("requestArguments", arguments)
+            .addVariable("errorData", e.getErrors())
+            .build();
     }
 
     @TryCatch(BadMessageException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         BadMessageException e
     ) {
-        return handleCommonBadRequestException(
-            request,
-            arguments,
-            e
-        );
+        return handleCommonBadRequestException(arguments, e);
     }
 
     @TryCatch(InvalidPathException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         InvalidPathException e
     ) {
-        return handleCommonBadRequestException(
-            request,
-            arguments,
-            e
-        );
+        return handleCommonBadRequestException(arguments, e);
     }
 
     @TryCatch(Utf8Appendable.NotUtf8Exception.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         Utf8Appendable.NotUtf8Exception e
     ) {
-        return handleCommonBadRequestException(
-            request,
-            arguments,
-            e
-        );
+        return handleCommonBadRequestException(arguments, e);
     }
 
     @TryCatch(IllegalArgumentException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         IllegalArgumentException e
     ) {
-        return handleCommonBadRequestException(
-            request,
-            arguments,
-            e
-        );
+        return handleCommonBadRequestException(arguments, e);
     }
 
     @TryCatch(ResourceNotFoundException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         ResourceNotFoundException e
     ) {
@@ -236,7 +219,10 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 e.getResponseData()
             );
         }
-        return Redirect.to(addLanguageToUri(request, "/not-found"));
+        return newNotFoundViewBuilder()
+            .addVariable("resource", e.getResource())
+            .addVariable("errorData", e.getResponseData())
+            .build();
     }
 
     @TryCatch(HttpUnauthorizedException.class)
@@ -263,7 +249,6 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
 
     @TryCatch(HttpNotFoundException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         HttpNotFoundException e
     ) {
@@ -273,12 +258,13 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
         if (requestUriManager.isApiURI(method, uriTemplate)) {
             return ResponseEntity.notFound(e.getData());
         }
-        return Redirect.to(addLanguageToUri(request, "/not-found"));
+        return newNotFoundViewBuilder()
+            .addVariable("errorData", e.getData())
+            .build();
     }
 
     @TryCatch(ForbiddenActionException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         ForbiddenActionException e
     ) {
@@ -292,12 +278,14 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(e.getResponseData())
                 .build();
         }
-        return Redirect.to(addLanguageToUri(request, "/not-found"));
+        return newPermissionDeniedViewBuilder()
+            .addVariable("action", e.getAction())
+            .addVariable("errorData", e.getResponseData())
+            .build();
     }
 
     @TryCatch(PermissionDeniedException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         PermissionDeniedException e
     ) {
@@ -311,12 +299,19 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(singletonMap("permission", "denied"))
                 .build();
         }
-        return Redirect.to(addLanguageToUri(request, "/permission-denied"));
+        return newPermissionDeniedViewBuilder()
+            .addVariable(
+                "errorData",
+                EzyMapBuilder.mapBuilder()
+                    .put("exceptionClass", e.getClass().getName())
+                    .put("message", e.getMessage())
+                    .toMap()
+            )
+            .build();
     }
 
     @TryCatch(HttpForbiddenException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         HttpForbiddenException e
     ) {
@@ -330,39 +325,39 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 .body(e.getData())
                 .build();
         }
-        return Redirect.to(addLanguageToUri(request, "/permission-denied"));
+        return newPermissionDeniedViewBuilder()
+            .addVariable("errorData", e.getData())
+            .build();
     }
 
     @TryCatch(DeserializeBodyException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         DeserializeBodyException e
     ) {
         logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage(), e);
         HttpMethod method = arguments.getMethod();
         String uriTemplate = arguments.getUriTemplate();
-        if (requestUriManager.isApiURI(method, uriTemplate)) {
-            Map<String, String> errors = new HashMap<>();
-            Throwable cause = e.getCause();
-            if (cause instanceof InvalidFormatException) {
-                InvalidFormatException ex = (InvalidFormatException) cause;
-                for (JsonMappingException.Reference ref : ex.getPath()) {
-                    errors.put(ref.getFieldName(), "invalid");
-                }
-            } else {
-                errors.put("fields", "invalid");
+        Map<String, String> errors = new HashMap<>();
+        Throwable cause = e.getCause();
+        if (cause instanceof InvalidFormatException) {
+            InvalidFormatException ex = (InvalidFormatException) cause;
+            for (JsonMappingException.Reference ref : ex.getPath()) {
+                errors.put(ref.getFieldName(), "invalid");
             }
-            return ResponseEntity.badRequest(
-                errors
-            );
+        } else {
+            errors.put("fields", "invalid");
         }
-        return Redirect.to(addLanguageToUri(request, "/bad-request"));
+        if (requestUriManager.isApiURI(method, uriTemplate)) {
+            return ResponseEntity.badRequest(errors);
+        }
+        return newBadRequestViewBuilder()
+            .addVariable("errorData", errors)
+            .build();
     }
 
     @TryCatch(DeserializeValueException.class)
     public Object handle(
-        HttpServletRequest request,
         RequestArguments arguments,
         DeserializeValueException e
     ) {
@@ -377,11 +372,19 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 )
             );
         }
-        return Redirect.to(addLanguageToUri(request, "/bad-request"));
+        return newBadRequestViewBuilder()
+            .addVariable(
+                "errorData",
+                EzyMapBuilder.mapBuilder()
+                    .put("valueName", e.getValueName())
+                    .put("value", e.getValue())
+                    .put("outType", e.getOutType())
+                    .toMap()
+            )
+            .build();
     }
 
     protected Object handleCommonBadRequestException(
-        HttpServletRequest request,
         RequestArguments arguments,
         Exception e
     ) {
@@ -393,7 +396,14 @@ public class WebGlobalExceptionHandler extends EzyLoggable {
                 Collections.singletonMap("request", "invalid")
             );
         }
-        return Redirect.to(addLanguageToUri(request, "/bad-request"));
+        return newBadRequestViewBuilder()
+            .addVariable(
+                "errorData",
+                EzyMapBuilder.mapBuilder()
+                    .put("exceptionMessage", exceptionToSimpleString(e))
+                    .toMap()
+            )
+            .build();
     }
 
     protected Redirect redirectToAdminLogin(
