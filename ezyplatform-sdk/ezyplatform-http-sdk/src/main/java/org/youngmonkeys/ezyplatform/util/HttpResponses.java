@@ -65,13 +65,37 @@ public final class HttpResponses {
         String cookieName,
         boolean httpOnly
     ) {
-        Cookie tokenCookie = new Cookie(
+        response.addCookie(newClearedCookie(cookieName, httpOnly));
+    }
+
+    public static void clearCookie(
+        HttpServletResponse response,
+        String cookieName,
+        String path,
+        boolean httpOnly
+    ) {
+        response.addCookie(newClearedCookie(cookieName, path, httpOnly));
+    }
+
+    public static Cookie newClearedCookie(
+        String cookieName,
+        boolean httpOnly
+    ) {
+        return newClearedCookie(cookieName, "/", httpOnly);
+    }
+
+    public static Cookie newClearedCookie(
+        String cookieName,
+        String path,
+        boolean httpOnly
+    ) {
+        Cookie cookie = new Cookie(
             cookieName,
             EMPTY_STRING
         );
-        tokenCookie.setMaxAge(ZERO);
-        tokenCookie.setPath("/");
-        tokenCookie.setHttpOnly(httpOnly);
-        response.addCookie(tokenCookie);
+        cookie.setMaxAge(ZERO);
+        cookie.setPath(path);
+        cookie.setHttpOnly(httpOnly);
+        return cookie;
     }
 }
