@@ -27,30 +27,46 @@ public class WebAbstractGlobalExceptionHandler extends EzyLoggable {
 
     protected View.Builder newBadRequestViewBuilder() {
         return newErrorViewBuilder(
-            "ezycommon/errors/400",
+            getBadRequestViewTemplate(),
             "bad_request"
         );
     }
 
+    protected String getBadRequestViewTemplate() {
+        return "ezycommon/errors/400";
+    }
+
     protected View.Builder newNotFoundViewBuilder() {
         return newErrorViewBuilder(
-            "ezycommon/errors/404",
+            getNotFoundViewTemplate(),
             "not_found"
         );
     }
 
+    protected String getNotFoundViewTemplate() {
+        return "ezycommon/errors/404";
+    }
+
     protected View.Builder newPermissionDeniedViewBuilder() {
         return newErrorViewBuilder(
-            "ezycommon/errors/403",
+            getPermissionDeniedViewTemplate(),
             "permission_denied"
         );
     }
 
+    protected String getPermissionDeniedViewTemplate() {
+        return "ezycommon/errors/403";
+    }
+
     protected View.Builder newServerErrorViewBuilder() {
         return newErrorViewBuilder(
-            "ezycommon/errors/500",
+            getServerErrorViewTemplate(),
             "server_error"
         );
+    }
+
+    protected String getServerErrorViewTemplate() {
+        return "ezycommon/errors/500";
     }
 
     protected View.Builder newErrorViewBuilder(
