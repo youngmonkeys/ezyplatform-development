@@ -33,42 +33,45 @@ public final class HttpResponses {
     public static void clearAdminAccessToken(
         HttpServletResponse response
     ) {
-        Cookie tokenCookie = new Cookie(
+        clearCookie(
+            response,
             COOKIE_NAME_ADMIN_ACCESS_TOKEN,
-            EMPTY_STRING
+            Boolean.TRUE
         );
-        tokenCookie.setPath("/");
-        tokenCookie.setMaxAge(ZERO);
-        tokenCookie.setHttpOnly(Boolean.TRUE);
-        Cookie tokenCookieExpiredAt = new Cookie(
+        clearCookie(
+            response,
             COOKIE_NAME_ADMIN_ACCESS_TOKEN_EXPIRED_AT,
-            "0"
+            Boolean.TRUE
         );
-        tokenCookieExpiredAt.setMaxAge(ZERO);
-        tokenCookieExpiredAt.setPath("/");
-        tokenCookieExpiredAt.setHttpOnly(Boolean.TRUE);
-        response.addCookie(tokenCookie);
-        response.addCookie(tokenCookieExpiredAt);
     }
 
     public static void clearUserAccessToken(
         HttpServletResponse response
     ) {
-        Cookie tokenCookie = new Cookie(
+        clearCookie(
+            response,
             COOKIE_NAME_ACCESS_TOKEN,
+            Boolean.TRUE
+        );
+        clearCookie(
+            response,
+            COOKIE_NAME_ACCESS_TOKEN_EXPIRED_AT,
+            Boolean.TRUE
+        );
+    }
+
+    public static void clearCookie(
+        HttpServletResponse response,
+        String cookieName,
+        boolean httpOnly
+    ) {
+        Cookie tokenCookie = new Cookie(
+            cookieName,
             EMPTY_STRING
         );
         tokenCookie.setMaxAge(ZERO);
         tokenCookie.setPath("/");
-        tokenCookie.setHttpOnly(Boolean.TRUE);
+        tokenCookie.setHttpOnly(httpOnly);
         response.addCookie(tokenCookie);
-        Cookie tokenCookieExpiredAt = new Cookie(
-            COOKIE_NAME_ACCESS_TOKEN_EXPIRED_AT,
-            "0"
-        );
-        tokenCookieExpiredAt.setMaxAge(ZERO);
-        tokenCookieExpiredAt.setPath("/");
-        tokenCookieExpiredAt.setHttpOnly(Boolean.TRUE);
-        response.addCookie(tokenCookieExpiredAt);
     }
 }
