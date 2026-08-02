@@ -100,16 +100,27 @@ public class Driver implements java.sql.Driver {
      * prefix (it just does {@code str.split(":")} and treats index 1 as
      * the port), so a legacy mysql-connector-j style URL such as
      * "jdbc:mysql://root:12345678@localhost:3306/db" would fail there
-     * with "Incorrect port value : 12345678@localhost". This method
-     * strips any embedded credentials out of the authority section,
-     * moves them into the connection properties (without overriding
-     * ones already set there), and rewrites the scheme to "jdbc:mariadb:".
+     * with "Incorrect port value : 12345678@localhost". The same bug
+     * applies regardless of scheme, so this method strips any embedded
+     * credentials out of the authority section for both "jdbc:mysql:"
+     * and "jdbc:mariadb:" input, moves them into the connection
+     * properties (without overriding ones already set there), and
+     * always returns a "jdbc:mariadb:" URL. Any other scheme is
+     * returned untouched.
      */
     public static String toMariaDbUrl(String url, Properties info) {
         if (url == null) {
             return null;
         }
-        String rest = url.substring(LEGACY_PREFIX.length());
+        String prefix;
+        if (url.startsWith(LEGACY_PREFIX)) {
+            prefix = LEGACY_PREFIX;
+        } else if (url.startsWith(MARIADB_PREFIX)) {
+            prefix = MARIADB_PREFIX;
+        } else {
+            return url;
+        }
+        String rest = url.substring(prefix.length());
         if (!rest.startsWith("//")) {
             return MARIADB_PREFIX + rest;
         }
