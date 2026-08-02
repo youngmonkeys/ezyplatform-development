@@ -51,7 +51,7 @@
         <hikaricp.version>4.0.3</hikaricp.version>
         <thymeleaf.layout.version>3.4.0</thymeleaf.layout.version>
         <thymeleaf.version>3.1.5.RELEASE</thymeleaf.version>
-        <mysql.connector.version>8.0.33</mysql.connector.version>
+        <mariadb.connector.version>3.5.10</mariadb.connector.version>
         <tika.version>2.9.4</tika.version>
         <rhino.version>1.7.15.1</rhino.version>
     </properties>
