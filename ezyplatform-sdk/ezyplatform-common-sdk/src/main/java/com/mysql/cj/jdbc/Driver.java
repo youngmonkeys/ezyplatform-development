@@ -105,7 +105,7 @@ public class Driver implements java.sql.Driver {
      * moves them into the connection properties (without overriding
      * ones already set there), and rewrites the scheme to "jdbc:mariadb:".
      */
-    private static String toMariaDbUrl(String url, Properties info) {
+    public static String toMariaDbUrl(String url, Properties info) {
         if (url == null) {
             return null;
         }
