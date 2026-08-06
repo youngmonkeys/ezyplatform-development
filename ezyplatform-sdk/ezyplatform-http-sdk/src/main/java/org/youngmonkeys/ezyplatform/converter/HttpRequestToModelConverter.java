@@ -82,6 +82,8 @@ public class HttpRequestToModelConverter {
             .description(request.getDescription())
             .fileSize(request.getFileSize())
             .notPublic(request.isNotPublic())
+            .updatePaymentRequired(request.isUpdatePaymentRequired())
+            .paymentRequired(request.isPaymentRequired())
             .build();
     }
 
@@ -101,6 +103,8 @@ public class HttpRequestToModelConverter {
             .description(request.getDescription())
             .fileSize(request.getFileSize())
             .notPublic(request.isNotPublic())
+            .updatePaymentRequired(request.isUpdatePaymentRequired())
+            .paymentRequired(request.isPaymentRequired())
             .updateUrl(Boolean.TRUE)
             .url(request.getUrl())
             .updateDuration(request.isUpdateDuration())

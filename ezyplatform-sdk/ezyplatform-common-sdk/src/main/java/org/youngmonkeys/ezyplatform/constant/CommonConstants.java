@@ -290,6 +290,8 @@ public final class CommonConstants {
         = "web_allow_media_file_size_reduction";
     public static final String SETTING_NAME_WEB_ALLOW_PERMANENTLY_DELETE_MEDIA
         = "web_allow_permanently_delete_media";
+    public static final String SETTING_NAME_WEB_ALLOW_USER_UPDATE_MEDIA_PAYMENT_REQUIRED
+        = "web_allow_user_update_media_payment_required";
     public static final String SETTING_NAME_WEB_SITE_NAME
         = "web_site_name";
     public static final String SETTING_NAME_WEB_SITE_TITLE
@@ -335,6 +337,7 @@ public final class CommonConstants {
         "web_additional_script";
     public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
         "web_additional_foot";
+
     public static final int DEFAULT_TIMEOUT_SECONDS = 15;
     public static final String DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
     public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";

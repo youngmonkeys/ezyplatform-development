@@ -107,6 +107,12 @@ public class DefaultMediaService implements MediaService {
         }
         modelToEntityConverter.mergeToEntity(model, entity);
         mediaRepository.save(entity);
+        if (model.isUpdatePaymentRequired()) {
+            saveMediaPaymentRequired(
+                mediaId,
+                model.isPaymentRequired()
+            );
+        }
         if (model.isUpdateDuration()) {
             saveMediaDurationInMinutes(
                 mediaId,

@@ -36,6 +36,8 @@ public class UpdateMediaModel {
     private String description;
     private long fileSize;
     private boolean notPublic;
+    private boolean updatePaymentRequired;
+    private boolean paymentRequired;
     private boolean updateUrl;
     private String url;
     private boolean updateDuration;

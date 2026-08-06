@@ -34,6 +34,8 @@ public class UpdateMediaRequest {
     private String description;
     private long fileSize;
     private boolean notPublic;
+    private boolean updatePaymentRequired;
+    private boolean paymentRequired;
 
     public void setFileSize(long fileSize) {
         if (fileSize > ZERO_LONG) {
