@@ -50,6 +50,7 @@ public final class CommonConstants {
     public static final Long NULL_LONG = null;
     public static final Object NULL_OBJECT = null;
     public static final String NULL_STRING = null;
+    public static final Void NULL_VOID = null;
     public static final String TRUE_STRING = "true";
     public static final String FALSE_STRING = "false";
     public static final String DELETED = "DELETED";
@@ -202,6 +203,7 @@ public final class CommonConstants {
     public static final String META_KEY_ORIGINAL_SIZE_FILE_NAME = "original_size_file_name";
     public static final String META_KEY_REPLACED_FILE_NAME = "replaced_file_name";
     public static final String META_KEY_ORIGINAL_NAME = "original_name";
+    public static final String META_KEY_PAYMENT_REQUIRED = "payment_required";
 
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY

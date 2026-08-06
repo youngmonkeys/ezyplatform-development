@@ -52,6 +52,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_SIZE_FILE_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_PAYMENT_REQUIRED;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_REPLACED_FILE_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
@@ -195,6 +196,19 @@ public class DefaultMediaService implements MediaService {
             mediaId,
             META_KEY_SLUG,
             slug
+        );
+    }
+
+    @Override
+    public void saveMediaPaymentRequired(
+        long mediaId,
+        boolean paymentRequired
+    ) {
+        dataMetaService.saveDataMetaUniqueKey(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_PAYMENT_REQUIRED,
+            paymentRequired
         );
     }
 
@@ -535,6 +549,19 @@ public class DefaultMediaService implements MediaService {
             .findUpdatedAtByNameOrOriginalName(mediaName);
         return entityToModelConverter.toTimestamp(
             updatedAtOrNull(result)
+        );
+    }
+
+    @Override
+    public boolean isPaymentRequiredByMediaId(
+        long mediaId
+    ) {
+        return Boolean.parseBoolean(
+            dataMetaService.getLatestMetaValueByDataIdAndMetaKey(
+                TABLE_NAME_MEDIA,
+                mediaId,
+                META_KEY_PAYMENT_REQUIRED
+            )
         );
     }
 

@@ -130,6 +130,11 @@ public interface MediaService {
         String originalName
     );
 
+    void saveMediaPaymentRequired(
+        long mediaId,
+        boolean paymentRequired
+    );
+
     MediaModel removeMedia(long mediaId);
 
     MediaModel removeMedia(String mediaName);
@@ -297,4 +302,6 @@ public interface MediaService {
     );
 
     long getUpdatedAtByMediaName(String mediaName);
+
+    boolean isPaymentRequiredByMediaId(long mediaId);
 }

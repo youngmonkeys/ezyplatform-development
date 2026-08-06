@@ -56,7 +56,7 @@ public class Driver implements java.sql.Driver {
     }
 
     @Override
-    public boolean acceptsURL(String url) throws SQLException {
+    public boolean acceptsURL(String url) {
         return url != null
             && url.startsWith(LEGACY_PREFIX)
             && DELEGATE.acceptsURL(toMariaDbUrl(url, new Properties()));

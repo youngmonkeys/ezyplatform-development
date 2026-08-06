@@ -57,7 +57,6 @@ import java.util.Map;
 import static com.tvd12.ezyfox.io.EzyStrings.exceptionToSimpleString;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static java.util.Collections.singletonMap;
-import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 import static org.youngmonkeys.ezyplatform.util.HttpResponses.clearAdminAccessToken;
 import static org.youngmonkeys.ezyplatform.util.HttpResponses.clearUserAccessToken;
 
@@ -242,9 +241,10 @@ public class WebGlobalExceptionHandler
                 .body(e.getData())
                 .build();
         }
-        return Redirect.builder()
-            .uri(addLanguageToUri(arguments.getRequest(), "/login"))
-            .build();
+        return WebViews.redirectToLogin(
+            arguments.getRequest(),
+            Boolean.TRUE
+        );
     }
 
     @TryCatch(HttpNotFoundException.class)

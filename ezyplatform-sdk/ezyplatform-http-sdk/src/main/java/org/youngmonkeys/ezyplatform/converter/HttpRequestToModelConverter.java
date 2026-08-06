@@ -17,12 +17,16 @@
 package org.youngmonkeys.ezyplatform.converter;
 
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.SaveMetaModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.request.AddMediaFromUrlRequest;
+import org.youngmonkeys.ezyplatform.request.SaveMetaRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.*;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.UNKNOWN_LOWERCASE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 public class HttpRequestToModelConverter {
 
@@ -87,7 +91,7 @@ public class HttpRequestToModelConverter {
     ) {
         return UpdateMediaModel.builder()
             .mediaId(mediaId)
-            .updateType(true)
+            .updateType(Boolean.TRUE)
             .type(request.getType())
             .originalName(request.getOriginalName())
             .groupName(request.getGroupName())
@@ -97,10 +101,21 @@ public class HttpRequestToModelConverter {
             .description(request.getDescription())
             .fileSize(request.getFileSize())
             .notPublic(request.isNotPublic())
-            .updateUrl(true)
+            .updateUrl(Boolean.TRUE)
             .url(request.getUrl())
             .updateDuration(request.isUpdateDuration())
             .durationInMinutes(request.getDurationInMinutes())
+            .build();
+    }
+
+    public SaveMetaModel toModel(
+        SaveMetaRequest request
+    ) {
+        return SaveMetaModel.builder()
+            .metaKey(request.getMetaKey())
+            .metaValue(request.getMetaValue())
+            .metaNumberValue(request.getMetaNumberValue())
+            .metaTextValue(request.getMetaTextValue())
             .build();
     }
 }

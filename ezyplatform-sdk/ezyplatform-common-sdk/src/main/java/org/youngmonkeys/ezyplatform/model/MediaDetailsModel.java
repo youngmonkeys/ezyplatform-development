@@ -42,6 +42,7 @@ public class MediaDetailsModel {
     private String alternativeText;
     private String description;
     private boolean publicMedia;
+    private boolean paymentRequired;
     private String status;
     private long createdAt;
     private long updatedAt;

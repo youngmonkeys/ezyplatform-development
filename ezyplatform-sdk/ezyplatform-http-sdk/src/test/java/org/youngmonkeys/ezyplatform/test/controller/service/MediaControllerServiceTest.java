@@ -3109,6 +3109,7 @@ public class MediaControllerServiceTest {
             MediaType.VIDEO,
             "video-detail.mp4"
         );
+        verify(mediaService).isPaymentRequiredByMediaId(media.getId());
 
         Asserts.assertEquals(actual.getId(), 905L);
         Asserts.assertEquals(actual.getName(), "video-detail.mp4");
@@ -3152,6 +3153,7 @@ public class MediaControllerServiceTest {
             "video-detail.mp4"
         );
         verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
+        verify(mediaService).isPaymentRequiredByMediaId(media.getId());
 
         verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
@@ -3253,6 +3255,7 @@ public class MediaControllerServiceTest {
             "audio-detail.mp3"
         );
         verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
+        verify(mediaService).isPaymentRequiredByMediaId(media.getId());
 
         verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
@@ -3339,6 +3342,7 @@ public class MediaControllerServiceTest {
         );
         inOrder.verify(eventHandlerManager).handleEvent(any(GetMediaFilePathEvent.class));
         inOrder.verify(mediaService).getMediaImageSizeOrDefault(mediaFilePath);
+        verify(mediaService).isPaymentRequiredByMediaId(media.getId());
     }
 
     @Test
