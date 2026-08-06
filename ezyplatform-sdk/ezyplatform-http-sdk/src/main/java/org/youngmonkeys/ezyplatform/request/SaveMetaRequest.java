@@ -16,30 +16,16 @@
 
 package org.youngmonkeys.ezyplatform.request;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+import java.math.BigInteger;
 
 @Getter
 @Setter
-@JsonIgnoreProperties(ignoreUnknown = true)
-public class UpdateMediaRequest {
-    private String originalName;
-    private String groupName;
-    private String alternativeText;
-    private String title;
-    private String caption;
-    private String description;
-    private long fileSize;
-    private boolean notPublic;
-    private boolean updatePaymentRequired;
-    private boolean paymentRequired;
-
-    public void setFileSize(long fileSize) {
-        if (fileSize > ZERO_LONG) {
-            this.fileSize = fileSize;
-        }
-    }
+public class SaveMetaRequest {
+    private String metaKey;
+    private String metaValue;
+    private BigInteger metaNumberValue;
+    private String metaTextValue;
 }

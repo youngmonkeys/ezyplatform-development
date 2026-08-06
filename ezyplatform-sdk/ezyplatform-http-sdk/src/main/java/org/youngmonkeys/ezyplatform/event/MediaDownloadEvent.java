@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
@@ -23,6 +24,7 @@ import org.youngmonkeys.ezyplatform.model.MediaModel;
 @Getter
 @AllArgsConstructor
 public class MediaDownloadEvent {
+    private RequestArguments requestArguments;
     private Long userId;
     private MediaModel media;
 }

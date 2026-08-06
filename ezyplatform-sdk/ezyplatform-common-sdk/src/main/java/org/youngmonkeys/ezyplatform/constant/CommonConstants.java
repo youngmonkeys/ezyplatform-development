@@ -50,6 +50,7 @@ public final class CommonConstants {
     public static final Long NULL_LONG = null;
     public static final Object NULL_OBJECT = null;
     public static final String NULL_STRING = null;
+    public static final Void NULL_VOID = null;
     public static final String TRUE_STRING = "true";
     public static final String FALSE_STRING = "false";
     public static final String DELETED = "DELETED";
@@ -202,6 +203,7 @@ public final class CommonConstants {
     public static final String META_KEY_ORIGINAL_SIZE_FILE_NAME = "original_size_file_name";
     public static final String META_KEY_REPLACED_FILE_NAME = "replaced_file_name";
     public static final String META_KEY_ORIGINAL_NAME = "original_name";
+    public static final String META_KEY_PAYMENT_REQUIRED = "payment_required";
 
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY
@@ -288,6 +290,8 @@ public final class CommonConstants {
         = "web_allow_media_file_size_reduction";
     public static final String SETTING_NAME_WEB_ALLOW_PERMANENTLY_DELETE_MEDIA
         = "web_allow_permanently_delete_media";
+    public static final String SETTING_NAME_WEB_ALLOW_USER_UPDATE_MEDIA_PAYMENT_REQUIRED
+        = "web_allow_user_update_media_payment_required";
     public static final String SETTING_NAME_WEB_SITE_NAME
         = "web_site_name";
     public static final String SETTING_NAME_WEB_SITE_TITLE
@@ -333,6 +337,7 @@ public final class CommonConstants {
         "web_additional_script";
     public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
         "web_additional_foot";
+
     public static final int DEFAULT_TIMEOUT_SECONDS = 15;
     public static final String DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
     public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";

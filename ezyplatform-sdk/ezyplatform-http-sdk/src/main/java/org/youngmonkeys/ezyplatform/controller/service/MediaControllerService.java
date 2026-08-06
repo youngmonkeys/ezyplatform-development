@@ -1152,7 +1152,7 @@ public class MediaControllerService extends EzyLoggable {
             new ValidateMediaOwnerEvent(userId, media)
         );
         eventHandlerManager.handleEvent(
-            new MediaDownloadEvent(userId, media)
+            new MediaDownloadEvent(requestArguments, userId, media)
         );
         MediaType mediaType = media.getType();
         String mediaName = media.getName();
@@ -1253,6 +1253,7 @@ public class MediaControllerService extends EzyLoggable {
         return mediaDetails;
     }
 
+    @SuppressWarnings("MethodLength")
     public MediaDetailsModel getMediaDetails(
         MediaModel media
     ) {
@@ -1302,14 +1303,18 @@ public class MediaControllerService extends EzyLoggable {
         if (size < ZERO) {
             size = ZERO;
         }
+        long mediaId = media.getId();
         return fromMediaModel(media)
             .width(width)
             .height(height)
             .size(size)
             .originalSizeFileName(
                 mediaService.getOriginalSizeFileNameByMediaId(
-                    media.getId()
+                    mediaId
                 )
+            )
+            .paymentRequired(
+                mediaService.isPaymentRequiredByMediaId(mediaId)
             )
             .build();
     }
