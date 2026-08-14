@@ -31,7 +31,9 @@ public class HttpModelToResponseConverter extends DefaultModelToResponseConverte
             .build();
     }
 
-    public MediaResponse toResponse(MediaModel model) {
+    public MediaResponse toResponse(
+        MediaModel model
+    ) {
         return MediaResponse.builder()
             .id(model.getId())
             .name(model.getName())

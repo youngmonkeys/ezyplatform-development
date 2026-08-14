@@ -204,6 +204,7 @@ public final class CommonConstants {
     public static final String META_KEY_REPLACED_FILE_NAME = "replaced_file_name";
     public static final String META_KEY_ORIGINAL_NAME = "original_name";
     public static final String META_KEY_PAYMENT_REQUIRED = "payment_required";
+    public static final String META_KEY_ACCESS_TO_OWNER_ONLY = "access_to_owner_only";
 
     public static final String SETTING_NAME_VALUE_MAP = "valueMap";
     public static final String SETTING_NAME_EZYPLATFORM_DICTIONARY

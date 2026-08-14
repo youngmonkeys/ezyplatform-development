@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DELETED;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ACCESS_TO_OWNER_ONLY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_DURATION_IN_MINUTES;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_NAME;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ORIGINAL_SIZE_FILE_NAME;
@@ -107,12 +108,17 @@ public class DefaultMediaService implements MediaService {
         }
         modelToEntityConverter.mergeToEntity(model, entity);
         mediaRepository.save(entity);
+        mediaId = entity.getId();
         if (model.isUpdatePaymentRequired()) {
             saveMediaPaymentRequired(
                 mediaId,
                 model.isPaymentRequired()
             );
         }
+        saveMediaAccessToOwnerOnly(
+            mediaId,
+            model.isAccessToOwnerOnly()
+        );
         if (model.isUpdateDuration()) {
             saveMediaDurationInMinutes(
                 mediaId,
@@ -215,6 +221,19 @@ public class DefaultMediaService implements MediaService {
             mediaId,
             META_KEY_PAYMENT_REQUIRED,
             paymentRequired
+        );
+    }
+
+    @Override
+    public void saveMediaAccessToOwnerOnly(
+        long mediaId,
+        boolean accessToOwnerOnly
+    ) {
+        dataMetaService.saveDataMetaUniqueKey(
+            TABLE_NAME_MEDIA,
+            mediaId,
+            META_KEY_ACCESS_TO_OWNER_ONLY,
+            accessToOwnerOnly
         );
     }
 
@@ -567,6 +586,19 @@ public class DefaultMediaService implements MediaService {
                 TABLE_NAME_MEDIA,
                 mediaId,
                 META_KEY_PAYMENT_REQUIRED
+            )
+        );
+    }
+
+    @Override
+    public boolean isAccessToOwnerOnlyByMediaId(
+        long mediaId
+    ) {
+        return Boolean.parseBoolean(
+            dataMetaService.getLatestMetaValueByDataIdAndMetaKey(
+                TABLE_NAME_MEDIA,
+                mediaId,
+                META_KEY_ACCESS_TO_OWNER_ONLY
             )
         );
     }

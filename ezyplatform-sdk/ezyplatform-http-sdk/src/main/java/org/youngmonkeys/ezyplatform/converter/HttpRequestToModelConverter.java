@@ -82,6 +82,7 @@ public class HttpRequestToModelConverter {
             .description(request.getDescription())
             .fileSize(request.getFileSize())
             .notPublic(request.isNotPublic())
+            .accessToOwnerOnly(request.isAccessToOwnerOnly())
             .updatePaymentRequired(request.isUpdatePaymentRequired())
             .paymentRequired(request.isPaymentRequired())
             .build();
@@ -103,6 +104,7 @@ public class HttpRequestToModelConverter {
             .description(request.getDescription())
             .fileSize(request.getFileSize())
             .notPublic(request.isNotPublic())
+            .accessToOwnerOnly(request.isAccessToOwnerOnly())
             .updatePaymentRequired(request.isUpdatePaymentRequired())
             .paymentRequired(request.isPaymentRequired())
             .updateUrl(Boolean.TRUE)
