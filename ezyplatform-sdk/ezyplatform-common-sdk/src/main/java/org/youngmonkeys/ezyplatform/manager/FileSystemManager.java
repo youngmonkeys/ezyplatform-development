@@ -73,6 +73,13 @@ public interface FileSystemManager {
         return new File(concatWithEzyHome(path.toString()));
     }
 
+    default File concatWithEzyHomeToFile(String path) {
+        return concatWithEzyHome(
+            getEzyHomePathString(),
+            path
+        );
+    }
+
     default File getUploadFolder() {
         return new File(concatWithEzyHome(FOLDER_UPLOAD));
     }
