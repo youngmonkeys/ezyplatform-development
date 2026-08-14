@@ -216,14 +216,14 @@ public class SocketPropertiesManager extends EzyLoggable {
                     value instanceof Number
                         ? ((Number) value).intValue()
                         : Integer.parseInt(stringValue)
-                );
+                    );
             }
             if (defaultValueType == Long.class) {
                 return (T) (Long) (
                     value instanceof Number
                         ? ((Number) value).longValue()
                         : Long.parseLong(stringValue)
-                );
+                    );
             }
             if (defaultValueType == Boolean.class) {
                 return (T) Boolean.valueOf(stringValue);
