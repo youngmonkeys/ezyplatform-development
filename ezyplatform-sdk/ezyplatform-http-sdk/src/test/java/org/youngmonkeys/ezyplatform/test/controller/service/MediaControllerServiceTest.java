@@ -2991,6 +2991,7 @@ public class MediaControllerServiceTest {
         verify(mediaUpDownloader).isDownloadSupported();
         verify(mediaValidator).validateMediaName("private-video.mp4");
         verify(mediaService).getMediaByName("private-video.mp4");
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
         verify(validMediaCondition).test(media);
         verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
         verify(fileSystemManager).getMediaFilePath(
@@ -3030,6 +3031,7 @@ public class MediaControllerServiceTest {
         );
         inOrder.verify(mediaValidator).validateMediaName("private-video.mp4");
         inOrder.verify(mediaService).getMediaByName("private-video.mp4");
+        inOrder.verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(eventHandlerManager, times(2)).handleEvent(any(MediaDownloadEvent.class));
         inOrder.verify(fileSystemManager).getMediaFilePath(
@@ -3091,6 +3093,8 @@ public class MediaControllerServiceTest {
             MediaType.VIDEO,
             "video-detail.mp4"
         )).thenReturn(321L);
+        when(mediaService.isAccessToOwnerOnlyByMediaId(media.getId()))
+            .thenReturn(true);
 
         // when
         MediaDetailsModel actual = instance.getMediaDetailsById(
@@ -3110,6 +3114,7 @@ public class MediaControllerServiceTest {
             "video-detail.mp4"
         );
         verify(mediaService).isPaymentRequiredByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
 
         Asserts.assertEquals(actual.getId(), 905L);
         Asserts.assertEquals(actual.getName(), "video-detail.mp4");
@@ -3127,6 +3132,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual.getAlternativeText(), "detail alt");
         Asserts.assertEquals(actual.getDescription(), "detail description");
         Asserts.assertTrue(actual.isPublicMedia());
+        Asserts.assertTrue(actual.isAccessToOwnerOnly());
         Asserts.assertEquals(actual.getStatus(), "ACTIVE");
         Asserts.assertEquals(actual.getCreatedAt(), 100L);
         Asserts.assertEquals(actual.getUpdatedAt(), 200L);
@@ -3154,6 +3160,7 @@ public class MediaControllerServiceTest {
         );
         verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
         verify(mediaService).isPaymentRequiredByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
 
         verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
@@ -3256,6 +3263,7 @@ public class MediaControllerServiceTest {
         );
         verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
         verify(mediaService).isPaymentRequiredByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
 
         verifyNoMoreInteractions(validMediaCondition, mediaUpDownloader);
     }
@@ -3310,6 +3318,7 @@ public class MediaControllerServiceTest {
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
         verify(mediaService).getMediaImageSizeOrDefault(mediaFilePath);
         verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
 
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), media);
         Asserts.assertEquals(actual.getId(), 907L);
@@ -3328,6 +3337,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual.getAlternativeText(), "poster alt");
         Asserts.assertEquals(actual.getDescription(), "poster description");
         Asserts.assertTrue(actual.isPublicMedia());
+        Asserts.assertTrue(!actual.isAccessToOwnerOnly());
         Asserts.assertEquals(actual.getStatus(), "ACTIVE");
         Asserts.assertEquals(actual.getCreatedAt(), 500L);
         Asserts.assertEquals(actual.getUpdatedAt(), 600L);
@@ -3343,6 +3353,7 @@ public class MediaControllerServiceTest {
         inOrder.verify(eventHandlerManager).handleEvent(any(GetMediaFilePathEvent.class));
         inOrder.verify(mediaService).getMediaImageSizeOrDefault(mediaFilePath);
         verify(mediaService).isPaymentRequiredByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
     }
 
     @Test
@@ -3581,7 +3592,9 @@ public class MediaControllerServiceTest {
         when(entityToModelConverter.toModel(mediaEntity)).thenReturn(mediaModel);
         when(mediaPaginationParameterConverter.serialize(any(String.class), eq(mediaModel)))
             .thenReturn("page-token");
-        when(modelToResponseConverter.toResponse(mediaModel))
+        when(mediaService.getAccessToOwnerOnlyMapByMediaIds(any()))
+            .thenReturn(Collections.singletonMap(908L, true));
+        when(modelToResponseConverter.toResponse(mediaModel, true))
             .thenReturn(mediaResponse);
 
         // when
@@ -3609,7 +3622,8 @@ public class MediaControllerServiceTest {
         );
         verify(paginationMediaRepository).countElements(filter);
         verify(entityToModelConverter).toModel(mediaEntity);
-        verify(modelToResponseConverter).toResponse(mediaModel);
+        verify(mediaService).getAccessToOwnerOnlyMapByMediaIds(any());
+        verify(modelToResponseConverter).toResponse(mediaModel, true);
 
         Asserts.assertEquals(actual.getItems().size(), 1);
         Asserts.assertEquals(actual.getItems().get(0), mediaResponse);
@@ -3622,7 +3636,7 @@ public class MediaControllerServiceTest {
             modelToResponseConverter
         );
         inOrder.verify(commonValidator).validatePageSize(20);
-        inOrder.verify(modelToResponseConverter).toResponse(mediaModel);
+        inOrder.verify(modelToResponseConverter).toResponse(mediaModel, true);
     }
 
     @Test
