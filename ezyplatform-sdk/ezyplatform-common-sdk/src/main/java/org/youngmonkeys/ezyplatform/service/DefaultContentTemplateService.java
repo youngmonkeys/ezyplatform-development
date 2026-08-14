@@ -31,6 +31,7 @@ import org.youngmonkeys.ezyplatform.model.SaveContentTemplateModel;
 import org.youngmonkeys.ezyplatform.repo.ContentTemplateRepository;
 import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
 
 import java.util.Collection;
@@ -222,6 +223,16 @@ public class DefaultContentTemplateService
             .findAllContentTypes()
             .stream()
             .map(ContentTypeResult::getContentType)
+            .filter(EzyStrings::isNotBlank)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> getAllTemplateStatuses() {
+        return contentTemplateRepository
+            .findAllStatuses()
+            .stream()
+            .map(StatusResult::getStatus)
             .filter(EzyStrings::isNotBlank)
             .collect(Collectors.toList());
     }

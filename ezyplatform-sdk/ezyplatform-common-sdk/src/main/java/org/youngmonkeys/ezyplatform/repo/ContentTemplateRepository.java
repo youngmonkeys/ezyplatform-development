@@ -24,6 +24,7 @@ import org.youngmonkeys.ezyplatform.result.ContentTemplateIdAndNameResult;
 import org.youngmonkeys.ezyplatform.result.ContentTypeResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.SimpleContentTemplateResult;
+import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TemplateTypeResult;
 
 import java.util.Collection;
@@ -44,6 +45,13 @@ public interface ContentTemplateRepository
             "ORDER BY e.templateType ASC"
     )
     List<TemplateTypeResult> findAllTemplateTypes();
+
+    @EzyQuery(
+        "SELECT DISTINCT e.status " +
+            "FROM ContentTemplate e " +
+            "ORDER BY e.status ASC"
+    )
+    List<StatusResult> findAllStatuses();
 
     @EzyQuery(
         "SELECT e.id, e.templateName, e.titleTemplate, " +
