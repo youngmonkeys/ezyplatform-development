@@ -3592,9 +3592,7 @@ public class MediaControllerServiceTest {
         when(entityToModelConverter.toModel(mediaEntity)).thenReturn(mediaModel);
         when(mediaPaginationParameterConverter.serialize(any(String.class), eq(mediaModel)))
             .thenReturn("page-token");
-        when(mediaService.getAccessToOwnerOnlyMapByMediaIds(any()))
-            .thenReturn(Collections.singletonMap(908L, true));
-        when(modelToResponseConverter.toResponse(mediaModel, true))
+        when(modelToResponseConverter.toResponse(mediaModel))
             .thenReturn(mediaResponse);
 
         // when
@@ -3622,8 +3620,7 @@ public class MediaControllerServiceTest {
         );
         verify(paginationMediaRepository).countElements(filter);
         verify(entityToModelConverter).toModel(mediaEntity);
-        verify(mediaService).getAccessToOwnerOnlyMapByMediaIds(any());
-        verify(modelToResponseConverter).toResponse(mediaModel, true);
+        verify(modelToResponseConverter).toResponse(mediaModel);
 
         Asserts.assertEquals(actual.getItems().size(), 1);
         Asserts.assertEquals(actual.getItems().get(0), mediaResponse);
@@ -3636,7 +3633,7 @@ public class MediaControllerServiceTest {
             modelToResponseConverter
         );
         inOrder.verify(commonValidator).validatePageSize(20);
-        inOrder.verify(modelToResponseConverter).toResponse(mediaModel, true);
+        inOrder.verify(modelToResponseConverter).toResponse(mediaModel);
     }
 
     @Test
