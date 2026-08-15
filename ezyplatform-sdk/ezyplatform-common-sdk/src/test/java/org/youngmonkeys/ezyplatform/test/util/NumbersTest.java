@@ -28,6 +28,7 @@ import static org.youngmonkeys.ezyplatform.util.Numbers.fromRandomText;
 import static org.youngmonkeys.ezyplatform.util.Numbers.isFloatingPointText;
 import static org.youngmonkeys.ezyplatform.util.Numbers.roundUpOrDownToInt;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toIntOrZero;
+import static org.youngmonkeys.ezyplatform.util.Numbers.toIntOrZeroFromObject;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toIntValue;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrZero;
 import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrNullFromObject;
@@ -62,6 +63,53 @@ public class NumbersTest {
         Asserts.assertEquals(toLongOrZero(null), 0L);
         Asserts.assertEquals(toLongOrZero("10"), 10L);
         Asserts.assertEquals(toLongOrZero("10a"), 0L);
+    }
+
+    @Test
+    public void toIntOrZeroFromObjectTest() throws Exception {
+        // given
+        // when
+        // then
+        Asserts.assertEquals(
+            toIntOrZeroFromObject(null),
+            0
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject(10L),
+            10
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject(10),
+            10
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject(BigInteger.valueOf(10L)),
+            10
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject(BigDecimal.valueOf(10.9D)),
+            10
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject(-10),
+            -10
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject("10"),
+            10
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject("-10"),
+            -10
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject(""),
+            0
+        );
+        Asserts.assertEquals(
+            toIntOrZeroFromObject("10a"),
+            0
+        );
     }
 
     @Test
