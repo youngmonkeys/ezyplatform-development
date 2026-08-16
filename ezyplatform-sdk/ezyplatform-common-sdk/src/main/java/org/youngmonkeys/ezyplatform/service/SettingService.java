@@ -42,6 +42,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATE
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_REDUCED_IMAGE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_UPLOAD_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_UPLOAD_IMAGE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_NATURAL_LANGUAGE_STOP_WORDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TOKEN_EXPIRED_IN_DAY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_WEBSOCKET_URL;
@@ -60,6 +61,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_PAGINATION_COUNT_LIMIT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_USER_ACCESS_TOKEN_HTTP_ONLY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_USER_TOKEN_EXPIRED_IN_DAY;
@@ -661,4 +663,11 @@ public interface SettingService {
         Class<T> outputType,
         T defaultValue
     );
+
+    default Set<String> getNaturalLanguageStopWords() {
+        return getSetStringValue(
+            SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS,
+            DEFAULT_NATURAL_LANGUAGE_STOP_WORDS
+        );
+    }
 }

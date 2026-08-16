@@ -47,6 +47,7 @@ public class DefaultDataIndexService
         extends EzyLoggable
         implements DataIndexService {
 
+    private final SettingService settingService;
     private final DataIndexRepository dataIndexRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
@@ -227,6 +228,22 @@ public class DefaultDataIndexService
             }
         }
         return new ArrayList<>(distinctDataTypeIdModels);
+    }
+
+    public List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
+        Collection<String> dataTypes,
+        String query,
+        int limit,
+        int maxKeywords,
+        int dataRankFusionConstant
+    ) {
+        return searchDataIdsByReciprocalRankFusion(
+            dataTypes,
+            query,
+            limit,
+            settingService.getNaturalLanguageStopWords(),
+
+        );
     }
 
     /**
