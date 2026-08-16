@@ -16,12 +16,15 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.model.DataTypeIdModel;
 import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATA_INDEX_OVER_FETCH_FACTOR;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MAX_FETCH_ROUND;
 
 public interface DataIndexService {
@@ -122,5 +125,74 @@ public interface DataIndexService {
         String keywordPrefix,
         int limit,
         int maxFetchRound
+    );
+
+    default List<DataTypeIdModel> getDataTypeIdsByDataTypesAndKeywordPrefix(
+        Collection<String> dataTypes,
+        String keywordPrefix,
+        int limit
+    ) {
+        return getDataTypeIdsByDataTypesAndKeywordPrefix(
+            dataTypes,
+            keywordPrefix,
+            limit,
+            DEFAULT_DATA_INDEX_OVER_FETCH_FACTOR
+        );
+    }
+
+    List<DataTypeIdModel> getDataTypeIdsByDataTypesAndKeywordPrefix(
+        Collection<String> dataTypes,
+        String keywordPrefix,
+        long limit,
+        long overFetchFactor
+    );
+
+    /**
+     * Searches {@code ezy_data_indices} for the data ids most relevant to a
+     * free-text query (e.g. a chat message), using Reciprocal Rank Fusion
+     * (RRF) to combine per-keyword rankings.
+     *
+     * <p>Algorithm:
+     * <ol>
+     *     <li>The query is normalized and tokenized into keywords
+     *     (see {@link #extractKeywords(String)}); stop words and
+     *     over-short tokens are dropped, and the result is capped at
+     *     {@link org.youngmonkeys.ezyai.constant.EzyAIConstants#MAX_INDEXED_DATA_SEARCH_KEYWORDS}
+     *     tokens so a long query cannot fan out into unbounded lookups.</li>
+     *     <li>Each keyword is searched independently as a prefix match
+     *     against {@code ezy_data_indices} (across all of {@code dataTypes}
+     *     at once), returning a list already ranked by the index's
+     *     {@code priority} column, most specific match first.</li>
+     *     <li>The per-keyword ranked lists are fused with RRF: for a data
+     *     id at zero-based {@code rank} in a keyword's result list, it
+     *     earns {@code 1 / (k + rank + 1)} points, where {@code k} is
+     *     {@link org.youngmonkeys.ezyai.constant.EzyAIConstants#INDEXED_DATA_RANK_FUSION_CONSTANT}.
+     *     Points from all keywords are summed per data id, so a data id
+     *     that ranks highly under several keywords outscores one that
+     *     ranks highly under only one. RRF is used instead of a raw
+     *     priority sum because the underlying
+     *     {@code DataIndexService} API only exposes the rank/order of
+     *     each keyword's matches, not a comparable numeric score.</li>
+     *     <li>Data ids are sorted by fused score, descending, and
+     *     truncated to {@code limit}.</li>
+     * </ol>
+     *
+     * @param dataTypes the {@code data_type} values in {@code ezy_data_indices}
+     *                   to search across
+     * @param query the free-text query to search for, e.g. a chat message
+     * @param limit the maximum number of results to return
+     * @return data ids ranked by fused relevance, descending; empty if
+     *         {@code dataTypes} is empty, {@code query} is blank, or no
+     *         keyword could be extracted from it
+     */
+    List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
+        Collection<String> dataTypes,
+        String query,
+        int limit,
+        String splitPattern,
+        int minKeywordLength,
+        Set<String> stopWords,
+        int maxKeywords,
+        int dataRankFusionConstant
     );
 }

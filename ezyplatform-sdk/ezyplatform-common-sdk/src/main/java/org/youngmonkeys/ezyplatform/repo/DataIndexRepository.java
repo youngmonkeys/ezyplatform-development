@@ -20,6 +20,7 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.DataIndex;
+import org.youngmonkeys.ezyplatform.result.DataTypeIdResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.Collection;
@@ -69,6 +70,18 @@ public interface DataIndexRepository
         String dataType,
         String keywordPrefix,
         Collection<Long> exclusiveDataIds,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT e.dataType, e.dataId FROM DataIndex e " +
+        "WHERE e.dataType IN ?0 " +
+        "AND e.keyword LIKE CONCAT(?1,'%') " +
+        "ORDER BY e.priority DESC, e.id DESC"
+    )
+    List<DataTypeIdResult> findDataTypeIdsByDataTypeInAndKeywordPrefixOrderByPriorityDescIdDesc(
+        Collection<String> dataTypes,
+        String keywordPrefix,
         Next next
     );
 }

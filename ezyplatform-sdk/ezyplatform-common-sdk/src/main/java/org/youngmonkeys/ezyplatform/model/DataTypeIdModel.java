@@ -1,12 +1,12 @@
 /*
- * Copyright 2023 youngmonkeys.org
- * 
+ * Copyright 2022 youngmonkeys.org
+ *
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://youngmonkeys.org/licenses/ezyplatform-1.0.0.txt
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,24 +14,16 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.util;
+package org.youngmonkeys.ezyplatform.model;
 
-public final class Values {
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-    private Values() {}
-
-    public static <T> T nullValue() {
-        return null;
-    }
-
-    public static boolean isAllNull(
-        Object... values
-    ) {
-        for (Object value : values) {
-            if (value != null) {
-                return false;
-            }
-        }
-        return true;
-    }
+@Getter
+@AllArgsConstructor
+@EqualsAndHashCode
+public class DataTypeIdModel {
+    private final String dataType;
+    private final long dataId;
 }

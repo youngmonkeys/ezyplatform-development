@@ -17,8 +17,12 @@
 package org.youngmonkeys.ezyplatform.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
@@ -72,6 +76,37 @@ public final class Keywords {
             }
         }
         return answer;
+    }
+
+    /**
+     *
+     * @param query
+     * @param splitPattern
+     * @param minKeywordLength
+     * @param stopWords
+     * @param maxKeywords
+     * @return
+     */
+    public static List<String> toKeywords(
+        String query,
+        String splitPattern,
+        int minKeywordLength,
+        Set<String> stopWords,
+        int maxKeywords
+    ) {
+        return Arrays
+            .stream(
+                query
+                    .trim()
+                    .toLowerCase()
+                    .split(splitPattern)
+            )
+            .filter(token -> token.length() >= minKeywordLength)
+            .filter(token -> !stopWords.contains(token))
+            .distinct()
+            .sorted(Comparator.comparingInt(String::length).reversed())
+            .limit(maxKeywords)
+            .collect(Collectors.toList());
     }
 
     public static List<String> keywordsFromEmail(

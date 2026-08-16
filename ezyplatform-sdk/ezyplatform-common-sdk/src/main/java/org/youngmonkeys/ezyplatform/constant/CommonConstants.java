@@ -109,6 +109,7 @@ public final class CommonConstants {
     public static final String TOKEN_TYPE_BEARER = "Bearer";
 
     public static final int MAX_FETCH_ROUND = 3;
+    public static final int DEFAULT_DATA_INDEX_OVER_FETCH_FACTOR = 3;
     public static final int MAX_LENGTH_UUID = 128;
     public static final int MIN_LENGTH_PASSWORD = 6;
     public static final int MAX_LENGTH_PASSWORD = 128;
