@@ -147,6 +147,12 @@ public interface DataIndexService {
         long overFetchFactor
     );
 
+    List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
+        Collection<String> dataTypes,
+        String query,
+        int limit
+    );
+
     /**
      * Searches {@code ezy_data_indices} for the data type/id pairs most
      * relevant to a free-text query (e.g. a chat message), using

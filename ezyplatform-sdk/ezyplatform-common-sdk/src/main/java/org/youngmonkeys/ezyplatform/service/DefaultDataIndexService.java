@@ -230,19 +230,21 @@ public class DefaultDataIndexService
         return new ArrayList<>(distinctDataTypeIdModels);
     }
 
+    @Override
     public List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
         Collection<String> dataTypes,
         String query,
-        int limit,
-        int maxKeywords,
-        int dataRankFusionConstant
+        int limit
     ) {
         return searchDataIdsByReciprocalRankFusion(
             dataTypes,
             query,
             limit,
+            settingService.getDataKeywordSplitPattern(),
+            settingService.getMinDataKeywordLength(),
             settingService.getNaturalLanguageStopWords(),
-
+            settingService.getMaxDataSearchKeywords(),
+            settingService.getDataRankFusionConstant()
         );
     }
 

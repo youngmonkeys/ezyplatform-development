@@ -36,12 +36,16 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_ACCEPTED_IMAGE_TYPES;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_ADMIN_URL;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATA_KEYWORD_SPLIT_PATTERN;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATA_RANK_FUSION_CONSTANT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATETIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATE_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_DATE_MINUTE_FORMAT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_DATA_SEARCH_KEYWORDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_REDUCED_IMAGE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_UPLOAD_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MAX_UPLOAD_IMAGE_SIZE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_MIN_DATA_KEYWORD_LENGTH;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_NATURAL_LANGUAGE_STOP_WORDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.DEFAULT_TOKEN_EXPIRED_IN_DAY;
@@ -58,9 +62,13 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ALLOW_SEND_STATISTICS_DATA;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_DATA_KEYWORD_SPLIT_PATTERN;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_DATA_RANK_FUSION_CONSTANT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_DATA_SEARCH_KEYWORDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MEDIA_UP_DOWN_LOADER_NAME;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MIN_DATA_KEYWORD_LENGTH;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_PAGINATION_COUNT_LIMIT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_USER_ACCESS_TOKEN_HTTP_ONLY;
@@ -668,6 +676,34 @@ public interface SettingService {
         return getSetStringValue(
             SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS,
             DEFAULT_NATURAL_LANGUAGE_STOP_WORDS
+        );
+    }
+
+    default String getDataKeywordSplitPattern() {
+        return getTextValue(
+            SETTING_NAME_DATA_KEYWORD_SPLIT_PATTERN,
+            DEFAULT_DATA_KEYWORD_SPLIT_PATTERN
+        );
+    }
+
+    default int getMaxDataSearchKeywords() {
+        return getIntValue(
+            SETTING_NAME_MAX_DATA_SEARCH_KEYWORDS,
+            DEFAULT_MAX_DATA_SEARCH_KEYWORDS
+        );
+    }
+
+    default int getMinDataKeywordLength() {
+        return getIntValue(
+            SETTING_NAME_MIN_DATA_KEYWORD_LENGTH,
+            DEFAULT_MIN_DATA_KEYWORD_LENGTH
+        );
+    }
+
+    default int getDataRankFusionConstant() {
+        return getIntValue(
+            SETTING_NAME_DATA_RANK_FUSION_CONSTANT,
+            DEFAULT_DATA_RANK_FUSION_CONSTANT
         );
     }
 }
