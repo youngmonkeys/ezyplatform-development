@@ -139,5 +139,24 @@ public class SettingServiceTest {
         public <T> T getObjectValue(String settingName, Class<T> objectType) {
             return null;
         }
+
+        @Override
+        public Map<Object, Object> getLocalSettings() {
+            return Collections.emptyMap();
+        }
+
+        @Override
+        public String getLocalSettingTextValue(String settingName) {
+            return "";
+        }
+
+        @Override
+        public <T> T getLocalSettingValue(
+            String settingName,
+            Class<T> outputType,
+            T defaultValue
+        ) {
+            return null;
+        }
     }
 }

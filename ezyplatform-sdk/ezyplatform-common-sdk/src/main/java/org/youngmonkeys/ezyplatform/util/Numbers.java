@@ -77,6 +77,22 @@ public final class Numbers {
         }
     }
 
+    public static int toIntOrZeroFromObject(
+        Object value
+    ) {
+        if (value == null) {
+            return ZERO;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        try {
+            return Integer.parseInt(value.toString());
+        } catch (Exception e) {
+            return ZERO;
+        }
+    }
+
     public static long toLongOrZero(String value) {
         try {
             return isBlank(value)

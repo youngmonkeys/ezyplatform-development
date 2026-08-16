@@ -592,4 +592,16 @@ public final class Strings {
     ) {
         return value != null ? value.toString() : null;
     }
+
+    public static boolean toBooleanFromObject(
+        Object value
+    ) {
+        if (value == null) {
+            return Boolean.FALSE;
+        }
+        if (value instanceof Boolean) {
+            return (Boolean) value;
+        }
+        return Boolean.parseBoolean(value.toString());
+    }
 }

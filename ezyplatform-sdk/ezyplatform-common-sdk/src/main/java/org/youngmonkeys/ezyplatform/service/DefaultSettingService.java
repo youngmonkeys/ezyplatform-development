@@ -24,6 +24,7 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyfox.util.EzyLoggable;
+import com.tvd12.properties.file.reader.BaseFileReader;
 import lombok.Setter;
 import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
@@ -52,6 +53,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 import static java.nio.file.Files.readAllLines;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FILE_ENCRYPTION_KEYS;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FOLDER_SETTINGS;
@@ -68,8 +70,9 @@ public abstract class DefaultSettingService
     @EzyProperty("server.websocket_url")
     protected String serverWebsocketUrl;
 
-    private final Scheduler scheduler;
+    private final FileSystemManager fileSystemManager;
     private final ObjectMapper objectMapper;
+    private final Scheduler scheduler;
     private final SettingRepository settingRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
     protected final File encryptionKeysFile;
@@ -85,11 +88,16 @@ public abstract class DefaultSettingService
         = new ConcurrentHashMap<>();
     private final Map<String, EzyExceptionFunction<String, Object>> converters
         = new ConcurrentHashMap<>();
+    protected final AtomicReference<Map<Object, Object>> localSettingRef =
+        new AtomicReference<>();
+    protected final AtomicLong localSettingLastModified =
+        new AtomicLong();
 
     public static final LocalDateTime DEFAULT_LAST_CHANGED_TIME
         = LocalDateTime.of(1970, 1, 1, 0, 0);
     public static final String DEFAULT_ENCRYPTION_KEY = "KSYzjcc8nqrBk8jXtW4QaMpr2suBU9vY";
     public static final String LAST_UPDATE_TIME_SUFFIX = "_last_updated_time";
+    public static final String LOCAL_SETTING_FILE_PATH = "data/local-setting.properties";
 
     public DefaultSettingService(
         Scheduler scheduler,
@@ -98,8 +106,9 @@ public abstract class DefaultSettingService
         SettingRepository settingRepository,
         DefaultEntityToModelConverter entityToModelConverter
     ) {
-        this.scheduler = scheduler;
+        this.fileSystemManager = fileSystemManager;
         this.objectMapper = objectMapper;
+        this.scheduler = scheduler;
         this.settingRepository = settingRepository;
         this.entityToModelConverter = entityToModelConverter;
         this.encryptionKeysFile = fileSystemManager.concatWithEzyHome(
@@ -431,5 +440,72 @@ public abstract class DefaultSettingService
                 Boolean.TRUE
             );
         }
+    }
+
+    @Override
+    public Map<Object, Object> getLocalSettings() {
+        File file = fileSystemManager.concatWithEzyHomeToFile(
+            LOCAL_SETTING_FILE_PATH
+        );
+        if (file.exists()) {
+            loadLocalSettingsIfNeed(file);
+        }
+        synchronized (localSettingRef) {
+            Map<Object, Object> answer = localSettingRef.get();
+            return answer != null ? answer : Collections.emptyMap();
+        }
+    }
+
+    protected void loadLocalSettingsIfNeed(File file) {
+        synchronized (localSettingRef) {
+            long lastModified = file.lastModified();
+            if (localSettingLastModified.get() != lastModified) {
+                localSettingRef.set(readLocalSettings(file));
+                localSettingLastModified.set(lastModified);
+            }
+        }
+    }
+
+    private Map<Object, Object> readLocalSettings(
+        File file
+    ) {
+        return new BaseFileReader().read(file);
+    }
+
+    @Override
+    public String getLocalSettingTextValue(
+        String settingName
+    ) {
+        Map<Object, Object> map = getLocalSettings();
+        Object answer = map.get(settingName);
+        return answer != null
+            ? answer.toString()
+            : NULL_STRING;
+    }
+
+    @Override
+    public <T> T getLocalSettingValue(
+        String settingName,
+        Class<T> outputType,
+        T defaultValue
+    ) {
+        String value = getLocalSettingTextValue(
+            settingName
+        );
+        if (value != null) {
+            try {
+                return objectMapper.convertValue(
+                    value,
+                    outputType
+                );
+            } catch (Exception e) {
+                logger.warn(
+                    "convert value: {} to: {} failed",
+                    value,
+                    outputType
+                );
+            }
+        }
+        return defaultValue;
     }
 }

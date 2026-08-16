@@ -641,4 +641,24 @@ public interface SettingService {
     default String randomWebEmail() {
         return randomEmailFromUrl(getWebUrl());
     }
+
+    Map<Object, Object> getLocalSettings();
+
+    String getLocalSettingTextValue(
+        String settingName
+    );
+
+    default String getLocalSettingTextValue(
+        String settingName,
+        String defaultValue
+    ) {
+        String value = getLocalSettingTextValue(settingName);
+        return value != null ? value : defaultValue;
+    }
+
+    <T> T getLocalSettingValue(
+        String settingName,
+        Class<T> outputType,
+        T defaultValue
+    );
 }
