@@ -147,6 +147,21 @@ public interface DataIndexService {
         long overFetchFactor
     );
 
+    /**
+     * Equivalent to
+     * {@link #searchDataIdsByReciprocalRankFusion(Collection, String, int, String, int, Set, int, int)}
+     * with {@code splitPattern}, {@code minKeywordLength},
+     * {@code stopWords}, {@code maxKeywords} and
+     * {@code dataRankFusionConstant} taken from the current settings.
+     *
+     * @param dataTypes the {@code data_type} values in {@code ezy_data_indices}
+     *                   to search across
+     * @param query the free-text query to search for, e.g. a chat message
+     * @param limit the maximum number of results to return
+     * @return data type/id pairs ranked by fused relevance, descending;
+     *         empty if {@code dataTypes} is empty, {@code query} is blank,
+     *         or no keyword could be extracted from it
+     */
     List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
         Collection<String> dataTypes,
         String query,
