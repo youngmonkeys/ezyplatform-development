@@ -229,7 +229,21 @@ public abstract class MutableSettingService
             LOCAL_SETTING_FILE_PATH
         );
         synchronized (localSettingRef) {
-            writeLocalSettings(file, settings);
+            if (file.exists()) {
+                loadLocalSettingsIfNeed(file);
+            }
+            Map<Object, Object> current = localSettingRef.get();
+            Map<Object, Object> mergedSettings = current != null
+                ? new HashMap<>(current)
+                : new HashMap<>();
+            for (Map.Entry<Object, Object> entry : settings.entrySet()) {
+                if (entry.getValue() == null) {
+                    mergedSettings.remove(entry.getKey());
+                } else {
+                    mergedSettings.put(entry.getKey(), entry.getValue());
+                }
+            }
+            writeLocalSettings(file, mergedSettings);
         }
     }
 
