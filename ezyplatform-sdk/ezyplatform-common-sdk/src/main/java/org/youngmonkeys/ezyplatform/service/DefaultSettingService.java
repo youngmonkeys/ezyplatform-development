@@ -492,8 +492,20 @@ public abstract class DefaultSettingService
         String value = getLocalSettingTextValue(
             settingName
         );
-        return value != null
-            ? objectMapper.convertValue(value, outputType)
-            : defaultValue;
+        if (value != null) {
+            try {
+                return objectMapper.convertValue(
+                    value,
+                    outputType
+                );
+            } catch (Exception e) {
+                logger.warn(
+                    "convert value: {} to: {} failed",
+                    value,
+                    outputType
+                );
+            }
+        }
+        return defaultValue;
     }
 }
