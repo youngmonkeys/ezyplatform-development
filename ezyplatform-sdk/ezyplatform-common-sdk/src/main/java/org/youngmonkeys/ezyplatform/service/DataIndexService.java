@@ -148,42 +148,55 @@ public interface DataIndexService {
     );
 
     /**
-     * Searches {@code ezy_data_indices} for the data ids most relevant to a
-     * free-text query (e.g. a chat message), using Reciprocal Rank Fusion
-     * (RRF) to combine per-keyword rankings.
+     * Searches {@code ezy_data_indices} for the data type/id pairs most
+     * relevant to a free-text query (e.g. a chat message), using
+     * Reciprocal Rank Fusion (RRF) to combine per-keyword rankings.
      *
      * <p>Algorithm:
      * <ol>
-     *     <li>The query is normalized and tokenized into keywords
-     *     (see {@link #extractKeywords(String)}); stop words and
-     *     over-short tokens are dropped, and the result is capped at
-     *     {@link org.youngmonkeys.ezyai.constant.EzyAIConstants#MAX_INDEXED_DATA_SEARCH_KEYWORDS}
-     *     tokens so a long query cannot fan out into unbounded lookups.</li>
+     *     <li>The query is trimmed, lower-cased and split by
+     *     {@code splitPattern} into tokens (see
+     *     {@link org.youngmonkeys.ezyplatform.util.Keywords#toKeywords(String, String, int, Set, int)});
+     *     tokens shorter than {@code minKeywordLength} or contained in
+     *     {@code stopWords} are dropped, duplicates are removed, the
+     *     remaining tokens are sorted longest-first (most specific first),
+     *     and the result is capped at {@code maxKeywords} tokens so a
+     *     long query cannot fan out into unbounded lookups.</li>
      *     <li>Each keyword is searched independently as a prefix match
-     *     against {@code ezy_data_indices} (across all of {@code dataTypes}
-     *     at once), returning a list already ranked by the index's
-     *     {@code priority} column, most specific match first.</li>
+     *     against {@code ezy_data_indices} across all of {@code dataTypes}
+     *     at once (see
+     *     {@link #getDataTypeIdsByDataTypesAndKeywordPrefix(Collection, String, int)}),
+     *     returning up to {@code limit} distinct data type/id pairs already
+     *     ranked by the index's {@code priority} column, most specific
+     *     match first.</li>
      *     <li>The per-keyword ranked lists are fused with RRF: for a data
-     *     id at zero-based {@code rank} in a keyword's result list, it
-     *     earns {@code 1 / (k + rank + 1)} points, where {@code k} is
-     *     {@link org.youngmonkeys.ezyai.constant.EzyAIConstants#INDEXED_DATA_RANK_FUSION_CONSTANT}.
-     *     Points from all keywords are summed per data id, so a data id
-     *     that ranks highly under several keywords outscores one that
-     *     ranks highly under only one. RRF is used instead of a raw
-     *     priority sum because the underlying
-     *     {@code DataIndexService} API only exposes the rank/order of
-     *     each keyword's matches, not a comparable numeric score.</li>
-     *     <li>Data ids are sorted by fused score, descending, and
-     *     truncated to {@code limit}.</li>
+     *     type/id pair at zero-based {@code rank} in a keyword's result
+     *     list, it earns {@code 1 / (dataRankFusionConstant + rank + 1)}
+     *     points. Points from all keywords are summed per data type/id
+     *     pair, so a pair that ranks highly under several keywords
+     *     outscores one that ranks highly under only one. RRF is used
+     *     instead of a raw priority sum because the underlying prefix
+     *     search only exposes the rank/order of each keyword's matches,
+     *     not a comparable numeric score.</li>
+     *     <li>Data type/id pairs are sorted by fused score, descending,
+     *     and truncated to {@code limit}.</li>
      * </ol>
      *
      * @param dataTypes the {@code data_type} values in {@code ezy_data_indices}
      *                   to search across
      * @param query the free-text query to search for, e.g. a chat message
      * @param limit the maximum number of results to return
-     * @return data ids ranked by fused relevance, descending; empty if
-     *         {@code dataTypes} is empty, {@code query} is blank, or no
-     *         keyword could be extracted from it
+     * @param splitPattern the regex used to split {@code query} into tokens
+     * @param minKeywordLength the minimum token length to keep as a keyword
+     * @param stopWords tokens to discard even if they meet
+     *                   {@code minKeywordLength}
+     * @param maxKeywords the maximum number of keywords extracted from
+     *                     {@code query} to fuse over
+     * @param dataRankFusionConstant the {@code k} constant in the RRF
+     *                                formula {@code 1 / (k + rank + 1)}
+     * @return data type/id pairs ranked by fused relevance, descending;
+     *         empty if {@code dataTypes} is empty, {@code query} is blank,
+     *         or no keyword could be extracted from it
      */
     List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
         Collection<String> dataTypes,

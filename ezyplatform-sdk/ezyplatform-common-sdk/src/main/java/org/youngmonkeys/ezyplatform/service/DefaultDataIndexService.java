@@ -229,6 +229,9 @@ public class DefaultDataIndexService
         return new ArrayList<>(distinctDataTypeIdModels);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
         Collection<String> dataTypes,
