@@ -149,10 +149,10 @@ public interface DataIndexService {
 
     /**
      * Equivalent to
-     * {@link #searchDataIdsByReciprocalRankFusion(Collection, String, int, String, int, Set, int, int)}
-     * with {@code splitPattern}, {@code minKeywordLength},
-     * {@code stopWords}, {@code maxKeywords} and
-     * {@code dataRankFusionConstant} taken from the current settings.
+     * {@link #searchDataIdsByReciprocalRankFusion(Collection, String, int,
+     * String, int, Set, int, int)} with {@code splitPattern},
+     * {@code minKeywordLength}, {@code stopWords}, {@code maxKeywords}
+     * and {@code dataRankFusionConstant} taken from the current settings.
      *
      * @param dataTypes the {@code data_type} values in {@code ezy_data_indices}
      *                   to search across
@@ -177,7 +177,8 @@ public interface DataIndexService {
      * <ol>
      *     <li>The query is trimmed, lower-cased and split by
      *     {@code splitPattern} into tokens (see
-     *     {@link org.youngmonkeys.ezyplatform.util.Keywords#toKeywords(String, String, int, Set, int)});
+     *     {@link org.youngmonkeys.ezyplatform.util.Keywords#toKeywords(
+     *     String, String, int, Set, int)});
      *     tokens shorter than {@code minKeywordLength} or contained in
      *     {@code stopWords} are dropped, duplicates are removed, the
      *     remaining tokens are sorted longest-first (most specific first),
@@ -228,5 +229,9 @@ public interface DataIndexService {
         Set<String> stopWords,
         int maxKeywords,
         int dataRankFusionConstant
+    );
+
+    List<String> convertToSearchKeywords(
+        String query
     );
 }

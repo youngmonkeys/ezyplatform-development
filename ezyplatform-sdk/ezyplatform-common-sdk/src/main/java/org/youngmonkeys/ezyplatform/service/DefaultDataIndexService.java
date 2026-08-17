@@ -299,4 +299,17 @@ public class DefaultDataIndexService
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
     }
+
+    @Override
+    public List<String> convertToSearchKeywords(
+        String query
+    ) {
+        return toKeywords(
+            query,
+            settingService.getDataKeywordSplitPattern(),
+            settingService.getMinDataKeywordLength(),
+            settingService.getNaturalLanguageStopWords(),
+            settingService.getMaxDataSearchKeywords()
+        );
+    }
 }

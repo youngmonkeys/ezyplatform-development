@@ -27,6 +27,7 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
     public final String metaKey;
     public final String exclusiveMetaKey;
     public final Collection<String> exclusiveMetaKeys;
+    public final String metaValue;
     public final String likeKeyword;
 
     public DefaultDataMetaFilter(Builder builder) {
@@ -35,6 +36,7 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         this.metaKey = builder.metaKey;
         this.exclusiveMetaKey = builder.exclusiveMetaKey;
         this.exclusiveMetaKeys = builder.exclusiveMetaKeys;
+        this.metaValue = builder.metaValue;
         this.likeKeyword = builder.likeKeyword;
     }
 
@@ -56,6 +58,9 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         if (exclusiveMetaKeys != null) {
             answer.and("e.metaKey NOT IN :exclusiveMetaKeys");
         }
+        if (metaValue != null) {
+            answer.and("e.metaValue = :metaValue");
+        }
         if (likeKeyword != null) {
             answer.and(
                 "(e.metaValue LIKE CONCAT(:likeKeyword, '%')" +
@@ -76,6 +81,7 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         private String metaKey;
         private String exclusiveMetaKey;
         private Collection<String> exclusiveMetaKeys;
+        protected String metaValue;
         private String likeKeyword;
 
         public Builder dataType(String dataType) {
@@ -102,6 +108,11 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
             Collection<String> exclusiveMetaKeys
         ) {
             this.exclusiveMetaKeys = exclusiveMetaKeys;
+            return this;
+        }
+
+        public Builder metaValue(String metaValue) {
+            this.metaValue = metaValue;
             return this;
         }
 
