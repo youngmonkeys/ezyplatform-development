@@ -22,7 +22,6 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_ACCESS_TO_OWNER_ONLY;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
@@ -34,7 +33,6 @@ public class DefaultMediaFilter implements MediaFilter {
     public final String type;
     public final Collection<String> types;
     public final Long ownerAdminId;
-    public final Long ownerAdminIdOrAccessToOwnerOnlyMetaFalse;
     public final Long ownerUserId;
     public final String prefixKeyword;
     public final String likeKeyword;
@@ -55,8 +53,6 @@ public class DefaultMediaFilter implements MediaFilter {
         this.uploadFrom = builder.uploadFrom;
         this.types = builder.types;
         this.ownerAdminId = builder.ownerAdminId;
-        this.ownerAdminIdOrAccessToOwnerOnlyMetaFalse =
-            builder.ownerAdminIdOrAccessToOwnerOnlyMetaFalse;
         this.ownerUserId = builder.ownerUserId;
         this.prefixKeyword = builder.prefixKeyword;
         this.likeKeyword = builder.likeKeyword;
@@ -77,20 +73,8 @@ public class DefaultMediaFilter implements MediaFilter {
         if (prefixKeyword != null) {
             queryString.append(" INNER JOIN DataIndex k ON e.id = k.dataId");
         }
-        if (ownerAdminIdOrAccessToOwnerOnlyMetaFalse != null) {
-            queryString
-                .append(" LEFT JOIN DataMeta accessToOwnerOnlyMeta")
-                .append(" ON e.id = accessToOwnerOnlyMeta.dataId")
-                .append(" AND accessToOwnerOnlyMeta.dataType = '")
-                .append(TABLE_NAME_MEDIA)
-                .append("'")
-                .append(" AND accessToOwnerOnlyMeta.metaKey = '")
-                .append(META_KEY_ACCESS_TO_OWNER_ONLY)
-                .append("'");
-        }
     }
 
-    @SuppressWarnings("MethodLength")
     @Override
     public String matchingCondition() {
         EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
@@ -105,13 +89,6 @@ public class DefaultMediaFilter implements MediaFilter {
         }
         if (ownerAdminId != null) {
             answer.and("e.ownerAdminId = :ownerAdminId");
-        }
-        if (ownerAdminIdOrAccessToOwnerOnlyMetaFalse != null) {
-            answer.and(
-                "(accessToOwnerOnlyMeta.id IS NULL " +
-                    "OR accessToOwnerOnlyMeta.metaValue <> 'true' " +
-                    "OR e.ownerAdminId = :ownerAdminIdOrAccessToOwnerOnlyMetaFalse)"
-            );
         }
         if (ownerUserId != null) {
             answer.and("e.ownerUserId = :ownerUserId");
@@ -174,7 +151,6 @@ public class DefaultMediaFilter implements MediaFilter {
         private String uploadFrom;
         private Collection<String> types;
         private Long ownerAdminId;
-        private Long ownerAdminIdOrAccessToOwnerOnlyMetaFalse;
         private Long ownerUserId;
         private boolean allowSearchByLikeOperator;
         private String prefixKeyword;
@@ -220,14 +196,6 @@ public class DefaultMediaFilter implements MediaFilter {
 
         public T ownerAdminId(Long ownerAdminId) {
             this.ownerAdminId = ownerAdminId;
-            return (T) this;
-        }
-
-        public T ownerAdminIdOrAccessToOwnerOnlyMetaFalse(
-            Long ownerAdminIdOrAccessToOwnerOnlyMetaFalse
-        ) {
-            this.ownerAdminIdOrAccessToOwnerOnlyMetaFalse =
-                ownerAdminIdOrAccessToOwnerOnlyMetaFalse;
             return (T) this;
         }
 
