@@ -20,8 +20,19 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 
 import static org.youngmonkeys.ezyplatform.util.Values.isAllNull;
+import static org.youngmonkeys.ezyplatform.util.Values.nullValue;
 
 public class ValuesTest {
+
+    @Test
+    public void nullValueTest() {
+        // given
+        // when
+        String actual = nullValue();
+
+        // then
+        Asserts.assertNull(actual);
+    }
 
     @Test
     public void isAllNullReturnTrueTest() {
@@ -34,10 +45,30 @@ public class ValuesTest {
     }
 
     @Test
+    public void isAllNullReturnTrueWithEmptyValuesTest() {
+        // given
+        // when
+        boolean actual = isAllNull();
+
+        // then
+        Asserts.assertTrue(actual);
+    }
+
+    @Test
     public void isAllNullReturnFalseTest() {
         // given
         // when
         boolean actual = isAllNull(null, "Hello");
+
+        // then
+        Asserts.assertFalse(actual);
+    }
+
+    @Test
+    public void isAllNullReturnFalseWithAllNonNullValuesTest() {
+        // given
+        // when
+        boolean actual = isAllNull("Hello", "World");
 
         // then
         Asserts.assertFalse(actual);

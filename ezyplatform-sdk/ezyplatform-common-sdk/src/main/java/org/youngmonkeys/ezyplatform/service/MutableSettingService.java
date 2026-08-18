@@ -34,6 +34,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_DATA_KEYWORD_SPLIT_PATTERN;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_DATA_RANK_FUSION_CONSTANT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_DATA_SEARCH_KEYWORDS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MIN_DATA_KEYWORD_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS;
+
 public abstract class MutableSettingService
     extends DefaultSettingService {
 
@@ -278,5 +284,50 @@ public abstract class MutableSettingService
         PropertiesFileProxy.sortAndWrite(settings, file);
         localSettingRef.set(settings);
         localSettingLastModified.set(file.lastModified());
+    }
+
+    public void setNaturalLanguageStopWords(
+        Collection<String> value
+    ) {
+        setArrayValue(
+            SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS,
+            value
+        );
+    }
+
+    public void setDataKeywordSplitPattern(
+        String value
+    ) {
+        setTextValue(
+            SETTING_NAME_DATA_KEYWORD_SPLIT_PATTERN,
+            value
+        );
+    }
+
+    public void setMaxDataSearchKeywords(
+        int value
+    ) {
+        setIntValue(
+            SETTING_NAME_MAX_DATA_SEARCH_KEYWORDS,
+            value
+        );
+    }
+
+    public void setMinDataKeywordLength(
+        int value
+    ) {
+        setIntValue(
+            SETTING_NAME_MIN_DATA_KEYWORD_LENGTH,
+            value
+        );
+    }
+
+    public void setDataRankFusionConstant(
+        int value
+    ) {
+        setIntValue(
+            SETTING_NAME_DATA_RANK_FUSION_CONSTANT,
+            value
+        );
     }
 }

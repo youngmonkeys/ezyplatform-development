@@ -17,12 +17,14 @@
 package org.youngmonkeys.ezyplatform.test.util;
 
 import com.tvd12.ezyfox.collect.Lists;
+import com.tvd12.ezyfox.collect.Sets;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.util.Keywords;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 public class KeywordsTest {
 
@@ -269,6 +271,148 @@ public class KeywordsTest {
                 "b/c",
                 "/c",
                 "c"
+            )
+        );
+    }
+
+    @Test
+    public void toKeywordsFromQueryTest() {
+        // given
+        String query = "  The Lucky Wheel Game  ";
+        String splitPattern = "\\s+";
+        int minKeywordLength = 3;
+        Set<String> stopWords = Sets.newHashSet("the");
+        int maxKeywords = 10;
+
+        // when
+        List<String> actual = Keywords.toKeywords(
+            query,
+            splitPattern,
+            minKeywordLength,
+            stopWords,
+            maxKeywords
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Lists.newArrayList(
+                "lucky",
+                "wheel",
+                "game"
+            )
+        );
+    }
+
+    @Test
+    public void toKeywordsFromQueryFilterShortTokensTest() {
+        // given
+        String query = "a bb ccc dddd";
+        String splitPattern = "\\s+";
+        int minKeywordLength = 3;
+        Set<String> stopWords = Collections.emptySet();
+        int maxKeywords = 10;
+
+        // when
+        List<String> actual = Keywords.toKeywords(
+            query,
+            splitPattern,
+            minKeywordLength,
+            stopWords,
+            maxKeywords
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Lists.newArrayList(
+                "dddd",
+                "ccc"
+            )
+        );
+    }
+
+    @Test
+    public void toKeywordsFromQueryRemoveDuplicatesTest() {
+        // given
+        String query = "game game wheel";
+        String splitPattern = "\\s+";
+        int minKeywordLength = 1;
+        Set<String> stopWords = Collections.emptySet();
+        int maxKeywords = 10;
+
+        // when
+        List<String> actual = Keywords.toKeywords(
+            query,
+            splitPattern,
+            minKeywordLength,
+            stopWords,
+            maxKeywords
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Lists.newArrayList(
+                "wheel",
+                "game"
+            )
+        );
+    }
+
+    @Test
+    public void toKeywordsFromQueryLimitByMaxKeywordsTest() {
+        // given
+        String query = "aaaaa bbbb ccc dd e";
+        String splitPattern = "\\s+";
+        int minKeywordLength = 1;
+        Set<String> stopWords = Collections.emptySet();
+        int maxKeywords = 2;
+
+        // when
+        List<String> actual = Keywords.toKeywords(
+            query,
+            splitPattern,
+            minKeywordLength,
+            stopWords,
+            maxKeywords
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Lists.newArrayList(
+                "aaaaa",
+                "bbbb"
+            )
+        );
+    }
+
+    @Test
+    public void toKeywordsFromQuerySplitByCommaTest() {
+        // given
+        String query = "Foo,Bar,Baz";
+        String splitPattern = ",";
+        int minKeywordLength = 1;
+        Set<String> stopWords = Collections.emptySet();
+        int maxKeywords = 10;
+
+        // when
+        List<String> actual = Keywords.toKeywords(
+            query,
+            splitPattern,
+            minKeywordLength,
+            stopWords,
+            maxKeywords
+        );
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Lists.newArrayList(
+                "foo",
+                "bar",
+                "baz"
             )
         );
     }

@@ -25,7 +25,9 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 
 @SuppressWarnings("LineLength")
@@ -109,6 +111,7 @@ public final class CommonConstants {
     public static final String TOKEN_TYPE_BEARER = "Bearer";
 
     public static final int MAX_FETCH_ROUND = 3;
+    public static final int DEFAULT_DATA_INDEX_OVER_FETCH_FACTOR = 3;
     public static final int MAX_LENGTH_UUID = 128;
     public static final int MIN_LENGTH_PASSWORD = 6;
     public static final int MAX_LENGTH_PASSWORD = 128;
@@ -338,6 +341,17 @@ public final class CommonConstants {
         "web_additional_script";
     public static final String SETTING_NAME_WEB_ADDITIONAL_FOOT =
         "web_additional_foot";
+    public static final String SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS =
+        "natural_language_stop_words";
+    public static final String SETTING_NAME_DATA_KEYWORD_SPLIT_PATTERN =
+        "data_keyword_spit_pattern";
+    public static final String SETTING_NAME_MAX_DATA_SEARCH_KEYWORDS =
+        "max_data_search_keywords";
+    public static final String SETTING_NAME_MIN_DATA_KEYWORD_LENGTH =
+        "data_min_data_key_word_length";
+    public static final String SETTING_NAME_DATA_RANK_FUSION_CONSTANT =
+        "data_rank_fusion_constant";
+
 
     public static final int DEFAULT_TIMEOUT_SECONDS = 15;
     public static final String DEFAULT_DATE_FORMAT = "YYYY-MM-DD";
@@ -373,6 +387,28 @@ public final class CommonConstants {
         );
     public static final String DEFAULT_THEME_NAME = "welcome";
     public static final String DEFAULT_SOCKET_MONITOR_PLUGIN = "socket-monitor";
+    public static final Set<String> DEFAULT_NATURAL_LANGUAGE_STOP_WORDS =
+        Collections.unmodifiableSet(
+            new HashSet<>(
+                Arrays.asList(
+                    "là", "của", "và", "có", "cho", "để", "một", "các",
+                    "những", "này", "đó", "kia", "ở", "tại", "với", "khi",
+                    "mà", "thì", "sẽ", "đã", "đang", "được", "bị", "không",
+                    "rất", "cũng", "nhưng", "hay", "hoặc", "nếu", "vì",
+                    "do", "theo", "về", "trong", "ngoài", "trên", "dưới",
+                    "ra", "vào", "lên", "xuống", "tôi", "bạn", "mình",
+                    "ta", "họ", "nó", "gì", "sao", "thế", "nào", "ai",
+                    "đâu", "làm", "ơi", "à", "ừ", "nhé", "nhỉ", "vậy",
+                    "the", "a", "an", "is", "are", "of", "to", "in",
+                    "on", "for", "and", "or", "how", "what", "do", "does"
+                )
+            )
+        );
+    public static final String DEFAULT_DATA_KEYWORD_SPLIT_PATTERN =
+        "[^\\p{L}\\p{Nd}]+";
+    public static final int DEFAULT_MAX_DATA_SEARCH_KEYWORDS = 6;
+    public static final int DEFAULT_MIN_DATA_KEYWORD_LENGTH = 2;
+    public static final int DEFAULT_DATA_RANK_FUSION_CONSTANT = 60;
 
     public static final String VIEW_VARIABLE_SITE_TITLE = "siteTitle";
     public static final String VIEW_VARIABLE_PAGE_TITLE = "pageTitle";
