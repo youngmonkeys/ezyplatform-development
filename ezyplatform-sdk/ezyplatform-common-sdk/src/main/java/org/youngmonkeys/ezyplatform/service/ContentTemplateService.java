@@ -84,6 +84,8 @@ public interface ContentTemplateService {
 
     List<String> getAllTemplateContentTypes();
 
+    List<String> getAllTemplateStatuses();
+
     ContentTemplateModel getTemplateByOwnerTypeAndOwnerIdAndTemplateTypeAndTemplateName(
         String ownerType,
         long ownerId,

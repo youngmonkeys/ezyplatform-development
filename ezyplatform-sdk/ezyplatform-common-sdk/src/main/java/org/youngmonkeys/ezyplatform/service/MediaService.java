@@ -135,6 +135,11 @@ public interface MediaService {
         boolean paymentRequired
     );
 
+    void saveMediaAccessToOwnerOnly(
+        long mediaId,
+        boolean accessToOwnerOnly
+    );
+
     MediaModel removeMedia(long mediaId);
 
     MediaModel removeMedia(String mediaName);
@@ -304,4 +309,6 @@ public interface MediaService {
     long getUpdatedAtByMediaName(String mediaName);
 
     boolean isPaymentRequiredByMediaId(long mediaId);
+
+    boolean isAccessToOwnerOnlyByMediaId(long mediaId);
 }

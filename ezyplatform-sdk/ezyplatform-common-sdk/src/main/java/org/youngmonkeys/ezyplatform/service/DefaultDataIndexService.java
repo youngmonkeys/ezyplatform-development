@@ -21,25 +21,33 @@ import com.tvd12.ezyfox.util.Next;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.DataIndex;
+import org.youngmonkeys.ezyplatform.model.DataTypeIdModel;
 import org.youngmonkeys.ezyplatform.model.SaveDataKeywordModel;
 import org.youngmonkeys.ezyplatform.repo.DataIndexRepository;
+import org.youngmonkeys.ezyplatform.result.DataTypeIdResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
+import static org.youngmonkeys.ezyplatform.util.Keywords.toKeywords;
 
 @AllArgsConstructor
 public class DefaultDataIndexService
         extends EzyLoggable
         implements DataIndexService {
 
+    private final SettingService settingService;
     private final DataIndexRepository dataIndexRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
@@ -188,5 +196,120 @@ public class DefaultDataIndexService
             ++fetchedRound;
         }
         return dataIds.size() <= limit ? dataIds : dataIds.subList(0, limit);
+    }
+
+    @Override
+    public List<DataTypeIdModel> getDataTypeIdsByDataTypesAndKeywordPrefix(
+        Collection<String> dataTypes,
+        String keywordPrefix,
+        long limit,
+        long overFetchFactor
+    ) {
+        if (dataTypes.isEmpty() || isBlank(keywordPrefix)) {
+            return Collections.emptyList();
+        }
+        List<DataTypeIdResult> results = dataIndexRepository
+            .findDataTypeIdsByDataTypeInAndKeywordPrefixOrderByPriorityDescIdDesc(
+                dataTypes,
+                keywordPrefix,
+                Next.limit(limit * overFetchFactor)
+            );
+        Set<DataTypeIdModel> distinctDataTypeIdModels =
+            new LinkedHashSet<>();
+        for (DataTypeIdResult result : results) {
+            distinctDataTypeIdModels.add(
+                new DataTypeIdModel(
+                    result.getDataType(),
+                    result.getDataId()
+                )
+            );
+            if (distinctDataTypeIdModels.size() >= limit) {
+                break;
+            }
+        }
+        return new ArrayList<>(distinctDataTypeIdModels);
+    }
+
+    @Override
+    public List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
+        Collection<String> dataTypes,
+        String query,
+        int limit
+    ) {
+        return searchDataIdsByReciprocalRankFusion(
+            dataTypes,
+            query,
+            limit,
+            settingService.getDataKeywordSplitPattern(),
+            settingService.getMinDataKeywordLength(),
+            settingService.getNaturalLanguageStopWords(),
+            settingService.getMaxDataSearchKeywords(),
+            settingService.getDataRankFusionConstant()
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<DataTypeIdModel> searchDataIdsByReciprocalRankFusion(
+        Collection<String> dataTypes,
+        String query,
+        int limit,
+        String splitPattern,
+        int minKeywordLength,
+        Set<String> stopWords,
+        int maxKeywords,
+        int dataRankFusionConstant
+    ) {
+        if (dataTypes.isEmpty() || isBlank(query)) {
+            return Collections.emptyList();
+        }
+        List<String> keywords = toKeywords(
+            query,
+            splitPattern,
+            minKeywordLength,
+            stopWords,
+            maxKeywords
+        );
+        if (keywords.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<DataTypeIdModel, Double> scoresByDataTypeId = new HashMap<>();
+        for (String keyword : keywords) {
+            List<DataTypeIdModel> dataTypeIds =
+                getDataTypeIdsByDataTypesAndKeywordPrefix(
+                    dataTypes,
+                    keyword,
+                    limit
+                );
+            for (int rank = 0; rank < dataTypeIds.size(); ++rank) {
+                double score = 1.0 / (dataRankFusionConstant + rank + 1);
+                scoresByDataTypeId.merge(dataTypeIds.get(rank), score, Double::sum);
+            }
+        }
+        return scoresByDataTypeId.entrySet()
+            .stream()
+            .sorted(
+                Map.Entry
+                    .<DataTypeIdModel, Double>comparingByValue()
+                    .reversed()
+            )
+            .limit(limit)
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<String> convertToSearchKeywords(
+        String query
+    ) {
+        return toKeywords(
+            query,
+            settingService.getDataKeywordSplitPattern(),
+            settingService.getMinDataKeywordLength(),
+            settingService.getNaturalLanguageStopWords(),
+            settingService.getMaxDataSearchKeywords()
+        );
     }
 }

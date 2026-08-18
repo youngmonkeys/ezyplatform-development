@@ -25,14 +25,25 @@ import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.DataType;
 import org.youngmonkeys.ezyplatform.entity.Setting;
+import org.youngmonkeys.ezyplatform.io.PropertiesFileProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.repo.SettingRepository;
 
+import java.io.File;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_DATA_KEYWORD_SPLIT_PATTERN;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_DATA_RANK_FUSION_CONSTANT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_DATA_SEARCH_KEYWORDS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MIN_DATA_KEYWORD_LENGTH;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS;
 
 public abstract class MutableSettingService
     extends DefaultSettingService {
 
+    private final FileSystemManager fileSystemManager;
     private final SettingRepository settingRepository;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
@@ -51,6 +62,7 @@ public abstract class MutableSettingService
             settingRepository,
             entityToModelConverter
         );
+        this.fileSystemManager = fileSystemManager;
         this.settingRepository = settingRepository;
         this.modelToEntityConverter = modelToEntityConverter;
     }
@@ -214,5 +226,108 @@ public abstract class MutableSettingService
         } catch (Exception e) {
             return settingValue;
         }
+    }
+
+    public void saveLocalSettings(
+        Map<Object, Object> settings
+    ) {
+        File file = fileSystemManager.concatWithEzyHomeToFile(
+            LOCAL_SETTING_FILE_PATH
+        );
+        synchronized (localSettingRef) {
+            if (file.exists()) {
+                loadLocalSettingsIfNeed(file);
+            }
+            Map<Object, Object> current = localSettingRef.get();
+            Map<Object, Object> mergedSettings = current != null
+                ? new HashMap<>(current)
+                : new HashMap<>();
+            for (Map.Entry<Object, Object> entry : settings.entrySet()) {
+                if (entry.getValue() == null) {
+                    mergedSettings.remove(entry.getKey());
+                } else {
+                    mergedSettings.put(entry.getKey(), entry.getValue());
+                }
+            }
+            writeLocalSettings(file, mergedSettings);
+        }
+    }
+
+    public void saveLocalSetting(
+        String settingName,
+        Object value
+    ) {
+        File file = fileSystemManager.concatWithEzyHomeToFile(
+            LOCAL_SETTING_FILE_PATH
+        );
+        synchronized (localSettingRef) {
+            if (file.exists()) {
+                loadLocalSettingsIfNeed(file);
+            }
+            Map<Object, Object> current = localSettingRef.get();
+            Map<Object, Object> settings = current != null
+                ? new HashMap<>(current)
+                : new HashMap<>();
+            if (value == null) {
+                settings.remove(settingName);
+            } else {
+                settings.put(settingName, value);
+            }
+            writeLocalSettings(file, settings);
+        }
+    }
+
+    private void writeLocalSettings(
+        File file,
+        Map<Object, Object> settings
+    ) {
+        PropertiesFileProxy.sortAndWrite(settings, file);
+        localSettingRef.set(settings);
+        localSettingLastModified.set(file.lastModified());
+    }
+
+    public void setNaturalLanguageStopWords(
+        Collection<String> value
+    ) {
+        setArrayValue(
+            SETTING_NAME_NATURAL_LANGUAGE_STOP_WORDS,
+            value
+        );
+    }
+
+    public void setDataKeywordSplitPattern(
+        String value
+    ) {
+        setTextValue(
+            SETTING_NAME_DATA_KEYWORD_SPLIT_PATTERN,
+            value
+        );
+    }
+
+    public void setMaxDataSearchKeywords(
+        int value
+    ) {
+        setIntValue(
+            SETTING_NAME_MAX_DATA_SEARCH_KEYWORDS,
+            value
+        );
+    }
+
+    public void setMinDataKeywordLength(
+        int value
+    ) {
+        setIntValue(
+            SETTING_NAME_MIN_DATA_KEYWORD_LENGTH,
+            value
+        );
+    }
+
+    public void setDataRankFusionConstant(
+        int value
+    ) {
+        setIntValue(
+            SETTING_NAME_DATA_RANK_FUSION_CONSTANT,
+            value
+        );
     }
 }

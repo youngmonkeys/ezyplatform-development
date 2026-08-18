@@ -34,6 +34,7 @@ public class UpdateMediaIncludeUrlRequest {
     private long fileSize;
     private String url;
     private boolean notPublic;
+    private boolean accessToOwnerOnly;
     private boolean updatePaymentRequired;
     private boolean paymentRequired;
     private boolean updateDuration;

@@ -1139,9 +1139,11 @@ public class MediaControllerService extends EzyLoggable {
         }
         mediaValidator.validateMediaName(name);
         MediaModel media = mediaService.getMediaByName(name);
+        boolean accessToOwnerOnly = media != null
+            && mediaService.isAccessToOwnerOnlyByMediaId(media.getId());
         if (media == null
             || (
-                !media.isPublicMedia()
+                (accessToOwnerOnly || !media.isPublicMedia())
                     && !exposePrivateMedia
                     && !validMediaCondition.test(media)
             )
@@ -1315,6 +1317,9 @@ public class MediaControllerService extends EzyLoggable {
             )
             .paymentRequired(
                 mediaService.isPaymentRequiredByMediaId(mediaId)
+            )
+            .accessToOwnerOnly(
+                mediaService.isAccessToOwnerOnlyByMediaId(mediaId)
             )
             .build();
     }
