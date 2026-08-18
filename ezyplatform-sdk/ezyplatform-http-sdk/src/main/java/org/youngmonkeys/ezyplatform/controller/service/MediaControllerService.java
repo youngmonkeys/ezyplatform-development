@@ -33,6 +33,7 @@ import com.tvd12.ezyhttp.server.core.resources.FileUploader;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.Metadata;
+import org.youngmonkeys.ezyplatform.annotation.AdminId;
 import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpRequestToModelConverter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
@@ -1139,15 +1140,14 @@ public class MediaControllerService extends EzyLoggable {
         }
         mediaValidator.validateMediaName(name);
         MediaModel media = mediaService.getMediaByName(name);
-        boolean accessToOwnerOnly = media != null
-            && mediaService.isAccessToOwnerOnlyByMediaId(media.getId());
-        if (media == null
-            || (
-                (accessToOwnerOnly || !media.isPublicMedia())
-                    && !exposePrivateMedia
-                    && !validMediaCondition.test(media)
-            )
-        ) {
+        boolean accessible = isAccessibleMedia(
+            requestArguments,
+            userId,
+            media,
+            exposePrivateMedia,
+            validMediaCondition
+        );
+        if (!accessible) {
             throw new MediaNotFoundException(name);
         }
         eventHandlerManager.handleEvent(
@@ -1180,6 +1180,33 @@ public class MediaControllerService extends EzyLoggable {
             resourceDownloadManager
         );
         handler.handle(requestArguments);
+    }
+
+    public boolean isAccessibleMedia(
+        RequestArguments requestArguments,
+        Long userId,
+        MediaModel media,
+        boolean exposePrivateMedia,
+        Predicate<MediaModel> validMediaCondition
+    ) {
+        if (media == null
+            || (!media.isPublicMedia()
+            && !exposePrivateMedia
+            && !validMediaCondition.test(media))
+        ) {
+            return false;
+        }
+        boolean accessToOwnerOnly = mediaService
+            .isAccessToOwnerOnlyByMediaId(media.getId());
+        if (!accessToOwnerOnly
+            || (userId != null && userId == media.getOwnerUserId())
+        ) {
+            return true;
+        }
+        Long adminId = requestArguments.getArgument(
+            AdminId.class
+        );
+        return adminId != null && adminId == media.getOwnerAdminId();
     }
 
     public MediaDetailsModel getMediaDetailsById(

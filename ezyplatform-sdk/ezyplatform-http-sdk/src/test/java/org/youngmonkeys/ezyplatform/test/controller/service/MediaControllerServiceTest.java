@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.youngmonkeys.ezyplatform.annotation.AdminId;
 import org.youngmonkeys.ezyplatform.controller.service.MediaControllerService;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
@@ -118,6 +119,7 @@ import static org.mockito.Matchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -3031,8 +3033,8 @@ public class MediaControllerServiceTest {
         );
         inOrder.verify(mediaValidator).validateMediaName("private-video.mp4");
         inOrder.verify(mediaService).getMediaByName("private-video.mp4");
-        inOrder.verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
         inOrder.verify(validMediaCondition).test(media);
+        inOrder.verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
         inOrder.verify(eventHandlerManager, times(2)).handleEvent(any(MediaDownloadEvent.class));
         inOrder.verify(fileSystemManager).getMediaFilePath(
             MediaType.VIDEO.getFolder(),
@@ -3055,6 +3057,180 @@ public class MediaControllerServiceTest {
             mediaUpDownloader,
             validMediaCondition
         );
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void isAccessibleMediaWhenMediaNullTest() {
+        // given
+        RequestArguments requestArguments = mock(RequestArguments.class);
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+
+        // when
+        boolean actual = instance.isAccessibleMedia(
+            requestArguments,
+            1L,
+            null,
+            true,
+            validMediaCondition
+        );
+
+        // then
+        Asserts.assertFalse(actual);
+        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void isAccessibleMediaWhenPrivateNotExposedAndConditionFailsTest() {
+        // given
+        RequestArguments requestArguments = mock(RequestArguments.class);
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(950L)
+            .publicMedia(false)
+            .build();
+        when(validMediaCondition.test(media)).thenReturn(false);
+
+        // when
+        boolean actual = instance.isAccessibleMedia(
+            requestArguments,
+            1L,
+            media,
+            false,
+            validMediaCondition
+        );
+
+        // then
+        Asserts.assertFalse(actual);
+        verify(validMediaCondition).test(media);
+        verify(mediaService, never()).isAccessToOwnerOnlyByMediaId(media.getId());
+        verifyNoMoreInteractions(mediaService, requestArguments);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void isAccessibleMediaWhenNotAccessToOwnerOnlyTest() {
+        // given
+        RequestArguments requestArguments = mock(RequestArguments.class);
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(951L)
+            .publicMedia(true)
+            .ownerUserId(200L)
+            .build();
+        when(mediaService.isAccessToOwnerOnlyByMediaId(media.getId()))
+            .thenReturn(false);
+
+        // when
+        boolean actual = instance.isAccessibleMedia(
+            requestArguments,
+            999L,
+            media,
+            false,
+            validMediaCondition
+        );
+
+        // then
+        Asserts.assertTrue(actual);
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+        verify(requestArguments, never()).getArgument(AdminId.class);
+        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void isAccessibleMediaWhenAccessToOwnerOnlyAndUserIsOwnerTest() {
+        // given
+        RequestArguments requestArguments = mock(RequestArguments.class);
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(952L)
+            .publicMedia(true)
+            .ownerUserId(200L)
+            .ownerAdminId(300L)
+            .build();
+        when(mediaService.isAccessToOwnerOnlyByMediaId(media.getId()))
+            .thenReturn(true);
+
+        // when
+        boolean actual = instance.isAccessibleMedia(
+            requestArguments,
+            200L,
+            media,
+            false,
+            validMediaCondition
+        );
+
+        // then
+        Asserts.assertTrue(actual);
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+        verify(requestArguments, never()).getArgument(AdminId.class);
+        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void isAccessibleMediaWhenAccessToOwnerOnlyAndAdminIsOwnerTest() {
+        // given
+        RequestArguments requestArguments = mock(RequestArguments.class);
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(953L)
+            .publicMedia(true)
+            .ownerUserId(200L)
+            .ownerAdminId(300L)
+            .build();
+        when(mediaService.isAccessToOwnerOnlyByMediaId(media.getId()))
+            .thenReturn(true);
+        when(requestArguments.getArgument(AdminId.class)).thenReturn(300L);
+
+        // when
+        boolean actual = instance.isAccessibleMedia(
+            requestArguments,
+            null,
+            media,
+            false,
+            validMediaCondition
+        );
+
+        // then
+        Asserts.assertTrue(actual);
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+        verify(requestArguments).getArgument(AdminId.class);
+        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void isAccessibleMediaWhenAccessToOwnerOnlyAndNeitherUserNorAdminIsOwnerTest() {
+        // given
+        RequestArguments requestArguments = mock(RequestArguments.class);
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(954L)
+            .publicMedia(true)
+            .ownerUserId(200L)
+            .ownerAdminId(300L)
+            .build();
+        when(mediaService.isAccessToOwnerOnlyByMediaId(media.getId()))
+            .thenReturn(true);
+        when(requestArguments.getArgument(AdminId.class)).thenReturn(999L);
+
+        // when
+        boolean actual = instance.isAccessibleMedia(
+            requestArguments,
+            888L,
+            media,
+            false,
+            validMediaCondition
+        );
+
+        // then
+        Asserts.assertFalse(actual);
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+        verify(requestArguments).getArgument(AdminId.class);
+        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
     }
 
     @Test
