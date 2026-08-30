@@ -225,4 +225,16 @@ public interface DataMetaRepository
         Collection<Long> dataIds,
         Collection<String> metaKeys
     );
+
+    @EzyQuery(
+        "SELECT e FROM DataMeta e " +
+            "WHERE e.metaKey = ?0 " +
+            "AND e.id > ?1 " +
+            "ORDER BY e.id ASC"
+    )
+    List<DataMeta> findByMetaKeyAndIdGtOrderByIdAsc(
+        String metaKey,
+        long idExclusive,
+        Next next
+    );
 }

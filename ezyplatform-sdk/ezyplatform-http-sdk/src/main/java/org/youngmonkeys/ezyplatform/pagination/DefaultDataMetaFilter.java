@@ -29,6 +29,7 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
     public final Collection<String> exclusiveMetaKeys;
     public final String metaValue;
     public final String likeKeyword;
+    public final String keywordPrefix;
 
     public DefaultDataMetaFilter(Builder builder) {
         this.dataType = builder.dataType;
@@ -38,6 +39,16 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         this.exclusiveMetaKeys = builder.exclusiveMetaKeys;
         this.metaValue = builder.metaValue;
         this.likeKeyword = builder.likeKeyword;
+        this.keywordPrefix = builder.keywordPrefix;
+    }
+
+    @Override
+    public void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {
+        if (keywordPrefix != null) {
+            queryString.append(" INNER JOIN DataIndex k ON e.dataId = k.dataId");
+        }
     }
 
     @Override
@@ -62,10 +73,11 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
             answer.and("e.metaValue = :metaValue");
         }
         if (likeKeyword != null) {
-            answer.and(
-                "(e.metaValue LIKE CONCAT(:likeKeyword, '%')" +
-                " OR e.metaTextValue LIKE CONCAT(:likeKeyword, '%'))"
-            );
+            answer.and("e.metaValue LIKE CONCAT(:likeKeyword, '%')");
+        }
+        if (keywordPrefix != null) {
+            answer.and("k.dataType = e.dataType");
+            answer.and("k.keyword LIKE CONCAT(:keywordPrefix,'%')");
         }
         return answer.build();
     }
@@ -83,6 +95,7 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         private Collection<String> exclusiveMetaKeys;
         protected String metaValue;
         private String likeKeyword;
+        private String keywordPrefix;
 
         public Builder dataType(String dataType) {
             this.dataType = dataType;
@@ -118,6 +131,11 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
 
         public Builder likeKeyword(String likeKeyword) {
             this.likeKeyword = likeKeyword;
+            return this;
+        }
+
+        public Builder keywordPrefix(String keywordPrefix) {
+            this.keywordPrefix = keywordPrefix;
             return this;
         }
 
