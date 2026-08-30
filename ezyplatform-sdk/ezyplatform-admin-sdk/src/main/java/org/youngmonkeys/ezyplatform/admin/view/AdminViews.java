@@ -22,6 +22,7 @@ import com.tvd12.ezyhttp.server.core.view.Redirect;
 import javax.servlet.http.HttpServletRequest;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PATTERN_STATIC_RESOURCE_URI;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
 
 public final class AdminViews {
@@ -41,6 +42,7 @@ public final class AdminViews {
             && !requestUri.equals("/register")
             && !requestUri.equals("/login")
             && !requestUri.equals("/logout")
+            && !isStaticResourceUri(requestUri)
         ) {
             String queryString = request.getQueryString();
             String callbackUri = requestUri +
@@ -48,5 +50,9 @@ public final class AdminViews {
             builder.addAttribute("callbackUri", callbackUri);
         }
         return builder.build();
+    }
+
+    private static boolean isStaticResourceUri(String requestUri) {
+        return requestUri.matches(PATTERN_STATIC_RESOURCE_URI);
     }
 }
