@@ -62,6 +62,7 @@ public class CommonUserEntityFetcher
             .code(model.getUsername())
             .displayName(model.getName())
             .url(getUriPrefix() + "/" + model.getUsername())
+            .icon("fas fa-user")
             .build();
     }
 

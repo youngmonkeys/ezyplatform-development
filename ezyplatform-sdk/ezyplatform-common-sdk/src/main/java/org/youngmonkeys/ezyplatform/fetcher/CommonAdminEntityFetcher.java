@@ -62,6 +62,7 @@ public class CommonAdminEntityFetcher
             .code(model.getUsername())
             .displayName(model.getName())
             .url("/admins/" + model.getUsername())
+            .icon("fas fa-user-shield")
             .build();
     }
 
