@@ -58,11 +58,11 @@ public class CommonMediaEntityFetcher
     ) {
         return CommonEntityModel.builder()
             .id(model.getId())
-            .code(model.getName())
+            .code(model.getOriginalName())
             .displayName(
                 isNotBlank(model.getTitle())
                     ? model.getTitle()
-                    : model.getOriginalName()
+                    : model.getAlternativeText()
             )
             .url(model.getUrlOrNull())
             .icon("far fa-image")
