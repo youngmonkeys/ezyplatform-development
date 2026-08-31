@@ -57,10 +57,7 @@ public class DefaultUserMetaFilter implements UserMetaFilter {
             answer.and("e.metaValue = :metaValue");
         }
         if (likeKeyword != null) {
-            answer.and(
-                "(e.metaValue LIKE CONCAT(:likeKeyword, '%')" +
-                " OR e.metaTextValue LIKE CONCAT(:likeKeyword, '%'))"
-            );
+            answer.and("e.metaValue LIKE CONCAT(:likeKeyword, '%')");
         }
         return answer.build();
     }

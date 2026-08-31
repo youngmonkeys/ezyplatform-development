@@ -99,6 +99,8 @@ public final class CommonConstants {
     public static final String PATTERN_CONTRACT_ADDRESS = "[a-zA-Z0-9]{8,64}";
     public static final String PATTERN_WALLET_ADDRESS = "[a-zA-Z0-9]{8,64}";
     public static final String PATTERN_IP = "^\\d{1,3}(\\.\\d{1,3}){3}$";
+    public static final String PATTERN_STATIC_RESOURCE_URI =
+        ".+\\.(css|js|png|jpe?g|gif|svg|ico|woff2?|ttf|eot|map)$";
 
     public static final String PREFIX_HTTP_URL = "http://";
     public static final String PREFIX_HTTPS_URL = "https://";

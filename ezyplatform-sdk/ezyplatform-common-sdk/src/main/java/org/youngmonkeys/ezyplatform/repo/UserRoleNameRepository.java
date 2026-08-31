@@ -17,6 +17,8 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
+import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.UserRoleName;
 
 import java.util.Collection;
@@ -27,5 +29,13 @@ public interface UserRoleNameRepository
 
     List<UserRoleName> findByNameIn(
         Collection<String> roleNames
+    );
+
+    @EzyQuery(
+        "SELECT e FROM UserRoleName e " +
+            "ORDER BY e.priority ASC, e.id ASC"
+    )
+    List<UserRoleName> findAllOrderByPriorityId(
+        Next next
     );
 }

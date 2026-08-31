@@ -1,12 +1,12 @@
 /*
  * Copyright 2025 youngmonkeys.org
- * 
+ *
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://youngmonkeys.org/licenses/ezyplatform-1.0.0.txt
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,29 +18,28 @@ package org.youngmonkeys.ezyplatform.fetcher;
 
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.model.CommonEntityModel;
-import org.youngmonkeys.ezyplatform.model.UserNameModel;
-import org.youngmonkeys.ezyplatform.service.UserService;
+import org.youngmonkeys.ezyplatform.model.MediaNameModel;
+import org.youngmonkeys.ezyplatform.service.MediaService;
 
 import java.util.Collection;
 import java.util.Map;
 
 import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
-import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_USER;
+import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 import static org.youngmonkeys.ezyplatform.model.CommonEntityModel.defaultEntity;
 
 @AllArgsConstructor
-public class CommonUserEntityFetcher
+public class CommonMediaEntityFetcher
     implements CommonEntityFetcher {
 
-    private final UserService userService;
+    private final MediaService mediaService;
 
     @Override
     public CommonEntityModel getEntityById(long entityId) {
-        UserNameModel model = userService.getUsernameById(
-            entityId
-        );
-        return model != null
-            ? toCommonEntityModel(model)
+        MediaNameModel media = mediaService.getMediaNameById(entityId);
+        return media != null
+            ? toCommonEntityModel(media)
             : defaultEntity(entityId, getEntityType());
     }
 
@@ -49,32 +48,29 @@ public class CommonUserEntityFetcher
         Collection<Long> entityIds
     ) {
         return newHashMapNewValues(
-            userService.getUsernameMapByIds(entityIds),
+            mediaService.getMediaNameMapByIds(entityIds),
             this::toCommonEntityModel
         );
     }
 
     protected CommonEntityModel toCommonEntityModel(
-        UserNameModel model
+        MediaNameModel model
     ) {
         return CommonEntityModel.builder()
-            .id(model.getUserId())
-            .code(model.getUsername())
-            .displayName(model.getName())
-            .url(getUriPrefix() + "/" + model.getUsername())
-            .icon("fas fa-user")
+            .id(model.getId())
+            .code(model.getOriginalName())
+            .displayName(
+                isNotBlank(model.getTitle())
+                    ? model.getTitle()
+                    : model.getAlternativeText()
+            )
+            .url(model.getUrlOrNull())
+            .icon("far fa-image")
             .build();
     }
 
-    protected String getUriPrefix() {
-        return "/users";
-    }
-
     @Override
-    public String[] getEntityTypes() {
-        return new String[] {
-            "USER",
-            TABLE_NAME_USER
-        };
+    public String getEntityType() {
+        return TABLE_NAME_MEDIA;
     }
 }

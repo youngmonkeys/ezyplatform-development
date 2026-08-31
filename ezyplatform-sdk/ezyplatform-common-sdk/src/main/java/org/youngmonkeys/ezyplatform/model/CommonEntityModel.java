@@ -30,6 +30,7 @@ public class CommonEntityModel {
     private String name;
     private String displayName;
     private String url;
+    private String icon;
     private Map<String, Object> properties;
 
     public static CommonEntityModel defaultEntity(
