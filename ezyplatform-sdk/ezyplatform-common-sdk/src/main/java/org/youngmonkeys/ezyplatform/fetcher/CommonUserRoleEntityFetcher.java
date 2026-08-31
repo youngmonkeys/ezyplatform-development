@@ -64,7 +64,7 @@ public class CommonUserRoleEntityFetcher
             .code(entity.getName())
             .displayName(entity.getDisplayName())
             .url("/users/roles/" + entity.getName())
-            .icon("fas fa-users-cog")
+            .icon("fas fa-user-cog")
             .build();
     }
 

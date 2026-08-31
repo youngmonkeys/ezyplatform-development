@@ -17,8 +17,41 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
+import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.AdminRoleName;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 public interface AdminRoleNameRepository
     extends EzyDatabaseRepository<Long, AdminRoleName> {
+
+    @EzyQuery(
+        "SELECT e FROM AdminRoleName e " +
+            "WHERE e.priority >= ?0 " +
+            "ORDER by e.priority ASC, e.id ASC"
+    )
+    List<AdminRoleName> findByByPriorityGteOrderByPriorityAndId(
+        int priorityGte
+    );
+
+    @EzyQuery(
+        "SELECT e FROM AdminRoleName e " +
+            "INNER JOIN AdminRole a ON e.id = a.roleId " +
+            "WHERE a.adminId = ?0 " +
+            "ORDER BY e.priority ASC"
+    )
+    Optional<AdminRoleName> findMinAdminRoleName(long adminId);
+
+    @EzyQuery(
+        "SELECT e FROM AdminRoleName e " +
+            "WHERE e.id in ?0 " +
+            "ORDER BY e.priority ASC"
+    )
+    Optional<AdminRoleName> findMinRoleByIds(
+        Collection<Long> ids
+    );
+
+    long countByPriorityGte(int priorityGte);
 }
