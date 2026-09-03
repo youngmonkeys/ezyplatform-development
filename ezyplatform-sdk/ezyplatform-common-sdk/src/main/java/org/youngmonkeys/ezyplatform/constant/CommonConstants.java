@@ -175,6 +175,7 @@ public final class CommonConstants {
     public static final String COOKIE_NAME_MARKET_SSO_NONCE = "marketSsoNonce";
     public static final String COOKIE_NAME_MARKET_SSO_CALLBACK_URI = "marketSsoCallbackUri";
 
+    public static final int COOKIE_ACCESS_TOKEN_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
     public static final int COOKIE_MARKET_SSO_MAX_AGE_SECONDS = 5 * 60;
     public static final int COOKIE_ADMIN_SSO_CALL_BACK_URL_MAX_AGE = 5 * 60;
 
