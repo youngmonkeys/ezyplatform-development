@@ -24,6 +24,7 @@ import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidResult;
+import org.youngmonkeys.ezyplatform.result.LocalDateTimeResult;
 import org.youngmonkeys.ezyplatform.result.PhoneResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 
@@ -68,6 +69,14 @@ public interface UserRepository
             "WHERE e.uuid = ?0"
     )
     IdResult findUserIdByUuid(String uuid);
+
+    @EzyQuery(
+        "SELECT e.createdAt FROM User e " +
+            "WHERE e.id = ?0"
+    )
+    LocalDateTimeResult findCreatedAtById(
+        long userId
+    );
 
     @EzyQuery(
         "SELECT e.id " +
