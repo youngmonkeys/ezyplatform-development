@@ -88,6 +88,10 @@ public interface UserService {
 
     Long getUserIdByUuid(String uuid);
 
+    long getUserCreatedAtById(
+        long userId
+    );
+
     Map<String, Long> getUserIdMapByUuids(
         Collection<String> uuids
     );

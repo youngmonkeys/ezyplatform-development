@@ -175,6 +175,7 @@ public final class CommonConstants {
     public static final String COOKIE_NAME_MARKET_SSO_NONCE = "marketSsoNonce";
     public static final String COOKIE_NAME_MARKET_SSO_CALLBACK_URI = "marketSsoCallbackUri";
 
+    public static final int COOKIE_ACCESS_TOKEN_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
     public static final int COOKIE_MARKET_SSO_MAX_AGE_SECONDS = 5 * 60;
     public static final int COOKIE_ADMIN_SSO_CALL_BACK_URL_MAX_AGE = 5 * 60;
 
@@ -312,8 +313,6 @@ public final class CommonConstants {
         = "web_auto_pass_management_uris";
     public static final String SETTING_NAME_WEB_ALLOW_SEARCH_USER_BY_LIKE_OPERATOR
         = "web_allow_search_user_by_like_operator";
-    public static final String SETTING_NAME_WEB_ALLOW_SEARCH_MEDIA_BY_LIKE_OPERATOR
-        = "web_allow_search_media_by_like_operator";
     public static final String SETTING_NAME_WEB_LANGUAGE_MESSAGES_MAP
         = "web_language_messages_map";
     public static final String SETTING_NAME_WEB_SITE_ICON_URL = "web_site_icon_url";

@@ -38,6 +38,7 @@ import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidResult;
+import org.youngmonkeys.ezyplatform.result.LocalDateTimeResult;
 import org.youngmonkeys.ezyplatform.result.PhoneResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
@@ -388,6 +389,19 @@ public class DefaultUserService implements UserService {
     public Long getUserIdByUuid(String uuid) {
         IdResult result = userRepository.findUserIdByUuid(uuid);
         return result != null ? result.getId() : null;
+    }
+
+    @Override
+    public long getUserCreatedAtById(long userId) {
+        LocalDateTimeResult result = userRepository
+            .findCreatedAtById(userId);
+        if (result == null) {
+            return ZERO_LONG;
+        }
+        LocalDateTime value = result.getValue();
+        return value != null
+            ? clock.toTimestamp(value)
+            : ZERO_LONG;
     }
 
     @Override
