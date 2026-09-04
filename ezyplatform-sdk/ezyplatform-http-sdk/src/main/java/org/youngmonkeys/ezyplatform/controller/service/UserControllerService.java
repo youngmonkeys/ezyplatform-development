@@ -37,7 +37,6 @@ public class UserControllerService {
 
     public PaginationModel<UserModel> getUserPagination(
         String keyword,
-        boolean allowSearchUserByLikeOperator,
         DefaultUserFilter.Builder<?> filterBuilder,
         String nextPageToken,
         String prevPageToken,
@@ -46,7 +45,6 @@ public class UserControllerService {
     ) {
         return getUserPagination(
             keyword,
-            allowSearchUserByLikeOperator,
             filterBuilder,
             NULL_STRING,
             nextPageToken,
@@ -59,7 +57,6 @@ public class UserControllerService {
     @SuppressWarnings("MethodLength")
     public PaginationModel<UserModel> getUserPagination(
         String keyword,
-        boolean allowSearchUserByLikeOperator,
         DefaultUserFilter.Builder<?> filterBuilder,
         String sortOrder,
         String nextPageToken,
@@ -95,30 +92,12 @@ public class UserControllerService {
                 lastPage,
                 limit
             );
-            if (pagination.getCount() == ZERO
-                && allowSearchUserByLikeOperator
-            ) {
-                pagination = getPaginationModelBySortOrder(
-                    paginationUserService,
-                    userPaginationParameterConverter,
-                    filterBuilder
-                        .uniqueKeyword(NULL_STRING)
-                        .likeKeyword(nullableKeyword)
-                        .build(),
-                    sortOrder,
-                    nextPageToken,
-                    prevPageToken,
-                    lastPage,
-                    limit
-                );
-            }
             if (pagination.getCount() == ZERO) {
                 pagination = getPaginationModelBySortOrder(
                     paginationUserService,
                     userPaginationParameterConverter,
                     filterBuilder
                         .uniqueKeyword(NULL_STRING)
-                        .likeKeyword(NULL_STRING)
                         .keywordPrefix(nullableKeyword)
                         .build(),
                     sortOrder,
@@ -134,7 +113,6 @@ public class UserControllerService {
                     userPaginationParameterConverter,
                     filterBuilder
                         .uniqueKeyword(NULL_STRING)
-                        .likeKeyword(NULL_STRING)
                         .keywordPrefix(NULL_STRING)
                         .keywords(toKeywords(nullableKeyword, Boolean.TRUE))
                         .build(),

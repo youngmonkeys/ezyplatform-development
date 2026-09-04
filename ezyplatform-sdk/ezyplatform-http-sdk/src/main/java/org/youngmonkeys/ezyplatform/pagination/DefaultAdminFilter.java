@@ -31,7 +31,6 @@ public class DefaultAdminFilter implements AdminFilter {
     public final String exclusiveStatus;
     public final String uniqueKeyword;
     public final String keywordPrefix;
-    public final String likeKeyword;
     public final Long roleId;
     public final Collection<Long> roleIds;
     public final String roleName;
@@ -51,7 +50,6 @@ public class DefaultAdminFilter implements AdminFilter {
         this.exclusiveStatus = builder.exclusiveStatus;
         this.uniqueKeyword = builder.uniqueKeyword;
         this.keywordPrefix = builder.keywordPrefix;
-        this.likeKeyword = builder.likeKeyword;
         this.roleId = builder.roleId;
         this.roleIds = builder.roleIds;
         this.roleName = builder.roleName;
@@ -179,18 +177,6 @@ public class DefaultAdminFilter implements AdminFilter {
                 .and("k.dataType = '" + TABLE_NAME_ADMIN + "'")
                 .and("k.keyword LIKE CONCAT(:keywordPrefix, '%')");
         }
-        if (likeKeyword != null) {
-            answer.and(
-                new EzyQueryConditionBuilder()
-                    .append("(")
-                    .append("e.phone LIKE CONCAT('%',:likeKeyword,'%')")
-                    .or("e.email LIKE CONCAT('%',:likeKeyword,'%')")
-                    .or("e.displayName LIKE CONCAT('%',:likeKeyword,'%')")
-                    .or("e.username LIKE CONCAT('%',:likeKeyword,'%')")
-                    .append(")")
-                    .build()
-            );
-        }
         return answer.build();
     }
 
@@ -203,7 +189,6 @@ public class DefaultAdminFilter implements AdminFilter {
         private String exclusiveStatus;
         private String uniqueKeyword;
         private String keywordPrefix;
-        private String likeKeyword;
         private Long roleId;
         private Collection<Long> roleIds;
         private String roleName;
@@ -243,11 +228,6 @@ public class DefaultAdminFilter implements AdminFilter {
 
         public T keywordPrefix(String keywordPrefix) {
             this.keywordPrefix = keywordPrefix;
-            return (T) this;
-        }
-
-        public T likeKeyword(String likeKeyword) {
-            this.likeKeyword = likeKeyword;
             return (T) this;
         }
 

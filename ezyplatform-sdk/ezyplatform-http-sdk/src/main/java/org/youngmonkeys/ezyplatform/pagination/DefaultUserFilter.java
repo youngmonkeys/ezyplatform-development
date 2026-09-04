@@ -26,7 +26,6 @@ public class DefaultUserFilter implements UserFilter {
     public final String status;
     public final Collection<String> statuses;
     public final String uniqueKeyword;
-    public final String likeKeyword;
     public final String keywordPrefix;
     public final Collection<String> keywords;
     public final Long roleId;
@@ -45,7 +44,6 @@ public class DefaultUserFilter implements UserFilter {
         this.status = builder.status;
         this.statuses = builder.statuses;
         this.uniqueKeyword = builder.uniqueKeyword;
-        this.likeKeyword = builder.likeKeyword;
         this.keywordPrefix = builder.keywordPrefix;
         this.keywords = builder.keywords;
         this.roleId = builder.roleId;
@@ -168,18 +166,6 @@ public class DefaultUserFilter implements UserFilter {
         if (keywords != null) {
             answer.and("k.keyword IN :keywords");
         }
-        if (likeKeyword != null) {
-            answer.and(
-                new EzyQueryConditionBuilder()
-                    .append("(")
-                    .append("e.phone LIKE CONCAT('%',:likeKeyword,'%')")
-                    .or("e.email LIKE CONCAT('%',:likeKeyword,'%')")
-                    .or("e.displayName LIKE CONCAT('%',:likeKeyword,'%')")
-                    .or("e.username LIKE CONCAT('%',:likeKeyword,'%')")
-                    .append(")")
-                    .build()
-            );
-        }
         return answer.build();
     }
 
@@ -190,7 +176,6 @@ public class DefaultUserFilter implements UserFilter {
         private String status;
         private Collection<String> statuses;
         private String uniqueKeyword;
-        private String likeKeyword;
         private String keywordPrefix;
         private Collection<String> keywords;
         private Long roleId;
@@ -217,11 +202,6 @@ public class DefaultUserFilter implements UserFilter {
 
         public T uniqueKeyword(String uniqueKeyword) {
             this.uniqueKeyword = uniqueKeyword;
-            return (T) this;
-        }
-
-        public T likeKeyword(String likeKeyword) {
-            this.likeKeyword = likeKeyword;
             return (T) this;
         }
 

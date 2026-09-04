@@ -254,23 +254,12 @@ public interface UserService {
     long countUsersByStatus(String status);
 
     List<UserNameModel> simpleSearch(
-        String keyword,
-        int limit
-    );
-
-    List<UserNameModel> simpleSearch(
         Collection<String> keywords,
         int limit
     );
 
     List<UserNameModel> simpleSearchWithKeywordPrefix(
         String keywordPrefix,
-        int limit
-    );
-
-    List<UserNameModel> simpleSearchWithRoleIds(
-        Collection<Long> roleIds,
-        String keyword,
         int limit
     );
 
@@ -283,12 +272,6 @@ public interface UserService {
     List<UserNameModel> simpleSearchWithRoleIdsAndKeywordPrefix(
         Collection<Long> roleIds,
         String keywordKeyword,
-        int limit
-    );
-
-    List<UserNameModel> simpleSearchWithRoleNames(
-        Collection<String> roleNames,
-        String keyword,
         int limit
     );
 

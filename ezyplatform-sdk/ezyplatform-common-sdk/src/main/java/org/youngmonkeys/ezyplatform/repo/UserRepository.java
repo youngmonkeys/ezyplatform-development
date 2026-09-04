@@ -196,22 +196,6 @@ public interface UserRepository
             "e.username, " +
             "e.displayName " +
             "FROM User e " +
-            "WHERE e.phone LIKE CONCAT('%',?0,'%') " +
-            "OR e.email LIKE CONCAT('%',?0,'%') " +
-            "OR e.displayName LIKE CONCAT('%',?0,'%') " +
-            "OR e.username LIKE CONCAT('%',?0,'%')"
-    )
-    List<IdNameResult> findUsernameByKeyword(
-        String keyword,
-        Next next
-    );
-
-    @EzyQuery(
-        "SELECT " +
-            "DISTINCT(e.id), " +
-            "e.username, " +
-            "e.displayName " +
-            "FROM User e " +
             "INNER JOIN UserKeyword k ON e.id = k.userId " +
             "WHERE k.keyword IN ?0"
     )
@@ -231,26 +215,6 @@ public interface UserRepository
     )
     List<IdNameResult> findUsernameByKeywordPrefix(
         String keywordPrefix,
-        Next next
-    );
-
-    @EzyQuery(
-        "SELECT " +
-            "DISTINCT(e.id), " +
-            "e.username, " +
-            "e.displayName " +
-            "FROM User e " +
-            "INNER JOIN UserRole a ON e.id = a.userId " +
-            "WHERE a.roleId IN ?0 AND (" +
-            "e.phone LIKE CONCAT('%',?1,'%') " +
-            "OR e.email LIKE CONCAT('%',?1,'%') " +
-            "OR e.displayName LIKE CONCAT('%',?1,'%') " +
-            "OR e.username LIKE CONCAT('%',?1,'%')" +
-            ")"
-    )
-    List<IdNameResult> findUsernameByKeywordAndRoleIds(
-        Collection<Long> roleIds,
-        String keyword,
         Next next
     );
 
@@ -283,28 +247,6 @@ public interface UserRepository
     List<IdNameResult> findUsernameByKeywordPrefixAndRoleIds(
         Collection<Long> roleIds,
         String keywordPrefix,
-        Next next
-    );
-
-    @EzyQuery(
-        "SELECT " +
-            "DISTINCT(e.id), " +
-            "e.username, " +
-            "e.displayName " +
-            "FROM User e " +
-            "INNER JOIN UserRole a ON e.id = a.userId " +
-            "INNER JOIN UserRoleName b ON b.id = a.roleId " +
-            "INNER JOIN UserKeyword c ON e.id = c.userId " +
-            "WHERE b.name IN ?0 AND (" +
-            "e.phone LIKE CONCAT('%',?1,'%') " +
-            "OR e.email LIKE CONCAT('%',?1,'%') " +
-            "OR e.displayName LIKE CONCAT('%',?1,'%') " +
-            "OR e.username LIKE CONCAT('%',?1,'%')" +
-            ")"
-    )
-    List<IdNameResult> findUsernameByKeywordAndRoleNames(
-        Collection<String> roleNames,
-        String keyword,
         Next next
     );
 

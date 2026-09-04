@@ -549,28 +549,6 @@ public class DefaultUserService implements UserService {
 
     @Override
     public List<UserNameModel> simpleSearch(
-        String keyword,
-        int limit
-    ) {
-        List<IdNameResult> results = userRepository
-            .findUsernameByUniqueKeyword(
-                keyword,
-                limit(limit)
-            );
-        if (results.isEmpty()) {
-            results = userRepository.findUsernameByKeyword(
-                keyword,
-                limit(limit)
-            );
-        }
-        return newArrayList(
-            results,
-            resultToModelConverter::toUserNameModel
-        );
-    }
-
-    @Override
-    public List<UserNameModel> simpleSearch(
         Collection<String> keywords,
         int limit
     ) {
@@ -610,22 +588,6 @@ public class DefaultUserService implements UserService {
     @Override
     public List<UserNameModel> simpleSearchWithRoleIds(
         Collection<Long> roleIds,
-        String keyword,
-        int limit
-    ) {
-        return newArrayList(
-            userRepository.findUsernameByKeywordAndRoleIds(
-                roleIds,
-                keyword,
-                limit(limit)
-            ),
-            resultToModelConverter::toUserNameModel
-        );
-    }
-
-    @Override
-    public List<UserNameModel> simpleSearchWithRoleIds(
-        Collection<Long> roleIds,
         Collection<String> keywords,
         int limit
     ) {
@@ -649,22 +611,6 @@ public class DefaultUserService implements UserService {
             userRepository.findUsernameByKeywordPrefixAndRoleIds(
                 roleIds,
                 keywordPrefix,
-                limit(limit)
-            ),
-            resultToModelConverter::toUserNameModel
-        );
-    }
-
-    @Override
-    public List<UserNameModel> simpleSearchWithRoleNames(
-        Collection<String> roleNames,
-        String keyword,
-        int limit
-    ) {
-        return newArrayList(
-            userRepository.findUsernameByKeywordAndRoleNames(
-                roleNames,
-                keyword,
                 limit(limit)
             ),
             resultToModelConverter::toUserNameModel
