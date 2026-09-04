@@ -22,7 +22,6 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 public class DefaultMediaFilter implements MediaFilter {
@@ -35,7 +34,6 @@ public class DefaultMediaFilter implements MediaFilter {
     public final Long ownerAdminId;
     public final Long ownerUserId;
     public final String prefixKeyword;
-    public final String likeKeyword;
     public final String status;
     public final Collection<String> statuses;
     public final String exclusiveStatus;
@@ -55,7 +53,6 @@ public class DefaultMediaFilter implements MediaFilter {
         this.ownerAdminId = builder.ownerAdminId;
         this.ownerUserId = builder.ownerUserId;
         this.prefixKeyword = builder.prefixKeyword;
-        this.likeKeyword = builder.likeKeyword;
         this.status = builder.status;
         this.statuses = builder.statuses;
         this.exclusiveStatus = builder.exclusiveStatus;
@@ -131,9 +128,6 @@ public class DefaultMediaFilter implements MediaFilter {
                 .and("k.dataType = '" + TABLE_NAME_MEDIA + "'")
                 .and("k.keyword LIKE CONCAT(:prefixKeyword,'%')");
         }
-        if (likeKeyword != null) {
-            answer.and("e.originalName LIKE CONCAT('%',:likeKeyword,'%')");
-        }
         return answer.build();
     }
 
@@ -152,9 +146,7 @@ public class DefaultMediaFilter implements MediaFilter {
         private Collection<String> types;
         private Long ownerAdminId;
         private Long ownerUserId;
-        private boolean allowSearchByLikeOperator;
         private String prefixKeyword;
-        private String likeKeyword;
         private String status;
         private Collection<String> statuses;
         private String exclusiveStatus;
@@ -204,20 +196,8 @@ public class DefaultMediaFilter implements MediaFilter {
             return (T) this;
         }
 
-        public T allowSearchByLikeOperator(
-            boolean allowSearchByLikeOperator
-        ) {
-            this.allowSearchByLikeOperator = allowSearchByLikeOperator;
-            return (T) this;
-        }
-
         public T prefixKeyword(String prefixKeyword) {
             this.prefixKeyword = prefixKeyword;
-            return (T) this;
-        }
-
-        public T likeKeyword(String likeKeyword) {
-            this.likeKeyword = likeKeyword;
             return (T) this;
         }
 
@@ -263,16 +243,6 @@ public class DefaultMediaFilter implements MediaFilter {
 
         @Override
         public DefaultMediaFilter build() {
-            if (allowSearchByLikeOperator) {
-                if (likeKeyword != null) {
-                    prefixKeyword = NULL_STRING;
-                }
-            } else {
-                if (likeKeyword != null) {
-                    prefixKeyword = likeKeyword;
-                    likeKeyword = NULL_STRING;
-                }
-            }
             return new DefaultMediaFilter(this);
         }
     }
