@@ -86,26 +86,6 @@ public final class CommonConstants {
         "wss?:\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.?[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
     public static final String PATTERN_MEDIA_NAME_SEGMENT =
         "\\p{L}\\p{M}0-9_()\\[\\]+~!@$%^&=\\- ";
-    public static final String MEDIA_NAME_RESULT_FIELDS =
-        "e.id," +
-            "e.name," +
-            "e.originalName," +
-            "e.type," +
-            "e.url," +
-            "e.title," +
-            "e.caption," +
-            "e.alternativeText," +
-            "e.description," +
-            "e.updatedAt";
-    public static final String MEDIA_TITLE_RESULT_FIELDS =
-        "e.id," +
-            "e.name," +
-            "e.originalName," +
-            "e.type," +
-            "e.url," +
-            "e.title," +
-            "e.caption," +
-            "e.alternativeText";
     public static final String PATTERN_MEDIA_NAME =
         "^[" + PATTERN_MEDIA_NAME_SEGMENT + "]+"
             + "(\\.[" + PATTERN_MEDIA_NAME_SEGMENT + "]+)*$";
@@ -476,6 +456,27 @@ public final class CommonConstants {
 
     public static final LocalDateTime MIN_SQL_DATETIME
         = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
+
+    public static final String MEDIA_NAME_RESULT_FIELDS =
+        "e.id," +
+            "e.name," +
+            "e.originalName," +
+            "e.type," +
+            "e.url," +
+            "e.title," +
+            "e.caption," +
+            "e.alternativeText," +
+            "e.description," +
+            "e.updatedAt";
+    public static final String MEDIA_TITLE_RESULT_FIELDS =
+        "e.id," +
+            "e.name," +
+            "e.originalName," +
+            "e.type," +
+            "e.url," +
+            "e.title," +
+            "e.caption," +
+            "e.alternativeText";
 
     private CommonConstants() {}
 
