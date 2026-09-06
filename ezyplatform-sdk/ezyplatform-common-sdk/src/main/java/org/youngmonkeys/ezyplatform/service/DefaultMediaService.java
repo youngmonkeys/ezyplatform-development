@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.io.EzyStrings;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultResultToModelConverter;
 import org.youngmonkeys.ezyplatform.data.ImageSize;
 import org.youngmonkeys.ezyplatform.entity.Media;
 import org.youngmonkeys.ezyplatform.entity.MediaStatus;
@@ -29,12 +30,14 @@ import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.io.ImageProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaNameModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 import org.youngmonkeys.ezyplatform.result.IdResult;
+import org.youngmonkeys.ezyplatform.result.MediaNameResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
 import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
@@ -45,6 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
@@ -70,6 +74,7 @@ public class DefaultMediaService implements MediaService {
     private final MediaRepository mediaRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultModelToEntityConverter modelToEntityConverter;
+    private final DefaultResultToModelConverter resultToModelConverter;
 
     @Override
     public MediaModel addMedia(
@@ -360,6 +365,45 @@ public class DefaultMediaService implements MediaService {
         return entityToModelConverter.toModel(
             mediaRepository.findById(mediaId)
         );
+    }
+
+    @Override
+    public MediaNameModel getMediaNameById(long mediaId) {
+        return resultToModelConverter.toModel(
+            mediaRepository.findMediaNameById(mediaId)
+        );
+    }
+
+    @Override
+    public List<MediaNameModel> getMediaNameListByIds(
+        Collection<Long> mediaIds
+    ) {
+        if (mediaIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+        Map<Long, MediaNameModel> mediaMap = getMediaNameMapByIds(mediaIds);
+        return mediaIds.stream()
+            .map(mediaMap::get)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<Long, MediaNameModel> getMediaNameMapByIds(
+        Collection<Long> mediaIds
+    ) {
+        if (mediaIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return mediaRepository.findMediaNamesByIds(mediaIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    MediaNameResult::getId,
+                    resultToModelConverter::toModel,
+                    (o, n) -> n
+                )
+            );
     }
 
     @Override

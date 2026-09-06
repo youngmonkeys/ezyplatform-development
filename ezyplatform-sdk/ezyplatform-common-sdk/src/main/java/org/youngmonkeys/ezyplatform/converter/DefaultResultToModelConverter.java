@@ -21,12 +21,14 @@ import org.youngmonkeys.ezyplatform.model.AdminNameModel;
 import org.youngmonkeys.ezyplatform.model.AvatarCoverImageIdsModel;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateIdAndNameModel;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
+import org.youngmonkeys.ezyplatform.model.MediaNameModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.model.UuidNameModel;
 import org.youngmonkeys.ezyplatform.result.AvatarCoverImageIdsResult;
 import org.youngmonkeys.ezyplatform.result.ContentTemplateIdAndNameResult;
 import org.youngmonkeys.ezyplatform.result.IdNameResult;
 import org.youngmonkeys.ezyplatform.result.IdUuidNameResult;
+import org.youngmonkeys.ezyplatform.result.MediaNameResult;
 import org.youngmonkeys.ezyplatform.result.SimpleContentTemplateResult;
 import org.youngmonkeys.ezyplatform.util.LocalDateTimes;
 
@@ -86,6 +88,26 @@ public class DefaultResultToModelConverter {
         return ContentTemplateIdAndNameModel.builder()
             .id(result.getId())
             .name(result.getTemplateName())
+            .build();
+    }
+
+    public MediaNameModel toModel(
+        MediaNameResult result
+    ) {
+        if (result == null) {
+            return null;
+        }
+        return MediaNameModel.builder()
+            .id(result.getId())
+            .name(result.getName())
+            .originalName(result.getOriginalName())
+            .type(result.getType())
+            .url(result.getUrl())
+            .title(result.getTitle())
+            .caption(result.getCaption())
+            .alternativeText(result.getAlternativeText())
+            .description(result.getDescription())
+            .updatedAt(result.getUpdatedAt())
             .build();
     }
 

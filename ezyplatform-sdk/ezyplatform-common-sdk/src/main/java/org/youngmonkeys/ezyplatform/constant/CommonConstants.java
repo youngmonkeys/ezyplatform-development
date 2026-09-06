@@ -86,6 +86,17 @@ public final class CommonConstants {
         "wss?:\\/\\/[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.?[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
     public static final String PATTERN_MEDIA_NAME_SEGMENT =
         "\\p{L}\\p{M}0-9_()\\[\\]+~!@$%^&=\\- ";
+    public static final String MEDIA_NAME_RESULT_FIELDS =
+        "e.id," +
+            "e.name," +
+            "e.originalName," +
+            "e.type," +
+            "e.url," +
+            "e.title," +
+            "e.caption," +
+            "e.alternativeText," +
+            "e.description," +
+            "e.updatedAt";
     public static final String PATTERN_MEDIA_NAME =
         "^[" + PATTERN_MEDIA_NAME_SEGMENT + "]+"
             + "(\\.[" + PATTERN_MEDIA_NAME_SEGMENT + "]+)*$";
