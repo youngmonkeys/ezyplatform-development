@@ -32,12 +32,14 @@ import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
 import org.youngmonkeys.ezyplatform.model.MediaNameModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaTitleModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.repo.MediaRepository;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.MediaNameResult;
+import org.youngmonkeys.ezyplatform.result.MediaTitleResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
 import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
@@ -400,6 +402,24 @@ public class DefaultMediaService implements MediaService {
             .collect(
                 Collectors.toMap(
                     MediaNameResult::getId,
+                    resultToModelConverter::toModel,
+                    (o, n) -> n
+                )
+            );
+    }
+
+    @Override
+    public Map<Long, MediaTitleModel> getMediaTitleMapByIds(
+        Collection<Long> mediaIds
+    ) {
+        if (mediaIds.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        return mediaRepository.findMediaTitlesByIds(mediaIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    MediaTitleResult::getId,
                     resultToModelConverter::toModel,
                     (o, n) -> n
                 )

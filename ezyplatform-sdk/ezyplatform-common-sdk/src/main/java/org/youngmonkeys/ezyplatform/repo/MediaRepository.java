@@ -22,6 +22,7 @@ import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.Media;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 import org.youngmonkeys.ezyplatform.result.MediaNameResult;
+import org.youngmonkeys.ezyplatform.result.MediaTitleResult;
 import org.youngmonkeys.ezyplatform.result.StatusResult;
 import org.youngmonkeys.ezyplatform.result.TypeResult;
 import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
@@ -32,6 +33,7 @@ import java.util.List;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MEDIA_NAME_RESULT_FIELDS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MEDIA_TITLE_RESULT_FIELDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
@@ -70,6 +72,14 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
             "WHERE e.id IN ?0"
     )
     List<MediaNameResult> findMediaNamesByIds(
+        Collection<Long> mediaIds
+    );
+
+    @EzyQuery(
+        "SELECT " + MEDIA_TITLE_RESULT_FIELDS + " FROM Media e " +
+            "WHERE e.id IN ?0"
+    )
+    List<MediaTitleResult> findMediaTitlesByIds(
         Collection<Long> mediaIds
     );
 

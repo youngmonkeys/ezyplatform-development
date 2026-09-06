@@ -23,6 +23,7 @@ import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.model.MediaNameModel;
+import org.youngmonkeys.ezyplatform.model.MediaTitleModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.SimpleMediaModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
@@ -191,6 +192,10 @@ public interface MediaService {
     );
 
     Map<Long, MediaNameModel> getMediaNameMapByIds(
+        Collection<Long> mediaIds
+    );
+
+    Map<Long, MediaTitleModel> getMediaTitleMapByIds(
         Collection<Long> mediaIds
     );
 
