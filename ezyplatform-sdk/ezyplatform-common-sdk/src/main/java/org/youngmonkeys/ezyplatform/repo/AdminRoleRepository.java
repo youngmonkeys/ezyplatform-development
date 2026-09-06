@@ -16,12 +16,16 @@
 
 package org.youngmonkeys.ezyplatform.repo;
 
+import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
+import org.youngmonkeys.ezyplatform.entity.AdminRole;
+import org.youngmonkeys.ezyplatform.entity.AdminRoleId;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.List;
 
-public interface AdminIdRoleRepository {
+public interface AdminRoleRepository
+    extends EzyDatabaseRepository<AdminRoleId, AdminRole>  {
 
     @EzyQuery(
         "SELECT e.adminId FROM AdminRole e " +
