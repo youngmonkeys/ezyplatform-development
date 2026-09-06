@@ -16,12 +16,14 @@
 
 package org.youngmonkeys.ezyplatform.result;
 
+import com.tvd12.ezyfox.database.annotation.EzyQueryResult;
 import lombok.Getter;
 import lombok.Setter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 
 @Getter
 @Setter
+@EzyQueryResult
 public class MediaTitleResult {
     private long id;
     private String name;
