@@ -109,7 +109,7 @@ public class DefaultResultToModelConverter {
             .caption(result.getCaption())
             .alternativeText(result.getAlternativeText())
             .description(result.getDescription())
-            .updatedAt(result.getUpdatedAt())
+            .updatedAt(toTimestamp(result.getUpdatedAt()))
             .build();
     }
 

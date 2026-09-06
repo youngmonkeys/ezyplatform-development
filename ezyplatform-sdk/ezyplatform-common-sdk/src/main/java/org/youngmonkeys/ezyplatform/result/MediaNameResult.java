@@ -21,6 +21,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @EzyQueryResult
@@ -34,5 +36,5 @@ public class MediaNameResult {
     private String caption;
     private String alternativeText;
     private String description;
-    private long updatedAt;
+    private LocalDateTime updatedAt;
 }
