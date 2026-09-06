@@ -23,6 +23,7 @@ import org.youngmonkeys.ezyplatform.entity.UploadFrom;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 import org.youngmonkeys.ezyplatform.model.MediaNameModel;
+import org.youngmonkeys.ezyplatform.model.MediaTitleModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.SimpleMediaModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
@@ -38,8 +39,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
-import static com.tvd12.ezyfox.io.EzyMaps.newHashMapNewValues;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
@@ -148,13 +147,9 @@ public interface MediaService {
 
     MediaModel getMediaById(long mediaId);
 
-    default MediaNameModel getMediaNameById(
+    MediaNameModel getMediaNameById(
         long mediaId
-    ) {
-        return MediaNameModel.fromMediaModel(
-            getMediaById(mediaId)
-        );
-    }
+    );
 
     default SimpleMediaModel getSimpleMediaModelById(
         long mediaId
@@ -188,27 +183,21 @@ public interface MediaService {
             .collect(Collectors.toList());
     }
 
-    default List<MediaNameModel> getMediaNameListByIds(
+    List<MediaNameModel> getMediaNameListByIds(
         Collection<Long> mediaIds
-    ) {
-        return newArrayList(
-            getMediaListByIds(mediaIds),
-            MediaNameModel::fromMediaModel
-        );
-    }
+    );
 
     Map<Long, MediaModel> getMediaMapByIds(
         Collection<Long> mediaIds
     );
 
-    default Map<Long, MediaNameModel> getMediaNameMapByIds(
+    Map<Long, MediaNameModel> getMediaNameMapByIds(
         Collection<Long> mediaIds
-    ) {
-        return newHashMapNewValues(
-            getMediaMapByIds(mediaIds),
-            MediaNameModel::fromMediaModel
-        );
-    }
+    );
+
+    Map<Long, MediaTitleModel> getMediaTitleMapByIds(
+        Collection<Long> mediaIds
+    );
 
     long getMediaFileLength(
         MediaType mediaType,

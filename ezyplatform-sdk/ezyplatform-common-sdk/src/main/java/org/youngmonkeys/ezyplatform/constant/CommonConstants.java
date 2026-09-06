@@ -457,6 +457,27 @@ public final class CommonConstants {
     public static final LocalDateTime MIN_SQL_DATETIME
         = LocalDateTime.of(1900, 1, 1, 0, 0, 0);
 
+    public static final String MEDIA_NAME_RESULT_FIELDS =
+        "e.id," +
+            "e.name," +
+            "e.originalName," +
+            "e.type," +
+            "e.url," +
+            "e.title," +
+            "e.caption," +
+            "e.alternativeText," +
+            "e.description," +
+            "e.updatedAt";
+    public static final String MEDIA_TITLE_RESULT_FIELDS =
+        "e.id," +
+            "e.name," +
+            "e.originalName," +
+            "e.type," +
+            "e.url," +
+            "e.title," +
+            "e.caption," +
+            "e.alternativeText";
+
     private CommonConstants() {}
 
     public static String settingNameTargetRoleFeatures(TargetType targetType) {

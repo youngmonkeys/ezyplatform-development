@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,29 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.service;
+package org.youngmonkeys.ezyplatform.validator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.youngmonkeys.ezyplatform.repo.AdminRoleRepository;
-import org.youngmonkeys.ezyplatform.result.IdResult;
 
-import java.util.List;
-
-import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 
 @AllArgsConstructor
-public class DefaultAdminRoleService implements AdminRoleService {
+public class DataValidator {
 
-    private final AdminRoleRepository adminRoleRepository;
+    private final ObjectMapper objectMapper;
 
-    @Override
-    public List<Long> getAdminIdsByRoleName(String roleName) {
-        return newArrayList(
-            adminRoleRepository.findAdminIdsByRoleName(roleName),
-            IdResult::getId
-        );
+    public boolean isValidJson(
+        String message
+    ) {
+        if (isBlank(message)) {
+            return false;
+        }
+        try {
+            objectMapper.readTree(message);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
