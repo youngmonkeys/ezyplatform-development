@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.fetcher;
 
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.constant.SocketUserType;
 import org.youngmonkeys.ezyplatform.model.CommonEntityModel;
 import org.youngmonkeys.ezyplatform.model.UserNameModel;
 import org.youngmonkeys.ezyplatform.service.UserService;
@@ -71,10 +72,15 @@ public class CommonUserEntityFetcher
     }
 
     @Override
+    public String getEntityType() {
+        return TABLE_NAME_USER;
+    }
+
+    @Override
     public String[] getEntityTypes() {
         return new String[] {
-            "USER",
-            TABLE_NAME_USER
+            TABLE_NAME_USER,
+            SocketUserType.USER.toString()
         };
     }
 }
