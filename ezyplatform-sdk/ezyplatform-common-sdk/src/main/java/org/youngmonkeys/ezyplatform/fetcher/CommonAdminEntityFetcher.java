@@ -17,6 +17,7 @@
 package org.youngmonkeys.ezyplatform.fetcher;
 
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.constant.SocketUserType;
 import org.youngmonkeys.ezyplatform.model.AdminNameModel;
 import org.youngmonkeys.ezyplatform.model.CommonEntityModel;
 import org.youngmonkeys.ezyplatform.service.AdminService;
@@ -69,5 +70,13 @@ public class CommonAdminEntityFetcher
     @Override
     public String getEntityType() {
         return TABLE_NAME_ADMIN;
+    }
+
+    @Override
+    public String[] getEntityTypes() {
+        return new String[] {
+            TABLE_NAME_ADMIN,
+            SocketUserType.ADMIN.toString()
+        };
     }
 }
