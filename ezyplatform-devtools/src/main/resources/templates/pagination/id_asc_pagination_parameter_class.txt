@@ -41,7 +41,7 @@ public class IdAsc${entityClassName}PaginationParameter
     @Override
     public String sortOrder() {
         return ${entityClassName}PaginationSortOrder
-            .ID_DESC
+            .ID_ASC
             .toString();
     }
 }
