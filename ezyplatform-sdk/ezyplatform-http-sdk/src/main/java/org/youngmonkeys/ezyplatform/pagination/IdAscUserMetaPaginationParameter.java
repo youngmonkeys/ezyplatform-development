@@ -57,7 +57,7 @@ public class IdAscUserMetaPaginationParameter
     @Override
     public String sortOrder() {
         return UserMetaPaginationSortOrder
-            .ID_DESC
+            .ID_ASC
             .toString();
     }
 }

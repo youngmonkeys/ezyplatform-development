@@ -57,7 +57,7 @@ public class IdAscContentTemplatePaginationParameter
     @Override
     public String sortOrder() {
         return ContentTemplatePaginationSortOrder
-            .ID_DESC
+            .ID_ASC
             .toString();
     }
 }
