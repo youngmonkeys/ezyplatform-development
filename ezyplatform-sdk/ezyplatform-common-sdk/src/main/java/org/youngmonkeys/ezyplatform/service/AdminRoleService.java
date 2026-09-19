@@ -20,5 +20,11 @@ import java.util.List;
 
 public interface AdminRoleService {
 
-    List<Long> getAdminIdsByRoleName(String roleName);
+    long getRoleIdByName(
+        String roleName
+    );
+
+    List<Long> getAdminIdsByRoleName(
+        String roleName
+    );
 }

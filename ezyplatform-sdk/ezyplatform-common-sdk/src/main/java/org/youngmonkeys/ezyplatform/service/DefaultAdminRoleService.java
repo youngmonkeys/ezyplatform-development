@@ -17,20 +17,40 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.entity.AdminRoleName;
+import org.youngmonkeys.ezyplatform.repo.AdminRoleNameRepository;
 import org.youngmonkeys.ezyplatform.repo.AdminRoleRepository;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.List;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 public class DefaultAdminRoleService implements AdminRoleService {
 
     private final AdminRoleRepository adminRoleRepository;
+    private final AdminRoleNameRepository adminRoleNameRepository;
 
     @Override
-    public List<Long> getAdminIdsByRoleName(String roleName) {
+    public long getRoleIdByName(
+        String roleName
+    ) {
+        AdminRoleName adminRoleName = adminRoleNameRepository
+            .findByField(
+                "name",
+                roleName
+            );
+        return adminRoleName == null
+            ? ZERO_LONG
+            : adminRoleName.getId();
+    }
+
+    @Override
+    public List<Long> getAdminIdsByRoleName(
+        String roleName
+    ) {
         return newArrayList(
             adminRoleRepository.findAdminIdsByRoleName(roleName),
             IdResult::getId

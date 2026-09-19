@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzySets.newHashSet;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 public class DefaultUserRoleService implements UserRoleService {
@@ -74,7 +76,7 @@ public class DefaultUserRoleService implements UserRoleService {
                 roleName
             );
         return userRoleName == null
-            ? 0L
+            ? ZERO_LONG
             : userRoleName.getId();
     }
 
@@ -127,7 +129,7 @@ public class DefaultUserRoleService implements UserRoleService {
             userRoleRepository.findListByField(
                 "roleId",
                 roleId,
-                0,
+                ZERO,
                 limit
             ),
             UserRole::getUserId
@@ -140,7 +142,7 @@ public class DefaultUserRoleService implements UserRoleService {
         int limit
     ) {
         long roleId = getRoleIdByName(roleName);
-        return roleId > 0
+        return roleId > ZERO_LONG
             ? getUserIdsByRoleId(roleId, limit)
             : Collections.emptySet();
     }
