@@ -5,43 +5,48 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makeOrderByAsc;
-import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makePaginationConditionAsc;
+import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makeOrderByDesc;
+import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makePaginationConditionDesc;
 import static org.youngmonkeys.ezyplatform.util.Values.isAllNull;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IdAscAdminRolePaginationParameter
+public class RoleIdDescAdminIdDescAdminRolePaginationParameter
     implements AdminRolePaginationParameter {
 
-    public Long id;
+    public Long roleId;
+    public Long adminId;
 
     @Override
     public String paginationCondition(boolean nextPage) {
         return isEmpty()
             ? null
-            : makePaginationConditionAsc(
+            : makePaginationConditionDesc(
                 nextPage,
-                "id"
+                "roleId",
+                "adminId"
             );
     }
 
     @Override
     public String orderBy(boolean nextPage) {
-        return makeOrderByAsc(nextPage, "id");
+        return makeOrderByDesc(
+            nextPage,
+            "roleId", "adminId"
+        );
     }
 
     @Override
     public boolean isEmpty() {
-        return isAllNull(id);
+        return isAllNull(roleId, adminId);
     }
 
     @Override
     public String sortOrder() {
         return AdminRolePaginationSortOrder
-            .ID_ASC
+            .ROLE_ID_DESC_ADMIN_ID_DESC
             .toString();
     }
 }

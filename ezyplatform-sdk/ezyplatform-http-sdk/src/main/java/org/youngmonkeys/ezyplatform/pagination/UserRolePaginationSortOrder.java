@@ -1,6 +1,6 @@
 package org.youngmonkeys.ezyplatform.pagination;
 
 public enum UserRolePaginationSortOrder {
-    ID_ASC,
-    ID_DESC
+    ROLE_ID_ASC_USER_ID_ASC,
+    ROLE_ID_DESC_USER_ID_DESC
 }

@@ -13,10 +13,11 @@ import static org.youngmonkeys.ezyplatform.util.Values.isAllNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IdAscDataI18nPaginationParameter
-    implements DataI18nPaginationParameter {
+public class RoleIdAscAdminIdAscAdminRolePaginationParameter
+    implements AdminRolePaginationParameter {
 
-    public Long id;
+    public Long roleId;
+    public Long adminId;
 
     @Override
     public String paginationCondition(boolean nextPage) {
@@ -24,24 +25,28 @@ public class IdAscDataI18nPaginationParameter
             ? null
             : makePaginationConditionAsc(
                 nextPage,
-                "id"
+                "roleId",
+                "adminId"
             );
     }
 
     @Override
     public String orderBy(boolean nextPage) {
-        return makeOrderByAsc(nextPage, "id");
+        return makeOrderByAsc(
+            nextPage,
+            "roleId", "adminId"
+        );
     }
 
     @Override
     public boolean isEmpty() {
-        return isAllNull(id);
+        return isAllNull(roleId, adminId);
     }
 
     @Override
     public String sortOrder() {
-        return DataI18nPaginationSortOrder
-            .ID_ASC
+        return AdminRolePaginationSortOrder
+            .ROLE_ID_ASC_ADMIN_ID_ASC
             .toString();
     }
 }

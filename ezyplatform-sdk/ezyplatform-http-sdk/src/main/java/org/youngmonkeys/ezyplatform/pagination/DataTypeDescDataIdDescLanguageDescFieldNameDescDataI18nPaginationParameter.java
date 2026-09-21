@@ -13,10 +13,13 @@ import static org.youngmonkeys.ezyplatform.util.Values.isAllNull;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IdDescUserRolePaginationParameter
-    implements UserRolePaginationParameter {
+public class DataTypeDescDataIdDescLanguageDescFieldNameDescDataI18nPaginationParameter
+    implements DataI18nPaginationParameter {
 
-    public Long id;
+    public String dataType;
+    public Long dataId;
+    public String language;
+    public String fieldName;
 
     @Override
     public String paginationCondition(boolean nextPage) {
@@ -24,24 +27,30 @@ public class IdDescUserRolePaginationParameter
             ? null
             : makePaginationConditionDesc(
                 nextPage,
-                "id"
+                "dataType",
+                "dataId",
+                "language",
+                "fieldName"
             );
     }
 
     @Override
     public String orderBy(boolean nextPage) {
-        return makeOrderByDesc(nextPage, "id");
+        return makeOrderByDesc(
+            nextPage,
+            "dataType", "dataId", "language", "fieldName"
+        );
     }
 
     @Override
     public boolean isEmpty() {
-        return isAllNull(id);
+        return isAllNull(dataType, dataId, language, fieldName);
     }
 
     @Override
     public String sortOrder() {
-        return UserRolePaginationSortOrder
-            .ID_DESC
+        return DataI18nPaginationSortOrder
+            .DATA_TYPE_DESC_DATA_ID_DESC_LANGUAGE_DESC_FIELD_NAME_DESC
             .toString();
     }
 }

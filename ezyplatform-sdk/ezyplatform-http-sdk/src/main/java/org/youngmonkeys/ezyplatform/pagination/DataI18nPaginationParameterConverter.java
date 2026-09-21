@@ -24,12 +24,16 @@ public class DataI18nPaginationParameterConverter
         Map<String, Class<?>> map
     ) {
         map.put(
-            DataI18nPaginationSortOrder.ID_ASC.toString(),
-            IdAscDataI18nPaginationParameter.class
+            DataI18nPaginationSortOrder
+                .DATA_TYPE_ASC_DATA_ID_ASC_LANGUAGE_ASC_FIELD_NAME_ASC
+                .toString(),
+            DataTypeAscDataIdAscLanguageAscFieldNameAscDataI18nPaginationParameter.class
         );
         map.put(
-            DataI18nPaginationSortOrder.ID_DESC.toString(),
-            IdDescDataI18nPaginationParameter.class
+            DataI18nPaginationSortOrder
+                .DATA_TYPE_DESC_DATA_ID_DESC_LANGUAGE_DESC_FIELD_NAME_DESC
+                .toString(),
+            DataTypeDescDataIdDescLanguageDescFieldNameDescDataI18nPaginationParameter.class
         );
     }
 
@@ -38,15 +42,25 @@ public class DataI18nPaginationParameterConverter
         Map<String, Function<DataI18nModel, Object>> map
     ) {
         map.put(
-            DataI18nPaginationSortOrder.ID_ASC.toString(),
-            model -> new IdAscDataI18nPaginationParameter(
-                model.getId()
+            DataI18nPaginationSortOrder
+                .DATA_TYPE_ASC_DATA_ID_ASC_LANGUAGE_ASC_FIELD_NAME_ASC
+                .toString(),
+            model -> new DataTypeAscDataIdAscLanguageAscFieldNameAscDataI18nPaginationParameter(
+                model.getDataType(),
+                model.getDataId(),
+                model.getLanguage(),
+                model.getFieldName()
             )
         );
         map.put(
-            DataI18nPaginationSortOrder.ID_DESC.toString(),
-            model -> new IdDescDataI18nPaginationParameter(
-                model.getId()
+            DataI18nPaginationSortOrder
+                .DATA_TYPE_DESC_DATA_ID_DESC_LANGUAGE_DESC_FIELD_NAME_DESC
+                .toString(),
+            model -> new DataTypeDescDataIdDescLanguageDescFieldNameDescDataI18nPaginationParameter(
+                model.getDataType(),
+                model.getDataId(),
+                model.getLanguage(),
+                model.getFieldName()
             )
         );
     }

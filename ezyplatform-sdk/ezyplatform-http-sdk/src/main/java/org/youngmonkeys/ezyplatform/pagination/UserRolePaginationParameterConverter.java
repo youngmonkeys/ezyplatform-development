@@ -24,12 +24,16 @@ public class UserRolePaginationParameterConverter
         Map<String, Class<?>> map
     ) {
         map.put(
-            UserRolePaginationSortOrder.ID_ASC.toString(),
-            IdAscUserRolePaginationParameter.class
+            UserRolePaginationSortOrder
+                .ROLE_ID_ASC_USER_ID_ASC
+                .toString(),
+            RoleIdAscUserIdAscUserRolePaginationParameter.class
         );
         map.put(
-            UserRolePaginationSortOrder.ID_DESC.toString(),
-            IdDescUserRolePaginationParameter.class
+            UserRolePaginationSortOrder
+                .ROLE_ID_DESC_USER_ID_DESC
+                .toString(),
+            RoleIdDescUserIdDescUserRolePaginationParameter.class
         );
     }
 
@@ -38,15 +42,21 @@ public class UserRolePaginationParameterConverter
         Map<String, Function<UserRoleModel, Object>> map
     ) {
         map.put(
-            UserRolePaginationSortOrder.ID_ASC.toString(),
-            model -> new IdAscUserRolePaginationParameter(
-                model.getId()
+            UserRolePaginationSortOrder
+                .ROLE_ID_ASC_USER_ID_ASC
+                .toString(),
+            model -> new RoleIdAscUserIdAscUserRolePaginationParameter(
+                model.getRoleId(),
+                model.getUserId()
             )
         );
         map.put(
-            UserRolePaginationSortOrder.ID_DESC.toString(),
-            model -> new IdDescUserRolePaginationParameter(
-                model.getId()
+            UserRolePaginationSortOrder
+                .ROLE_ID_DESC_USER_ID_DESC
+                .toString(),
+            model -> new RoleIdDescUserIdDescUserRolePaginationParameter(
+                model.getRoleId(),
+                model.getUserId()
             )
         );
     }
