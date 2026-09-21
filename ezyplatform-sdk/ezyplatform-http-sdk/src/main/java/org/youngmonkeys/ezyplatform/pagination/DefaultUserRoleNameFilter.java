@@ -1,0 +1,45 @@
+package org.youngmonkeys.ezyplatform.pagination;
+
+import com.tvd12.ezydata.database.query.EzyQueryConditionBuilder;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.util.Collection;
+
+@Getter
+@Builder
+public class DefaultUserRoleNameFilter implements UserRoleNameFilter {
+    public final Collection<String> keywords;
+    public final String likeKeyword;
+    public final String keywordPrefix;
+
+    @Override
+    public void decorateQueryStringBeforeWhere(
+        StringBuilder queryString
+    ) {
+        if (keywordPrefix != null || keywords != null) {
+            queryString.append(" INNER JOIN DataIndex k ON e.id = k.dataId");
+        }
+    }
+
+    @Override
+    public String matchingCondition() {
+        EzyQueryConditionBuilder answer = new EzyQueryConditionBuilder();
+        if (keywordPrefix != null || keywords != null) {
+            answer.and("k.dataType = 'ezy_user_role_names'");
+            if (keywordPrefix != null) {
+                answer.and("k.keyword LIKE CONCAT(:keywordPrefix, '%')");
+            }
+            if (keywords != null) {
+                answer.and("k.keyword IN :keywords");
+            }
+        }
+        if (likeKeyword != null) {
+            answer.and(
+                "(e.name LIKE CONCAT('%',:likeKeyword,'%') " +
+                    "OR e.displayName LIKE CONCAT('%',:likeKeyword,'%'))"
+            );
+        }
+        return answer.build();
+    }
+}
