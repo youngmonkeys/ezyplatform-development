@@ -1,12 +1,12 @@
 /*
  * Copyright 2026 youngmonkeys.org
- * 
+ *
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *     https://youngmonkeys.org/licenses/ezyplatform-1.0.0.txt
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,43 +21,45 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makeOrderByDesc;
-import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makePaginationConditionDesc;
+import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makeOrderByAsc;
+import static org.youngmonkeys.ezyplatform.pagination.PaginationParameters.makePaginationConditionAsc;
 import static org.youngmonkeys.ezyplatform.util.Values.isAllNull;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class IdDescAdminRoleNamePaginationParameter
-    implements AdminRoleNamePaginationParameter {
+public class PriorityAscIdAscUserRoleNamePaginationParameter
+    implements UserRoleNamePaginationParameter {
 
+    public Integer priority;
     public Long id;
 
     @Override
     public String paginationCondition(boolean nextPage) {
         return isEmpty()
             ? null
-            : makePaginationConditionDesc(
+            : makePaginationConditionAsc(
                 nextPage,
+                "priority",
                 "id"
             );
     }
 
     @Override
     public String orderBy(boolean nextPage) {
-        return makeOrderByDesc(nextPage, "id");
+        return makeOrderByAsc(nextPage, "priority", "id");
     }
 
     @Override
     public boolean isEmpty() {
-        return isAllNull(id);
+        return isAllNull(priority, id);
     }
 
     @Override
     public String sortOrder() {
-        return AdminRoleNamePaginationSortOrder
-            .ID_DESC
+        return UserRoleNamePaginationSortOrder
+            .PRIORITY_ASC_ID_ASC
             .toString();
     }
 }
