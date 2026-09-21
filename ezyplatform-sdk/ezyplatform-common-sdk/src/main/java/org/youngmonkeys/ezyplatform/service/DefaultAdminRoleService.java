@@ -237,17 +237,4 @@ public class DefaultAdminRoleService implements AdminRoleService {
             .map(AdminRoleName::getPriority)
             .orElse(ZERO);
     }
-
-    @Override
-    public long countAllRoles() {
-        return adminRoleNameRepository.count();
-    }
-
-    @Override
-    public long countAdminVisibleRoles(
-        long adminId
-    ) {
-        int minPriority = getMinAdminRolePriority(adminId);
-        return adminRoleNameRepository.countByPriorityGte(minPriority);
-    }
 }

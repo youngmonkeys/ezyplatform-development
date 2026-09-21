@@ -92,10 +92,4 @@ public interface AdminRoleService {
     int getMinPriorityByRoleIds(
         Collection<Long> roleIds
     );
-
-    long countAllRoles();
-
-    long countAdminVisibleRoles(
-        long adminId
-    );
 }
