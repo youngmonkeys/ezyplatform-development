@@ -19,6 +19,8 @@ package org.youngmonkeys.ezyplatform.model;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Builder
 public class DataRecordCountModel {
@@ -29,6 +31,7 @@ public class DataRecordCountModel {
     private long recordCount;
     private long lastRecordId;
     private long lastCountedAt;
+    private LocalDateTime lastCountedAtLocalDateTime;
     private String queryString;
     private String queryType;
     private String parameters;

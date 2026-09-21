@@ -285,6 +285,7 @@ public class DefaultEntityToModelConverter {
             .recordCount(entity.getRecordCount())
             .lastRecordId(entity.getLastRecordId())
             .lastCountedAt(toTimestamp(entity.getLastCountedAt()))
+            .lastCountedAtLocalDateTime(entity.getLastCountedAt())
             .queryString(entity.getQueryString())
             .queryType(entity.getQueryType())
             .parameters(entity.getParameters())
