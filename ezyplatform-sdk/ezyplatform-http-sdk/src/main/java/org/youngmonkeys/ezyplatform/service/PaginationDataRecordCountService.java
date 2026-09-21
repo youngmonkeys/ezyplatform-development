@@ -1,6 +1,6 @@
 package org.youngmonkeys.ezyplatform.service;
 
-import org.youngmonkeys.ezyplatform.converter.EzyplatformDevelopmentEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
 import org.youngmonkeys.ezyplatform.model.DataRecordCountModel;
 import org.youngmonkeys.ezyplatform.pagination.DataRecordCountFilter;
@@ -17,11 +17,11 @@ public class PaginationDataRecordCountService extends CommonPaginationService<
     Long,
     DataRecordCount> {
 
-    private final EzyplatformDevelopmentEntityToModelConverter entityToModelConverter;
+    private final DefaultEntityToModelConverter entityToModelConverter;
 
     public PaginationDataRecordCountService(
         PaginationDataRecordCountRepository repository,
-        EzyplatformDevelopmentEntityToModelConverter entityToModelConverter,
+        DefaultEntityToModelConverter entityToModelConverter,
         DataRecordCountPaginationParameterConverter paginationParameterConverter
     ) {
         super(repository, paginationParameterConverter);

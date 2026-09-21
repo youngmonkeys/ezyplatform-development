@@ -1,6 +1,6 @@
 package org.youngmonkeys.ezyplatform.service;
 
-import org.youngmonkeys.ezyplatform.converter.EzyplatformDevelopmentEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.UserRoleName;
 import org.youngmonkeys.ezyplatform.model.UserRoleNameModel;
 import org.youngmonkeys.ezyplatform.pagination.UserRoleNameFilter;
@@ -17,11 +17,11 @@ public class PaginationUserRoleNameService extends CommonPaginationService<
     Long,
     UserRoleName> {
 
-    private final EzyplatformDevelopmentEntityToModelConverter entityToModelConverter;
+    private final DefaultEntityToModelConverter entityToModelConverter;
 
     public PaginationUserRoleNameService(
         PaginationUserRoleNameRepository repository,
-        EzyplatformDevelopmentEntityToModelConverter entityToModelConverter,
+        DefaultEntityToModelConverter entityToModelConverter,
         UserRoleNamePaginationParameterConverter paginationParameterConverter
     ) {
         super(repository, paginationParameterConverter);
