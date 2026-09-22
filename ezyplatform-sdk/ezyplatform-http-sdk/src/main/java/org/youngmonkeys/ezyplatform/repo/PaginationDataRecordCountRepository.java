@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,21 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.repo;
 
-import org.youngmonkeys.devtools.pagination.PaginationClassesGenerator;
 import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
+import org.youngmonkeys.ezyplatform.pagination.DataRecordCountFilter;
+import org.youngmonkeys.ezyplatform.pagination.DataRecordCountPaginationParameter;
+import org.youngmonkeys.ezyplatform.repo.CommonPaginationRepository;
 
-public class HttpSdkPaginationClassesGenerator {
+public class PaginationDataRecordCountRepository extends CommonPaginationRepository<
+    DataRecordCountFilter,
+    DataRecordCountPaginationParameter,
+    Long,
+    DataRecordCount> {
 
-    public static void main(String[] args) throws Exception {
-        new PaginationClassesGenerator(DataRecordCount.class)
-            .generate();
+    @Override
+    protected Class<DataRecordCount> getEntityType() {
+        return DataRecordCount.class;
     }
 }

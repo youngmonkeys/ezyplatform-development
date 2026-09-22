@@ -16,7 +16,12 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.model.AdminRoleModel;
+import org.youngmonkeys.ezyplatform.model.AdminRoleNameModel;
+
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface AdminRoleService {
 
@@ -26,5 +31,65 @@ public interface AdminRoleService {
 
     List<Long> getAdminIdsByRoleName(
         String roleName
+    );
+
+    boolean containsAdminRole(
+        long roleId,
+        long adminId
+    );
+
+    boolean containsAdminRoleName(
+        long roleId
+    );
+
+    boolean containsAllAdminRoleIds(
+        Collection<Long> roleIds
+    );
+
+    List<AdminRoleNameModel> getAdminRoleNames();
+
+    List<AdminRoleNameModel> getAdminRoleNamesByIds(
+        Collection<Long> roleIds
+    );
+
+    List<AdminRoleNameModel> getAdminRoleNamesByAdminId(
+        long adminId
+    );
+
+    List<AdminRoleNameModel> getAdminRoleNamesByPriorityGte(
+        int priorityGte
+    );
+
+    List<AdminRoleNameModel> getVisibleAdminRoleNamesByAdminId(
+        long adminId
+    );
+
+    AdminRoleNameModel getAdminRoleNameById(
+        long id
+    );
+
+    AdminRoleNameModel getAdminRoleNameByName(
+        String name
+    );
+
+    AdminRoleNameModel getAdminRoleNameByNameOrDisplayName(
+        String name,
+        String displayName
+    );
+
+    Set<Long> getRoleIdsByAdminId(
+        long adminId
+    );
+
+    List<AdminRoleModel> getAdminRolesByRoleId(
+        long roleId
+    );
+
+    int getMinAdminRolePriority(
+        long adminId
+    );
+
+    int getMinPriorityByRoleIds(
+        Collection<Long> roleIds
     );
 }

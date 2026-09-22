@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 youngmonkeys.org
+ * Copyright 2026 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,11 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.pagination;
 
-import org.youngmonkeys.devtools.pagination.PaginationClassesGenerator;
-import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
-
-public class HttpSdkPaginationClassesGenerator {
-
-    public static void main(String[] args) throws Exception {
-        new PaginationClassesGenerator(DataRecordCount.class)
-            .generate();
-    }
+public enum AdminRoleNamePaginationSortOrder {
+    ID_ASC,
+    ID_DESC,
+    PRIORITY_ASC_ID_ASC,
+    PRIORITY_DESC_ID_DESC
 }

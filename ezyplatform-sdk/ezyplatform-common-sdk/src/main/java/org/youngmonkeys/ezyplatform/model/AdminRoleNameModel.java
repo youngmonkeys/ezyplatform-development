@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 youngmonkeys.org
+ * Copyright 2022 youngmonkeys.org
  * 
  * Licensed under the ezyplatform, Version 1.0.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,20 @@
  * limitations under the License.
 */
 
-package org.youngmonkeys.ezyplatform.test;
+package org.youngmonkeys.ezyplatform.model;
 
-import org.youngmonkeys.devtools.pagination.PaginationClassesGenerator;
-import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
-public class HttpSdkPaginationClassesGenerator {
-
-    public static void main(String[] args) throws Exception {
-        new PaginationClassesGenerator(DataRecordCount.class)
-            .generate();
-    }
+@Getter
+@Builder
+@EqualsAndHashCode(of = "id")
+public class AdminRoleNameModel {
+    private long id;
+    private String name;
+    private String displayName;
+    private int priority;
+    private long createdAt;
+    private long updatedAt;
 }

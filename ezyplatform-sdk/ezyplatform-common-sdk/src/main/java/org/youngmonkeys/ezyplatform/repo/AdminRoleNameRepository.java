@@ -18,8 +18,11 @@ package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
+import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.AdminRoleName;
+import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -54,4 +57,22 @@ public interface AdminRoleNameRepository
     );
 
     long countByPriorityGte(int priorityGte);
+
+    @EzyQuery(
+        "SELECT e FROM AdminRoleName e " +
+            "WHERE e.updatedAt > ?0 " +
+            "OR (e.updatedAt = ?0 AND e.id > ?1) " +
+            "ORDER BY e.updatedAt ASC, e.id ASC"
+    )
+    List<AdminRoleName> findAdminRoleNamesByUpdatedAtAndIdPaginationAsc(
+        LocalDateTime updatedAtInclusive,
+        long idExclusive,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT e.updatedAt FROM AdminRoleName e " +
+            "ORDER BY e.updatedAt ASC"
+    )
+    UpdatedAtValueResult findFirstUpdatedAt();
 }

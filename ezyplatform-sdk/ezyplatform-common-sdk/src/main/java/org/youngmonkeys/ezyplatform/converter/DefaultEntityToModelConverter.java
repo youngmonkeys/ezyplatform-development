@@ -21,10 +21,13 @@ import org.youngmonkeys.ezyplatform.entity.Admin;
 import org.youngmonkeys.ezyplatform.entity.AdminAccessToken;
 import org.youngmonkeys.ezyplatform.entity.AdminMeta;
 import org.youngmonkeys.ezyplatform.entity.AdminRole;
+import org.youngmonkeys.ezyplatform.entity.AdminRoleName;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
+import org.youngmonkeys.ezyplatform.entity.DataI18n;
 import org.youngmonkeys.ezyplatform.entity.DataIndex;
 import org.youngmonkeys.ezyplatform.entity.DataMapping;
 import org.youngmonkeys.ezyplatform.entity.DataMeta;
+import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
 import org.youngmonkeys.ezyplatform.entity.Letter;
 import org.youngmonkeys.ezyplatform.entity.LetterReceiver;
 import org.youngmonkeys.ezyplatform.entity.Link;
@@ -44,10 +47,13 @@ import org.youngmonkeys.ezyplatform.model.AdminAccessTokenModel;
 import org.youngmonkeys.ezyplatform.model.AdminMetaModel;
 import org.youngmonkeys.ezyplatform.model.AdminModel;
 import org.youngmonkeys.ezyplatform.model.AdminRoleModel;
+import org.youngmonkeys.ezyplatform.model.AdminRoleNameModel;
 import org.youngmonkeys.ezyplatform.model.ContentTemplateModel;
+import org.youngmonkeys.ezyplatform.model.DataI18nModel;
 import org.youngmonkeys.ezyplatform.model.DataIndexModel;
 import org.youngmonkeys.ezyplatform.model.DataMappingModel;
 import org.youngmonkeys.ezyplatform.model.DataMetaModel;
+import org.youngmonkeys.ezyplatform.model.DataRecordCountModel;
 import org.youngmonkeys.ezyplatform.model.LetterModel;
 import org.youngmonkeys.ezyplatform.model.LetterReceiverModel;
 import org.youngmonkeys.ezyplatform.model.LinkModel;
@@ -74,6 +80,7 @@ import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.model.MediaNameModel.getMediaUrlOrNull;
 
+@SuppressWarnings("MethodCount")
 @AllArgsConstructor
 public class DefaultEntityToModelConverter {
 
@@ -196,6 +203,20 @@ public class DefaultEntityToModelConverter {
             .build();
     }
 
+    public AdminRoleNameModel toModel(AdminRoleName entity) {
+        if (entity == null) {
+            return null;
+        }
+        return AdminRoleNameModel.builder()
+            .id(entity.getId())
+            .name(entity.getName())
+            .displayName(entity.getDisplayName())
+            .priority(entity.getPriority())
+            .createdAt(toTimestamp(entity.getCreatedAt()))
+            .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .build();
+    }
+
     public UserRoleNameModel toModel(UserRoleName entity) {
         if (entity == null) {
             return null;
@@ -236,6 +257,39 @@ public class DefaultEntityToModelConverter {
             .priority(entity.getPriority())
             .createdAt(toTimestamp(entity.getCreatedAt()))
             .updatedAt(toTimestamp(entity.getUpdatedAt()))
+            .build();
+    }
+
+    public DataI18nModel toModel(DataI18n entity) {
+        if (entity == null) {
+            return null;
+        }
+        return DataI18nModel.builder()
+            .dataType(entity.getDataType())
+            .dataId(entity.getDataId())
+            .language(entity.getLanguage())
+            .fieldName(entity.getFieldName())
+            .fieldValue(entity.getFieldValue())
+            .build();
+    }
+
+    public DataRecordCountModel toModel(DataRecordCount entity) {
+        if (entity == null) {
+            return null;
+        }
+        return DataRecordCountModel.builder()
+            .id(entity.getId())
+            .dataType(entity.getDataType())
+            .dataName(entity.getDataName())
+            .recordType(entity.getRecordType())
+            .recordCount(entity.getRecordCount())
+            .lastRecordId(entity.getLastRecordId())
+            .lastCountedAt(toTimestamp(entity.getLastCountedAt()))
+            .lastCountedAtLocalDateTime(entity.getLastCountedAt())
+            .queryString(entity.getQueryString())
+            .queryType(entity.getQueryType())
+            .parameters(entity.getParameters())
+            .parameterType(entity.getParameterType())
             .build();
     }
 

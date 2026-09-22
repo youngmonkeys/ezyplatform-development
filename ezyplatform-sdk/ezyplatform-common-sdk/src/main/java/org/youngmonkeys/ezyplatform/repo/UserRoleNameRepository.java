@@ -20,7 +20,9 @@ import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import com.tvd12.ezyfox.util.Next;
 import org.youngmonkeys.ezyplatform.entity.UserRoleName;
+import org.youngmonkeys.ezyplatform.result.UpdatedAtValueResult;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -38,4 +40,22 @@ public interface UserRoleNameRepository
     List<UserRoleName> findAllOrderByPriorityId(
         Next next
     );
+
+    @EzyQuery(
+        "SELECT e FROM UserRoleName e " +
+            "WHERE e.updatedAt > ?0 " +
+            "OR (e.updatedAt = ?0 AND e.id > ?1) " +
+            "ORDER BY e.updatedAt ASC, e.id ASC"
+    )
+    List<UserRoleName> findUserRoleNamesByUpdatedAtAndIdPaginationAsc(
+        LocalDateTime updatedAtInclusive,
+        long idExclusive,
+        Next next
+    );
+
+    @EzyQuery(
+        "SELECT e.updatedAt FROM UserRoleName e " +
+            "ORDER BY e.updatedAt ASC"
+    )
+    UpdatedAtValueResult findFirstUpdatedAt();
 }
