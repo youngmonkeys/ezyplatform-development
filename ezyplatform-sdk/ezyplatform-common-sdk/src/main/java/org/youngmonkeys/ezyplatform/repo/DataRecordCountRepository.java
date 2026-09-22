@@ -28,7 +28,15 @@ import java.util.List;
 public interface DataRecordCountRepository
     extends EzyDatabaseRepository<Long, DataRecordCount> {
 
-    DataRecordCount findByDataType(String dataType);
+    void deleteByDataName(String dataName);
+
+    List<DataRecordCount> findByDataName(
+        String dataName
+    );
+
+    DataRecordCount findByDataType(
+        String dataType
+    );
 
     DataRecordCount findByDataNameAndRecordType(
         String dataName,
@@ -81,4 +89,10 @@ public interface DataRecordCountRepository
         String dataName,
         String recordType
     );
+
+    @EzyQuery(
+        "SELECT COUNT(e) FROM DataRecordCount e " +
+            "WHERE e.dataName = ?0"
+    )
+    long countByDataName(String dataName);
 }
