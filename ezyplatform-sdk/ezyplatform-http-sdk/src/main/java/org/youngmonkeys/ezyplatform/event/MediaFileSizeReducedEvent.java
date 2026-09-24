@@ -16,17 +16,59 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import lombok.AllArgsConstructor;
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 import java.io.File;
 
 @Getter
-@AllArgsConstructor
 public class MediaFileSizeReducedEvent {
-    private long byAdminId;
-    private long byUserId;
-    private MediaModel media;
-    private File mediaFilePath;
+    private final long byAdminId;
+    private final long byUserId;
+    private final MediaModel media;
+    private final File mediaFilePath;
+
+    protected MediaFileSizeReducedEvent(Builder builder) {
+        this.byAdminId = builder.byAdminId;
+        this.byUserId = builder.byUserId;
+        this.media = builder.media;
+        this.mediaFilePath = builder.mediaFilePath;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements EzyBuilder<MediaFileSizeReducedEvent> {
+        private long byAdminId;
+        private long byUserId;
+        private MediaModel media;
+        private File mediaFilePath;
+
+        public Builder byAdminId(long byAdminId) {
+            this.byAdminId = byAdminId;
+            return this;
+        }
+
+        public Builder byUserId(long byUserId) {
+            this.byUserId = byUserId;
+            return this;
+        }
+
+        public Builder media(MediaModel media) {
+            this.media = media;
+            return this;
+        }
+
+        public Builder mediaFilePath(File mediaFilePath) {
+            this.mediaFilePath = mediaFilePath;
+            return this;
+        }
+
+        @Override
+        public MediaFileSizeReducedEvent build() {
+            return new MediaFileSizeReducedEvent(this);
+        }
+    }
 }

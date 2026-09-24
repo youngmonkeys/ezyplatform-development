@@ -16,16 +16,51 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import lombok.AllArgsConstructor;
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
 
 import java.io.File;
 
 @Getter
-@AllArgsConstructor
 public class MediaFileSizeReductionEvent {
-    private MediaType mediaType;
-    private File mediaFilePath;
-    private long expectedFileSize;
+    private final MediaType mediaType;
+    private final File mediaFilePath;
+    private final long expectedFileSize;
+
+    protected MediaFileSizeReductionEvent(Builder builder) {
+        this.mediaType = builder.mediaType;
+        this.mediaFilePath = builder.mediaFilePath;
+        this.expectedFileSize = builder.expectedFileSize;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements EzyBuilder<MediaFileSizeReductionEvent> {
+        private MediaType mediaType;
+        private File mediaFilePath;
+        private long expectedFileSize;
+
+        public Builder mediaType(MediaType mediaType) {
+            this.mediaType = mediaType;
+            return this;
+        }
+
+        public Builder mediaFilePath(File mediaFilePath) {
+            this.mediaFilePath = mediaFilePath;
+            return this;
+        }
+
+        public Builder expectedFileSize(long expectedFileSize) {
+            this.expectedFileSize = expectedFileSize;
+            return this;
+        }
+
+        @Override
+        public MediaFileSizeReductionEvent build() {
+            return new MediaFileSizeReductionEvent(this);
+        }
+    }
 }

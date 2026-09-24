@@ -16,12 +16,33 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import lombok.AllArgsConstructor;
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 @Getter
-@AllArgsConstructor
 public class GetMediaFilePathEvent {
-    private MediaModel media;
+    private final MediaModel media;
+
+    protected GetMediaFilePathEvent(Builder builder) {
+        this.media = builder.media;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements EzyBuilder<GetMediaFilePathEvent> {
+        private MediaModel media;
+
+        public Builder media(MediaModel media) {
+            this.media = media;
+            return this;
+        }
+
+        @Override
+        public GetMediaFilePathEvent build() {
+            return new GetMediaFilePathEvent(this);
+        }
+    }
 }

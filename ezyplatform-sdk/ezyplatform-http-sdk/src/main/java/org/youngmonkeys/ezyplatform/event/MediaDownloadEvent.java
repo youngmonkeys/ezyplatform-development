@@ -16,16 +16,58 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import com.tvd12.ezyhttp.server.core.request.RequestArguments;
-import lombok.AllArgsConstructor;
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
+import com.tvd12.ezyhttp.server.core.request.RequestArguments;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 @Getter
-@AllArgsConstructor
 public class MediaDownloadEvent {
-    private RequestArguments requestArguments;
-    private long byAdminId;
-    private long byUserId;
-    private MediaModel media;
+    private final RequestArguments requestArguments;
+    private final long byAdminId;
+    private final long byUserId;
+    private final MediaModel media;
+
+    protected MediaDownloadEvent(Builder builder) {
+        this.requestArguments = builder.requestArguments;
+        this.byAdminId = builder.byAdminId;
+        this.byUserId = builder.byUserId;
+        this.media = builder.media;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements EzyBuilder<MediaDownloadEvent> {
+        private RequestArguments requestArguments;
+        private long byAdminId;
+        private long byUserId;
+        private MediaModel media;
+
+        public Builder requestArguments(RequestArguments requestArguments) {
+            this.requestArguments = requestArguments;
+            return this;
+        }
+
+        public Builder byAdminId(long byAdminId) {
+            this.byAdminId = byAdminId;
+            return this;
+        }
+
+        public Builder byUserId(long byUserId) {
+            this.byUserId = byUserId;
+            return this;
+        }
+
+        public Builder media(MediaModel media) {
+            this.media = media;
+            return this;
+        }
+
+        @Override
+        public MediaDownloadEvent build() {
+            return new MediaDownloadEvent(this);
+        }
+    }
 }
