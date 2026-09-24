@@ -1027,7 +1027,9 @@ public class MediaControllerService extends EzyLoggable {
         }
         MediaModel updatedMedia = mediaService
             .updateMediaPublicIfExists(media.getId(), isPublic);
-        eventHandlerManager.handleEvent(updatedMedia);
+        eventHandlerManager.handleEvent(
+            new MediaUpdatedEvent(updatedMedia)
+        );
     }
 
     public boolean isMediaPublic(

@@ -2458,10 +2458,13 @@ public class MediaControllerServiceTest {
         );
 
         // then: the media must actually become public, not just accepted
+        ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
+            ArgumentCaptor.forClass(MediaUpdatedEvent.class);
         verify(mediaValidator).validateMediaNameAndGet(1L, 2L, "visibility-media.png");
         verify(validMediaCondition).test(media);
         verify(mediaService).updateMediaPublicIfExists(911L, true);
-        verify(eventHandlerManager).handleEvent(updatedMedia);
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        Asserts.assertEquals(eventCaptor.getValue().getMedia(), updatedMedia);
 
         InOrder inOrder = inOrder(
             mediaValidator,
@@ -2472,7 +2475,7 @@ public class MediaControllerServiceTest {
         inOrder.verify(mediaValidator).validateMediaNameAndGet(1L, 2L, "visibility-media.png");
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(mediaService).updateMediaPublicIfExists(911L, true);
-        inOrder.verify(eventHandlerManager).handleEvent(updatedMedia);
+        inOrder.verify(eventHandlerManager).handleEvent(any(MediaUpdatedEvent.class));
 
         verifyNoMoreInteractions(validMediaCondition);
     }
