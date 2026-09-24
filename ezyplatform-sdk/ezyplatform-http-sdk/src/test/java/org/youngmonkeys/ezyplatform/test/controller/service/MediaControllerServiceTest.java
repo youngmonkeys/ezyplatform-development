@@ -232,14 +232,24 @@ public class MediaControllerServiceTest {
         // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        Part filePart = mock(Part.class);
         FileUploader fileUploader = mock(FileUploader.class);
         MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.AVATAR)
+            .fileSize(123L)
+            .build();
         when(settingService.getMaxUploadFileSize()).thenReturn(512L);
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
+        when(request.getPart("file")).thenReturn(filePart);
+        when(mediaValidator.validateFilePart(filePart, true))
+            .thenReturn(fileMetadata);
         when(mediaUpDownloader.isUploadSupported()).thenReturn(true);
 
         // when
@@ -260,6 +270,8 @@ public class MediaControllerServiceTest {
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
+        verify(request).getPart("file");
+        verify(mediaValidator).validateFilePart(filePart, true);
         verify(mediaUpDownloader).isUploadSupported();
         verify(mediaUpDownloader).upload(argumentsCaptor.capture());
 
@@ -268,6 +280,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual.getResponse(), response);
         Asserts.assertEquals(actual.getUploadFrom(), "s3");
         Asserts.assertEquals(actual.getAction(), UploadAction.ADD);
+        Asserts.assertEquals(actual.getFileMetadata(), fileMetadata);
         Asserts.assertEquals(actual.getOwnerAdminId(), 11L);
         Asserts.assertEquals(actual.getOwnerUserId(), 22L);
         Asserts.assertTrue(actual.isAvatar());
@@ -820,10 +833,17 @@ public class MediaControllerServiceTest {
         // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        Part filePart = mock(Part.class);
         FileUploader fileUploader = mock(FileUploader.class);
         MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
         @SuppressWarnings("unchecked")
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.AVATAR)
+            .fileSize(456L)
+            .build();
         MediaModel media = MediaModel.builder()
             .id(456L)
             .name("avatar.png")
@@ -840,12 +860,17 @@ public class MediaControllerServiceTest {
             .thenReturn(mediaUpDownloader);
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
+        when(request.getPart("file")).thenReturn(filePart);
+        when(mediaValidator.validateFilePart(filePart, true))
+            .thenReturn(fileMetadata);
         when(mediaUpDownloader.isUploadSupported()).thenReturn(true);
 
         // when
         instance.replaceMedia(
             request,
             response,
+            33L,
+            44L,
             456L,
             validMediaCondition
         );
@@ -858,6 +883,8 @@ public class MediaControllerServiceTest {
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
+        verify(request).getPart("file");
+        verify(mediaValidator).validateFilePart(filePart, true);
         verify(mediaUpDownloader).isUploadSupported();
         verify(mediaUpDownloader).upload(argumentsCaptor.capture());
 
@@ -866,6 +893,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual.getResponse(), response);
         Asserts.assertEquals(actual.getUploadFrom(), "s3");
         Asserts.assertEquals(actual.getAction(), UploadAction.REPLACE);
+        Asserts.assertEquals(actual.getFileMetadata(), fileMetadata);
         Asserts.assertEquals(actual.getMediaId(), 456L);
         Asserts.assertEquals(actual.getOwnerAdminId(), 11L);
         Asserts.assertEquals(actual.getOwnerUserId(), 22L);
@@ -976,6 +1004,8 @@ public class MediaControllerServiceTest {
         instance.replaceMedia(
             request,
             response,
+            77L,
+            88L,
             654L,
             validMediaCondition
         );
@@ -1047,6 +1077,8 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
 
         MediaReplacedEvent replacedEvent = (MediaReplacedEvent) events.get(2);
+        Asserts.assertEquals(replacedEvent.getByAdminId(), 77L);
+        Asserts.assertEquals(replacedEvent.getByUserId(), 88L);
         Asserts.assertEquals(replacedEvent.getMedia(), replacedMedia);
         Asserts.assertEquals(replacedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);
@@ -1189,6 +1221,8 @@ public class MediaControllerServiceTest {
         instance.replaceMedia(
             request,
             response,
+            77L,
+            88L,
             655L,
             validMediaCondition
         );
@@ -1426,6 +1460,8 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
 
         MediaReplacedEvent replacedEvent = (MediaReplacedEvent) events.get(2);
+        Asserts.assertEquals(replacedEvent.getByAdminId(), 55L);
+        Asserts.assertEquals(replacedEvent.getByUserId(), 66L);
         Asserts.assertEquals(replacedEvent.getMedia(), replacedMedia);
         Asserts.assertEquals(replacedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);

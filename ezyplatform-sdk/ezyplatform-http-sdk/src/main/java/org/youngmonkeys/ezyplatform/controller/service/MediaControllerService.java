@@ -234,6 +234,17 @@ public class MediaControllerService extends EzyLoggable {
         MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
             .getMediaUpDownloaderByName(mediaUploaderName);
         FileUploader fileUploader = fileUploaderWrapper.get();
+        Part filePart = request.getPart("file");
+        if (filePart == null) {
+            Collection<Part> parts = request.getParts();
+            if (!parts.isEmpty()) {
+                filePart = parts.iterator().next();
+            }
+        }
+        FileMetadata fileMetadata = mediaValidator.validateFilePart(
+            filePart,
+            avatar
+        );
         if (mediaUpDownloader != null
             && mediaUpDownloader.isUploadSupported()
         ) {
@@ -245,6 +256,7 @@ public class MediaControllerService extends EzyLoggable {
                     .response(response)
                     .uploadFrom(uploadFrom)
                     .action(UploadAction.ADD)
+                    .fileMetadata(fileMetadata)
                     .ownerAdminId(ownerAdminId)
                     .ownerUserId(ownerUserId)
                     .avatar(avatar)
@@ -258,17 +270,6 @@ public class MediaControllerService extends EzyLoggable {
                 singletonMap("fileUpload", "disabled")
             );
         }
-        Part filePart = request.getPart("file");
-        if (filePart == null) {
-            Collection<Part> parts = request.getParts();
-            if (!parts.isEmpty()) {
-                filePart = parts.iterator().next();
-            }
-        }
-        FileMetadata fileMetadata = mediaValidator.validateFilePart(
-            filePart,
-            avatar
-        );
         eventHandlerManager.handleEvent(
             MediaUploadEvent.builder()
                 .uploadFrom(uploadFrom)
@@ -396,12 +397,16 @@ public class MediaControllerService extends EzyLoggable {
     public void replaceMedia(
         HttpServletRequest request,
         HttpServletResponse response,
+        long byAdminId,
+        long byUserId,
         long mediaId,
         Predicate<MediaModel> validMediaCondition
     ) throws Exception {
         replaceMedia(
             request,
             response,
+            byAdminId,
+            byUserId,
             mediaService.getMediaById(mediaId),
             validMediaCondition
         );
@@ -418,6 +423,8 @@ public class MediaControllerService extends EzyLoggable {
         replaceMedia(
             request,
             response,
+            byAdminId,
+            byUserId,
             mediaService.getMediaByName(
                 byAdminId,
                 byUserId,
@@ -431,6 +438,8 @@ public class MediaControllerService extends EzyLoggable {
     public void replaceMedia(
         HttpServletRequest request,
         HttpServletResponse response,
+        long byAdminId,
+        long byUserId,
         MediaModel media,
         Predicate<MediaModel> validMediaCondition
     ) throws Exception {
@@ -444,9 +453,18 @@ public class MediaControllerService extends EzyLoggable {
             .getMediaUpDownloaderByName(mediaUploaderName);
         FileUploader fileUploader = fileUploaderWrapper.get();
         String uploadFrom = media.getUploadFrom();
+        Part filePart = request.getPart("file");
+        if (filePart == null) {
+            Collection<Part> parts = request.getParts();
+            if (!parts.isEmpty()) {
+                filePart = parts.iterator().next();
+            }
+        }
+        boolean avatar = media.getType() == MediaType.AVATAR;
+        FileMetadata fileMetadata = mediaValidator
+            .validateFilePart(filePart, avatar);
         long ownerAdminId = media.getOwnerAdminId();
         long ownerUserId = media.getOwnerUserId();
-        boolean avatar = media.getType() == MediaType.AVATAR;
         if (mediaUpDownloader != null
             && mediaUpDownloader.isUploadSupported()
         ) {
@@ -458,6 +476,7 @@ public class MediaControllerService extends EzyLoggable {
                     .response(response)
                     .uploadFrom(uploadFrom)
                     .action(UploadAction.REPLACE)
+                    .fileMetadata(fileMetadata)
                     .mediaId(mediaId)
                     .ownerAdminId(ownerAdminId)
                     .ownerUserId(ownerUserId)
@@ -472,15 +491,6 @@ public class MediaControllerService extends EzyLoggable {
                 singletonMap("fileUpload", "disabled")
             );
         }
-        Part filePart = request.getPart("file");
-        if (filePart == null) {
-            Collection<Part> parts = request.getParts();
-            if (!parts.isEmpty()) {
-                filePart = parts.iterator().next();
-            }
-        }
-        FileMetadata fileMetadata = mediaValidator
-            .validateFilePart(filePart, avatar);
         eventHandlerManager.handleEvent(
             MediaUploadEvent.builder()
                 .uploadFrom(uploadFrom)
@@ -560,6 +570,8 @@ public class MediaControllerService extends EzyLoggable {
                 );
                 eventHandlerManager.handleEvent(
                     new MediaReplacedEvent(
+                        byAdminId,
+                        byUserId,
                         model,
                         storedMediaFilePath
                     )
@@ -1173,6 +1185,7 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
+    @SuppressWarnings("MethodLength")
     public void getMediaByName(
         RequestArguments requestArguments,
         long byAdminId,

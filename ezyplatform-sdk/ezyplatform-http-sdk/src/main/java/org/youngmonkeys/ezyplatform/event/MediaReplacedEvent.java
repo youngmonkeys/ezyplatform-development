@@ -25,6 +25,8 @@ import java.io.File;
 @Getter
 @AllArgsConstructor
 public class MediaReplacedEvent {
+    private long byAdminId;
+    private long byUserId;
     private MediaModel media;
     private File mediaFilePath;
 }
