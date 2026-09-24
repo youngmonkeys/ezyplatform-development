@@ -108,15 +108,19 @@ public class MediaValidator {
         }
     }
 
-    public void validateOwnerUserMedia(
+    public long validateOwnerUserMedia(
         long userId,
         String mediaName
     ) {
-        long ownerId = mediaService
-            .getOwnerUserIdByMediaName(mediaName);
-        if (ownerId != userId) {
+        long mediaId = mediaService
+            .getMediaIdByNameOrOriginalNameAndOwnerUserId(
+                mediaName,
+                userId
+            );
+        if (mediaId <= ZERO_LONG) {
             throw new MediaNotFoundException(mediaName);
         }
+        return mediaId;
     }
 
     public MediaModel validateUserMedia(
@@ -141,9 +145,13 @@ public class MediaValidator {
     }
 
     public MediaModel validateMediaNameAndGet(
+        long byAdminId,
+        long byUserId,
         String mediaName
     ) {
         MediaModel media = mediaService.getMediaByName(
+            byAdminId,
+            byUserId,
             mediaName
         );
         if (media == null) {

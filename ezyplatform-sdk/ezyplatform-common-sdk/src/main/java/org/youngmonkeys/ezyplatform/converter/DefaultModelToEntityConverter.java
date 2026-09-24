@@ -623,7 +623,10 @@ public class DefaultModelToEntityConverter {
         Media entity
     ) {
         entity.setName(model.getFileName());
-        entity.setOriginalName(model.getOriginalFileName());
+        String originalFileName = model.getOriginalFileName();
+        if (isNotBlank(originalFileName)) {
+            entity.setOriginalName(originalFileName);
+        }
         entity.setType(model.getMediaType());
         entity.setMimeType(model.getMimeType());
         entity.setFileSize(model.getFileSize());

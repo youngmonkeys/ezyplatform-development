@@ -16,17 +16,82 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import lombok.Builder;
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 @Getter
-@Builder
 public class MediaUploadEvent {
-    private String uploadFrom;
-    private long ownerAdminId;
-    private long ownerUserId;
-    private MediaModel media;
-    private FileMetadata fileMetadata;
+    private final long byAdminId;
+    private final long byUserId;
+    private final String uploadFrom;
+    private final long ownerAdminId;
+    private final long ownerUserId;
+    private final MediaModel media;
+    private final FileMetadata fileMetadata;
+
+    protected MediaUploadEvent(Builder builder) {
+        this.byAdminId = builder.byAdminId;
+        this.byUserId = builder.byUserId;
+        this.uploadFrom = builder.uploadFrom;
+        this.ownerAdminId = builder.ownerAdminId;
+        this.ownerUserId = builder.ownerUserId;
+        this.media = builder.media;
+        this.fileMetadata = builder.fileMetadata;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements EzyBuilder<MediaUploadEvent> {
+        private long byAdminId;
+        private long byUserId;
+        private String uploadFrom;
+        private long ownerAdminId;
+        private long ownerUserId;
+        private MediaModel media;
+        private FileMetadata fileMetadata;
+
+        public Builder byAdminId(long byAdminId) {
+            this.byAdminId = byAdminId;
+            return this;
+        }
+
+        public Builder byUserId(long byUserId) {
+            this.byUserId = byUserId;
+            return this;
+        }
+
+        public Builder uploadFrom(String uploadFrom) {
+            this.uploadFrom = uploadFrom;
+            return this;
+        }
+
+        public Builder ownerAdminId(long ownerAdminId) {
+            this.ownerAdminId = ownerAdminId;
+            return this;
+        }
+
+        public Builder ownerUserId(long ownerUserId) {
+            this.ownerUserId = ownerUserId;
+            return this;
+        }
+
+        public Builder media(MediaModel media) {
+            this.media = media;
+            return this;
+        }
+
+        public Builder fileMetadata(FileMetadata fileMetadata) {
+            this.fileMetadata = fileMetadata;
+            return this;
+        }
+
+        @Override
+        public MediaUploadEvent build() {
+            return new MediaUploadEvent(this);
+        }
+    }
 }

@@ -42,8 +42,14 @@ public class GetMediaDetailsEventSchemaFetcher
                         Arrays.asList(
                             EventSchema.DataSchema.builder()
                                 .dataType(Long.class)
-                                .name("userId")
-                                .description("The user requesting media details.")
+                                .name("byAdminId")
+                                .description("The admin requesting media details, 0 if none.")
+                                .example("1")
+                                .build(),
+                            EventSchema.DataSchema.builder()
+                                .dataType(Long.class)
+                                .name("byUserId")
+                                .description("The user requesting media details, 0 if none.")
                                 .example("1")
                                 .build(),
                             EventSchema.DataSchema.builder()

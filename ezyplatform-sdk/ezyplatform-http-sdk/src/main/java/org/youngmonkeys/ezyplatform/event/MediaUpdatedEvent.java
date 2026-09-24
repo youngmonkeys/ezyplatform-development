@@ -16,12 +16,49 @@
 
 package org.youngmonkeys.ezyplatform.event;
 
-import lombok.AllArgsConstructor;
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 @Getter
-@AllArgsConstructor
 public class MediaUpdatedEvent {
-    private MediaModel media;
+    private final long byAdminId;
+    private final long byUserId;
+    private final MediaModel media;
+
+    protected MediaUpdatedEvent(Builder builder) {
+        this.byAdminId = builder.byAdminId;
+        this.byUserId = builder.byUserId;
+        this.media = builder.media;
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder implements EzyBuilder<MediaUpdatedEvent> {
+        private long byAdminId;
+        private long byUserId;
+        private MediaModel media;
+
+        public Builder byAdminId(long byAdminId) {
+            this.byAdminId = byAdminId;
+            return this;
+        }
+
+        public Builder byUserId(long byUserId) {
+            this.byUserId = byUserId;
+            return this;
+        }
+
+        public Builder media(MediaModel media) {
+            this.media = media;
+            return this;
+        }
+
+        @Override
+        public MediaUpdatedEvent build() {
+            return new MediaUpdatedEvent(this);
+        }
+    }
 }

@@ -24,9 +24,7 @@ import org.youngmonkeys.ezyplatform.request.SaveMetaRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaIncludeUrlRequest;
 import org.youngmonkeys.ezyplatform.request.UpdateMediaRequest;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.UNKNOWN_LOWERCASE;
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 public class HttpRequestToModelConverter {
 
@@ -53,27 +51,9 @@ public class HttpRequestToModelConverter {
     }
 
     public UpdateMediaModel toModel(
-        long mediaId,
-        UpdateMediaRequest request
-    ) {
-        return toModel(mediaId, NULL_STRING, request);
-    }
-
-    public UpdateMediaModel toModel(
-        String mediaName,
-        UpdateMediaRequest request
-    ) {
-        return toModel(ZERO_LONG, mediaName, request);
-    }
-
-    public UpdateMediaModel toModel(
-        long mediaId,
-        String mediaName,
         UpdateMediaRequest request
     ) {
         return UpdateMediaModel.builder()
-            .mediaId(mediaId)
-            .mediaName(mediaName)
             .originalName(request.getOriginalName())
             .groupName(request.getGroupName())
             .alternativeText(request.getAlternativeText())
@@ -89,11 +69,9 @@ public class HttpRequestToModelConverter {
     }
 
     public UpdateMediaModel toModel(
-        long mediaId,
         UpdateMediaIncludeUrlRequest request
     ) {
         return UpdateMediaModel.builder()
-            .mediaId(mediaId)
             .updateType(Boolean.TRUE)
             .type(request.getType())
             .originalName(request.getOriginalName())

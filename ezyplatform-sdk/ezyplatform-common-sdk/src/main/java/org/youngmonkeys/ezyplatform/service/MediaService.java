@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @SuppressWarnings("MethodCount")
 public interface MediaService {
@@ -61,6 +62,7 @@ public interface MediaService {
     );
 
     MediaModel updateMedia(
+        long mediaId,
         UpdateMediaModel model
     );
 
@@ -141,7 +143,11 @@ public interface MediaService {
 
     MediaModel removeMedia(long mediaId);
 
-    MediaModel removeMedia(String mediaName);
+    MediaModel removeMedia(
+        long byAdminId,
+        long byUserId,
+        String mediaName
+    );
 
     void removeMediaPermanently(long mediaId);
 
@@ -159,10 +165,32 @@ public interface MediaService {
         );
     }
 
-    MediaModel getMediaByName(String mediaName);
+    default MediaModel getMediaByName(String mediaName) {
+        return getMediaByName(
+            ZERO_LONG,
+            ZERO_LONG,
+            mediaName
+        );
+    }
+
+    MediaModel getMediaByName(
+        long byAdminId,
+        long byUserId,
+        String mediaName
+    );
 
     long getMediaIdByNameOrOriginalName(
         String mediaName
+    );
+
+    long getMediaIdByNameOrOriginalNameAndOwnerAdminId(
+        String mediaName,
+        long ownerAdminId
+    );
+
+    long getMediaIdByNameOrOriginalNameAndOwnerUserId(
+        String mediaName,
+        long ownerUserId
     );
 
     boolean containsMedia(long mediaId);

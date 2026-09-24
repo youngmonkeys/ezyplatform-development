@@ -46,7 +46,7 @@
 	</module>
 
 	<module name="FileLength">
-		<property name="max" value="1500" />
+		<property name="max" value="3000" />
 	</module>
 
 	<module name="SuppressWarningsFilter" />

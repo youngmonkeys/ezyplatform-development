@@ -41,8 +41,14 @@ public class ValidateMediaOwnerEventSchemaFetcher
                         Arrays.asList(
                             EventSchema.DataSchema.builder()
                                 .dataType(Long.class)
-                                .name("userId")
-                                .description("The user to validate as media owner.")
+                                .name("byAdminId")
+                                .description("The admin to validate as media owner, 0 if none.")
+                                .example("1")
+                                .build(),
+                            EventSchema.DataSchema.builder()
+                                .dataType(Long.class)
+                                .name("byUserId")
+                                .description("The user to validate as media owner, 0 if none.")
                                 .example("1")
                                 .build(),
                             EventSchema.DataSchema.builder()

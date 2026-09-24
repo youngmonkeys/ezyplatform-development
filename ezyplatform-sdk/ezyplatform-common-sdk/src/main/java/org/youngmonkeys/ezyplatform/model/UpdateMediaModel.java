@@ -24,8 +24,6 @@ import java.math.BigDecimal;
 @Getter
 @Builder
 public class UpdateMediaModel {
-    private long mediaId;
-    private String mediaName;
     private String originalName;
     private String groupName;
     private boolean updateType;

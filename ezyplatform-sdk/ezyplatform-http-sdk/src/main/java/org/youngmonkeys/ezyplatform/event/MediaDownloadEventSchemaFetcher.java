@@ -41,8 +41,14 @@ public class MediaDownloadEventSchemaFetcher
                         Arrays.asList(
                             EventSchema.DataSchema.builder()
                                 .dataType(Long.class)
-                                .name("userId")
-                                .description("The user downloading the media.")
+                                .name("byAdminId")
+                                .description("The admin downloading the media, 0 if none.")
+                                .example("1")
+                                .build(),
+                            EventSchema.DataSchema.builder()
+                                .dataType(Long.class)
+                                .name("byUserId")
+                                .description("The user downloading the media, 0 if none.")
                                 .example("1")
                                 .build(),
                             EventSchema.DataSchema.builder()

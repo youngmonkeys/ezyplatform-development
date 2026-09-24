@@ -136,31 +136,39 @@ public class MediaValidatorTest {
     @Test
     public void validateMediaNameAndGetTest() {
         // given
+        long adminId = 1L;
+        long userId = 2L;
         String existingMediaName = "media-1";
         MediaModel expected = MediaModel.builder()
             .id(1L)
             .name(existingMediaName)
             .build();
-        when(mediaService.getMediaByName(existingMediaName))
+        when(mediaService.getMediaByName(adminId, userId, existingMediaName))
             .thenReturn(expected);
 
         String missingMediaName = "media-2";
-        when(mediaService.getMediaByName(missingMediaName))
+        when(mediaService.getMediaByName(adminId, userId, missingMediaName))
             .thenReturn(null);
 
         // when
         MediaModel actual = instance.validateMediaNameAndGet(
+            adminId,
+            userId,
             existingMediaName
         );
         Throwable e = Asserts.assertThrows(() ->
-            instance.validateMediaNameAndGet(missingMediaName)
+            instance.validateMediaNameAndGet(
+                adminId,
+                userId,
+                missingMediaName
+            )
         );
 
         // then
         Asserts.assertEquals(actual, expected);
         Asserts.assertEqualsType(e, ResourceNotFoundException.class);
-        verify(mediaService).getMediaByName(existingMediaName);
-        verify(mediaService).getMediaByName(missingMediaName);
+        verify(mediaService).getMediaByName(adminId, userId, existingMediaName);
+        verify(mediaService).getMediaByName(adminId, userId, missingMediaName);
     }
 
     @Test
@@ -936,23 +944,39 @@ public class MediaValidatorTest {
     public void validateOwnerUserMediaNameTest() {
         // given
         long userId = 1L;
+        long ownedMediaId = 10L;
         String ownedMediaName = "media-1";
         String notOwnedMediaName = "media-2";
-        when(mediaService.getOwnerUserIdByMediaName(ownedMediaName))
-            .thenReturn(userId);
-        when(mediaService.getOwnerUserIdByMediaName(notOwnedMediaName))
-            .thenReturn(userId + 1);
+        when(
+            mediaService.getMediaIdByNameOrOriginalNameAndOwnerUserId(
+                ownedMediaName,
+                userId
+            )
+        ).thenReturn(ownedMediaId);
+        when(
+            mediaService.getMediaIdByNameOrOriginalNameAndOwnerUserId(
+                notOwnedMediaName,
+                userId
+            )
+        ).thenReturn(0L);
 
         // when
-        instance.validateOwnerUserMedia(userId, ownedMediaName);
+        long actual = instance.validateOwnerUserMedia(userId, ownedMediaName);
         Throwable e = Asserts.assertThrows(() ->
             instance.validateOwnerUserMedia(userId, notOwnedMediaName)
         );
 
         // then
+        Asserts.assertEquals(actual, ownedMediaId);
         Asserts.assertEqualsType(e, MediaNotFoundException.class);
-        verify(mediaService).getOwnerUserIdByMediaName(ownedMediaName);
-        verify(mediaService).getOwnerUserIdByMediaName(notOwnedMediaName);
+        verify(mediaService).getMediaIdByNameOrOriginalNameAndOwnerUserId(
+            ownedMediaName,
+            userId
+        );
+        verify(mediaService).getMediaIdByNameOrOriginalNameAndOwnerUserId(
+            notOwnedMediaName,
+            userId
+        );
     }
 
     @Test

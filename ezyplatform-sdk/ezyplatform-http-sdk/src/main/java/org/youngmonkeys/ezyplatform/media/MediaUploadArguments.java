@@ -20,6 +20,7 @@ import com.tvd12.ezyhttp.server.core.resources.FileUploader;
 import lombok.Builder;
 import lombok.Getter;
 import org.apache.tika.config.TikaConfig;
+import org.youngmonkeys.ezyplatform.data.FileMetadata;
 import org.youngmonkeys.ezyplatform.entity.UploadAction;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,9 +35,12 @@ public class MediaUploadArguments {
     private HttpServletResponse response;
     private String uploadFrom;
     private UploadAction action;
+    private FileMetadata fileMetadata;
     private long mediaId;
     private long ownerAdminId;
     private long ownerUserId;
+    private long byAdminId;
+    private long byUserId;
     private boolean avatar;
     private boolean notPublic;
 }

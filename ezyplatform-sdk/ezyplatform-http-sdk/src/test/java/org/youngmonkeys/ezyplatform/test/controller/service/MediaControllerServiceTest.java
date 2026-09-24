@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import org.youngmonkeys.ezyplatform.annotation.AdminId;
 import org.youngmonkeys.ezyplatform.controller.service.MediaControllerService;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.HttpModelToResponseConverter;
@@ -58,6 +57,7 @@ import org.youngmonkeys.ezyplatform.event.MediaReplacedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUpdatedEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadEvent;
 import org.youngmonkeys.ezyplatform.event.MediaUploadedEvent;
+import org.youngmonkeys.ezyplatform.event.ValidateMediaOwnerEvent;
 import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
@@ -232,14 +232,24 @@ public class MediaControllerServiceTest {
         // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        Part filePart = mock(Part.class);
         FileUploader fileUploader = mock(FileUploader.class);
         MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.AVATAR)
+            .fileSize(123L)
+            .build();
         when(settingService.getMaxUploadFileSize()).thenReturn(512L);
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
+        when(request.getPart("file")).thenReturn(filePart);
+        when(mediaValidator.validateFilePart(filePart, true))
+            .thenReturn(fileMetadata);
         when(mediaUpDownloader.isUploadSupported()).thenReturn(true);
 
         // when
@@ -260,6 +270,8 @@ public class MediaControllerServiceTest {
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
+        verify(request).getPart("file");
+        verify(mediaValidator).validateFilePart(filePart, true);
         verify(mediaUpDownloader).isUploadSupported();
         verify(mediaUpDownloader).upload(argumentsCaptor.capture());
 
@@ -268,8 +280,11 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual.getResponse(), response);
         Asserts.assertEquals(actual.getUploadFrom(), "s3");
         Asserts.assertEquals(actual.getAction(), UploadAction.ADD);
+        Asserts.assertEquals(actual.getFileMetadata(), fileMetadata);
         Asserts.assertEquals(actual.getOwnerAdminId(), 11L);
         Asserts.assertEquals(actual.getOwnerUserId(), 22L);
+        Asserts.assertEquals(actual.getByAdminId(), 11L);
+        Asserts.assertEquals(actual.getByUserId(), 22L);
         Asserts.assertTrue(actual.isAvatar());
         Asserts.assertTrue(!actual.isNotPublic());
         Asserts.assertEquals(actual.getFileUploader(), fileUploader);
@@ -426,6 +441,8 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(uploadEvent.getUploadFrom(), "local");
         Asserts.assertEquals(uploadEvent.getOwnerAdminId(), 101L);
         Asserts.assertEquals(uploadEvent.getOwnerUserId(), 202L);
+        Asserts.assertEquals(uploadEvent.getByAdminId(), 101L);
+        Asserts.assertEquals(uploadEvent.getByUserId(), 202L);
         Asserts.assertEquals(uploadEvent.getFileMetadata(), fileMetadata);
 
         AddMediaModel addMediaModel = addMediaCaptor.getValue();
@@ -444,6 +461,8 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
 
         MediaUploadedEvent uploadedEvent = (MediaUploadedEvent) events.get(2);
+        Asserts.assertEquals(uploadedEvent.getByAdminId(), 101L);
+        Asserts.assertEquals(uploadedEvent.getByUserId(), 202L);
         Asserts.assertEquals(uploadedEvent.getMedia(), mediaModel);
         Asserts.assertEquals(uploadedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);
@@ -820,10 +839,17 @@ public class MediaControllerServiceTest {
         // given
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
+        Part filePart = mock(Part.class);
         FileUploader fileUploader = mock(FileUploader.class);
         MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
         @SuppressWarnings("unchecked")
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.AVATAR)
+            .fileSize(456L)
+            .build();
         MediaModel media = MediaModel.builder()
             .id(456L)
             .name("avatar.png")
@@ -840,12 +866,17 @@ public class MediaControllerServiceTest {
             .thenReturn(mediaUpDownloader);
         when(singletonFactory.getSingletonCast(FileUploader.class))
             .thenReturn(fileUploader);
+        when(request.getPart("file")).thenReturn(filePart);
+        when(mediaValidator.validateFilePart(filePart, true))
+            .thenReturn(fileMetadata);
         when(mediaUpDownloader.isUploadSupported()).thenReturn(true);
 
         // when
         instance.replaceMedia(
             request,
             response,
+            33L,
+            44L,
             456L,
             validMediaCondition
         );
@@ -858,6 +889,8 @@ public class MediaControllerServiceTest {
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(singletonFactory).getSingletonCast(FileUploader.class);
+        verify(request).getPart("file");
+        verify(mediaValidator).validateFilePart(filePart, true);
         verify(mediaUpDownloader).isUploadSupported();
         verify(mediaUpDownloader).upload(argumentsCaptor.capture());
 
@@ -866,9 +899,12 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual.getResponse(), response);
         Asserts.assertEquals(actual.getUploadFrom(), "s3");
         Asserts.assertEquals(actual.getAction(), UploadAction.REPLACE);
+        Asserts.assertEquals(actual.getFileMetadata(), fileMetadata);
         Asserts.assertEquals(actual.getMediaId(), 456L);
         Asserts.assertEquals(actual.getOwnerAdminId(), 11L);
         Asserts.assertEquals(actual.getOwnerUserId(), 22L);
+        Asserts.assertEquals(actual.getByAdminId(), 33L);
+        Asserts.assertEquals(actual.getByUserId(), 44L);
         Asserts.assertTrue(actual.isAvatar());
         Asserts.assertTrue(actual.isNotPublic());
         Asserts.assertEquals(actual.getFileUploader(), fileUploader);
@@ -940,7 +976,6 @@ public class MediaControllerServiceTest {
         when(request.getPart("file")).thenReturn(filePart);
         when(mediaValidator.validateFilePart(filePart, false))
             .thenReturn(fileMetadata);
-        when(filePart.getSubmittedFileName()).thenReturn("replaced.webp");
         when(request.getAsyncContext()).thenReturn(asyncContext);
         when(
             fileSystemManager.getMediaFilePath(
@@ -977,6 +1012,8 @@ public class MediaControllerServiceTest {
         instance.replaceMedia(
             request,
             response,
+            77L,
+            88L,
             654L,
             validMediaCondition
         );
@@ -999,7 +1036,6 @@ public class MediaControllerServiceTest {
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
-        verify(filePart).getSubmittedFileName();
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -1033,15 +1069,14 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(uploadEvent.getUploadFrom(), "local");
         Asserts.assertEquals(uploadEvent.getOwnerAdminId(), 111L);
         Asserts.assertEquals(uploadEvent.getOwnerUserId(), 222L);
+        Asserts.assertEquals(uploadEvent.getByAdminId(), 77L);
+        Asserts.assertEquals(uploadEvent.getByUserId(), 88L);
         Asserts.assertEquals(uploadEvent.getMedia(), media);
         Asserts.assertEquals(uploadEvent.getFileMetadata(), fileMetadata);
 
         ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
         Asserts.assertEquals(replaceMediaModel.getMediaId(), 654L);
-        Asserts.assertEquals(
-            replaceMediaModel.getOriginalFileName(),
-            "replaced.webp"
-        );
+        Asserts.assertNull(replaceMediaModel.getOriginalFileName());
         Asserts.assertEquals(replaceMediaModel.getMediaType(), "IMAGE");
         Asserts.assertEquals(replaceMediaModel.getMimeType(), "image/webp");
         Asserts.assertEquals(replaceMediaModel.getFileSize(), 11L);
@@ -1052,6 +1087,8 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
 
         MediaReplacedEvent replacedEvent = (MediaReplacedEvent) events.get(2);
+        Asserts.assertEquals(replacedEvent.getByAdminId(), 77L);
+        Asserts.assertEquals(replacedEvent.getByUserId(), 88L);
         Asserts.assertEquals(replacedEvent.getMedia(), replacedMedia);
         Asserts.assertEquals(replacedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);
@@ -1158,7 +1195,6 @@ public class MediaControllerServiceTest {
         when(request.getParts()).thenReturn(Collections.singletonList(filePart));
         when(mediaValidator.validateFilePart(filePart, false))
             .thenReturn(fileMetadata);
-        when(filePart.getSubmittedFileName()).thenReturn("first-part.png");
         when(request.getAsyncContext()).thenReturn(asyncContext);
         when(
             fileSystemManager.getMediaFilePath(
@@ -1195,6 +1231,8 @@ public class MediaControllerServiceTest {
         instance.replaceMedia(
             request,
             response,
+            77L,
+            88L,
             655L,
             validMediaCondition
         );
@@ -1218,7 +1256,6 @@ public class MediaControllerServiceTest {
         verify(request).getParts();
         verify(mediaValidator).validateFilePart(filePart, false);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
-        verify(filePart).getSubmittedFileName();
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -1244,10 +1281,7 @@ public class MediaControllerServiceTest {
 
         ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
         Asserts.assertEquals(replaceMediaModel.getMediaId(), 655L);
-        Asserts.assertEquals(
-            replaceMediaModel.getOriginalFileName(),
-            "first-part.png"
-        );
+        Asserts.assertNull(replaceMediaModel.getOriginalFileName());
         Asserts.assertEquals(replaceMediaModel.getMediaType(), "IMAGE");
         Asserts.assertEquals(replaceMediaModel.getMimeType(), "image/png");
         Asserts.assertEquals(replaceMediaModel.getFileSize(), 11L);
@@ -1306,7 +1340,7 @@ public class MediaControllerServiceTest {
         String json = "{\"id\":789,\"name\":\"current-media.jpg\"}";
         mediaFilePath.deleteOnExit();
 
-        when(mediaService.getMediaByName("current-media.jpg"))
+        when(mediaService.getMediaByName(55L, 66L, "current-media.jpg"))
             .thenReturn(currentMedia);
         when(validMediaCondition.test(currentMedia)).thenReturn(true);
         when(settingService.getMediaUpDownloaderName()).thenReturn("local");
@@ -1326,7 +1360,6 @@ public class MediaControllerServiceTest {
         when(request.getPart("file")).thenReturn(filePart);
         when(mediaValidator.validateFilePart(filePart, false))
             .thenReturn(replacementMetadata);
-        when(filePart.getSubmittedFileName()).thenReturn("replacement.png");
         when(request.getAsyncContext()).thenReturn(asyncContext);
         when(
             fileSystemManager.getMediaFilePath(
@@ -1363,6 +1396,8 @@ public class MediaControllerServiceTest {
         instance.replaceMedia(
             request,
             response,
+            55L,
+            66L,
             "current-media.jpg",
             validMediaCondition
         );
@@ -1373,7 +1408,7 @@ public class MediaControllerServiceTest {
         ArgumentCaptor<Object> eventCaptor =
             ArgumentCaptor.forClass(Object.class);
 
-        verify(mediaService).getMediaByName("current-media.jpg");
+        verify(mediaService).getMediaByName(55L, 66L, "current-media.jpg");
         verify(validMediaCondition).test(currentMedia);
         verify(settingService, times(2)).getMediaUpDownloaderName();
         verify(settingService).isAllowReduceMediaFileSize();
@@ -1383,7 +1418,6 @@ public class MediaControllerServiceTest {
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
-        verify(filePart).getSubmittedFileName();
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -1417,6 +1451,8 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(uploadEvent.getUploadFrom(), "local");
         Asserts.assertEquals(uploadEvent.getOwnerAdminId(), 55L);
         Asserts.assertEquals(uploadEvent.getOwnerUserId(), 66L);
+        Asserts.assertEquals(uploadEvent.getByAdminId(), 55L);
+        Asserts.assertEquals(uploadEvent.getByUserId(), 66L);
         Asserts.assertEquals(uploadEvent.getMedia(), currentMedia);
         Asserts.assertEquals(
             uploadEvent.getFileMetadata(),
@@ -1425,10 +1461,7 @@ public class MediaControllerServiceTest {
 
         ReplaceMediaModel replaceMediaModel = replaceMediaCaptor.getValue();
         Asserts.assertEquals(replaceMediaModel.getMediaId(), 789L);
-        Asserts.assertEquals(
-            replaceMediaModel.getOriginalFileName(),
-            "replacement.png"
-        );
+        Asserts.assertNull(replaceMediaModel.getOriginalFileName());
         Asserts.assertEquals(replaceMediaModel.getMediaType(), "IMAGE");
         Asserts.assertEquals(replaceMediaModel.getMimeType(), "image/png");
         Asserts.assertEquals(replaceMediaModel.getFileSize(), 19L);
@@ -1439,6 +1472,8 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(reductionEvent.getMediaFilePath(), mediaFilePath);
 
         MediaReplacedEvent replacedEvent = (MediaReplacedEvent) events.get(2);
+        Asserts.assertEquals(replacedEvent.getByAdminId(), 55L);
+        Asserts.assertEquals(replacedEvent.getByUserId(), 66L);
         Asserts.assertEquals(replacedEvent.getMedia(), replacedMedia);
         Asserts.assertEquals(replacedEvent.getMediaFilePath(), mediaFilePath);
         Asserts.assertEquals(outputStream.asString(), json);
@@ -1466,6 +1501,8 @@ public class MediaControllerServiceTest {
 
         // when
         MediaFileSizeReductionResult actual = instance.reduceMediaFileSize(
+            1L,
+            2L,
             MediaType.IMAGE,
             mediaFilePath
         );
@@ -1504,6 +1541,8 @@ public class MediaControllerServiceTest {
         when(mediaUpDownloader.isReduceMediaSupported()).thenReturn(true);
         when(
             mediaUpDownloader.reduceMediaFileSize(
+                eq(1L),
+                eq(2L),
                 any(MediaFileSizeReductionArguments.class)
             )
         )
@@ -1511,6 +1550,8 @@ public class MediaControllerServiceTest {
 
         // when
         MediaFileSizeReductionResult actual = instance.reduceMediaFileSize(
+            1L,
+            2L,
             MediaType.IMAGE,
             mediaFilePath
         );
@@ -1525,6 +1566,8 @@ public class MediaControllerServiceTest {
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(mediaUpDownloader).isReduceMediaSupported();
         verify(mediaUpDownloader).reduceMediaFileSize(
+            eq(1L),
+            eq(2L),
             argumentsCaptor.capture()
         );
 
@@ -1588,6 +1631,8 @@ public class MediaControllerServiceTest {
 
         // when
         MediaFileSizeReductionResult actual = instance.reduceMediaFileSizeById(
+            1L,
+            2L,
             123L,
             789L,
             validMediaCondition
@@ -1644,6 +1689,8 @@ public class MediaControllerServiceTest {
 
         MediaFileSizeReducedEvent reducedEvent =
             (MediaFileSizeReducedEvent) events.get(1);
+        Asserts.assertEquals(reducedEvent.getByAdminId(), 1L);
+        Asserts.assertEquals(reducedEvent.getByUserId(), 2L);
         Asserts.assertEquals(reducedEvent.getMedia(), replacedMedia);
         Asserts.assertEquals(
             reducedEvent.getMediaFilePath(),
@@ -1664,6 +1711,8 @@ public class MediaControllerServiceTest {
         // when
         Throwable e = Asserts.assertThrows(() ->
             instance.reduceMediaFileSizeById(
+                1L,
+                2L,
                 123L,
                 789L,
                 validMediaCondition
@@ -1707,7 +1756,7 @@ public class MediaControllerServiceTest {
                 .build();
         mediaFilePath.deleteOnExit();
 
-        when(mediaService.getMediaByName("intro.mp4")).thenReturn(media);
+        when(mediaService.getMediaByName(1L, 2L, "intro.mp4")).thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(true);
         when(
             fileSystemManager.getMediaFilePath(
@@ -1730,6 +1779,8 @@ public class MediaControllerServiceTest {
         // when
         MediaFileSizeReductionResult actual =
             instance.reduceMediaFileSizeByName(
+                1L,
+                2L,
                 "intro.mp4",
                 2048L,
                 validMediaCondition
@@ -1742,7 +1793,7 @@ public class MediaControllerServiceTest {
             ArgumentCaptor.forClass(ReplaceMediaModel.class);
 
         Asserts.assertEquals(actual, reductionResult);
-        verify(mediaService).getMediaByName("intro.mp4");
+        verify(mediaService).getMediaByName(1L, 2L, "intro.mp4");
         verify(validMediaCondition).test(media);
         verify(fileSystemManager).getMediaFilePath(
             MediaType.VIDEO.getFolder(),
@@ -1786,6 +1837,8 @@ public class MediaControllerServiceTest {
 
         MediaFileSizeReducedEvent reducedEvent =
             (MediaFileSizeReducedEvent) events.get(1);
+        Asserts.assertEquals(reducedEvent.getByAdminId(), 1L);
+        Asserts.assertEquals(reducedEvent.getByUserId(), 2L);
         Asserts.assertEquals(reducedEvent.getMedia(), replacedMedia);
         Asserts.assertEquals(
             reducedEvent.getMediaFilePath(),
@@ -1806,12 +1859,14 @@ public class MediaControllerServiceTest {
             .type(MediaType.VIDEO)
             .build();
 
-        when(mediaService.getMediaByName("intro.mp4")).thenReturn(media);
+        when(mediaService.getMediaByName(1L, 2L, "intro.mp4")).thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(false);
 
         // when
         Throwable e = Asserts.assertThrows(() ->
             instance.reduceMediaFileSizeByName(
+                1L,
+                2L,
                 "intro.mp4",
                 2048L,
                 validMediaCondition
@@ -1820,7 +1875,7 @@ public class MediaControllerServiceTest {
 
         // then
         Asserts.assertEqualsType(e, MediaNotFoundException.class);
-        verify(mediaService).getMediaByName("intro.mp4");
+        verify(mediaService).getMediaByName(1L, 2L, "intro.mp4");
         verify(validMediaCondition).test(media);
 
         verifyNoMoreInteractions(validMediaCondition);
@@ -2028,6 +2083,8 @@ public class MediaControllerServiceTest {
             eventCaptor.getValue() instanceof MediaUploadedEvent
         );
         MediaUploadedEvent event = (MediaUploadedEvent) eventCaptor.getValue();
+        Asserts.assertEquals(event.getByAdminId(), 101L);
+        Asserts.assertEquals(event.getByUserId(), 202L);
         Asserts.assertEquals(event.getMedia(), media);
         Asserts.assertEquals(event.getMediaFilePath(), mediaFile);
     }
@@ -2081,6 +2138,8 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(arguments.getMediaUrl(), mediaUrl);
         Asserts.assertEquals(arguments.getOwnerAdminId(), 101L);
         Asserts.assertEquals(arguments.getOwnerUserId(), 202L);
+        Asserts.assertEquals(arguments.getByAdminId(), 101L);
+        Asserts.assertEquals(arguments.getByUserId(), 202L);
         Asserts.assertTrue(arguments.isNotPublic());
 
         verifyNoMoreInteractions(mediaUpDownloader);
@@ -2104,7 +2163,6 @@ public class MediaControllerServiceTest {
             .title("new title")
             .build();
         UpdateMediaModel updateMediaModel = UpdateMediaModel.builder()
-            .mediaId(789L)
             .title("new title")
             .fileSize(12L)
             .build();
@@ -2123,12 +2181,15 @@ public class MediaControllerServiceTest {
                 "poster.png"
             )
         ).thenReturn(mediaFilePath);
-        when(requestToModelConverter.toModel(789L, request))
+        when(requestToModelConverter.toModel(request))
             .thenReturn(updateMediaModel);
-        when(mediaService.updateMedia(updateMediaModel)).thenReturn(updatedMedia);
+        when(mediaService.updateMedia(789L, updateMediaModel))
+            .thenReturn(updatedMedia);
 
         // when
         instance.updateMedia(
+            11L,
+            22L,
             789L,
             request,
             validMediaCondition
@@ -2145,12 +2206,14 @@ public class MediaControllerServiceTest {
             MediaType.IMAGE.getFolder(),
             "poster.png"
         );
-        verify(requestToModelConverter).toModel(789L, request);
-        verify(mediaService).updateMedia(updateMediaModel);
+        verify(requestToModelConverter).toModel(request);
+        verify(mediaService).updateMedia(789L, updateMediaModel);
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
 
         Asserts.assertEquals(request.getFileSize(), mediaFilePath.length());
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), updatedMedia);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 11L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 22L);
 
         InOrder inOrder = inOrder(
             mediaValidator,
@@ -2167,8 +2230,8 @@ public class MediaControllerServiceTest {
             MediaType.IMAGE.getFolder(),
             "poster.png"
         );
-        inOrder.verify(requestToModelConverter).toModel(789L, request);
-        inOrder.verify(mediaService).updateMedia(updateMediaModel);
+        inOrder.verify(requestToModelConverter).toModel(request);
+        inOrder.verify(mediaService).updateMedia(789L, updateMediaModel);
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaUpdatedEvent.class));
 
         verifyNoMoreInteractions(validMediaCondition);
@@ -2194,7 +2257,6 @@ public class MediaControllerServiceTest {
             .title("updated title")
             .build();
         UpdateMediaModel updateMediaModel = UpdateMediaModel.builder()
-            .mediaId(790L)
             .title("updated title")
             .url("https://cdn.example.com/updated.mp4")
             .fileSize(13L)
@@ -2214,12 +2276,15 @@ public class MediaControllerServiceTest {
                 "video.mp4"
             )
         ).thenReturn(mediaFilePath);
-        when(requestToModelConverter.toModel(790L, request))
+        when(requestToModelConverter.toModel(request))
             .thenReturn(updateMediaModel);
-        when(mediaService.updateMedia(updateMediaModel)).thenReturn(updatedMedia);
+        when(mediaService.updateMedia(790L, updateMediaModel))
+            .thenReturn(updatedMedia);
 
         // when
         instance.updateMedia(
+            11L,
+            22L,
             790L,
             request,
             validMediaCondition
@@ -2236,12 +2301,14 @@ public class MediaControllerServiceTest {
             MediaType.VIDEO.getFolder(),
             "video.mp4"
         );
-        verify(requestToModelConverter).toModel(790L, request);
-        verify(mediaService).updateMedia(updateMediaModel);
+        verify(requestToModelConverter).toModel(request);
+        verify(mediaService).updateMedia(790L, updateMediaModel);
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
 
         Asserts.assertEquals(request.getFileSize(), mediaFilePath.length());
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), updatedMedia);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 11L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 22L);
 
         InOrder inOrder = inOrder(
             mediaValidator,
@@ -2258,8 +2325,8 @@ public class MediaControllerServiceTest {
             MediaType.VIDEO.getFolder(),
             "video.mp4"
         );
-        inOrder.verify(requestToModelConverter).toModel(790L, request);
-        inOrder.verify(mediaService).updateMedia(updateMediaModel);
+        inOrder.verify(requestToModelConverter).toModel(request);
+        inOrder.verify(mediaService).updateMedia(790L, updateMediaModel);
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaUpdatedEvent.class));
 
         verifyNoMoreInteractions(validMediaCondition);
@@ -2283,7 +2350,6 @@ public class MediaControllerServiceTest {
             .title("named title")
             .build();
         UpdateMediaModel updateMediaModel = UpdateMediaModel.builder()
-            .mediaName("named-poster.png")
             .title("named title")
             .fileSize(14L)
             .build();
@@ -2294,7 +2360,7 @@ public class MediaControllerServiceTest {
             "hello world!!!".getBytes(StandardCharsets.UTF_8)
         );
 
-        when(mediaValidator.validateMediaNameAndGet("named-poster.png"))
+        when(mediaValidator.validateMediaNameAndGet(1L, 2L, "named-poster.png"))
             .thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(true);
         when(
@@ -2303,12 +2369,15 @@ public class MediaControllerServiceTest {
                 "named-poster.png"
             )
         ).thenReturn(mediaFilePath);
-        when(requestToModelConverter.toModel("named-poster.png", request))
+        when(requestToModelConverter.toModel(request))
             .thenReturn(updateMediaModel);
-        when(mediaService.updateMedia(updateMediaModel)).thenReturn(updatedMedia);
+        when(mediaService.updateMedia(791L, updateMediaModel))
+            .thenReturn(updatedMedia);
 
         // when
         instance.updateMedia(
+            1L,
+            2L,
             "named-poster.png",
             request,
             validMediaCondition
@@ -2318,19 +2387,21 @@ public class MediaControllerServiceTest {
         ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaUpdatedEvent.class);
 
-        verify(mediaValidator).validateMediaNameAndGet("named-poster.png");
+        verify(mediaValidator).validateMediaNameAndGet(1L, 2L, "named-poster.png");
         verify(mediaValidator).validate(791L, request);
         verify(validMediaCondition).test(media);
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
             "named-poster.png"
         );
-        verify(requestToModelConverter).toModel("named-poster.png", request);
-        verify(mediaService).updateMedia(updateMediaModel);
+        verify(requestToModelConverter).toModel(request);
+        verify(mediaService).updateMedia(791L, updateMediaModel);
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
 
         Asserts.assertEquals(request.getFileSize(), mediaFilePath.length());
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), updatedMedia);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 1L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 2L);
 
         InOrder inOrder = inOrder(
             mediaValidator,
@@ -2341,15 +2412,15 @@ public class MediaControllerServiceTest {
             eventHandlerManager
         );
         inOrder.verify(mediaValidator)
-            .validateMediaNameAndGet("named-poster.png");
+            .validateMediaNameAndGet(1L, 2L, "named-poster.png");
         inOrder.verify(mediaValidator).validate(791L, request);
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
             "named-poster.png"
         );
-        inOrder.verify(requestToModelConverter).toModel("named-poster.png", request);
-        inOrder.verify(mediaService).updateMedia(updateMediaModel);
+        inOrder.verify(requestToModelConverter).toModel(request);
+        inOrder.verify(mediaService).updateMedia(791L, updateMediaModel);
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaUpdatedEvent.class));
 
         verifyNoMoreInteractions(validMediaCondition);
@@ -2367,7 +2438,7 @@ public class MediaControllerServiceTest {
             .thenReturn(updatedMedia);
 
         // when
-        instance.updateMediaStatus(900L, "INACTIVE");
+        instance.updateMediaStatus(11L, 22L, 900L, "INACTIVE");
 
         // then
         ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
@@ -2376,6 +2447,8 @@ public class MediaControllerServiceTest {
         verify(mediaService).updateMediaStatus(900L, "INACTIVE");
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), updatedMedia);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 11L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 22L);
 
         InOrder inOrder = inOrder(mediaService, eventHandlerManager);
         inOrder.verify(mediaService).updateMediaStatus(900L, "INACTIVE");
@@ -2397,7 +2470,7 @@ public class MediaControllerServiceTest {
             .name("visibility-media.png")
             .publicMedia(true)
             .build();
-        when(mediaValidator.validateMediaNameAndGet("visibility-media.png"))
+        when(mediaValidator.validateMediaNameAndGet(1L, 2L, "visibility-media.png"))
             .thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(true);
         when(mediaService.updateMediaPublicIfExists(911L, true))
@@ -2405,16 +2478,23 @@ public class MediaControllerServiceTest {
 
         // when
         instance.updateMediaPublic(
+            1L,
+            2L,
             "visibility-media.png",
             true,
             validMediaCondition
         );
 
         // then: the media must actually become public, not just accepted
-        verify(mediaValidator).validateMediaNameAndGet("visibility-media.png");
+        ArgumentCaptor<MediaUpdatedEvent> eventCaptor =
+            ArgumentCaptor.forClass(MediaUpdatedEvent.class);
+        verify(mediaValidator).validateMediaNameAndGet(1L, 2L, "visibility-media.png");
         verify(validMediaCondition).test(media);
         verify(mediaService).updateMediaPublicIfExists(911L, true);
-        verify(eventHandlerManager).handleEvent(updatedMedia);
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
+        Asserts.assertEquals(eventCaptor.getValue().getMedia(), updatedMedia);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 1L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 2L);
 
         InOrder inOrder = inOrder(
             mediaValidator,
@@ -2422,10 +2502,10 @@ public class MediaControllerServiceTest {
             mediaService,
             eventHandlerManager
         );
-        inOrder.verify(mediaValidator).validateMediaNameAndGet("visibility-media.png");
+        inOrder.verify(mediaValidator).validateMediaNameAndGet(1L, 2L, "visibility-media.png");
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(mediaService).updateMediaPublicIfExists(911L, true);
-        inOrder.verify(eventHandlerManager).handleEvent(updatedMedia);
+        inOrder.verify(eventHandlerManager).handleEvent(any(MediaUpdatedEvent.class));
 
         verifyNoMoreInteractions(validMediaCondition);
     }
@@ -2439,13 +2519,15 @@ public class MediaControllerServiceTest {
             .id(912L)
             .name("forbidden-media.png")
             .build();
-        when(mediaValidator.validateMediaNameAndGet("forbidden-media.png"))
+        when(mediaValidator.validateMediaNameAndGet(1L, 2L, "forbidden-media.png"))
             .thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(false);
 
         // when: trying to change visibility of a media the caller cannot access
         Throwable e = Asserts.assertThrows(() ->
             instance.updateMediaPublic(
+                1L,
+                2L,
                 "forbidden-media.png",
                 true,
                 validMediaCondition
@@ -2454,7 +2536,7 @@ public class MediaControllerServiceTest {
 
         // then: the visibility must not be changed
         Asserts.assertEqualsType(e, MediaNotFoundException.class);
-        verify(mediaValidator).validateMediaNameAndGet("forbidden-media.png");
+        verify(mediaValidator).validateMediaNameAndGet(1L, 2L, "forbidden-media.png");
         verify(validMediaCondition).test(media);
         verifyNoMoreInteractions(validMediaCondition);
     }
@@ -2469,19 +2551,21 @@ public class MediaControllerServiceTest {
             .name("public-check-media.png")
             .publicMedia(true)
             .build();
-        when(mediaValidator.validateMediaNameAndGet("public-check-media.png"))
+        when(mediaValidator.validateMediaNameAndGet(1L, 2L, "public-check-media.png"))
             .thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(true);
 
         // when
         boolean actual = instance.isMediaPublic(
+            1L,
+            2L,
             "public-check-media.png",
             validMediaCondition
         );
 
         // then: the reported visibility must reflect the media's own state
         Asserts.assertTrue(actual);
-        verify(mediaValidator).validateMediaNameAndGet("public-check-media.png");
+        verify(mediaValidator).validateMediaNameAndGet(1L, 2L, "public-check-media.png");
         verify(validMediaCondition).test(media);
         verifyNoMoreInteractions(validMediaCondition);
     }
@@ -2495,13 +2579,15 @@ public class MediaControllerServiceTest {
             .id(914L)
             .name("forbidden-check-media.png")
             .build();
-        when(mediaValidator.validateMediaNameAndGet("forbidden-check-media.png"))
+        when(mediaValidator.validateMediaNameAndGet(1L, 2L, "forbidden-check-media.png"))
             .thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(false);
 
         // when
         Throwable e = Asserts.assertThrows(() ->
             instance.isMediaPublic(
+                1L,
+                2L,
                 "forbidden-check-media.png",
                 validMediaCondition
             )
@@ -2509,7 +2595,7 @@ public class MediaControllerServiceTest {
 
         // then
         Asserts.assertEqualsType(e, MediaNotFoundException.class);
-        verify(mediaValidator).validateMediaNameAndGet("forbidden-check-media.png");
+        verify(mediaValidator).validateMediaNameAndGet(1L, 2L, "forbidden-check-media.png");
         verify(validMediaCondition).test(media);
         verifyNoMoreInteractions(validMediaCondition);
     }
@@ -2558,7 +2644,7 @@ public class MediaControllerServiceTest {
         when(mediaService.removeMedia(902L)).thenReturn(removedMedia);
 
         // when
-        instance.removeMediaById(902L, false);
+        instance.removeMediaById(11L, 22L, 902L, false);
 
         // then
         ArgumentCaptor<MediaRemovedEvent> eventCaptor =
@@ -2567,6 +2653,8 @@ public class MediaControllerServiceTest {
         verify(mediaService).removeMedia(902L);
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), removedMedia);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 11L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 22L);
 
         InOrder inOrder = inOrder(mediaService, eventHandlerManager);
         inOrder.verify(mediaService).removeMedia(902L);
@@ -2602,7 +2690,7 @@ public class MediaControllerServiceTest {
         ).thenReturn(mediaFilePath);
 
         // when
-        instance.removeMediaById(904L, true);
+        instance.removeMediaById(11L, 22L, 904L, true);
 
         // then
         ArgumentCaptor<MediaRemovedEvent> eventCaptor =
@@ -2616,6 +2704,8 @@ public class MediaControllerServiceTest {
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
         Asserts.assertFalse(mediaFilePath.exists());
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), removedMedia);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 11L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 22L);
 
         InOrder inOrder = inOrder(
             mediaService,
@@ -2665,7 +2755,7 @@ public class MediaControllerServiceTest {
         ).thenReturn(mediaFilePath);
 
         // when: removing by id without explicitly choosing deleteFile
-        instance.removeMediaById(906L);
+        instance.removeMediaById(11L, 22L, 906L);
 
         // then: the setting is honored and the file is actually removed
         // from disk
@@ -2696,7 +2786,7 @@ public class MediaControllerServiceTest {
         when(mediaService.removeMedia(907L)).thenReturn(removedMedia);
 
         // when
-        instance.removeMediaById(907L);
+        instance.removeMediaById(11L, 22L, 907L);
 
         // then: the media is only soft-removed, the file must not be
         // touched at all
@@ -2714,22 +2804,24 @@ public class MediaControllerServiceTest {
             .type(MediaType.IMAGE)
             .status("ACTIVE")
             .build();
-        when(mediaService.removeMedia("removed-by-name.png"))
+        when(mediaService.removeMedia(1L, 2L, "removed-by-name.png"))
             .thenReturn(removedMedia);
 
         // when
-        instance.removeMediaByName("removed-by-name.png", false);
+        instance.removeMediaByName(1L, 2L, "removed-by-name.png", false);
 
         // then
         ArgumentCaptor<MediaRemovedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaRemovedEvent.class);
 
-        verify(mediaService).removeMedia("removed-by-name.png");
+        verify(mediaService).removeMedia(1L, 2L, "removed-by-name.png");
         verify(eventHandlerManager).handleEvent(eventCaptor.capture());
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), removedMedia);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 1L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 2L);
 
         InOrder inOrder = inOrder(mediaService, eventHandlerManager);
-        inOrder.verify(mediaService).removeMedia("removed-by-name.png");
+        inOrder.verify(mediaService).removeMedia(1L, 2L, "removed-by-name.png");
         inOrder.verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
     }
 
@@ -2753,7 +2845,7 @@ public class MediaControllerServiceTest {
         );
         Asserts.assertTrue(mediaFilePath.exists());
 
-        when(mediaService.removeMedia("deleted-by-name.png"))
+        when(mediaService.removeMedia(1L, 2L, "deleted-by-name.png"))
             .thenReturn(removedMedia);
         when(
             fileSystemManager.getMediaFilePath(
@@ -2763,13 +2855,13 @@ public class MediaControllerServiceTest {
         ).thenReturn(mediaFilePath);
 
         // when
-        instance.removeMediaByName("deleted-by-name.png", true);
+        instance.removeMediaByName(1L, 2L, "deleted-by-name.png", true);
 
         // then
         ArgumentCaptor<MediaRemovedEvent> eventCaptor =
             ArgumentCaptor.forClass(MediaRemovedEvent.class);
 
-        verify(mediaService).removeMedia("deleted-by-name.png");
+        verify(mediaService).removeMedia(1L, 2L, "deleted-by-name.png");
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
             "deleted-by-name.png"
@@ -2783,7 +2875,7 @@ public class MediaControllerServiceTest {
             fileSystemManager,
             eventHandlerManager
         );
-        inOrder.verify(mediaService).removeMedia("deleted-by-name.png");
+        inOrder.verify(mediaService).removeMedia(1L, 2L, "deleted-by-name.png");
         inOrder.verify(mediaService).removeMediaPermanently(905L);
         inOrder.verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -2817,7 +2909,7 @@ public class MediaControllerServiceTest {
 
         when(settingService.isAllowPermanentlyDeleteMedia())
             .thenReturn(true);
-        when(mediaService.removeMedia("permanently-deleted-by-name.png"))
+        when(mediaService.removeMedia(1L, 2L, "permanently-deleted-by-name.png"))
             .thenReturn(removedMedia);
         when(
             fileSystemManager.getMediaFilePath(
@@ -2827,13 +2919,13 @@ public class MediaControllerServiceTest {
         ).thenReturn(mediaFilePath);
 
         // when: removing by name without explicitly choosing deleteFile
-        instance.removeMediaByName("permanently-deleted-by-name.png");
+        instance.removeMediaByName(1L, 2L, "permanently-deleted-by-name.png");
 
         // then: the setting is honored and the file is actually removed
         // from disk
         Asserts.assertFalse(mediaFilePath.exists());
         verify(settingService).isAllowPermanentlyDeleteMedia();
-        verify(mediaService).removeMedia("permanently-deleted-by-name.png");
+        verify(mediaService).removeMedia(1L, 2L, "permanently-deleted-by-name.png");
         verify(mediaService).removeMediaPermanently(908L);
         verify(fileSystemManager).getMediaFilePath(
             MediaType.IMAGE.getFolder(),
@@ -2855,16 +2947,16 @@ public class MediaControllerServiceTest {
 
         when(settingService.isAllowPermanentlyDeleteMedia())
             .thenReturn(false);
-        when(mediaService.removeMedia("kept-by-name.png"))
+        when(mediaService.removeMedia(1L, 2L, "kept-by-name.png"))
             .thenReturn(removedMedia);
 
         // when
-        instance.removeMediaByName("kept-by-name.png");
+        instance.removeMediaByName(1L, 2L, "kept-by-name.png");
 
         // then: the media is only soft-removed, the file must not be
         // touched at all
         verify(settingService).isAllowPermanentlyDeleteMedia();
-        verify(mediaService).removeMedia("kept-by-name.png");
+        verify(mediaService).removeMedia(1L, 2L, "kept-by-name.png");
         verify(eventHandlerManager).handleEvent(any(MediaRemovedEvent.class));
     }
 
@@ -2876,6 +2968,14 @@ public class MediaControllerServiceTest {
         MediaUpDownloader mediaUpDownloader = mock(MediaUpDownloader.class);
         @SuppressWarnings("unchecked")
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(903L)
+            .name("downloaded.png")
+            .type(MediaType.IMAGE)
+            .publicMedia(false)
+            .build();
+        when(mediaService.getMediaByName(1L, 2L, "downloaded.png"))
+            .thenReturn(media);
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
@@ -2884,6 +2984,8 @@ public class MediaControllerServiceTest {
         // when
         instance.getMediaByName(
             requestArguments,
+            1L,
+            2L,
             "downloaded.png",
             true,
             validMediaCondition
@@ -2892,14 +2994,27 @@ public class MediaControllerServiceTest {
         // then
         ArgumentCaptor<MediaDownloadArguments> argumentsCaptor =
             ArgumentCaptor.forClass(MediaDownloadArguments.class);
+        ArgumentCaptor<ValidateMediaOwnerEvent> eventCaptor =
+            ArgumentCaptor.forClass(ValidateMediaOwnerEvent.class);
+        verify(mediaValidator).validateMediaName("downloaded.png");
+        verify(mediaService).getMediaByName(1L, 2L, "downloaded.png");
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(903L);
+        verify(eventHandlerManager).handleEvent(eventCaptor.capture());
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(mediaUpDownloader).isDownloadSupported();
         verify(mediaUpDownloader).download(argumentsCaptor.capture());
 
+        ValidateMediaOwnerEvent event = eventCaptor.getValue();
+        Asserts.assertEquals(event.getByAdminId(), 1L);
+        Asserts.assertEquals(event.getByUserId(), 2L);
+        Asserts.assertEquals(event.getMedia(), media);
+
         MediaDownloadArguments arguments = argumentsCaptor.getValue();
         Asserts.assertEquals(arguments.getRequestArguments(), requestArguments);
-        Asserts.assertEquals(arguments.getName(), "downloaded.png");
+        Asserts.assertEquals(arguments.getByAdminId(), 1L);
+        Asserts.assertEquals(arguments.getByUserId(), 2L);
+        Asserts.assertEquals(arguments.getMedia(), media);
         Asserts.assertTrue(arguments.isExposePrivateMedia());
         Asserts.assertEquals(arguments.getValidMediaCondition(), validMediaCondition);
 
@@ -2908,6 +3023,43 @@ public class MediaControllerServiceTest {
             mediaUpDownloader,
             validMediaCondition
         );
+    }
+
+    @Test
+    public void getMediaByNameWhenNotAccessibleShouldNotDownloadTest() {
+        // given
+        RequestArguments requestArguments = mock(RequestArguments.class);
+        @SuppressWarnings("unchecked")
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(906L)
+            .name("private.png")
+            .type(MediaType.IMAGE)
+            .ownerUserId(3L)
+            .publicMedia(false)
+            .build();
+        when(mediaService.getMediaByName(0L, 2L, "private.png"))
+            .thenReturn(media);
+        when(validMediaCondition.test(media)).thenReturn(false);
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            instance.getMediaByName(
+                requestArguments,
+                0L,
+                2L,
+                "private.png",
+                false,
+                validMediaCondition
+            )
+        );
+
+        // then
+        Asserts.assertEqualsType(e, MediaNotFoundException.class);
+        verify(mediaValidator).validateMediaName("private.png");
+        verify(mediaService).getMediaByName(0L, 2L, "private.png");
+        verify(validMediaCondition).test(media);
+        verifyNoMoreInteractions(requestArguments, validMediaCondition);
     }
 
     @SuppressWarnings("unchecked")
@@ -2939,7 +3091,8 @@ public class MediaControllerServiceTest {
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
         when(mediaUpDownloader.isDownloadSupported()).thenReturn(false);
-        when(mediaService.getMediaByName("private-video.mp4")).thenReturn(media);
+        when(mediaService.getMediaByName(1L, 2L, "private-video.mp4"))
+            .thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(true);
         when(
             fileSystemManager.getMediaFilePath(
@@ -2979,6 +3132,8 @@ public class MediaControllerServiceTest {
         // when
         instance.getMediaByName(
             requestArguments,
+            1L,
+            2L,
             "private-video.mp4",
             false,
             validMediaCondition
@@ -2992,7 +3147,7 @@ public class MediaControllerServiceTest {
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
         verify(mediaUpDownloader).isDownloadSupported();
         verify(mediaValidator).validateMediaName("private-video.mp4");
-        verify(mediaService).getMediaByName("private-video.mp4");
+        verify(mediaService).getMediaByName(1L, 2L, "private-video.mp4");
         verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
         verify(validMediaCondition).test(media);
         verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
@@ -3015,6 +3170,8 @@ public class MediaControllerServiceTest {
         verify(asyncContext).complete();
 
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), media);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 1L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 2L);
         Asserts.assertEquals(
             outputStream.asString(),
             "video-content"
@@ -3032,7 +3189,7 @@ public class MediaControllerServiceTest {
             asyncContext
         );
         inOrder.verify(mediaValidator).validateMediaName("private-video.mp4");
-        inOrder.verify(mediaService).getMediaByName("private-video.mp4");
+        inOrder.verify(mediaService).getMediaByName(1L, 2L, "private-video.mp4");
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
         inOrder.verify(eventHandlerManager, times(2)).handleEvent(any(MediaDownloadEvent.class));
@@ -3063,12 +3220,11 @@ public class MediaControllerServiceTest {
     @Test
     public void isAccessibleMediaWhenMediaNullTest() {
         // given
-        RequestArguments requestArguments = mock(RequestArguments.class);
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
 
         // when
         boolean actual = instance.isAccessibleMedia(
-            requestArguments,
+            0L,
             1L,
             null,
             true,
@@ -3077,14 +3233,13 @@ public class MediaControllerServiceTest {
 
         // then
         Asserts.assertFalse(actual);
-        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+        verifyNoMoreInteractions(mediaService, validMediaCondition);
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void isAccessibleMediaWhenPrivateNotExposedAndConditionFailsTest() {
         // given
-        RequestArguments requestArguments = mock(RequestArguments.class);
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
         MediaModel media = MediaModel.builder()
             .id(950L)
@@ -3094,7 +3249,7 @@ public class MediaControllerServiceTest {
 
         // when
         boolean actual = instance.isAccessibleMedia(
-            requestArguments,
+            0L,
             1L,
             media,
             false,
@@ -3105,14 +3260,13 @@ public class MediaControllerServiceTest {
         Asserts.assertFalse(actual);
         verify(validMediaCondition).test(media);
         verify(mediaService, never()).isAccessToOwnerOnlyByMediaId(media.getId());
-        verifyNoMoreInteractions(mediaService, requestArguments);
+        verifyNoMoreInteractions(mediaService);
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void isAccessibleMediaWhenNotAccessToOwnerOnlyTest() {
         // given
-        RequestArguments requestArguments = mock(RequestArguments.class);
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
         MediaModel media = MediaModel.builder()
             .id(951L)
@@ -3124,7 +3278,7 @@ public class MediaControllerServiceTest {
 
         // when
         boolean actual = instance.isAccessibleMedia(
-            requestArguments,
+            0L,
             999L,
             media,
             false,
@@ -3134,15 +3288,13 @@ public class MediaControllerServiceTest {
         // then
         Asserts.assertTrue(actual);
         verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
-        verify(requestArguments, never()).getArgument(AdminId.class);
-        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+        verifyNoMoreInteractions(mediaService, validMediaCondition);
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void isAccessibleMediaWhenAccessToOwnerOnlyAndUserIsOwnerTest() {
         // given
-        RequestArguments requestArguments = mock(RequestArguments.class);
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
         MediaModel media = MediaModel.builder()
             .id(952L)
@@ -3155,7 +3307,7 @@ public class MediaControllerServiceTest {
 
         // when
         boolean actual = instance.isAccessibleMedia(
-            requestArguments,
+            0L,
             200L,
             media,
             false,
@@ -3165,15 +3317,13 @@ public class MediaControllerServiceTest {
         // then
         Asserts.assertTrue(actual);
         verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
-        verify(requestArguments, never()).getArgument(AdminId.class);
-        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+        verifyNoMoreInteractions(mediaService, validMediaCondition);
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void isAccessibleMediaWhenAccessToOwnerOnlyAndAdminIsOwnerTest() {
         // given
-        RequestArguments requestArguments = mock(RequestArguments.class);
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
         MediaModel media = MediaModel.builder()
             .id(953L)
@@ -3183,12 +3333,11 @@ public class MediaControllerServiceTest {
             .build();
         when(mediaService.isAccessToOwnerOnlyByMediaId(media.getId()))
             .thenReturn(true);
-        when(requestArguments.getArgument(AdminId.class)).thenReturn(300L);
 
         // when
         boolean actual = instance.isAccessibleMedia(
-            requestArguments,
-            null,
+            300L,
+            0L,
             media,
             false,
             validMediaCondition
@@ -3197,15 +3346,13 @@ public class MediaControllerServiceTest {
         // then
         Asserts.assertTrue(actual);
         verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
-        verify(requestArguments).getArgument(AdminId.class);
-        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+        verifyNoMoreInteractions(mediaService, validMediaCondition);
     }
 
     @SuppressWarnings("unchecked")
     @Test
     public void isAccessibleMediaWhenAccessToOwnerOnlyAndNeitherUserNorAdminIsOwnerTest() {
         // given
-        RequestArguments requestArguments = mock(RequestArguments.class);
         Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
         MediaModel media = MediaModel.builder()
             .id(954L)
@@ -3215,11 +3362,10 @@ public class MediaControllerServiceTest {
             .build();
         when(mediaService.isAccessToOwnerOnlyByMediaId(media.getId()))
             .thenReturn(true);
-        when(requestArguments.getArgument(AdminId.class)).thenReturn(999L);
 
         // when
         boolean actual = instance.isAccessibleMedia(
-            requestArguments,
+            999L,
             888L,
             media,
             false,
@@ -3229,8 +3375,34 @@ public class MediaControllerServiceTest {
         // then
         Asserts.assertFalse(actual);
         verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
-        verify(requestArguments).getArgument(AdminId.class);
-        verifyNoMoreInteractions(mediaService, validMediaCondition, requestArguments);
+        verifyNoMoreInteractions(mediaService, validMediaCondition);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    public void isAccessibleMediaWhenAccessToOwnerOnlyAndAnonymousTest() {
+        // given
+        Predicate<MediaModel> validMediaCondition = mock(Predicate.class);
+        MediaModel media = MediaModel.builder()
+            .id(955L)
+            .publicMedia(true)
+            .build();
+        when(mediaService.isAccessToOwnerOnlyByMediaId(media.getId()))
+            .thenReturn(true);
+
+        // when
+        boolean actual = instance.isAccessibleMedia(
+            0L,
+            0L,
+            media,
+            false,
+            validMediaCondition
+        );
+
+        // then
+        Asserts.assertFalse(actual);
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+        verifyNoMoreInteractions(mediaService, validMediaCondition);
     }
 
     @Test
@@ -3262,7 +3434,7 @@ public class MediaControllerServiceTest {
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
-        when(mediaUpDownloader.getMediaDetails(null, media)).thenReturn(null);
+        when(mediaUpDownloader.getMediaDetails(1L, 2L, media)).thenReturn(null);
         when(eventHandlerManager.handleEvent(any(GetMediaDetailsEvent.class)))
             .thenReturn(null);
         when(mediaService.getMediaFileLengthOrNegative(
@@ -3274,6 +3446,8 @@ public class MediaControllerServiceTest {
 
         // when
         MediaDetailsModel actual = instance.getMediaDetailsById(
+            1L,
+            2L,
             905L,
             validMediaCondition
         );
@@ -3283,7 +3457,7 @@ public class MediaControllerServiceTest {
         verify(validMediaCondition).test(media);
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        verify(mediaUpDownloader).getMediaDetails(null, media);
+        verify(mediaUpDownloader).getMediaDetails(1L, 2L, media);
         verify(eventHandlerManager, times(2)).handleEvent(any());
         verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.VIDEO,
@@ -3328,7 +3502,7 @@ public class MediaControllerServiceTest {
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(settingService).getMediaUpDownloaderName();
         inOrder.verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        inOrder.verify(mediaUpDownloader).getMediaDetails(null, media);
+        inOrder.verify(mediaUpDownloader).getMediaDetails(1L, 2L, media);
         inOrder.verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
         inOrder.verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.VIDEO,
@@ -3365,12 +3539,13 @@ public class MediaControllerServiceTest {
             .createdAt(300L)
             .updatedAt(400L)
             .build();
-        when(mediaService.getMediaByName("audio-detail.mp3")).thenReturn(media);
+        when(mediaService.getMediaByName(1L, 2L, "audio-detail.mp3"))
+            .thenReturn(media);
         when(validMediaCondition.test(media)).thenReturn(true);
         when(settingService.getMediaUpDownloaderName()).thenReturn("cloud");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("cloud"))
             .thenReturn(mediaUpDownloader);
-        when(mediaUpDownloader.getMediaDetails(null, media)).thenReturn(null);
+        when(mediaUpDownloader.getMediaDetails(1L, 2L, media)).thenReturn(null);
         when(eventHandlerManager.handleEvent(any(GetMediaDetailsEvent.class)))
             .thenReturn(null);
         when(mediaService.getMediaFileLengthOrNegative(
@@ -3380,16 +3555,18 @@ public class MediaControllerServiceTest {
 
         // when
         MediaDetailsModel actual = instance.getMediaDetailsByName(
+            1L,
+            2L,
             "audio-detail.mp3",
             validMediaCondition
         );
 
         // then
-        verify(mediaService).getMediaByName("audio-detail.mp3");
+        verify(mediaService).getMediaByName(1L, 2L, "audio-detail.mp3");
         verify(validMediaCondition).test(media);
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        verify(mediaUpDownloader).getMediaDetails(null, media);
+        verify(mediaUpDownloader).getMediaDetails(1L, 2L, media);
         verify(eventHandlerManager, times(2)).handleEvent(any());
         verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.AUDIO,
@@ -3427,11 +3604,11 @@ public class MediaControllerServiceTest {
             mediaUpDownloader,
             eventHandlerManager
         );
-        inOrder.verify(mediaService).getMediaByName("audio-detail.mp3");
+        inOrder.verify(mediaService).getMediaByName(1L, 2L, "audio-detail.mp3");
         inOrder.verify(validMediaCondition).test(media);
         inOrder.verify(settingService).getMediaUpDownloaderName();
         inOrder.verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("cloud");
-        inOrder.verify(mediaUpDownloader).getMediaDetails(null, media);
+        inOrder.verify(mediaUpDownloader).getMediaDetails(1L, 2L, media);
         inOrder.verify(eventHandlerManager).handleEvent(any(GetMediaDetailsEvent.class));
         inOrder.verify(mediaService).getMediaFileLengthOrNegative(
             MediaType.AUDIO,
@@ -3872,6 +4049,8 @@ public class MediaControllerServiceTest {
 
         Asserts.assertEquals(actual, media);
         Asserts.assertEquals(eventCaptor.getValue().getMedia(), media);
+        Asserts.assertEquals(eventCaptor.getValue().getByAdminId(), 111L);
+        Asserts.assertEquals(eventCaptor.getValue().getByUserId(), 222L);
         Asserts.assertEquals(request.getOriginalName(), null);
 
         InOrder inOrder = inOrder(
