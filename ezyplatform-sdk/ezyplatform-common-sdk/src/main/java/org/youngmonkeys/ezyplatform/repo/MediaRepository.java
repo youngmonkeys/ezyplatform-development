@@ -31,9 +31,9 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
-import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MEDIA_NAME_RESULT_FIELDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.MEDIA_TITLE_RESULT_FIELDS;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.META_KEY_SLUG;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_MEDIA;
 
 public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
@@ -53,10 +53,35 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
 
     @EzyQuery(
         "SELECT e.id FROM Media e " +
-            "WHERE e.name = ?0 OR e.originalName = ?0"
+            "WHERE e.name = ?0 " +
+            "OR e.originalName = ?0"
     )
     IdResult findIdByNameOrOriginalName(
         String name
+    );
+
+    @EzyQuery(
+        "SELECT e.id FROM Media e " +
+            "WHERE (e.name = ?0 " +
+            "OR e.originalName = ?0) " +
+            "AND e.ownerAdminId = ?1 " +
+            "ORDER BY e.id ASC"
+    )
+    IdResult findIdByNameOrOriginalNameAndOwnerAdminIdOrderByIdAsc(
+        String name,
+        long ownerAdminId
+    );
+
+    @EzyQuery(
+        "SELECT e.id FROM Media e " +
+            "WHERE (e.name = ?0 " +
+            "OR e.originalName = ?0) " +
+            "AND e.ownerUserId = ?1 " +
+            "ORDER BY e.id ASC"
+    )
+    IdResult findIdByNameOrOriginalNameAndOwnerUserIdOrderByIdAsc(
+        String name,
+        long ownerAdminId
     );
 
     @EzyQuery(
@@ -83,11 +108,14 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
         Collection<Long> mediaIds
     );
 
+    Media findByName(String name);
+
     @EzyQuery(
         "SELECT e FROM Media e " +
-            "WHERE e.name = ?0 OR e.originalName = ?0"
+            "WHERE e.originalName = ?0 " +
+            "ORDER BY e.id ASC"
     )
-    Media findByNameOrOriginalName(
+    Media findByOriginalNameOrderByIdAsc(
         String name
     );
 
@@ -103,6 +131,28 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
     );
 
     @EzyQuery(
+        "SELECT e FROM Media e " +
+            "WHERE e.originalName = ?0 " +
+            "AND e.ownerAdminId = ?1 " +
+            "ORDER BY e.id DESC"
+    )
+    Media findByOriginalNameAndOwnerAdminIdOrderByIdDesc(
+        String name,
+        long ownerAdminId
+    );
+
+    @EzyQuery(
+        "SELECT e FROM Media e " +
+            "WHERE e.originalName = ?0 " +
+            "AND e.ownerUserId = ?1 " +
+            "ORDER BY e.id DESC"
+    )
+    Media findByOriginalNameAndOwnerUserIdOrderByIdDesc(
+        String name,
+        long ownerUserId
+    );
+
+    @EzyQuery(
         "SELECT e.ownerAdminId FROM Media e " +
             "WHERE e.id = ?0"
     )
@@ -112,7 +162,8 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
 
     @EzyQuery(
         "SELECT e.ownerAdminId FROM Media e " +
-            "WHERE e.name = ?0 OR e.originalName = ?0"
+            "WHERE e.name = ?0 " +
+            "OR e.originalName = ?0"
     )
     IdResult findOwnerAdminIdByNameOrOriginalName(
         String mediaName
@@ -128,7 +179,8 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
 
     @EzyQuery(
         "SELECT e.ownerUserId FROM Media e " +
-            "WHERE e.name = ?0 OR e.originalName = ?0"
+            "WHERE e.name = ?0 " +
+            "OR e.originalName = ?0"
     )
     IdResult findOwnerUserIdByNameOrOriginalName(
         String mediaName

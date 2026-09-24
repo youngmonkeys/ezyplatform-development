@@ -25,6 +25,7 @@ import org.youngmonkeys.ezyplatform.model.MediaModel;
 @AllArgsConstructor
 public class MediaDownloadEvent {
     private RequestArguments requestArguments;
-    private Long userId;
+    private long byAdminId;
+    private long byUserId;
     private MediaModel media;
 }

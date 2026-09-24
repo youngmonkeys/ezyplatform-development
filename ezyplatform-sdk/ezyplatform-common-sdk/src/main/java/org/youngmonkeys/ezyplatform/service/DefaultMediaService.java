@@ -30,8 +30,8 @@ import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.io.ImageProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.model.AddMediaModel;
-import org.youngmonkeys.ezyplatform.model.MediaNameModel;
 import org.youngmonkeys.ezyplatform.model.MediaModel;
+import org.youngmonkeys.ezyplatform.model.MediaNameModel;
 import org.youngmonkeys.ezyplatform.model.MediaTitleModel;
 import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
@@ -100,18 +100,14 @@ public class DefaultMediaService implements MediaService {
 
     @Override
     public MediaModel updateMedia(
+        long byAdminId,
+        long byUserId,
+        long mediaId,
         UpdateMediaModel model
     ) {
-        long mediaId = model.getMediaId();
-        String mediaName = model.getMediaName();
-        Media entity = model.getMediaId() > ZERO_LONG
-            ? mediaRepository.findById(mediaId)
-            : mediaRepository.findByNameOrOriginalName(mediaName);
+        Media entity = mediaRepository.findById(mediaId);
         if (entity == null) {
-            throw new MediaNotFoundException(
-                mediaId,
-                mediaName
-            );
+            throw new MediaNotFoundException(mediaId);
         }
         modelToEntityConverter.mergeToEntity(model, entity);
         mediaRepository.save(entity);
@@ -309,8 +305,16 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public MediaModel removeMedia(String mediaName) {
-        Media entity = getMediaEntityByNameOrThrow(mediaName);
+    public MediaModel removeMedia(
+        long byAdminId,
+        long byUserId,
+        String mediaName
+    ) {
+        Media entity = getMediaEntityByNameOrThrow(
+            byAdminId,
+            byUserId,
+            mediaName
+        );
         removeMediaEntity(entity);
         return entityToModelConverter.toModel(entity);
     }
@@ -427,13 +431,18 @@ public class DefaultMediaService implements MediaService {
     }
 
     @Override
-    public MediaModel getMediaByName(String mediaName) {
-        Media entity = mediaRepository
-            .findByNameOrOriginalName(mediaName);
-        if (entity == null) {
-            entity = mediaRepository.findBySlug(mediaName);
-        }
-        return entityToModelConverter.toModel(entity);
+    public MediaModel getMediaByName(
+        long byAdminId,
+        long byUserId,
+        String mediaName
+    ) {
+        return entityToModelConverter.toModel(
+            getMediaEntityByName(
+                byAdminId,
+                byUserId,
+                mediaName
+            )
+        );
     }
 
     @Override
@@ -442,6 +451,32 @@ public class DefaultMediaService implements MediaService {
     ) {
         IdResult result = mediaRepository
             .findIdByNameOrOriginalName(mediaName);
+        return result != null ? result.getId() : ZERO_LONG;
+    }
+
+    @Override
+    public long getMediaIdByNameOrOriginalNameAndOwnerAdminId(
+        String mediaName,
+        long ownerAdminId
+    ) {
+        IdResult result = mediaRepository
+            .findIdByNameOrOriginalNameAndOwnerAdminIdOrderByIdAsc(
+                mediaName,
+                ownerAdminId
+            );
+        return result != null ? result.getId() : ZERO_LONG;
+    }
+
+    @Override
+    public long getMediaIdByNameOrOriginalNameAndOwnerUserId(
+        String mediaName,
+        long ownerUserId
+    ) {
+        IdResult result = mediaRepository
+            .findIdByNameOrOriginalNameAndOwnerUserIdOrderByIdAsc(
+                mediaName,
+                ownerUserId
+            );
         return result != null ? result.getId() : ZERO_LONG;
     }
 
@@ -677,11 +712,46 @@ public class DefaultMediaService implements MediaService {
         return entity;
     }
 
-    protected Media getMediaEntityByNameOrThrow(
+    protected Media getMediaEntityByName(
+        long byAdminId,
+        long byUserId,
         String mediaName
     ) {
-        Media entity = mediaRepository
-            .findByNameOrOriginalName(mediaName);
+        Media entity = mediaRepository.findByName(mediaName);
+        if (entity == null) {
+            entity = mediaRepository.findBySlug(mediaName);
+        }
+        if (entity == null && byAdminId > ZERO_LONG) {
+            entity = mediaRepository
+                .findByOriginalNameAndOwnerAdminIdOrderByIdDesc(
+                    mediaName,
+                    byAdminId
+                );
+        }
+        if (entity == null && byUserId > ZERO_LONG) {
+            entity = mediaRepository
+                .findByOriginalNameAndOwnerUserIdOrderByIdDesc(
+                    mediaName,
+                    byUserId
+                );
+        }
+        if (entity == null) {
+            entity = mediaRepository
+                .findByOriginalNameOrderByIdAsc(mediaName);
+        }
+        return entity;
+    }
+
+    protected Media getMediaEntityByNameOrThrow(
+        long byAdminId,
+        long byUserId,
+        String mediaName
+    ) {
+        Media entity = getMediaEntityByName(
+            byAdminId,
+            byUserId,
+            mediaName
+        );
         if (entity == null) {
             throw new MediaNotFoundException(mediaName);
         }

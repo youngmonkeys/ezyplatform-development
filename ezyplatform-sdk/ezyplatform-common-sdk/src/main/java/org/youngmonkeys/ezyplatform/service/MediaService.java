@@ -61,6 +61,9 @@ public interface MediaService {
     );
 
     MediaModel updateMedia(
+        long byAdminId,
+        long byUserId,
+        long mediaId,
         UpdateMediaModel model
     );
 
@@ -141,7 +144,11 @@ public interface MediaService {
 
     MediaModel removeMedia(long mediaId);
 
-    MediaModel removeMedia(String mediaName);
+    MediaModel removeMedia(
+        long byAdminId,
+        long byUserId,
+        String mediaName
+    );
 
     void removeMediaPermanently(long mediaId);
 
@@ -159,10 +166,24 @@ public interface MediaService {
         );
     }
 
-    MediaModel getMediaByName(String mediaName);
+    MediaModel getMediaByName(
+        long byAdminId,
+        long byUserId,
+        String mediaName
+    );
 
     long getMediaIdByNameOrOriginalName(
         String mediaName
+    );
+
+    long getMediaIdByNameOrOriginalNameAndOwnerAdminId(
+        String mediaName,
+        long ownerAdminId
+    );
+
+    long getMediaIdByNameOrOriginalNameAndOwnerUserId(
+        String mediaName,
+        long ownerUserId
     );
 
     boolean containsMedia(long mediaId);

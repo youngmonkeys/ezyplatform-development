@@ -51,6 +51,8 @@ public interface MediaUpDownloader {
     }
 
     default MediaFileSizeReductionResult reduceMediaFileSize(
+        long byAdminId,
+        long byUserId,
         MediaFileSizeReductionArguments arguments
     ) {
         return MediaFileSizeReductionResult.NO;
@@ -61,7 +63,8 @@ public interface MediaUpDownloader {
     }
 
     default MediaDetailsModel getMediaDetails(
-        Long userId,
+        long byAdminId,
+        long byUserId,
         MediaModel media
     ) {
         return null;
