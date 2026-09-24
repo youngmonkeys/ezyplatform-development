@@ -24,6 +24,8 @@ import org.youngmonkeys.ezyplatform.model.MediaModel;
 @Getter
 @Builder
 public class MediaUploadEvent {
+    private long byAdminId;
+    private long byUserId;
     private String uploadFrom;
     private long ownerAdminId;
     private long ownerUserId;

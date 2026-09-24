@@ -39,6 +39,8 @@ public class MediaUploadArguments {
     private long mediaId;
     private long ownerAdminId;
     private long ownerUserId;
+    private long byAdminId;
+    private long byUserId;
     private boolean avatar;
     private boolean notPublic;
 }

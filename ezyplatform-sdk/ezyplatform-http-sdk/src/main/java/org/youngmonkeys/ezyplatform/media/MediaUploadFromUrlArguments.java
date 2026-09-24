@@ -34,5 +34,7 @@ public class MediaUploadFromUrlArguments {
     private String mediaUrl;
     private long ownerAdminId;
     private long ownerUserId;
+    private long byAdminId;
+    private long byUserId;
     private boolean notPublic;
 }

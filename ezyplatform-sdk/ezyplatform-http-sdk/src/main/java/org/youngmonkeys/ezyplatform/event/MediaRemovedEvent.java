@@ -23,5 +23,7 @@ import org.youngmonkeys.ezyplatform.model.MediaModel;
 @Getter
 @AllArgsConstructor
 public class MediaRemovedEvent {
+    private long byAdminId;
+    private long byUserId;
     private MediaModel media;
 }
