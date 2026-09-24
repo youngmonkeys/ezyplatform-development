@@ -81,7 +81,7 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
     )
     IdResult findIdByNameOrOriginalNameAndOwnerUserIdOrderByIdAsc(
         String name,
-        long ownerAdminId
+        long ownerUserId
     );
 
     @EzyQuery(
@@ -134,9 +134,9 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
         "SELECT e FROM Media e " +
             "WHERE e.originalName = ?0 " +
             "AND e.ownerAdminId = ?1 " +
-            "ORDER BY e.id DESC"
+            "ORDER BY e.id ASC"
     )
-    Media findByOriginalNameAndOwnerAdminIdOrderByIdDesc(
+    Media findByOriginalNameAndOwnerAdminIdOrderByIdAsc(
         String name,
         long ownerAdminId
     );
@@ -145,9 +145,9 @@ public interface MediaRepository extends EzyDatabaseRepository<Long, Media> {
         "SELECT e FROM Media e " +
             "WHERE e.originalName = ?0 " +
             "AND e.ownerUserId = ?1 " +
-            "ORDER BY e.id DESC"
+            "ORDER BY e.id ASC"
     )
-    Media findByOriginalNameAndOwnerUserIdOrderByIdDesc(
+    Media findByOriginalNameAndOwnerUserIdOrderByIdAsc(
         String name,
         long ownerUserId
     );

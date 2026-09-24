@@ -914,8 +914,6 @@ public class MediaControllerService extends EzyLoggable {
     }
 
     public void updateMedia(
-        long byAdminId,
-        long byUserId,
         long mediaId,
         UpdateMediaRequest request,
         Predicate<MediaModel> validMediaCondition
@@ -927,10 +925,8 @@ public class MediaControllerService extends EzyLoggable {
         }
         request.setFileSize(getMediaFileSize(media));
         UpdateMediaModel model = requestToModelConverter
-            .toModel(mediaId, request);
+            .toModel(request);
         MediaModel updatedMedia = mediaService.updateMedia(
-            byAdminId,
-            byUserId,
             mediaId,
             model
         );
@@ -940,8 +936,6 @@ public class MediaControllerService extends EzyLoggable {
     }
 
     public void updateMedia(
-        long byAdminId,
-        long byUserId,
         long mediaId,
         UpdateMediaIncludeUrlRequest request,
         Predicate<MediaModel> validMediaCondition
@@ -953,10 +947,8 @@ public class MediaControllerService extends EzyLoggable {
         }
         request.setFileSize(getMediaFileSize(media));
         UpdateMediaModel model = requestToModelConverter
-            .toModel(mediaId, request);
+            .toModel(request);
         MediaModel updatedMedia = mediaService.updateMedia(
-            byAdminId,
-            byUserId,
             mediaId,
             model
         );
@@ -984,10 +976,9 @@ public class MediaControllerService extends EzyLoggable {
         }
         request.setFileSize(getMediaFileSize(media));
         UpdateMediaModel model = requestToModelConverter
-            .toModel(mediaName, request);
+            .toModel(request);
         MediaModel updatedMedia = mediaService.updateMedia(
-            byAdminId,
-            byUserId,
+            media.getId(),
             model
         );
         eventHandlerManager.handleEvent(

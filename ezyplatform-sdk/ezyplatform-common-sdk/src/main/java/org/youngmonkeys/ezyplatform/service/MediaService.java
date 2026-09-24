@@ -42,6 +42,7 @@ import java.util.stream.Collectors;
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @SuppressWarnings("MethodCount")
 public interface MediaService {
@@ -61,8 +62,6 @@ public interface MediaService {
     );
 
     MediaModel updateMedia(
-        long byAdminId,
-        long byUserId,
         long mediaId,
         UpdateMediaModel model
     );
@@ -163,6 +162,14 @@ public interface MediaService {
     ) {
         return SimpleMediaModel.fromMediaModel(
             getMediaById(mediaId)
+        );
+    }
+
+    default MediaModel getMediaByName(String mediaName) {
+        return getMediaByName(
+            ZERO_LONG,
+            ZERO_LONG,
+            mediaName
         );
     }
 

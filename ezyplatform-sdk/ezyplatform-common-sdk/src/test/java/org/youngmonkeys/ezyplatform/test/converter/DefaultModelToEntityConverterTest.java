@@ -29,6 +29,7 @@ import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
 import org.youngmonkeys.ezyplatform.model.AddLetterModel;
 import org.youngmonkeys.ezyplatform.model.AddNotificationModel;
+import org.youngmonkeys.ezyplatform.model.ReplaceMediaModel;
 import org.youngmonkeys.ezyplatform.model.UpdateMediaModel;
 import org.youngmonkeys.ezyplatform.time.ClockProxy;
 
@@ -106,6 +107,55 @@ public class DefaultModelToEntityConverterTest {
         // then
         Asserts.assertEquals(entity.getOriginalName(), "new-name.png");
         Asserts.assertEquals(entity.getUpdatedAt(), now);
+        verify(clock, times(1)).nowDateTime();
+    }
+
+    @Test
+    public void mergeReplaceMediaModelToEntityWithoutOriginalFileName() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        Media entity = new Media();
+        entity.setOriginalName("logo.png");
+        ReplaceMediaModel model = ReplaceMediaModel.builder()
+            .mediaId(1L)
+            .fileName("new-file.png")
+            .mediaType("IMAGE")
+            .mimeType("image/png")
+            .fileSize(100L)
+            .build();
+        when(clock.nowDateTime()).thenReturn(now);
+
+        // when
+        sut.mergeToEntity(model, entity);
+
+        // then
+        Asserts.assertEquals(entity.getName(), "new-file.png");
+        Asserts.assertEquals(entity.getOriginalName(), "logo.png");
+        Asserts.assertEquals(entity.getType(), "IMAGE");
+        Asserts.assertEquals(entity.getMimeType(), "image/png");
+        Asserts.assertEquals(entity.getFileSize(), 100L);
+        Asserts.assertEquals(entity.getUpdatedAt(), now);
+        verify(clock, times(1)).nowDateTime();
+    }
+
+    @Test
+    public void mergeReplaceMediaModelToEntityWithOriginalFileName() {
+        // given
+        LocalDateTime now = LocalDateTime.now();
+        Media entity = new Media();
+        entity.setOriginalName("logo.png");
+        ReplaceMediaModel model = ReplaceMediaModel.builder()
+            .mediaId(1L)
+            .fileName("new-file.png")
+            .originalFileName("banner.png")
+            .build();
+        when(clock.nowDateTime()).thenReturn(now);
+
+        // when
+        sut.mergeToEntity(model, entity);
+
+        // then
+        Asserts.assertEquals(entity.getOriginalName(), "banner.png");
         verify(clock, times(1)).nowDateTime();
     }
 

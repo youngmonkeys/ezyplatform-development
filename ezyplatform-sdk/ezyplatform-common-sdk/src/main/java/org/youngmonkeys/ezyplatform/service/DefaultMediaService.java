@@ -100,8 +100,6 @@ public class DefaultMediaService implements MediaService {
 
     @Override
     public MediaModel updateMedia(
-        long byAdminId,
-        long byUserId,
         long mediaId,
         UpdateMediaModel model
     ) {
@@ -723,14 +721,14 @@ public class DefaultMediaService implements MediaService {
         }
         if (entity == null && byAdminId > ZERO_LONG) {
             entity = mediaRepository
-                .findByOriginalNameAndOwnerAdminIdOrderByIdDesc(
+                .findByOriginalNameAndOwnerAdminIdOrderByIdAsc(
                     mediaName,
                     byAdminId
                 );
         }
         if (entity == null && byUserId > ZERO_LONG) {
             entity = mediaRepository
-                .findByOriginalNameAndOwnerUserIdOrderByIdDesc(
+                .findByOriginalNameAndOwnerUserIdOrderByIdAsc(
                     mediaName,
                     byUserId
                 );

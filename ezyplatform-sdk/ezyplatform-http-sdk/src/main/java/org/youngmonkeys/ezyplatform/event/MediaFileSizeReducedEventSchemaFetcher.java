@@ -41,6 +41,18 @@ public class MediaFileSizeReducedEventSchemaFetcher
                     .fields(
                         Arrays.asList(
                             EventSchema.DataSchema.builder()
+                                .dataType(Long.class)
+                                .name("byAdminId")
+                                .description("The admin reducing the media file size, 0 if none.")
+                                .example("1")
+                                .build(),
+                            EventSchema.DataSchema.builder()
+                                .dataType(Long.class)
+                                .name("byUserId")
+                                .description("The user reducing the media file size, 0 if none.")
+                                .example("1")
+                                .build(),
+                            EventSchema.DataSchema.builder()
                                 .dataType(MediaModel.class)
                                 .name("media")
                                 .required(true)
