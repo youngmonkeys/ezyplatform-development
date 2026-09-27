@@ -54,10 +54,12 @@ import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
 import static com.tvd12.ezyfox.util.EzyProcessor.processWithLogException;
 import static java.nio.file.Files.readAllLines;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ALLOW_SEND_STATISTICS_DATA;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FILE_ENCRYPTION_KEYS;
 import static org.youngmonkeys.ezyplatform.manager.FileSystemManager.FOLDER_SETTINGS;
 
+@SuppressWarnings("MethodCount")
 public abstract class DefaultSettingService
     extends EzyLoggable
     implements SettingService {
@@ -69,6 +71,10 @@ public abstract class DefaultSettingService
     @Setter
     @EzyProperty("server.websocket_url")
     protected String serverWebsocketUrl;
+
+    @Setter
+    @EzyProperty("server.allow_send_statistics_data")
+    protected boolean serverAllowSendStatisticsData = true;
 
     private final FileSystemManager fileSystemManager;
     private final ObjectMapper objectMapper;
@@ -507,5 +513,13 @@ public abstract class DefaultSettingService
             }
         }
         return defaultValue;
+    }
+
+    @Override
+    public boolean isAllowSendStatisticsData() {
+        return serverAllowSendStatisticsData && getBooleanValue(
+            SETTING_NAME_ALLOW_SEND_STATISTICS_DATA,
+            Boolean.TRUE
+        );
     }
 }
