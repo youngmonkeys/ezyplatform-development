@@ -799,6 +799,28 @@ public class StringsTest extends BaseTest {
     }
 
     @Test
+    public void indexOfTextInStringIgnoreCaseMixedCaseTest() {
+        // given
+        String text = "Hello World, hello WORLD";
+
+        // when
+        int index1 = indexOfTextInStringIgnoreCase(text, "hello");
+        int index2 = indexOfTextInStringIgnoreCase(text, "wOrLd");
+        int index3 = indexOfTextInStringIgnoreCase(text, "HELLO", 1);
+        int index4 = indexOfTextInStringIgnoreCase(text, "world", 7);
+        int index5 = indexOfTextInStringIgnoreCase(text, "planet");
+        int index6 = indexOfTextInStringIgnoreCase(text, "hello", 100);
+
+        // then
+        Asserts.assertEquals(index1, 0);
+        Asserts.assertEquals(index2, 6);
+        Asserts.assertEquals(index3, 13);
+        Asserts.assertEquals(index4, 19);
+        Asserts.assertEquals(index5, -1);
+        Asserts.assertEquals(index6, -1);
+    }
+
+    @Test
     public void translateEmptyCheckTernaryOperatorIfNeedTest() {
         String result1 = translateEmptyCheckTernaryOperatorIfNeed(
             null,

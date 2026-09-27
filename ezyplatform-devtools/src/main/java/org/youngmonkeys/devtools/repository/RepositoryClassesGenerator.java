@@ -31,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import static com.tvd12.ezyfox.io.EzyStrings.*;
 
@@ -96,7 +97,7 @@ public class RepositoryClassesGenerator {
         entityClassName = entityClass.getSimpleName();
         entityVariableName = entityClassName
             .substring(0, 1)
-            .toLowerCase() + entityClassName.substring(1);
+            .toLowerCase(Locale.ROOT) + entityClassName.substring(1);
         IdClass idClassAnnotation = entityClass.getDeclaredAnnotation(
             IdClass.class
         );
@@ -226,7 +227,7 @@ public class RepositoryClassesGenerator {
         );
         String packageName = basePackageName;
         if (isNotBlank(moduleType)) {
-            packageName += "." + moduleType.toLowerCase();
+            packageName += "." + moduleType.toLowerCase(Locale.ROOT);
         }
         packageName += "." + subPackageName;
         String packagePath = packageName.replace(".", "/");
@@ -265,7 +266,7 @@ public class RepositoryClassesGenerator {
             .replace("${entityClassName}", entityClassName)
             .replace("${tableName}", tableName)
             .replace("${moduleType}", moduleType)
-            .replace("${moduleTypeLowercase}", moduleType.toLowerCase())
+            .replace("${moduleTypeLowercase}", moduleType.toLowerCase(Locale.ROOT))
             .replace("${moduleName}", moduleName)
             .replace("${entityVariableName}", entityVariableName)
             .replace("${importIdClass}", importIdClass);

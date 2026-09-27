@@ -25,6 +25,7 @@ import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -192,7 +193,7 @@ public class SocketPropertiesManager extends EzyLoggable {
 
     private String normalizeFieldName(String fieldName) {
         return fieldName
-            .toLowerCase()
+            .toLowerCase(Locale.ROOT)
             .replace("-", "")
             .replace("_", "");
     }

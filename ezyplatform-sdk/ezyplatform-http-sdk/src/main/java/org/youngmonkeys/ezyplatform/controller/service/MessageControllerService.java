@@ -44,7 +44,7 @@ public class MessageControllerService {
         Map<String, String> underscoreKeyByKey = new HashMap<>();
         for (String key : keys) {
             String underscoreKey = key
-                .toLowerCase()
+                .toLowerCase(Locale.ROOT)
                 .replace(" ", "_");
             underscoreKeyByKey.put(key, underscoreKey);
         }

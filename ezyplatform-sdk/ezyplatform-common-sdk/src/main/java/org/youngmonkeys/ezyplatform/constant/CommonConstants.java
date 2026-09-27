@@ -28,6 +28,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 @SuppressWarnings("LineLength")
@@ -488,7 +489,7 @@ public final class CommonConstants {
     }
 
     public static String settingNameTargetRoleFeatures(String targetType) {
-        return targetType.toLowerCase() +
+        return targetType.toLowerCase(Locale.ROOT) +
             SETTING_NAME_TARGET_ROLE_FEATURES_SUFFIX;
     }
 }

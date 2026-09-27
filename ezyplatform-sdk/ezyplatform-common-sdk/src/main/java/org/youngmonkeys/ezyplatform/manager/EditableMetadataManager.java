@@ -70,7 +70,7 @@ public class EditableMetadataManager {
     public List<String> getMetadataTypeMessageKeys() {
         return newArrayList(
             metadataTypeByName.values(),
-            String::toLowerCase
+            it -> it.toLowerCase(Locale.ROOT)
         );
     }
 

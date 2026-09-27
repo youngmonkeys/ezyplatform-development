@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import java.util.Locale;
+
 @SuppressWarnings("AbbreviationAsWordInName")
 public final class OS {
 
@@ -25,7 +27,7 @@ public final class OS {
 
     public static OSType currentType() {
         if (currentType == null) {
-            String operSys = System.getProperty("os.name").toLowerCase();
+            String operSys = System.getProperty("os.name").toLowerCase(Locale.ROOT);
             if (operSys.contains("win")) {
                 currentType = OSType.WINDOWS;
             } else if (operSys.contains("nix") 

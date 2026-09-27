@@ -66,6 +66,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -580,7 +581,7 @@ public class SwaggerGenerator {
         if (genericsType == null) {
             genericsTypeName = "object";
         } else if (EzyTypes.NON_ARRAY_TYPES.contains(genericsType)) {
-            genericsTypeName = genericsType.getSimpleName().toLowerCase();
+            genericsTypeName = genericsType.getSimpleName().toLowerCase(Locale.ROOT);
         } else if (Collection.class.isAssignableFrom(genericsType)) {
             genericsTypeName = "array";
         } else {
@@ -1090,7 +1091,7 @@ public class SwaggerGenerator {
             .trim()
             .replaceAll("\\s+", " ");
         String lower = Arrays.stream(withSpaces.split("\\s+"))
-            .map(String::toLowerCase)
+            .map(it -> it.toLowerCase(Locale.ROOT))
             .collect(Collectors.joining(" "));
         return lower.isEmpty()
             ? lower

@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -53,7 +54,7 @@ public final class Strings {
     public static String toLowerDashCase(String str) {
         return isBlank(str)
             ? str
-            : str.replace(' ', '-').toLowerCase();
+            : str.replace(' ', '-').toLowerCase(Locale.ROOT);
     }
 
     public static String entryToString(Map.Entry<?, ?> entry) {
@@ -476,17 +477,14 @@ public final class Strings {
         String keyword,
         int startIndex
     ) {
-        int index = message.indexOf(
-            keyword,
-            startIndex
-        );
-        if (index < 0) {
-            index = message.indexOf(
-                keyword.toUpperCase(),
-                startIndex
-            );
+        int keywordLength = keyword.length();
+        int maxIndex = message.length() - keywordLength;
+        for (int i = Math.max(startIndex, 0); i <= maxIndex; ++i) {
+            if (message.regionMatches(true, i, keyword, 0, keywordLength)) {
+                return i;
+            }
         }
-        return index;
+        return -1;
     }
 
     @SuppressWarnings("MethodLength")

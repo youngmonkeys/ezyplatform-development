@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 
 import static com.tvd12.ezyfox.io.EzyStrings.*;
 
@@ -101,7 +102,7 @@ public class PaginationClassesGenerator {
         entityClassName = entityClass.getSimpleName();
         entityVariableName = entityClassName
             .substring(0, 1)
-            .toLowerCase() + entityClassName.substring(1);
+            .toLowerCase(Locale.ROOT) + entityClassName.substring(1);
         Table tableAnnotation = entityClass.getDeclaredAnnotation(
             Table.class
         );
@@ -312,7 +313,7 @@ public class PaginationClassesGenerator {
         );
         String packageName = basePackageName;
         if (isNotBlank(moduleType)) {
-            packageName += "." + moduleType.toLowerCase();
+            packageName += "." + moduleType.toLowerCase(Locale.ROOT);
         }
         packageName += "." + subPackageName;
         String packagePath = packageName.replace(".", "/");
@@ -335,7 +336,7 @@ public class PaginationClassesGenerator {
             .replace("${entityVariableName}", entityVariableName)
             .replace("${tableName}", tableName)
             .replace("${moduleType}", moduleType)
-            .replace("${moduleTypeLowercase}", moduleType.toLowerCase())
+            .replace("${moduleTypeLowercase}", moduleType.toLowerCase(Locale.ROOT))
             .replace("${moduleName}", moduleName);
         Files.write(filePath, content.getBytes(StandardCharsets.UTF_8));
     }

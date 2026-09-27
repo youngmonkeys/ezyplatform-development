@@ -101,6 +101,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Predicate;
@@ -374,7 +375,7 @@ public class MediaControllerService extends EzyLoggable {
         mediaValidator.validate(request);
         String mediaName = mediaService.generateMediaFileName(
             request.getUrl(),
-            request.getType().toString().toLowerCase()
+            request.getType().toString().toLowerCase(Locale.ROOT)
         );
         String originalName = request.getOriginalName();
         String newOriginalFileName = generateNewMediaOriginalNameIfNeed(
