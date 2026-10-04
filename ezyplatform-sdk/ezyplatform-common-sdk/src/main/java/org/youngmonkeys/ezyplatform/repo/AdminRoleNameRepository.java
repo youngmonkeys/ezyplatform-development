@@ -30,6 +30,10 @@ import java.util.Optional;
 public interface AdminRoleNameRepository
     extends EzyDatabaseRepository<Long, AdminRoleName> {
 
+    List<AdminRoleName> findByNameIn(
+        Collection<String> roleNames
+    );
+
     @EzyQuery(
         "SELECT e FROM AdminRoleName e " +
             "WHERE e.priority >= ?0 " +

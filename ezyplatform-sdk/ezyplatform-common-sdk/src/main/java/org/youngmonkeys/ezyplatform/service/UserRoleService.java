@@ -16,9 +16,12 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import org.youngmonkeys.ezyplatform.model.UserRoleNameModel;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.LIMIT_1500_RECORDS;
 
@@ -27,6 +30,11 @@ public interface UserRoleService {
     void saveUserRoleByUserIdAndRoleId(
         long userId,
         long roleId
+    );
+
+    void saveUserRolesByUserIdAndRoleNames(
+        long userId,
+        Collection<String> roleNames
     );
 
     void deleteUserRoleByUserIdAndRoleId(
@@ -43,6 +51,24 @@ public interface UserRoleService {
     Map<String, Long> getRoleIdMapByNames(
         Collection<String> roleNames
     );
+
+    Map<Long, UserRoleNameModel> getRoleMapByIds(
+        Collection<Long> roleNameIds
+    );
+
+    default Map<Long, String> getRoleNameMapByIds(
+        Collection<Long> roleNameIds
+    ) {
+        return getRoleMapByIds(roleNameIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    it -> it.getValue().getName()
+                )
+            );
+    }
 
     Set<Long> getRoleIdsByUserId(long userId);
 

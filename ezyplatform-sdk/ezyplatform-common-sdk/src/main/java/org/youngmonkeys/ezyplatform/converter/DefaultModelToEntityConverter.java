@@ -21,10 +21,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.constant.CommonConstants;
 import org.youngmonkeys.ezyplatform.entity.AdminActivityHistory;
+import org.youngmonkeys.ezyplatform.entity.AdminMeta;
+import org.youngmonkeys.ezyplatform.entity.AdminRole;
 import org.youngmonkeys.ezyplatform.entity.ContentTemplate;
 import org.youngmonkeys.ezyplatform.entity.DataI18n;
 import org.youngmonkeys.ezyplatform.entity.DataIndex;
 import org.youngmonkeys.ezyplatform.entity.DataMapping;
+import org.youngmonkeys.ezyplatform.entity.DataMeta;
 import org.youngmonkeys.ezyplatform.entity.DataRecordCount;
 import org.youngmonkeys.ezyplatform.entity.DataType;
 import org.youngmonkeys.ezyplatform.entity.Letter;
@@ -37,8 +40,6 @@ import org.youngmonkeys.ezyplatform.entity.NotificationReceiver;
 import org.youngmonkeys.ezyplatform.entity.Setting;
 import org.youngmonkeys.ezyplatform.entity.UniqueData;
 import org.youngmonkeys.ezyplatform.entity.UserAccessToken;
-import org.youngmonkeys.ezyplatform.entity.AdminMeta;
-import org.youngmonkeys.ezyplatform.entity.DataMeta;
 import org.youngmonkeys.ezyplatform.entity.UserKeyword;
 import org.youngmonkeys.ezyplatform.entity.UserMeta;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
@@ -442,6 +443,17 @@ public class DefaultModelToEntityConverter {
         userAccessToken.setCreatedAt(now);
         userAccessToken.setExpiredAt(expiredAt);
         return userAccessToken;
+    }
+
+    public AdminRole toAdminRoleByAdminIdAndRoleId(
+        long adminId,
+        long roleId
+    ) {
+        AdminRole entity = new AdminRole();
+        entity.setAdminId(adminId);
+        entity.setRoleId(roleId);
+        entity.setCreatedAt(clock.nowDateTime());
+        return entity;
     }
 
     public UserRole toUserRoleByUserIdAndRoleId(
