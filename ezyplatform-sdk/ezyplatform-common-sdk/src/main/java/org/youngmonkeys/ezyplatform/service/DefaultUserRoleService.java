@@ -18,19 +18,23 @@ package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyfox.io.EzyCollections;
 import lombok.AllArgsConstructor;
+import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
 import org.youngmonkeys.ezyplatform.entity.UserRoleId;
 import org.youngmonkeys.ezyplatform.entity.UserRoleName;
+import org.youngmonkeys.ezyplatform.model.UserRoleNameModel;
 import org.youngmonkeys.ezyplatform.repo.UserRoleNameRepository;
 import org.youngmonkeys.ezyplatform.repo.UserRoleRepository;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzySets.newHashSet;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
@@ -40,8 +44,10 @@ public class DefaultUserRoleService implements UserRoleService {
 
     private final UserRoleRepository userRoleRepository;
     private final UserRoleNameRepository userRoleNameRepository;
+    private final DefaultEntityToModelConverter entityToModelConverter;
     private final DefaultModelToEntityConverter modelToEntityConverter;
 
+    @Override
     public void saveUserRoleByUserIdAndRoleId(
         long userId,
         long roleId
@@ -59,6 +65,24 @@ public class DefaultUserRoleService implements UserRoleService {
         }
     }
 
+    @Override
+    public void saveUserRolesByUserIdAndRoleNames(
+        long userId,
+        Collection<String> roleNames
+    ) {
+        if (roleNames.isEmpty()) {
+            return;
+        }
+        List<Long> roleIds = newArrayList(
+            userRoleNameRepository.findByNameIn(roleNames),
+            UserRoleName::getId
+        );
+        for (long roleId : roleIds) {
+            saveUserRoleByUserIdAndRoleId(userId, roleId);
+        }
+    }
+
+    @Override
     public void deleteUserRoleByUserIdAndRoleId(
         long userId,
         long roleId
@@ -108,6 +132,24 @@ public class DefaultUserRoleService implements UserRoleService {
                 Collectors.toMap(
                     UserRoleName::getName,
                     UserRoleName::getId
+                )
+            );
+    }
+
+    @Override
+    public Map<Long, UserRoleNameModel> getRoleMapByIds(
+        Collection<Long> roleNameIds
+    ) {
+        if (EzyCollections.isEmpty(roleNameIds)) {
+            return Collections.emptyMap();
+        }
+        return userRoleNameRepository
+            .findListByIds(roleNameIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    UserRoleName::getId,
+                    entityToModelConverter::toModel
                 )
             );
     }

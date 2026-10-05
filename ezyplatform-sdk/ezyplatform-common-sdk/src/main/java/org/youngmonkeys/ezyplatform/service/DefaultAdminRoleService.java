@@ -16,8 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.service;
 
+import com.tvd12.ezyfox.io.EzyCollections;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
+import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.AdminRole;
 import org.youngmonkeys.ezyplatform.entity.AdminRoleId;
 import org.youngmonkeys.ezyplatform.entity.AdminRoleName;
@@ -32,7 +34,9 @@ import org.youngmonkeys.ezyplatform.rx.RxValueMap;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzySets.newHashSet;
@@ -45,6 +49,42 @@ public class DefaultAdminRoleService implements AdminRoleService {
     private final AdminRoleRepository adminRoleRepository;
     private final AdminRoleNameRepository adminRoleNameRepository;
     private final DefaultEntityToModelConverter entityToModelConverter;
+    private final DefaultModelToEntityConverter modelToEntityConverter;
+
+    @Override
+    public void saveAdminRoleByAdminIdAndRoleId(
+        long adminId,
+        long roleId
+    ) {
+        AdminRole entity = adminRoleRepository.findById(
+            new AdminRoleId(
+                roleId,
+                adminId
+            )
+        );
+        if (entity == null) {
+            entity = modelToEntityConverter
+                .toAdminRoleByAdminIdAndRoleId(adminId, roleId);
+            adminRoleRepository.save(entity);
+        }
+    }
+
+    @Override
+    public void saveAdminRolesByAdminIdAndRoleNames(
+        long adminId,
+        Collection<String> roleNames
+    ) {
+        if (roleNames.isEmpty()) {
+            return;
+        }
+        List<Long> roleIds = newArrayList(
+            adminRoleNameRepository.findByNameIn(roleNames),
+            AdminRoleName::getId
+        );
+        for (long roleId : roleIds) {
+            saveAdminRoleByAdminIdAndRoleId(adminId, roleId);
+        }
+    }
 
     @Override
     public long getRoleIdByName(
@@ -211,6 +251,56 @@ public class DefaultAdminRoleService implements AdminRoleService {
                 .findListByField("roleId", roleId),
             entityToModelConverter::toModel
         );
+    }
+
+    @Override
+    public Set<Long> getRoleIdsByNames(
+        Collection<String> roleNames
+    ) {
+        if (EzyCollections.isEmpty(roleNames)) {
+            return Collections.emptySet();
+        }
+        return adminRoleNameRepository
+            .findByNameIn(roleNames)
+            .stream()
+            .map(AdminRoleName::getId)
+            .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Map<String, Long> getRoleIdMapByNames(
+        Collection<String> roleNames
+    ) {
+        if (EzyCollections.isEmpty(roleNames)) {
+            return Collections.emptyMap();
+        }
+        return adminRoleNameRepository
+            .findByNameIn(roleNames)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    AdminRoleName::getName,
+                    AdminRoleName::getId
+                )
+            );
+    }
+
+    @Override
+    public Map<Long, AdminRoleNameModel> getRoleMapByIds(
+        Collection<Long> roleNameIds
+    ) {
+        if (EzyCollections.isEmpty(roleNameIds)) {
+            return Collections.emptyMap();
+        }
+        return adminRoleNameRepository
+            .findListByIds(roleNameIds)
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    AdminRoleName::getId,
+                    entityToModelConverter::toModel
+                )
+            );
     }
 
     @Override

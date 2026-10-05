@@ -21,9 +21,21 @@ import org.youngmonkeys.ezyplatform.model.AdminRoleNameModel;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public interface AdminRoleService {
+
+    void saveAdminRoleByAdminIdAndRoleId(
+        long adminId,
+        long roleId
+    );
+
+    void saveAdminRolesByAdminIdAndRoleNames(
+        long adminId,
+        Collection<String> roleNames
+    );
 
     long getRoleIdByName(
         String roleName
@@ -84,6 +96,32 @@ public interface AdminRoleService {
     List<AdminRoleModel> getAdminRolesByRoleId(
         long roleId
     );
+
+    Set<Long> getRoleIdsByNames(
+        Collection<String> roleNames
+    );
+
+    Map<String, Long> getRoleIdMapByNames(
+        Collection<String> roleNames
+    );
+
+    Map<Long, AdminRoleNameModel> getRoleMapByIds(
+        Collection<Long> roleNameIds
+    );
+
+    default Map<Long, String> getRoleNameMapByIds(
+        Collection<Long> roleNameIds
+    ) {
+        return getRoleMapByIds(roleNameIds)
+            .entrySet()
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    it -> it.getValue().getName()
+                )
+            );
+    }
 
     int getMinAdminRolePriority(
         long adminId
