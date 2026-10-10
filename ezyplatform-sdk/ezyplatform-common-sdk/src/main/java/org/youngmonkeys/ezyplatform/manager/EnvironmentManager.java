@@ -31,6 +31,10 @@ public interface EnvironmentManager {
 
     long getServerStartTime();
 
+    default String getJavaVersion() {
+        return System.getProperty("java.specification.version");
+    }
+
     default boolean isDevelopmentEnvironment() {
         String env = getEnvironment();
         return isNotBlank(env) && env.equals(ENVIRONMENT_DEVELOPMENT);
