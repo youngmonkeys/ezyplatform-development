@@ -34,7 +34,7 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.PARAMETER_NA
 public class WebViewLanguageDecorator implements ViewDecorator {
 
     @EzyAutoBind
-    private WebLanguageService webLanguageService;
+    protected WebLanguageService webLanguageService;
 
     @Override
     public void decorate(HttpServletRequest request, View view) {
