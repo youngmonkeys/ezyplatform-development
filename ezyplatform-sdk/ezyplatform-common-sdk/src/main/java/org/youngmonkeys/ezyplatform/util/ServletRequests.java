@@ -79,6 +79,9 @@ public final class ServletRequests {
         if (!isUnknownIp(ip)) {
             return ip;
         }
+        if (requestDirectly) {
+            return request.getRemoteAddr();
+        }
         ip = request.getHeader("X-Forwarded-For");
         if (!isUnknownIp(ip)) {
             return ip;
@@ -103,7 +106,7 @@ public final class ServletRequests {
         if (!isUnknownIp(ip)) {
             return ip;
         }
-        return requestDirectly ? request.getRemoteAddr() : UNKNOWN_IP;
+        return UNKNOWN_IP;
     }
     
     public static boolean isUnknownIp(String ip) {
