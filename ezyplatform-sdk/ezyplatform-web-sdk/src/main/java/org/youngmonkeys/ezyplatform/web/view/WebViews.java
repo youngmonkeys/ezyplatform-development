@@ -20,12 +20,10 @@ import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import com.tvd12.ezyhttp.server.core.view.Redirect;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
+import static org.youngmonkeys.ezyplatform.util.Uris.urlEncode;
 
 public final class WebViews {
 
@@ -64,13 +62,5 @@ public final class WebViews {
             uri += "?callbackUrl=" + urlEncode(callbackUrl);
         }
         return Redirect.to(addLanguageToUri(request, uri));
-    }
-
-    private static String urlEncode(String value) {
-        try {
-            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            throw new IllegalStateException(e);
-        }
     }
 }
