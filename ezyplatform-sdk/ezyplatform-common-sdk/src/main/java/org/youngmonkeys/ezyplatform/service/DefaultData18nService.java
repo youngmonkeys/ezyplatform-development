@@ -119,6 +119,7 @@ public class DefaultData18nService implements Data18nService {
                 language
             )
             .stream()
+            .filter(it -> it.getFieldValue() != null)
             .collect(
                 Collectors.toMap(
                     DataI18n::getFieldName,
@@ -143,6 +144,7 @@ public class DefaultData18nService implements Data18nService {
                 fieldName
             )
             .stream()
+            .filter(it -> it.getFieldValue() != null)
             .collect(
                 Collectors.toMap(
                     DataI18n::getDataId,
@@ -164,6 +166,7 @@ public class DefaultData18nService implements Data18nService {
                 language
             )
             .stream()
+            .filter(it -> it.getFieldValue() != null)
             .collect(
                 Collectors.groupingBy(
                     DataI18n::getDataId,

@@ -16,40 +16,97 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import org.youngmonkeys.ezyplatform.manager.EnvironmentManager;
+
 import javax.servlet.http.HttpServletRequest;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isNotBlank;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
 
 public final class ServletRequests {
+
+    private static ClientIpResolver clientIpResolver;
+    private static EnvironmentManager environmentManager;
 
     private static final String UNKNOWN_IP = "unknown";
 
     private ServletRequests() {}
 
+    /**
+     * Keep the EzyPlatform core simple: complex client IP resolution
+     * should be delegated to a plugin such as EzyDefence.
+     * This method is always called on the main thread, so no synchronization is needed.
+     *
+     * @param resolver the client ip resolver.
+     */
+    public static void setClientIpResolver(
+        ClientIpResolver resolver
+    ) {
+        if (clientIpResolver == null) {
+            clientIpResolver = resolver;
+        }
+    }
+
+    public static void setEnvironmentManager(
+        EnvironmentManager manager
+    ) {
+        if (environmentManager == null) {
+            environmentManager = manager;
+        }
+    }
+
+    public static String getClientIp(
+        HttpServletRequest request
+    ) {
+        return getClientIp(
+            request,
+            environmentManager != null
+                && environmentManager.isWithoutProxy()
+        );
+    }
+
     public static String getClientIp(
         HttpServletRequest request,
         boolean requestDirectly
     ) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (isUnknownIp(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
+        String ip = NULL_STRING;
+        if (clientIpResolver != null) {
+            ip = clientIpResolver.resolve(
+                request,
+                requestDirectly
+            );
         }
-        if (isUnknownIp(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
+        if (!isUnknownIp(ip)) {
+            return ip;
         }
-        if (isUnknownIp(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
+        if (requestDirectly) {
+            return request.getRemoteAddr();
         }
-        if (isUnknownIp(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        ip = request.getHeader("X-Forwarded-For");
+        if (!isUnknownIp(ip)) {
+            return ip;
         }
-        if (isUnknownIp(ip)) {
-            ip = request.getHeader("X-Real-IP");
+        ip = request.getHeader("Proxy-Client-IP");
+        if (!isUnknownIp(ip)) {
+            return ip;
         }
-        if (isUnknownIp(ip)) {
-            ip = requestDirectly ? request.getRemoteAddr() : UNKNOWN_IP;
+        ip = request.getHeader("WL-Proxy-Client-IP");
+        if (!isUnknownIp(ip)) {
+            return ip;
         }
-        return ip;
+        ip = request.getHeader("HTTP_CLIENT_IP");
+        if (!isUnknownIp(ip)) {
+            return ip;
+        }
+        ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+        if (!isUnknownIp(ip)) {
+            return ip;
+        }
+        ip = request.getHeader("X-Real-IP");
+        if (!isUnknownIp(ip)) {
+            return ip;
+        }
+        return UNKNOWN_IP;
     }
     
     public static boolean isUnknownIp(String ip) {

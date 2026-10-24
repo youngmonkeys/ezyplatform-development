@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.util;
 import com.tvd12.ezyfox.io.EzyStrings;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.URI;
@@ -219,6 +220,29 @@ public final class Uris {
             + URLEncoder.encode(name, UTF_8)
             + "="
             + URLEncoder.encode(value, UTF_8);
+    }
+
+    public static String urlEncode(
+        String value
+    ) {
+        try {
+            return URLEncoder.encode(value, UTF_8);
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static String urlEncodeOrOriginal(
+        String value
+    ) {
+        if (value == null) {
+            return null;
+        }
+        try {
+            return URLEncoder.encode(value, UTF_8);
+        } catch (Exception e) {
+            return value;
+        }
     }
 
     public static String querySeparator(

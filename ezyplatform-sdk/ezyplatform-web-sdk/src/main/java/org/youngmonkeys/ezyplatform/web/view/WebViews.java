@@ -23,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.addLanguageToUri;
+import static org.youngmonkeys.ezyplatform.util.Uris.urlEncode;
 
 public final class WebViews {
 
@@ -48,5 +49,18 @@ public final class WebViews {
             builder.addAttribute("callbackUri", callbackUri);
         }
         return builder.build();
+    }
+
+    public static Redirect redirectTo2Fa(
+        HttpServletRequest request
+    ) {
+        String uri = "/2fa";
+        if (HttpMethod.GET.equalsValue(request.getMethod())) {
+            String queryString = request.getQueryString();
+            String callbackUrl = request.getRequestURI() +
+                (isBlank(queryString) ? "" : ("?" + queryString));
+            uri += "?callbackUrl=" + urlEncode(callbackUrl);
+        }
+        return Redirect.to(addLanguageToUri(request, uri));
     }
 }

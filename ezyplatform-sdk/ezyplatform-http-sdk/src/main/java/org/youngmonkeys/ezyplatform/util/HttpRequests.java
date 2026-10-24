@@ -16,6 +16,8 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import org.eclipse.jetty.http.BadMessageException;
+
 import javax.servlet.http.HttpServletRequest;
 
 import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
@@ -29,10 +31,14 @@ public final class HttpRequests {
     public static String getLanguage(
         HttpServletRequest request
     ) {
-        return getRequestValue(
-            request,
-            PARAMETER_NAME_LANG
-        );
+        try {
+            return getRequestValue(
+                request,
+                PARAMETER_NAME_LANG
+            );
+        } catch (BadMessageException e) {
+            return null;
+        }
     }
 
     public static String addLanguageToUri(

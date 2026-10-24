@@ -44,6 +44,7 @@ import org.youngmonkeys.ezyplatform.exception.PermissionDeniedException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.UserAccessTokenExpiredException;
 import org.youngmonkeys.ezyplatform.exception.UserInvalidAccessTokenException;
+import org.youngmonkeys.ezyplatform.exception.UserWaiting2FaAccessTokenException;
 import org.youngmonkeys.ezyplatform.service.SettingService;
 import org.youngmonkeys.ezyplatform.web.view.WebViews;
 
@@ -146,6 +147,23 @@ public class WebGlobalExceptionHandler
             arguments.getRequest(),
             Boolean.TRUE
         );
+    }
+
+    @TryCatch(UserWaiting2FaAccessTokenException.class)
+    public Object handle(
+        RequestArguments arguments,
+        UserWaiting2FaAccessTokenException e
+    ) {
+        logger.info("{}({})", e.getClass().getSimpleName(), e.getMessage());
+        HttpMethod method = arguments.getMethod();
+        String uriTemplate = arguments.getUriTemplate();
+        if (requestUriManager.isApiURI(method, uriTemplate)) {
+            return ResponseEntity.builder()
+                .status(StatusCodes.UNAUTHORIZED)
+                .body(Collections.singletonMap("token", "waiting2fa"))
+                .build();
+        }
+        return WebViews.redirectTo2Fa(arguments.getRequest());
     }
 
     @TryCatch(IncorrectPasswordException.class)
