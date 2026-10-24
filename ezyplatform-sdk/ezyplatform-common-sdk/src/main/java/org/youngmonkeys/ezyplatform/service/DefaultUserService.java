@@ -431,6 +431,7 @@ public class DefaultUserService implements UserService {
                 accessTokenRepository.findByToken(accessToken);
             if (entity != null
                 && tokenTypes.contains(entity.getTokenType())
+                && !AccessTokenStatus.WAITING_2FA.equalsValue(entity.getStatus())
             ) {
                 return entity.getUserId();
             }
