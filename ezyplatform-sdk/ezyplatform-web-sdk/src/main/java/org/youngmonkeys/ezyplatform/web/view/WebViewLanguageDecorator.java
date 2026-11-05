@@ -42,7 +42,7 @@ public class WebViewLanguageDecorator implements ViewDecorator {
     @Override
     public void decorate(HttpServletRequest request, View view) {
         setLanguage(request, view);
-        setTextDirection(view);
+        setEzyTextDirection(view);
         setLanguages(request, view);
     }
 
@@ -67,7 +67,7 @@ public class WebViewLanguageDecorator implements ViewDecorator {
         }
     }
 
-    protected void setTextDirection(View view) {
+    protected void setEzyTextDirection(View view) {
         if (view.containsVariable("ezyDir")) {
             return;
         }

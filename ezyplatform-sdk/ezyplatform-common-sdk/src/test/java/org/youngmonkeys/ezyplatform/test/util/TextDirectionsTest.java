@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.test.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.model.WebLanguageModel;
@@ -104,5 +105,32 @@ public class TextDirectionsTest {
         Asserts.assertEquals(autoArabic.resolveTextDirection(), TextDirections.RTL);
         Asserts.assertEquals(forcedLtrArabic.resolveTextDirection(), TextDirections.LTR);
         Asserts.assertEquals(forcedRtlCustom.resolveTextDirection(), TextDirections.RTL);
+    }
+
+    @Test
+    public void autoDirectionIsNotSavedToSettingTest() throws Exception {
+        ObjectMapper objectMapper = new ObjectMapper();
+        WebLanguageModel autoLanguage = WebLanguageModel.builder()
+            .code("ar")
+            .name("Arabic")
+            .build();
+        WebLanguageModel rtlLanguage = WebLanguageModel.builder()
+            .code("xx")
+            .name("Custom")
+            .direction("rtl")
+            .build();
+
+        String autoJson = objectMapper.writeValueAsString(autoLanguage);
+        String rtlJson = objectMapper.writeValueAsString(rtlLanguage);
+
+        Asserts.assertFalse(autoJson.contains("direction"));
+        Asserts.assertFalse(autoJson.contains("textDirection"));
+        Asserts.assertTrue(rtlJson.contains("\"direction\":\"rtl\""));
+        WebLanguageModel savedRtlLanguage = objectMapper.readValue(
+            rtlJson,
+            WebLanguageModel.Mutable.class
+        );
+        Asserts.assertEquals(savedRtlLanguage.getDirection(), "rtl");
+        Asserts.assertEquals(savedRtlLanguage.resolveTextDirection(), TextDirections.RTL);
     }
 }

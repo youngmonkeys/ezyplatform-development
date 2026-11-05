@@ -16,6 +16,7 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.util.TextDirections;
@@ -26,6 +27,7 @@ public class WebLanguageModel implements Comparable<WebLanguageModel> {
     protected String code;
     protected String name;
     protected String flag;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     protected String direction;
     protected int displayOrder;
     protected boolean active;
