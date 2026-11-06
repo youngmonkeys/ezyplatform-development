@@ -110,6 +110,24 @@ public final class PackageSigningKeys {
         return toPem(keyPair.getPrivate()) + toPem(keyPair.getPublic());
     }
 
+    private static String toPem(String type, byte[] encoded) {
+        String base64 = Base64.getEncoder().encodeToString(encoded);
+        StringBuilder builder = new StringBuilder()
+            .append("-----BEGIN ").append(type).append("-----\n");
+        for (int i = 0; i < base64.length(); i += PEM_LINE_LENGTH) {
+            builder
+                .append(
+                    base64,
+                    i,
+                    Math.min(base64.length(), i + PEM_LINE_LENGTH)
+                )
+                .append('\n');
+        }
+        return builder
+            .append("-----END ").append(type).append("-----\n")
+            .toString();
+    }
+
     public static PrivateKey parsePrivateKey(String pem) {
         List<byte[]> blocks = readPemBlocks(pem, PEM_PRIVATE_KEY);
         if (blocks.size() != 1) {
@@ -217,24 +235,6 @@ public final class PackageSigningKeys {
             }
         }
         return answer;
-    }
-
-    private static String toPem(String type, byte[] encoded) {
-        String base64 = Base64.getEncoder().encodeToString(encoded);
-        StringBuilder builder = new StringBuilder()
-            .append("-----BEGIN ").append(type).append("-----\n");
-        for (int i = 0; i < base64.length(); i += PEM_LINE_LENGTH) {
-            builder
-                .append(
-                    base64,
-                    i,
-                    Math.min(base64.length(), i + PEM_LINE_LENGTH)
-                )
-                .append('\n');
-        }
-        return builder
-            .append("-----END ").append(type).append("-----\n")
-            .toString();
     }
 
     private static String readText(File file) throws IOException {
