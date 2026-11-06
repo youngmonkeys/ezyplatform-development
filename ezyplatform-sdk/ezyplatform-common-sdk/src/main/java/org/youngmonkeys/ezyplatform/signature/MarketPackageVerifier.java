@@ -120,9 +120,13 @@ public class MarketPackageVerifier {
         String signature = fetchSignature(
             Uris.resolveUrl(normalizeMarketUrl(marketUrl), signaturePath)
         );
-        return keyList
+        PackageManifest manifest = keyList
             .getVerifier(type)
             .verify(signature, type, name, requestedVersion);
+        if (manifest.getFilesSha256() == null) {
+            throw new InvalidPackageSignatureException("filesSha256Missing");
+        }
+        return manifest;
     }
 
     public Map<String, String> fetchFileHashes(

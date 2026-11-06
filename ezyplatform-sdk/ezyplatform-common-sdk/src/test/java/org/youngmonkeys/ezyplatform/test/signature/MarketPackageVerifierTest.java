@@ -314,7 +314,7 @@ public class MarketPackageVerifierTest {
     }
 
     @Test
-    public void fileHashesOfOldSignatureAreNotFetchedTest() {
+    public void oldPlatformSignatureWithoutFilesSha256IsRejectedTest() {
         // given
         serveKeyList(1L, now.get() + DAY);
         serveSignature(
@@ -322,20 +322,60 @@ public class MarketPackageVerifierTest {
             new PackageSigner(platformKeyPair).sign(platformManifest(null))
         );
         MarketPackageVerifier verifier = newVerifier();
-        PackageManifest manifest = verifier.fetchManifest(
-            MARKET_URL,
-            "/api/v1/platforms/1.0.0/signature",
-            PackageType.PLATFORM,
-            "ezyplatform",
-            "1.0.0"
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            verifier.fetchManifest(
+                MARKET_URL,
+                "/api/v1/platforms/1.0.0/signature",
+                PackageType.PLATFORM,
+                "ezyplatform",
+                "1.0.0"
+            )
         );
+
+        // then
+        assertReason(e, "filesSha256Missing");
+    }
+
+    @Test
+    public void oldModuleSignatureWithoutFilesSha256IsRejectedTest() {
+        // given
+        serveKeyList(1L, now.get() + DAY);
+        serveSignature(
+            "/api/v1/released-projects/ezyarticle/1.2.3/signature",
+            new PackageSigner(marketKeyPair).sign(
+                manifest("ezyarticle", "1.2.3", null)
+            )
+        );
+        MarketPackageVerifier verifier = newVerifier();
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            verifier.fetchManifest(
+                MARKET_URL,
+                "/api/v1/released-projects/ezyarticle/1.2.3/signature",
+                PackageType.MODULE,
+                "ezyarticle",
+                "1.2.3"
+            )
+        );
+
+        // then
+        assertReason(e, "filesSha256Missing");
+    }
+
+    @Test
+    public void fileHashesOfManifestWithoutFilesSha256AreNotFetchedTest() {
+        // given
+        MarketPackageVerifier verifier = newVerifier();
 
         // when
         Throwable e = Asserts.assertThrows(() ->
             verifier.fetchFileHashes(
                 MARKET_URL,
                 "/api/v1/platforms/1.0.0/files",
-                manifest
+                platformManifest(null)
             )
         );
 
@@ -411,6 +451,18 @@ public class MarketPackageVerifierTest {
     }
 
     private static PackageManifest manifest(String name, String version) {
+        return manifest(
+            name,
+            version,
+            PackageFiles.sha256Of(PLATFORM_FILE_HASHES_TEXT)
+        );
+    }
+
+    private static PackageManifest manifest(
+        String name,
+        String version,
+        String filesSha256
+    ) {
         return PackageManifest.builder()
             .type(PackageType.MODULE)
             .name(name)
@@ -418,6 +470,7 @@ public class MarketPackageVerifierTest {
             .fileName(name + "-" + version + ".zip")
             .size(10L)
             .sha256("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+            .filesSha256(filesSha256)
             .issuedAt(1L)
             .build();
     }
