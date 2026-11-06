@@ -35,20 +35,31 @@ public final class Hashes {
     private Hashes() {}
 
     public static String sha256Hex(File file) throws IOException {
-        MessageDigest digest;
+        try (InputStream input = Files.newInputStream(file.toPath())) {
+            return sha256Hex(input);
+        }
+    }
+
+    public static String sha256Hex(InputStream input) throws IOException {
+        MessageDigest digest = newSha256Digest();
+        byte[] buffer = new byte[FILE_BUFFER_SIZE];
+        int length;
+        while ((length = input.read(buffer)) > 0) {
+            digest.update(buffer, 0, length);
+        }
+        return Hexes.toLowercaseHex(digest.digest());
+    }
+
+    public static String sha256Hex(byte[] bytes) {
+        return Hexes.toLowercaseHex(newSha256Digest().digest(bytes));
+    }
+
+    private static MessageDigest newSha256Digest() {
         try {
-            digest = MessageDigest.getInstance(SHA256);
+            return MessageDigest.getInstance(SHA256);
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("SHA-256 is not supported", e);
         }
-        try (InputStream input = Files.newInputStream(file.toPath())) {
-            byte[] buffer = new byte[FILE_BUFFER_SIZE];
-            int length;
-            while ((length = input.read(buffer)) > 0) {
-                digest.update(buffer, 0, length);
-            }
-        }
-        return Hexes.toLowercaseHex(digest.digest());
     }
 
     public static String hmacSha256(

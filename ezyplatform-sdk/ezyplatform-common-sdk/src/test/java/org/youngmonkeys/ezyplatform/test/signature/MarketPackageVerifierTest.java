@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.exception.InvalidPackageSignatureException;
 import org.youngmonkeys.ezyplatform.signature.MarketPackageVerifier;
+import org.youngmonkeys.ezyplatform.signature.PackageFiles;
 import org.youngmonkeys.ezyplatform.signature.PackageManifest;
 import org.youngmonkeys.ezyplatform.signature.PackageSigner;
 import org.youngmonkeys.ezyplatform.signature.PackageSigningKeyList;
@@ -50,6 +51,11 @@ public class MarketPackageVerifierTest {
 
     private static final long DAY = 24L * 60 * 60 * 1000;
     private static final String MARKET_URL = "https://ezyplatform.com";
+    private static final String PLATFORM_FILE_HASHES_TEXT =
+        "1111111111111111111111111111111111111111111111111111111111111111"
+            + "  ezyplatform/admin/lib/ezyplatform-admin.jar\n"
+            + "2222222222222222222222222222222222222222222222222222222222222222"
+            + "  ezyplatform/lib/ezyplatform-core.jar\n";
 
     private KeyPair rootKeyPair;
     private KeyPair marketKeyPair;
@@ -237,6 +243,106 @@ public class MarketPackageVerifierTest {
         Asserts.assertEquals(actual.getVersion(), 1L);
     }
 
+    @Test
+    public void fetchPlatformFileHashesTest() {
+        // given
+        String fileHashesText = PLATFORM_FILE_HASHES_TEXT;
+        serveKeyList(1L, now.get() + DAY);
+        serveSignature(
+            "/api/v1/platforms/1.0.0/signature",
+            new PackageSigner(platformKeyPair).sign(
+                platformManifest(PackageFiles.sha256Of(fileHashesText))
+            )
+        );
+        serveFiles("/api/v1/platforms/1.0.0/files", fileHashesText);
+        MarketPackageVerifier verifier = newVerifier();
+        PackageManifest manifest = verifier.fetchManifest(
+            MARKET_URL,
+            "/api/v1/platforms/1.0.0/signature",
+            PackageType.PLATFORM,
+            "ezyplatform",
+            "1.0.0"
+        );
+
+        // when
+        Map<String, String> actual = verifier.fetchFileHashes(
+            MARKET_URL,
+            "/api/v1/platforms/1.0.0/files",
+            manifest
+        );
+
+        // then
+        Asserts.assertEquals(actual, PackageFiles.parseText(fileHashesText));
+    }
+
+    @Test
+    public void fileHashesTamperedByMarketAreRejectedTest() {
+        // given
+        serveKeyList(1L, now.get() + DAY);
+        serveSignature(
+            "/api/v1/platforms/1.0.0/signature",
+            new PackageSigner(platformKeyPair).sign(
+                platformManifest(PackageFiles.sha256Of(PLATFORM_FILE_HASHES_TEXT))
+            )
+        );
+        serveFiles(
+            "/api/v1/platforms/1.0.0/files",
+            PLATFORM_FILE_HASHES_TEXT
+                + "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+                + "  ezyplatform/lib/evil.jar\n"
+        );
+        MarketPackageVerifier verifier = newVerifier();
+        PackageManifest manifest = verifier.fetchManifest(
+            MARKET_URL,
+            "/api/v1/platforms/1.0.0/signature",
+            PackageType.PLATFORM,
+            "ezyplatform",
+            "1.0.0"
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            verifier.fetchFileHashes(
+                MARKET_URL,
+                "/api/v1/platforms/1.0.0/files",
+                manifest
+            )
+        );
+
+        // then
+        assertReason(e, "filesSha256Mismatch");
+    }
+
+    @Test
+    public void fileHashesOfOldSignatureAreNotFetchedTest() {
+        // given
+        serveKeyList(1L, now.get() + DAY);
+        serveSignature(
+            "/api/v1/platforms/1.0.0/signature",
+            new PackageSigner(platformKeyPair).sign(platformManifest(null))
+        );
+        MarketPackageVerifier verifier = newVerifier();
+        PackageManifest manifest = verifier.fetchManifest(
+            MARKET_URL,
+            "/api/v1/platforms/1.0.0/signature",
+            PackageType.PLATFORM,
+            "ezyplatform",
+            "1.0.0"
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(() ->
+            verifier.fetchFileHashes(
+                MARKET_URL,
+                "/api/v1/platforms/1.0.0/files",
+                manifest
+            )
+        );
+
+        // then
+        assertReason(e, "filesSha256Missing");
+    }
+
     private MarketPackageVerifier newVerifier() {
         return new MarketPackageVerifier(
             cacheFolder,
@@ -282,6 +388,26 @@ public class MarketPackageVerifierTest {
             MARKET_URL + path,
             Collections.singletonMap("signature", signature)
         );
+    }
+
+    private void serveFiles(String path, String fileHashesText) {
+        responseByUrl.put(
+            MARKET_URL + path,
+            Collections.singletonMap("files", fileHashesText)
+        );
+    }
+
+    private static PackageManifest platformManifest(String filesSha256) {
+        return PackageManifest.builder()
+            .type(PackageType.PLATFORM)
+            .name("ezyplatform")
+            .version("1.0.0")
+            .fileName("ezyplatform-1.0.0.zip")
+            .size(10L)
+            .sha256("0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef")
+            .filesSha256(filesSha256)
+            .issuedAt(1L)
+            .build();
     }
 
     private static PackageManifest manifest(String name, String version) {

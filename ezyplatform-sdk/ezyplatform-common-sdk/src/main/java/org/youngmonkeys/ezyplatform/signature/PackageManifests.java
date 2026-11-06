@@ -37,6 +37,7 @@ public final class PackageManifests {
     public static final String FIELD_FILE_NAME = "fileName";
     public static final String FIELD_SIZE = "size";
     public static final String FIELD_SHA256 = "sha256";
+    public static final String FIELD_FILES_SHA256 = "filesSha256";
     public static final String FIELD_ISSUED_AT = "issuedAt";
 
     private static final Pattern SHA256_PATTERN = Pattern.compile(
@@ -55,6 +56,27 @@ public final class PackageManifests {
         if (!file.isFile()) {
             throw new IOException("package file not found: " + file);
         }
+        return create(
+            type,
+            name,
+            version,
+            file,
+            PackageFiles.sha256Of(PackageFiles.readZipFileHashesText(file)),
+            issuedAt
+        );
+    }
+
+    public static PackageManifest create(
+        PackageType type,
+        String name,
+        String version,
+        File file,
+        String filesSha256,
+        long issuedAt
+    ) throws IOException {
+        if (!file.isFile()) {
+            throw new IOException("package file not found: " + file);
+        }
         PackageManifest manifest = PackageManifest.builder()
             .type(type)
             .name(name)
@@ -62,6 +84,7 @@ public final class PackageManifests {
             .fileName(file.getName())
             .size(file.length())
             .sha256(Hashes.sha256Hex(file))
+            .filesSha256(filesSha256)
             .issuedAt(issuedAt)
             .build();
         validate(manifest);
@@ -91,6 +114,10 @@ public final class PackageManifests {
         String sha256 = manifest.getSha256();
         if (sha256 == null || !SHA256_PATTERN.matcher(sha256).matches()) {
             throw new InvalidPackageSignatureException("invalidSha256");
+        }
+        String filesSha256 = manifest.getFilesSha256();
+        if (filesSha256 != null && !SHA256_PATTERN.matcher(filesSha256).matches()) {
+            throw new InvalidPackageSignatureException("invalidFilesSha256");
         }
     }
 
@@ -151,6 +178,22 @@ public final class PackageManifests {
         }
     }
 
+    public static Map<String, String> verifyFileHashes(
+        PackageManifest manifest,
+        String fileHashesText
+    ) {
+        String filesSha256 = manifest.getFilesSha256();
+        if (filesSha256 == null) {
+            throw new InvalidPackageSignatureException("filesSha256Missing");
+        }
+        if (fileHashesText == null
+            || !PackageFiles.sha256Of(fileHashesText).equals(filesSha256)
+        ) {
+            throw new InvalidPackageSignatureException("filesSha256Mismatch");
+        }
+        return PackageFiles.parseText(fileHashesText);
+    }
+
     public static Map<String, Object> toMap(PackageManifest manifest) {
         Map<String, Object> answer = new LinkedHashMap<>();
         answer.put(FIELD_TYPE, manifest.getType().getValue());
@@ -159,6 +202,9 @@ public final class PackageManifests {
         answer.put(FIELD_FILE_NAME, manifest.getFileName());
         answer.put(FIELD_SIZE, manifest.getSize());
         answer.put(FIELD_SHA256, manifest.getSha256());
+        if (manifest.getFilesSha256() != null) {
+            answer.put(FIELD_FILES_SHA256, manifest.getFilesSha256());
+        }
         answer.put(FIELD_ISSUED_AT, manifest.getIssuedAt());
         return answer;
     }
@@ -171,6 +217,7 @@ public final class PackageManifests {
             .fileName(toStringOrNull(map.get(FIELD_FILE_NAME)))
             .size(toLong(map.get(FIELD_SIZE), FIELD_SIZE))
             .sha256(toStringOrNull(map.get(FIELD_SHA256)))
+            .filesSha256(toStringOrNull(map.get(FIELD_FILES_SHA256)))
             .issuedAt(toLong(map.get(FIELD_ISSUED_AT), FIELD_ISSUED_AT))
             .build();
         validate(manifest);

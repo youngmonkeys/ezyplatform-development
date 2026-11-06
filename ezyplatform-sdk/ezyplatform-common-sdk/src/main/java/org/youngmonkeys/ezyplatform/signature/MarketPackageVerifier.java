@@ -51,6 +51,7 @@ public class MarketPackageVerifier {
     public static final String KEY_LIST_PATH = "/api/v1/package-signing-keys";
     public static final String FIELD_KEYS = "keys";
     public static final String FIELD_SIGNATURE = "signature";
+    public static final String FIELD_FILES = "files";
 
     public MarketPackageVerifier(
         File cacheFolder,
@@ -122,6 +123,22 @@ public class MarketPackageVerifier {
         return keyList
             .getVerifier(type)
             .verify(signature, type, name, requestedVersion);
+    }
+
+    public Map<String, String> fetchFileHashes(
+        String marketUrl,
+        String filesPath,
+        PackageManifest manifest
+    ) {
+        if (manifest.getFilesSha256() == null) {
+            throw new InvalidPackageSignatureException("filesSha256Missing");
+        }
+        String fileHashesText = fetchString(
+            Uris.resolveUrl(normalizeMarketUrl(marketUrl), filesPath),
+            FIELD_FILES,
+            "fileHashesUnavailable"
+        );
+        return PackageManifests.verifyFileHashes(manifest, fileHashesText);
     }
 
     public PackageSigningKeyList getKeyList(String marketUrl) {

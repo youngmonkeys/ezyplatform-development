@@ -20,6 +20,7 @@ import com.tvd12.test.assertion.Asserts;
 import org.testng.annotations.Test;
 import org.youngmonkeys.ezyplatform.exception.InvalidPackageSignatureException;
 import org.youngmonkeys.ezyplatform.signature.EcdsaSignatureFormats;
+import org.youngmonkeys.ezyplatform.signature.PackageFiles;
 import org.youngmonkeys.ezyplatform.signature.PackageManifest;
 import org.youngmonkeys.ezyplatform.signature.PackageManifests;
 import org.youngmonkeys.ezyplatform.signature.PackageSignatureVerifier;
@@ -30,11 +31,14 @@ import org.youngmonkeys.ezyplatform.signature.PackageType;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 public class PackageSignatureTest {
 
@@ -73,6 +77,10 @@ public class PackageSignatureTest {
         Asserts.assertEquals(actual.getFileName(), file.getName());
         Asserts.assertEquals(actual.getSize(), file.length());
         Asserts.assertEquals(actual.getSha256(), manifest.getSha256());
+        Asserts.assertEquals(
+            actual.getFilesSha256(),
+            PackageFiles.sha256Of(PackageFiles.readZipFileHashesText(file))
+        );
         Asserts.assertEquals(actual.getIssuedAt(), 1000L);
         Asserts.assertEquals(
             signer.getKeyId(),
@@ -114,10 +122,9 @@ public class PackageSignatureTest {
             file,
             1000L
         );
-        Files.write(
-            file.toPath(),
-            "module contenT".getBytes(StandardCharsets.UTF_8)
-        );
+        byte[] bytes = Files.readAllBytes(file.toPath());
+        bytes[bytes.length / 2] ^= 1;
+        Files.write(file.toPath(), bytes);
 
         // when
         Throwable e = Asserts.assertThrows(
@@ -141,7 +148,8 @@ public class PackageSignatureTest {
         );
         Files.write(
             file.toPath(),
-            "module content!".getBytes(StandardCharsets.UTF_8)
+            new byte[] {1},
+            StandardOpenOption.APPEND
         );
 
         // when
@@ -402,7 +410,13 @@ public class PackageSignatureTest {
     private static File createFile(String content) throws Exception {
         File file = File.createTempFile("package-signature-test", ".zip");
         file.deleteOnExit();
-        Files.write(file.toPath(), content.getBytes(StandardCharsets.UTF_8));
+        try (ZipOutputStream output = new ZipOutputStream(
+            Files.newOutputStream(file.toPath())
+        )) {
+            output.putNextEntry(new ZipEntry("ezyarticle/content.txt"));
+            output.write(content.getBytes(StandardCharsets.UTF_8));
+            output.closeEntry();
+        }
         return file;
     }
 

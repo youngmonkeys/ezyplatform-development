@@ -34,6 +34,7 @@ public final class PackageSigningTool {
         "  generate-key <key-pem-file>\n" +
         "  sign <key-pem-file> <platform|sdk|module> <version> <bundle-file> [module-name]\n" +
         "  verify <public-keys-pem-file> <jws-file> <bundle-file>\n" +
+        "  files <bundle-file>\n" +
         "  sign-keys <root-key-pem-file> <version> <valid-days> " +
         "<market-public-keys-pem-file> <platform-public-keys-pem-file> <output-file>\n" +
         "  verify-keys <root-public-keys-base64> <key-list-file>";
@@ -53,6 +54,9 @@ public final class PackageSigningTool {
                 break;
             case "verify":
                 verify(args);
+                break;
+            case "files":
+                files(args);
                 break;
             case "sign-keys":
                 signKeys(args);
@@ -174,6 +178,7 @@ public final class PackageSigningTool {
         );
         System.out.println("key id: " + signer.getKeyId());
         System.out.println("sha256: " + manifest.getSha256());
+        System.out.println("files sha256: " + manifest.getFilesSha256());
         System.out.println("signature file: " + jwsFile);
     }
 
@@ -189,8 +194,24 @@ public final class PackageSigningTool {
             StandardCharsets.US_ASCII
         ).trim();
         PackageManifest manifest = verifier.verify(jws);
-        PackageManifests.verifyFile(manifest, new File(args[3]));
+        File bundleFile = new File(args[3]);
+        PackageManifests.verifyFile(manifest, bundleFile);
+        if (manifest.getFilesSha256() != null) {
+            PackageManifests.verifyFileHashes(
+                manifest,
+                PackageFiles.readZipFileHashesText(bundleFile)
+            );
+        }
         System.out.println("valid: " + manifest);
+    }
+
+    private static void files(String[] args) throws Exception {
+        if (args.length != 2) {
+            exit(USAGE);
+        }
+        String text = PackageFiles.readZipFileHashesText(new File(args[1]));
+        System.out.print(text);
+        System.out.println("files sha256: " + PackageFiles.sha256Of(text));
     }
 
     private static void exit(String message) {

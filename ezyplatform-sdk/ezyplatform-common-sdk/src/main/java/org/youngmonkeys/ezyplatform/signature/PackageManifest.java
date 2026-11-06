@@ -32,5 +32,6 @@ public class PackageManifest {
     private final String fileName;
     private final long size;
     private final String sha256;
+    private final String filesSha256;
     private final long issuedAt;
 }
