@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -70,7 +70,7 @@ public class MarketPackageVerifierTest {
         responseByUrl = new HashMap<>();
         httpClient = mock(HttpClient.class);
         when(httpClient.call(any(Request.class))).thenAnswer(it -> {
-            Request request = it.getArgument(0);
+            Request request = (Request) it.getArguments()[0];
             Object response = responseByUrl.get(request.getURL());
             if (response == null) {
                 throw new IllegalStateException("not found: " + request.getURL());
@@ -240,10 +240,10 @@ public class MarketPackageVerifierTest {
     private MarketPackageVerifier newVerifier() {
         return new MarketPackageVerifier(
             cacheFolder,
-            Collections.singletonList(rootKeyPair.getPublic()),
-            httpClient,
+            now::get,
             Collections.emptyMap(),
-            now::get
+            Collections.singletonList(rootKeyPair.getPublic()),
+            httpClient
         );
     }
 

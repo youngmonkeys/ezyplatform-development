@@ -18,12 +18,14 @@ package org.youngmonkeys.ezyplatform.signature;
 
 import lombok.Getter;
 
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.NULL_STRING;
+
 @Getter
 public enum PackageType {
 
     PLATFORM("platform", "ezyplatform"),
     SDK("sdk", "ezyplatform-sdk"),
-    MODULE("module", null);
+    MODULE("module", NULL_STRING);
 
     private final String value;
     private final String fixedPackageName;
