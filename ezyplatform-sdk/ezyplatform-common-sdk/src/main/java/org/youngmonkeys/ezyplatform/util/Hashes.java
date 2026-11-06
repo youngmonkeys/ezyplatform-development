@@ -18,13 +18,38 @@ package org.youngmonkeys.ezyplatform.util;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public final class Hashes {
 
     private static final String HMAC_SHA256 = "HmacSHA256";
+    private static final String SHA256 = "SHA-256";
+    private static final int FILE_BUFFER_SIZE = 8192;
 
     private Hashes() {}
+
+    public static String sha256Hex(File file) throws IOException {
+        MessageDigest digest;
+        try {
+            digest = MessageDigest.getInstance(SHA256);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is not supported", e);
+        }
+        try (InputStream input = Files.newInputStream(file.toPath())) {
+            byte[] buffer = new byte[FILE_BUFFER_SIZE];
+            int length;
+            while ((length = input.read(buffer)) > 0) {
+                digest.update(buffer, 0, length);
+            }
+        }
+        return Hexes.toLowercaseHex(digest.digest());
+    }
 
     public static String hmacSha256(
         String key,
