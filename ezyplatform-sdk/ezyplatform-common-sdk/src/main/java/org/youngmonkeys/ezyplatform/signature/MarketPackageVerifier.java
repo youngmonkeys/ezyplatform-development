@@ -234,6 +234,7 @@ public class MarketPackageVerifier {
                 StandardCopyOption.REPLACE_EXISTING
             );
         } catch (IOException expected) {
+            // do nothing
         }
     }
 
