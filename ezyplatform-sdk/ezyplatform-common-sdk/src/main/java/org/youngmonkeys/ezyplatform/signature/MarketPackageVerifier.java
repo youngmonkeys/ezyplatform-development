@@ -38,10 +38,10 @@ import java.util.function.LongSupplier;
 
 public class MarketPackageVerifier {
 
-    private final HttpClient httpClient;
     private final File cacheFolder;
-    private final Map<String, List<PublicKey>> rootKeysByMarketUrl;
     private final LongSupplier clock;
+    private final HttpClient httpClient;
+    private final Map<String, List<PublicKey>> rootKeysByMarketUrl;
 
     public static final String EZYPLATFORM_MARKET_URL = "https://ezyplatform.com";
     public static final String PROPERTY_ROOT_PUBLIC_KEYS =
@@ -53,26 +53,26 @@ public class MarketPackageVerifier {
     public static final String FIELD_SIGNATURE = "signature";
 
     public MarketPackageVerifier(
-        HttpClient httpClient,
         File cacheFolder,
+        Map<String, List<PublicKey>> customRootKeysByMarketUrl,
         List<PublicKey> ezyplatformRootKeys,
-        Map<String, List<PublicKey>> customRootKeysByMarketUrl
+        HttpClient httpClient
     ) {
         this(
-            httpClient,
             cacheFolder,
-            ezyplatformRootKeys,
+            System::currentTimeMillis,
             customRootKeysByMarketUrl,
-            System::currentTimeMillis
+            ezyplatformRootKeys,
+            httpClient
         );
     }
 
     public MarketPackageVerifier(
-        HttpClient httpClient,
         File cacheFolder,
-        List<PublicKey> ezyplatformRootKeys,
+        LongSupplier clock,
         Map<String, List<PublicKey>> customRootKeysByMarketUrl,
-        LongSupplier clock
+        List<PublicKey> ezyplatformRootKeys,
+        HttpClient httpClient
     ) {
         this.httpClient = httpClient;
         this.cacheFolder = cacheFolder;

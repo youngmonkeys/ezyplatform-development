@@ -221,11 +221,11 @@ public class MarketPackageVerifierTest {
             )
         );
         MarketPackageVerifier verifier = new MarketPackageVerifier(
-            httpClient,
             cacheFolder,
-            Collections.singletonList(rootKeyPair.getPublic()),
+            now::get,
             customRoots,
-            now::get
+            Collections.singletonList(rootKeyPair.getPublic()),
+            httpClient
         );
 
         // when
@@ -239,9 +239,9 @@ public class MarketPackageVerifierTest {
 
     private MarketPackageVerifier newVerifier() {
         return new MarketPackageVerifier(
-            httpClient,
             cacheFolder,
             Collections.singletonList(rootKeyPair.getPublic()),
+            httpClient,
             Collections.emptyMap(),
             now::get
         );
