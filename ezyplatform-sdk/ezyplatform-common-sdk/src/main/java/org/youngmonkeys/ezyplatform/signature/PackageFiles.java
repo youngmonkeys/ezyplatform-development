@@ -64,7 +64,7 @@ public final class PackageFiles {
                 if (entry.isDirectory()) {
                     continue;
                 }
-                String path = entry.getName();
+                String path = toRelativeEntryPath(entry.getName());
                 validatePath(path);
                 String sha256;
                 try (InputStream input = zip.getInputStream(entry)) {
@@ -183,6 +183,14 @@ public final class PackageFiles {
             missingFiles,
             unknownFiles
         );
+    }
+
+    private static String toRelativeEntryPath(String entryName) {
+        int start = 0;
+        while (start < entryName.length() && entryName.charAt(start) == '/') {
+            ++start;
+        }
+        return entryName.substring(start);
     }
 
     private static void validatePath(String path) {

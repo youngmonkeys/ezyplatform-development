@@ -416,4 +416,80 @@ public class KeywordsTest {
             )
         );
     }
+
+    @Test
+    public void normalizeKeywordRemovesVietnameseDiacriticsAndCaseTest() {
+        // given
+        String keyword = "Nguyễn Văn Đức ÂU";
+
+        // when
+        String actual = Keywords.normalizeKeyword(keyword);
+
+        // then
+        Asserts.assertEquals(actual, "nguyen van duc au");
+    }
+
+    @Test
+    public void normalizeKeywordKeepsNonLatinCombiningMarksTest() {
+        // given
+        String hindi = "नमस्ते";
+        String thai = "สวัสดี";
+
+        // when
+        // then
+        Asserts.assertEquals(Keywords.normalizeKeyword(hindi), hindi);
+        Asserts.assertEquals(Keywords.normalizeKeyword(thai), thai);
+    }
+
+    @Test
+    public void normalizeKeywordNullTest() {
+        // given
+        // when
+        // then
+        Asserts.assertNull(Keywords.normalizeKeyword(null));
+        Asserts.assertNull(Keywords.normalizeKeywords(null));
+    }
+
+    @Test
+    public void normalizeKeywordsTest() {
+        // given
+        List<String> keywords = Lists.newArrayList("Hà Nội", "SÀI GÒN");
+
+        // when
+        List<String> actual = Keywords.normalizeKeywords(keywords);
+
+        // then
+        Asserts.assertEquals(actual, Lists.newArrayList("ha noi", "sai gon"));
+    }
+
+    @Test
+    public void toKeywordsAreNormalizedSoSearchWithoutDiacriticsMatchesTest() {
+        // given
+        String displayName = "Phở Bò";
+
+        // when
+        List<String> actual = Keywords.toKeywords(displayName);
+
+        // then
+        Asserts.assertEquals(
+            actual,
+            Lists.newArrayList("pho bo", "ho bo", "o bo", "bo", "o")
+        );
+        Asserts.assertTrue(
+            actual.stream().anyMatch(it -> it.startsWith(Keywords.normalizeKeyword("PHỞ")))
+        );
+    }
+
+    @Test
+    public void keywordsFromEmailAreLowerCaseTest() {
+        // given
+        String email = "John.Doe@Example.COM";
+
+        // when
+        List<String> actual = Keywords.keywordsFromEmail(email);
+
+        // then
+        Asserts.assertEquals(actual.get(0), "john.doe@example.com");
+        Asserts.assertEquals(Keywords.keywordFromEmail(email), "john.doe");
+    }
 }

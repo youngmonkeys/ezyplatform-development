@@ -214,6 +214,64 @@ public class PackageFilesTest {
     }
 
     @Test
+    public void sdkPackedEntriesWithLeadingSlashAreHashedAsRelativePathsTest() throws Exception {
+        // given
+        Map<String, String> entries = new LinkedHashMap<>();
+        entries.put("/ezyarticle/admin/plugins/ezyarticle/module.properties", "a");
+        entries.put("/ezyarticle/web/plugins/ezyarticle/lib/ezyarticle.jar", "b");
+        File zipFile = createZipFile(entries, 1_600_000_000_000L, false);
+
+        // when
+        Map<String, String> actual = PackageFiles.readZipFileHashes(zipFile);
+
+        // then
+        Map<String, String> expected = new LinkedHashMap<>();
+        expected.put("ezyarticle/admin/plugins/ezyarticle/module.properties", sha256("a"));
+        expected.put("ezyarticle/web/plugins/ezyarticle/lib/ezyarticle.jar", sha256("b"));
+        Asserts.assertEquals(actual, expected, false);
+        Asserts.assertEquals(
+            PackageFiles.parseText(PackageFiles.toText(actual)),
+            expected,
+            false
+        );
+    }
+
+    @Test
+    public void leadingSlashDoesNotHideZipSlipEntryTest() throws Exception {
+        // given
+        File zipFile = createZipFile(
+            Collections.singletonMap("/../ezyplatform/lib/evil.jar", "evil"),
+            1_600_000_000_000L,
+            false
+        );
+
+        // when
+        Throwable e = Asserts.assertThrows(
+            () -> PackageFiles.readZipFileHashes(zipFile)
+        );
+
+        // then
+        assertReason(e, "invalidFilePath");
+    }
+
+    @Test
+    public void sameFileWithAndWithoutLeadingSlashIsDuplicatedTest() throws Exception {
+        // given
+        Map<String, String> entries = new LinkedHashMap<>();
+        entries.put("ezyplatform/lib/a.jar", "a");
+        entries.put("/ezyplatform/lib/a.jar", "evil");
+        File zipFile = createZipFile(entries, 1_600_000_000_000L, false);
+
+        // when
+        Throwable e = Asserts.assertThrows(
+            () -> PackageFiles.readZipFileHashes(zipFile)
+        );
+
+        // then
+        assertReason(e, "duplicatedFilePath");
+    }
+
+    @Test
     public void parseTextRejectsUnsafePathsTest() {
         // given
         String[] texts = new String[] {

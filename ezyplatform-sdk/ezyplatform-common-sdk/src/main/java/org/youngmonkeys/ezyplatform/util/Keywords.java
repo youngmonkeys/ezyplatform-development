@@ -16,12 +16,16 @@
 
 package org.youngmonkeys.ezyplatform.util;
 
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
@@ -33,7 +37,35 @@ public final class Keywords {
 
     public static final int DEFAULT_MAX_KEYWORD_LENGTH = 30;
 
+    private static final Pattern LATIN_DIACRITICS =
+        Pattern.compile("(?<=\\p{IsLatin})\\p{M}+");
+
     private Keywords() {}
+
+    public static String normalizeKeyword(String keyword) {
+        if (keyword == null) {
+            return null;
+        }
+        String decomposed = Normalizer.normalize(keyword, Normalizer.Form.NFD);
+        String withoutDiacritics = LATIN_DIACRITICS
+            .matcher(decomposed)
+            .replaceAll(EMPTY_STRING);
+        return Normalizer
+            .normalize(withoutDiacritics, Normalizer.Form.NFC)
+            .replace('đ', 'd')
+            .replace('Đ', 'D')
+            .toLowerCase(Locale.ROOT);
+    }
+
+    public static List<String> normalizeKeywords(Collection<String> keywords) {
+        if (keywords == null) {
+            return null;
+        }
+        return keywords
+            .stream()
+            .map(Keywords::normalizeKeyword)
+            .collect(Collectors.toList());
+    }
 
     /**
      * Equivalent to {@link #toKeywords(String, boolean)} with
@@ -100,14 +132,14 @@ public final class Keywords {
         if (maxKeywordLength == 0) {
             return Collections.emptyList();
         }
+        String normalized = normalizeKeyword(str);
         List<String> answer = new ArrayList<>();
-        for (int i = 0; i < str.length(); ++i) {
-            char ch = str.charAt(i);
+        for (int i = 0; i < normalized.length(); ++i) {
+            char ch = normalized.charAt(i);
             if (!isWhitespace(ch)) {
                 answer.add(
-                    substring(str, i, i + maxKeywordLength)
+                    substring(normalized, i, i + maxKeywordLength)
                     .trim()
-                    .toLowerCase()
                 );
             }
         }
@@ -142,9 +174,7 @@ public final class Keywords {
     ) {
         return Arrays
             .stream(
-                query
-                    .trim()
-                    .toLowerCase()
+                normalizeKeyword(query.trim())
                     .split(splitPattern)
             )
             .filter(token -> token.length() >= minKeywordLength)
@@ -173,10 +203,10 @@ public final class Keywords {
             return Collections.emptyList();
         }
         List<String> keywords = new ArrayList<>();
-        String emailKeyword = email;
+        String emailKeyword = normalizeKeyword(email);
         int maxLength = DEFAULT_MAX_KEYWORD_LENGTH;
-        if (email.length() > maxLength) {
-            emailKeyword = email.substring(0, maxLength);
+        if (emailKeyword.length() > maxLength) {
+            emailKeyword = emailKeyword.substring(0, maxLength);
         }
         keywords.add(emailKeyword);
         keywords.addAll(toKeywords(keywordFromEmail(email)));
@@ -196,6 +226,6 @@ public final class Keywords {
         int atIndex = email.indexOf("@");
         return atIndex < 1
             ? EMPTY_STRING
-            : email.substring(0, atIndex).toLowerCase();
+            : normalizeKeyword(email.substring(0, atIndex));
     }
 }
