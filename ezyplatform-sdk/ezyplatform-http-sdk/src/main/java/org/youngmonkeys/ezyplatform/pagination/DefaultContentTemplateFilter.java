@@ -22,6 +22,9 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.util.Collection;
 import java.util.List;
 
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeywords;
+
 public class DefaultContentTemplateFilter implements ContentTemplateFilter {
     public final String ownerType;
     public final Long ownerId;
@@ -44,8 +47,8 @@ public class DefaultContentTemplateFilter implements ContentTemplateFilter {
         this.contentType = builder.contentType;
         this.creatorId = builder.creatorId;
         this.status = builder.status;
-        this.keywordPrefix = builder.keywordPrefix;
-        this.keywords = builder.keywords;
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
+        this.keywords = normalizeKeywords(builder.keywords);
         this.likeKeyword = builder.likeKeyword;
     }
 

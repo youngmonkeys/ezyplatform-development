@@ -21,13 +21,16 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 
 import java.util.Collection;
 
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeywords;
+
 public class DefaultAdminRoleFilter implements AdminRoleFilter {
     public final Collection<String> keywords;
     public final String keywordPrefix;
 
     protected DefaultAdminRoleFilter(Builder<?> builder) {
-        this.keywords = builder.keywords;
-        this.keywordPrefix = builder.keywordPrefix;
+        this.keywords = normalizeKeywords(builder.keywords);
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
     }
 
     @Override

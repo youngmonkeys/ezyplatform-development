@@ -21,13 +21,16 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 
 import java.util.Collection;
 
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeywords;
+
 public class DefaultDataI18nFilter implements DataI18nFilter {
     public final Collection<String> keywords;
     public final String keywordPrefix;
 
     protected DefaultDataI18nFilter(Builder<?> builder) {
-        this.keywords = builder.keywords;
-        this.keywordPrefix = builder.keywordPrefix;
+        this.keywords = normalizeKeywords(builder.keywords);
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
     }
 
     @Override

@@ -21,6 +21,9 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 
 import java.util.Collection;
 
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeywords;
+
 public class DefaultAdminRoleNameFilter implements AdminRoleNameFilter {
     public final Integer priorityGte;
     public final Collection<String> keywords;
@@ -28,8 +31,8 @@ public class DefaultAdminRoleNameFilter implements AdminRoleNameFilter {
 
     protected DefaultAdminRoleNameFilter(Builder<?> builder) {
         this.priorityGte = builder.priorityGte;
-        this.keywords = builder.keywords;
-        this.keywordPrefix = builder.keywordPrefix;
+        this.keywords = normalizeKeywords(builder.keywords);
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
     }
 
     @Override

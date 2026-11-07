@@ -22,10 +22,15 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.math.BigInteger;
 import java.util.Collection;
 
+import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrNullFromObject;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeywords;
+
 public class DefaultUserFilter implements UserFilter {
     public final String status;
     public final Collection<String> statuses;
     public final String uniqueKeyword;
+    public final Long uniqueKeywordId;
     public final String keywordPrefix;
     public final Collection<String> keywords;
     public final Long roleId;
@@ -44,8 +49,9 @@ public class DefaultUserFilter implements UserFilter {
         this.status = builder.status;
         this.statuses = builder.statuses;
         this.uniqueKeyword = builder.uniqueKeyword;
-        this.keywordPrefix = builder.keywordPrefix;
-        this.keywords = builder.keywords;
+        this.uniqueKeywordId = toLongOrNullFromObject(builder.uniqueKeyword);
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
+        this.keywords = normalizeKeywords(builder.keywords);
         this.roleId = builder.roleId;
         this.roleIds = builder.roleIds;
         this.roleName = builder.roleName;
@@ -148,17 +154,16 @@ public class DefaultUserFilter implements UserFilter {
             answer.and("n.metaNumberValue = :metaNumberValue");
         }
         if (uniqueKeyword != null) {
-            answer.and(
-                new EzyQueryConditionBuilder()
-                    .append("(")
-                    .append("e.username = :uniqueKeyword")
-                    .or("e.phone = :uniqueKeyword")
-                    .or("e.email = :uniqueKeyword")
-                    .or("e.uuid = :uniqueKeyword")
-                    .or("e.id = :uniqueKeyword")
-                    .append(")")
-                    .build()
-            );
+            EzyQueryConditionBuilder uniqueKeywordCondition = new EzyQueryConditionBuilder()
+                .append("(")
+                .append("e.username = :uniqueKeyword")
+                .or("e.phone = :uniqueKeyword")
+                .or("e.email = :uniqueKeyword")
+                .or("e.uuid = :uniqueKeyword");
+            if (uniqueKeywordId != null) {
+                uniqueKeywordCondition.or("e.id = :uniqueKeywordId");
+            }
+            answer.and(uniqueKeywordCondition.append(")").build());
         }
         if (keywordPrefix != null) {
             answer.and("k.keyword LIKE CONCAT(:keywordPrefix,'%')");

@@ -21,6 +21,8 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 
 import java.util.Collection;
 
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
+
 public class DefaultDataMetaFilter implements DataMetaFilter {
     public final String dataType;
     public final Long dataId;
@@ -39,7 +41,7 @@ public class DefaultDataMetaFilter implements DataMetaFilter {
         this.exclusiveMetaKeys = builder.exclusiveMetaKeys;
         this.metaValue = builder.metaValue;
         this.likeKeyword = builder.likeKeyword;
-        this.keywordPrefix = builder.keywordPrefix;
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
     }
 
     @Override
