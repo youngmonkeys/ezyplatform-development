@@ -16,8 +16,10 @@
 
 package org.youngmonkeys.ezyplatform.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
+import org.youngmonkeys.ezyplatform.util.TextDirections;
 
 @Getter
 @Builder
@@ -25,8 +27,14 @@ public class WebLanguageModel implements Comparable<WebLanguageModel> {
     protected String code;
     protected String name;
     protected String flag;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    protected String direction;
     protected int displayOrder;
     protected boolean active;
+
+    public String resolveTextDirection() {
+        return TextDirections.getTextDirection(code, direction);
+    }
 
     @Override
     public int compareTo(WebLanguageModel o) {
@@ -40,7 +48,7 @@ public class WebLanguageModel implements Comparable<WebLanguageModel> {
     public static class Mutable extends WebLanguageModel {
 
         public Mutable() {
-            super(null, null, null, 0, false);
+            super(null, null, null, null, 0, false);
         }
 
         public void setCode(String code) {
@@ -53,6 +61,10 @@ public class WebLanguageModel implements Comparable<WebLanguageModel> {
 
         public void setFlag(String flag) {
             this.flag = flag;
+        }
+
+        public void setDirection(String direction) {
+            this.direction = direction;
         }
 
         public void setDisplayOrder(int displayOrder) {

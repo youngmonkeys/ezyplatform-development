@@ -20,8 +20,11 @@ import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyhttp.server.core.view.View;
 import com.tvd12.ezyhttp.server.core.view.ViewDecorator;
 import lombok.Setter;
+import org.youngmonkeys.ezyplatform.model.WebLanguageModel;
 import org.youngmonkeys.ezyplatform.service.WebLanguageService;
 import org.youngmonkeys.ezyplatform.util.HttpRequests;
+import org.youngmonkeys.ezyplatform.util.TextDirections;
+import org.youngmonkeys.ezyplatform.view.ViewVariables;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
@@ -39,6 +42,7 @@ public class WebViewLanguageDecorator implements ViewDecorator {
     @Override
     public void decorate(HttpServletRequest request, View view) {
         setLanguage(request, view);
+        setEzyTextDirection(view);
         setLanguages(request, view);
     }
 
@@ -61,6 +65,24 @@ public class WebViewLanguageDecorator implements ViewDecorator {
             view.setLocale(new Locale(lang));
             view.setVariable("ezyLang", lang);
         }
+    }
+
+    protected void setEzyTextDirection(View view) {
+        if (view.containsVariable("ezyDir")) {
+            return;
+        }
+        String lang = ViewVariables.getEzyLanguage(view);
+        if (isBlank(lang)) {
+            return;
+        }
+        WebLanguageModel language = webLanguageService
+            .getLanguageByCode(lang);
+        view.setVariable(
+            "ezyDir",
+            language != null
+                ? language.resolveTextDirection()
+                : TextDirections.getTextDirection(lang)
+        );
     }
 
     protected void setLanguages(HttpServletRequest request, View view) {
