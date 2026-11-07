@@ -21,6 +21,9 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 
 import java.util.Collection;
 
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeywords;
+
 public class DefaultDataIndexFilter implements DataIndexFilter {
     public final String dataType;
     public final String keywordPrefix;
@@ -28,8 +31,8 @@ public class DefaultDataIndexFilter implements DataIndexFilter {
 
     protected DefaultDataIndexFilter(Builder<?> builder) {
         this.dataType = builder.dataType;
-        this.keywordPrefix = builder.keywordPrefix;
-        this.keywords = builder.keywords;
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
+        this.keywords = normalizeKeywords(builder.keywords);
     }
 
     @Override

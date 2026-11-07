@@ -22,6 +22,9 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.time.LocalDateTime;
 import java.util.Collection;
 
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeywords;
+
 public class DefaultDataRecordCountFilter implements DataRecordCountFilter {
     public final String dataType;
     public final LocalDateTime lastCountedAtGte;
@@ -43,8 +46,8 @@ public class DefaultDataRecordCountFilter implements DataRecordCountFilter {
         this.recordType = builder.recordType;
         this.queryType = builder.queryType;
         this.parameterType = builder.parameterType;
-        this.keywords = builder.keywords;
-        this.keywordPrefix = builder.keywordPrefix;
+        this.keywords = normalizeKeywords(builder.keywords);
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
     }
 
     @Override

@@ -22,7 +22,9 @@ import com.tvd12.ezyfox.builder.EzyBuilder;
 import java.math.BigInteger;
 import java.util.Collection;
 
+import static org.youngmonkeys.ezyplatform.util.Numbers.toLongOrNullFromObject;
 import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_ADMIN;
+import static org.youngmonkeys.ezyplatform.util.Keywords.normalizeKeyword;
 
 public class DefaultAdminFilter implements AdminFilter {
     public final Collection<Long> ids;
@@ -30,6 +32,7 @@ public class DefaultAdminFilter implements AdminFilter {
     public final Collection<String> statuses;
     public final String exclusiveStatus;
     public final String uniqueKeyword;
+    public final Long uniqueKeywordId;
     public final String keywordPrefix;
     public final Long roleId;
     public final Collection<Long> roleIds;
@@ -49,7 +52,8 @@ public class DefaultAdminFilter implements AdminFilter {
         this.statuses = builder.statuses;
         this.exclusiveStatus = builder.exclusiveStatus;
         this.uniqueKeyword = builder.uniqueKeyword;
-        this.keywordPrefix = builder.keywordPrefix;
+        this.uniqueKeywordId = toLongOrNullFromObject(builder.uniqueKeyword);
+        this.keywordPrefix = normalizeKeyword(builder.keywordPrefix);
         this.roleId = builder.roleId;
         this.roleIds = builder.roleIds;
         this.roleName = builder.roleName;
@@ -160,17 +164,16 @@ public class DefaultAdminFilter implements AdminFilter {
             answer.and("n.metaNumberValue = :metaNumberValue");
         }
         if (uniqueKeyword != null) {
-            answer.and(
-                new EzyQueryConditionBuilder()
-                    .append("(")
-                    .append("e.username = :uniqueKeyword")
-                    .or("e.phone = :uniqueKeyword")
-                    .or("e.email = :uniqueKeyword")
-                    .or("e.uuid = :uniqueKeyword")
-                    .or("e.id = :uniqueKeyword")
-                    .append(")")
-                    .build()
-            );
+            EzyQueryConditionBuilder uniqueKeywordCondition = new EzyQueryConditionBuilder()
+                .append("(")
+                .append("e.username = :uniqueKeyword")
+                .or("e.phone = :uniqueKeyword")
+                .or("e.email = :uniqueKeyword")
+                .or("e.uuid = :uniqueKeyword");
+            if (uniqueKeywordId != null) {
+                uniqueKeywordCondition.or("e.id = :uniqueKeywordId");
+            }
+            answer.and(uniqueKeywordCondition.append(")").build());
         }
         if (keywordPrefix != null) {
             answer
