@@ -352,6 +352,9 @@ public final class CommonConstants {
         "data_min_data_key_word_length";
     public static final String SETTING_NAME_DATA_RANK_FUSION_CONSTANT =
         "data_rank_fusion_constant";
+    public static final String SETTING_NAME_ENVIRONMENT_TYPE =
+        "environment_type";
+    public static final String SETTING_NAME_APP_LOGO_ID = "app_logo_id";
 
 
     public static final int DEFAULT_TIMEOUT_SECONDS = 15;

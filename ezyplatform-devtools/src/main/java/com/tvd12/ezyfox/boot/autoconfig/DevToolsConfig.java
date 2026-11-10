@@ -16,6 +16,7 @@
 
 package com.tvd12.ezyfox.boot.autoconfig;
 
+import com.tvd12.ezyfox.bean.annotation.EzyAutoBind;
 import com.tvd12.ezyfox.bean.annotation.EzyConfigurationAfter;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.ezyhttp.server.core.manager.ComponentManager;
@@ -39,6 +40,9 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 @EzyConfigurationAfter
 public class DevToolsConfig extends EzyLoggable {
+
+    @EzyAutoBind
+    private ComponentManager componentManager;
 
     public DevToolsConfig() {
         this(getPackageManagerType());
@@ -139,7 +143,10 @@ public class DevToolsConfig extends EzyLoggable {
     }
 
     private void clearThymeleafCache() throws NoSuchFieldException, IllegalAccessException {
-        ViewContext viewContext = ComponentManager.getInstance().getViewContext();
+        if (componentManager == null) {
+            return;
+        }
+        ViewContext viewContext = componentManager.getViewContext();
         if (!(viewContext instanceof ThymeleafViewContext)) {
             return;
         }
