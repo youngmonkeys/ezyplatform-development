@@ -17,14 +17,13 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import org.youngmonkeys.ezyplatform.entity.DataMapping;
-import org.youngmonkeys.ezyplatform.entity.DataMappingId;
 import org.youngmonkeys.ezyplatform.pagination.DataMappingFilter;
 import org.youngmonkeys.ezyplatform.pagination.DataMappingPaginationParameter;
 
 public class PaginationDataMappingRepository extends CommonPaginationRepository<
     DataMappingFilter,
     DataMappingPaginationParameter,
-    DataMappingId,
+    Long,
     DataMapping> {
 
     @Override

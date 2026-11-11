@@ -19,7 +19,6 @@ package org.youngmonkeys.ezyplatform.entity;
 import lombok.*;
 
 import javax.persistence.Column;
-import javax.persistence.Id;
 import java.io.Serializable;
 
 @Getter
@@ -29,15 +28,12 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UniqueDataId implements Serializable {
-    @Id
     @Column(name = "data_type")
     private String dataType;
 
-    @Id
     @Column(name = "data_id")
     private long dataId;
 
-    @Id
     @Column(name = "unique_key")
     private String uniqueKey;
 }

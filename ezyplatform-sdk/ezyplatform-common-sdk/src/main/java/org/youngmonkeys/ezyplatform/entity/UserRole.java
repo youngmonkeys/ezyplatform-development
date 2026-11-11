@@ -27,16 +27,17 @@ import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_
 @Setter
 @ToString
 @Entity
-@IdClass(UserRoleId.class)
 @Table(name = TABLE_NAME_USER_ROLE)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRole {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
     @Column(name = "role_id")
     private long roleId;
 
-    @Id
     @Column(name = "user_id")
     private long userId;
 

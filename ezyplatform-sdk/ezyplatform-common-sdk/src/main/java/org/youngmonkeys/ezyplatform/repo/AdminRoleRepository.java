@@ -19,13 +19,22 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.AdminRole;
-import org.youngmonkeys.ezyplatform.entity.AdminRoleId;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.List;
 
 public interface AdminRoleRepository
-    extends EzyDatabaseRepository<AdminRoleId, AdminRole>  {
+    extends EzyDatabaseRepository<Long, AdminRole>  {
+
+    AdminRole findByRoleIdAndAdminId(
+        long roleId,
+        long adminId
+    );
+
+    void deleteByRoleIdAndAdminId(
+        long roleId,
+        long adminId
+    );
 
     @EzyQuery(
         "SELECT e.adminId FROM AdminRole e " +

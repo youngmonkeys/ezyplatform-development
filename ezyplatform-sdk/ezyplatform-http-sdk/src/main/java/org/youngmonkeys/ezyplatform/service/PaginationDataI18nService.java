@@ -18,7 +18,6 @@ package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.DataI18n;
-import org.youngmonkeys.ezyplatform.entity.DataI18nId;
 import org.youngmonkeys.ezyplatform.model.DataI18nModel;
 import org.youngmonkeys.ezyplatform.pagination.DataI18nFilter;
 import org.youngmonkeys.ezyplatform.pagination.DataI18nPaginationParameter;
@@ -31,7 +30,7 @@ public class PaginationDataI18nService extends CommonPaginationService<
     DataI18nModel,
     DataI18nFilter,
     DataI18nPaginationParameter,
-    DataI18nId,
+    Long,
     DataI18n> {
 
     private final DefaultEntityToModelConverter entityToModelConverter;

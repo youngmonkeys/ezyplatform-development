@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
-import org.youngmonkeys.ezyplatform.entity.UserRoleId;
 import org.youngmonkeys.ezyplatform.entity.UserRoleName;
 import org.youngmonkeys.ezyplatform.model.UserRoleNameModel;
 import org.youngmonkeys.ezyplatform.repo.UserRoleNameRepository;
@@ -52,11 +51,9 @@ public class DefaultUserRoleService implements UserRoleService {
         long userId,
         long roleId
     ) {
-        UserRole entity = userRoleRepository.findById(
-            new UserRoleId(
-                roleId,
-                userId
-            )
+        UserRole entity = userRoleRepository.findByRoleIdAndUserId(
+            roleId,
+            userId
         );
         if (entity == null) {
             entity = modelToEntityConverter
@@ -87,8 +84,9 @@ public class DefaultUserRoleService implements UserRoleService {
         long userId,
         long roleId
     ) {
-        userRoleRepository.delete(
-            new UserRoleId(roleId, userId)
+        userRoleRepository.deleteByRoleIdAndUserId(
+            roleId,
+            userId
         );
     }
 
@@ -191,9 +189,10 @@ public class DefaultUserRoleService implements UserRoleService {
 
     @Override
     public boolean containsUserRole(long userId, long roleId) {
-        return userRoleRepository.containsById(
-            new UserRoleId(roleId, userId)
-        );
+        return userRoleRepository.findByRoleIdAndUserId(
+            roleId,
+            userId
+        ) != null;
     }
 
     @Override

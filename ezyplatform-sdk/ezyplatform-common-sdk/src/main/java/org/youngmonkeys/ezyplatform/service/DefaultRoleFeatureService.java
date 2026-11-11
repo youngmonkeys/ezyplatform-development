@@ -17,6 +17,8 @@
 package org.youngmonkeys.ezyplatform.service;
 
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.RoleFeature;
 import org.youngmonkeys.ezyplatform.entity.TargetType;
 import org.youngmonkeys.ezyplatform.repo.RoleFeatureRepository;
@@ -30,8 +32,8 @@ public class DefaultRoleFeatureService implements RoleFeatureService {
 
     protected final String targetType;
     private final RoleFeatureRepository roleFeatureRepository;
-    private final AtomicReference<Map<Long, Map<String, Map<String, Set<HttpMethod>>>>>
-        methodsUriMapByFeatureByRoleIdRef = new AtomicReference<>();
+    private final AtomicReference<RoleFeaturesCache> roleFeaturesCacheRef =
+        new AtomicReference<>();
 
     public DefaultRoleFeatureService(
         TargetType targetType,
@@ -104,30 +106,78 @@ public class DefaultRoleFeatureService implements RoleFeatureService {
     @Override
     public Map<Long, Map<String, Map<String, Set<HttpMethod>>>>
         getMethodsUriMapByFeatureByRoleId() {
-        return methodsUriMapByFeatureByRoleIdRef.get();
+        return roleFeaturesCacheRef.get().methodsUriMapByFeatureByRoleId;
+    }
+
+    @Override
+    public String getRoleFeaturesVersion(Collection<Long> roleIds) {
+        return roleFeaturesCacheRef.get().getRoleFeaturesVersion(roleIds);
+    }
+
+    public RoleFeaturesCache getRoleFeaturesCache() {
+        return roleFeaturesCacheRef.get();
     }
 
     protected void cacheRoleFeatures() {
         Map<Long, Map<String, Map<String, Set<HttpMethod>>>> methodsUriMapByFeatureByRoleId
             = new HashMap<>();
+        Map<Long, long[]> countAndMaxIdByRoleId = new HashMap<>();
         roleFeatureRepository.findListByField(
             "target",
             targetType
-        ).forEach(entity ->
+        ).forEach(entity -> {
             methodsUriMapByFeatureByRoleId.computeIfAbsent(entity.getRoleId(), it ->
                 new HashMap<>()
             ).computeIfAbsent(entity.getFeature(), it ->
                 new HashMap<>()
             ).computeIfAbsent(entity.getFeatureUri(), it ->
                 new HashSet<>()
-            ).add(HttpMethod.valueOf(entity.getFeatureMethod()))
+            ).add(HttpMethod.valueOf(entity.getFeatureMethod()));
+            long[] countAndMaxId = countAndMaxIdByRoleId.computeIfAbsent(
+                entity.getRoleId(),
+                it -> new long[2]
+            );
+            ++countAndMaxId[0];
+            countAndMaxId[1] = Math.max(countAndMaxId[1], entity.getId());
+        });
+        Map<Long, String> versionByRoleId = new HashMap<>();
+        countAndMaxIdByRoleId.forEach((roleId, countAndMaxId) ->
+            versionByRoleId.put(
+                roleId,
+                countAndMaxId[0] + ":" + countAndMaxId[1]
+            )
         );
-        methodsUriMapByFeatureByRoleIdRef.set(methodsUriMapByFeatureByRoleId);
+        roleFeaturesCacheRef.set(
+            new RoleFeaturesCache(
+                methodsUriMapByFeatureByRoleId,
+                versionByRoleId
+            )
+        );
     }
 
     protected void cacheRoleFeaturesIfNull() {
-        if (methodsUriMapByFeatureByRoleIdRef.get() == null) {
+        if (roleFeaturesCacheRef.get() == null) {
             cacheRoleFeatures();
+        }
+    }
+
+    @AllArgsConstructor
+    public static class RoleFeaturesCache {
+        @Getter
+        private final Map<Long, Map<String, Map<String, Set<HttpMethod>>>>
+            methodsUriMapByFeatureByRoleId;
+        private final Map<Long, String> versionByRoleId;
+
+        public String getRoleFeaturesVersion(Collection<Long> roleIds) {
+            StringBuilder builder = new StringBuilder();
+            for (Long roleId : new TreeSet<>(roleIds)) {
+                builder
+                    .append(roleId)
+                    .append('=')
+                    .append(versionByRoleId.getOrDefault(roleId, "0:0"))
+                    .append(';');
+            }
+            return builder.toString();
         }
     }
 }

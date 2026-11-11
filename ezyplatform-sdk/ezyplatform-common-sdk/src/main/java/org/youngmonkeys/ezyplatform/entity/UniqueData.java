@@ -28,20 +28,20 @@ import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_
 @Setter
 @ToString
 @Entity
-@IdClass(UniqueDataId.class)
 @Table(name = TABLE_NAME_UNIQUE_DATA)
 @AllArgsConstructor
 @NoArgsConstructor
 public class UniqueData {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
     @Column(name = "data_type")
     private String dataType;
 
-    @Id
     @Column(name = "data_id")
     private long dataId;
 
-    @Id
     @Column(name = "unique_key")
     private String uniqueKey;
 

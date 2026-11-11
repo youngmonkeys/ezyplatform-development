@@ -18,12 +18,11 @@ package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.RoleFeature;
-import org.youngmonkeys.ezyplatform.entity.RoleFeatureId;
 
 import java.util.List;
 
 public interface RoleFeatureRepository
-    extends EzyDatabaseRepository<RoleFeatureId, RoleFeature> {
+    extends EzyDatabaseRepository<Long, RoleFeature> {
 
     List<RoleFeature> findByRoleIdAndTarget(
         long roleId,

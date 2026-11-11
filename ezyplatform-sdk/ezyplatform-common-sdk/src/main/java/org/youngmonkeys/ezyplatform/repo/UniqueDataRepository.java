@@ -19,14 +19,19 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.UniqueData;
-import org.youngmonkeys.ezyplatform.entity.UniqueDataId;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface UniqueDataRepository
-    extends EzyDatabaseRepository<UniqueDataId, UniqueData> {
+    extends EzyDatabaseRepository<Long, UniqueData> {
+
+    UniqueData findByDataTypeAndDataIdAndUniqueKey(
+        String dataType,
+        long dataId,
+        String uniqueKey
+    );
 
     void deleteByDataTypeAndUniqueKey(
         String dataType,

@@ -17,14 +17,13 @@
 package org.youngmonkeys.ezyplatform.repo;
 
 import org.youngmonkeys.ezyplatform.entity.UniqueData;
-import org.youngmonkeys.ezyplatform.entity.UniqueDataId;
 import org.youngmonkeys.ezyplatform.pagination.UniqueDataFilter;
 import org.youngmonkeys.ezyplatform.pagination.UniqueDataPaginationParameter;
 
 public class PaginationUniqueDataRepository extends CommonPaginationRepository<
     UniqueDataFilter,
     UniqueDataPaginationParameter,
-    UniqueDataId,
+    Long,
     UniqueData> {
 
     @Override

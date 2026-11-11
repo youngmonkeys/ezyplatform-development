@@ -18,13 +18,19 @@ package org.youngmonkeys.ezyplatform.repo;
 
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import org.youngmonkeys.ezyplatform.entity.DataI18n;
-import org.youngmonkeys.ezyplatform.entity.DataI18nId;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface DataI18nRepository
-    extends EzyDatabaseRepository<DataI18nId, DataI18n> {
+    extends EzyDatabaseRepository<Long, DataI18n> {
+
+    DataI18n findByDataTypeAndDataIdAndLanguageAndFieldName(
+        String dataType,
+        long dataId,
+        String language,
+        String fieldName
+    );
 
     void deleteByDataTypeAndDataId(
         String dataType,

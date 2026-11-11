@@ -19,14 +19,17 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.DataI18n;
-import org.youngmonkeys.ezyplatform.entity.DataI18nId;
 import org.youngmonkeys.ezyplatform.model.DataI18nFieldModel;
 import org.youngmonkeys.ezyplatform.model.DataI18nModel;
 import org.youngmonkeys.ezyplatform.repo.DataI18nRepository;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 public class DefaultData18nService implements Data18nService {
@@ -36,9 +39,18 @@ public class DefaultData18nService implements Data18nService {
 
     @Override
     public void saveData(DataI18nModel model) {
-        dataI18nRepository.save(
-            modelToEntityConverter.toEntity(model)
-        );
+        DataI18n entity = modelToEntityConverter.toEntity(model);
+        DataI18n existing = dataI18nRepository
+            .findByDataTypeAndDataIdAndLanguageAndFieldName(
+                entity.getDataType(),
+                entity.getDataId(),
+                entity.getLanguage(),
+                entity.getFieldName()
+            );
+        if (existing != null) {
+            entity.setId(existing.getId());
+        }
+        dataI18nRepository.save(entity);
     }
 
     @Override
@@ -48,19 +60,38 @@ public class DefaultData18nService implements Data18nService {
         String language,
         Collection<DataI18nFieldModel> fields
     ) {
+        if (fields.isEmpty()) {
+            return;
+        }
+        Map<String, Long> idByFieldName = dataI18nRepository
+            .findByDataTypeAndDataIdAndLanguage(
+                dataType,
+                dataId,
+                language
+            )
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    DataI18n::getFieldName,
+                    DataI18n::getId,
+                    (o, n) -> o
+                )
+            );
+        Map<String, DataI18n> entityByFieldName = new LinkedHashMap<>();
+        for (DataI18nFieldModel field : fields) {
+            DataI18n entity = new DataI18n();
+            entity.setId(
+                idByFieldName.getOrDefault(field.getName(), ZERO_LONG)
+            );
+            entity.setDataType(dataType);
+            entity.setDataId(dataId);
+            entity.setLanguage(language);
+            entity.setFieldName(field.getName());
+            entity.setFieldValue(field.getValue());
+            entityByFieldName.put(field.getName(), entity);
+        }
         dataI18nRepository.save(
-            fields
-                .stream()
-                .map(it -> {
-                    DataI18n entity = new DataI18n();
-                    entity.setDataType(dataType);
-                    entity.setDataId(dataId);
-                    entity.setLanguage(language);
-                    entity.setFieldName(it.getName());
-                    entity.setFieldValue(it.getValue());
-                    return entity;
-                })
-                .collect(Collectors.toList())
+            new ArrayList<>(entityByFieldName.values())
         );
     }
 
@@ -95,14 +126,13 @@ public class DefaultData18nService implements Data18nService {
         String language,
         String fieldName
     ) {
-        DataI18n entity = dataI18nRepository.findById(
-            new DataI18nId(
+        DataI18n entity = dataI18nRepository
+            .findByDataTypeAndDataIdAndLanguageAndFieldName(
                 dataType,
                 dataId,
                 language,
                 fieldName
-            )
-        );
+            );
         return entity != null ? entity.getFieldValue() : null;
     }
 

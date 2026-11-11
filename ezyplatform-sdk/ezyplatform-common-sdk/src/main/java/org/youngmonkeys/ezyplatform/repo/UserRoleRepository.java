@@ -19,12 +19,21 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
-import org.youngmonkeys.ezyplatform.entity.UserRoleId;
 
 import java.util.Collection;
 
 public interface UserRoleRepository
-    extends EzyDatabaseRepository<UserRoleId, UserRole> {
+    extends EzyDatabaseRepository<Long, UserRole> {
+
+    UserRole findByRoleIdAndUserId(
+        long roleId,
+        long userId
+    );
+
+    void deleteByRoleIdAndUserId(
+        long roleId,
+        long userId
+    );
 
     void deleteByUserId(long userId);
 

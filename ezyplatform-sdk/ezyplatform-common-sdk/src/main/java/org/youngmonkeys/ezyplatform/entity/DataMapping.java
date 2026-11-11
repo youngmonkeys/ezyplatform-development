@@ -24,8 +24,9 @@ import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
 import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -37,20 +38,20 @@ import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_
 @Setter
 @ToString
 @Entity
-@IdClass(DataMappingId.class)
 @Table(name = TABLE_NAME_DATA_MAPPING)
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataMapping {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
     @Column(name = "mapping_name")
     private String mappingName;
 
-    @Id
     @Column(name = "from_data_id")
     private long fromDataId;
 
-    @Id
     @Column(name = "to_data_id")
     private long toDataId;
 

@@ -27,26 +27,24 @@ import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_
 @Setter
 @ToString
 @Entity
-@IdClass(RoleFeatureId.class)
 @Table(name = TABLE_NAME_ROLE_FEATURE)
 @AllArgsConstructor
 @NoArgsConstructor
 public class RoleFeature {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
     @Column(name = "role_id")
     private long roleId;
 
-    @Id
     private String target;
 
-    @Id
     private String feature;
 
-    @Id
     @Column(name = "feature_uri")
     private String featureUri;
 
-    @Id
     @Column(name = "feature_method")
     private String featureMethod;
 
