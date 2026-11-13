@@ -26,13 +26,16 @@ import org.youngmonkeys.ezyplatform.model.UniqueDataModel;
 import org.youngmonkeys.ezyplatform.repo.UniqueDataRepository;
 import org.youngmonkeys.ezyplatform.result.IdResult;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 @SuppressWarnings("LineLength")
@@ -45,18 +48,21 @@ public class DefaultUniqueDataService implements UniqueDataService {
 
     @Override
     public void saveDataMeta(UniqueDataModel model) {
-        uniqueDataRepository.save(
-            modelToEntityConverter.toEntity(model)
+        saveEntities(
+            Collections.singletonList(
+                modelToEntityConverter.toEntity(model)
+            )
         );
     }
 
     @Override
     public void saveDataMetaList(List<UniqueDataModel> models) {
-        List<UniqueData> entities = newArrayList(
-            models,
-            modelToEntityConverter::toEntity
+        saveEntities(
+            newArrayList(
+                models,
+                modelToEntityConverter::toEntity
+            )
         );
-        uniqueDataRepository.save(entities);
     }
 
     @Override
@@ -65,15 +71,67 @@ public class DefaultUniqueDataService implements UniqueDataService {
         long dataId,
         List<UniqueDataKeyValueModel> models
     ) {
-        List<UniqueData> entities = newArrayList(
-            models,
-            it -> modelToEntityConverter.toEntity(
-                dataType,
-                dataId,
-                it
+        saveEntities(
+            newArrayList(
+                models,
+                it -> modelToEntityConverter.toEntity(
+                    dataType,
+                    dataId,
+                    it
+                )
             )
         );
-        uniqueDataRepository.save(entities);
+    }
+
+    private void saveEntities(List<UniqueData> entities) {
+        if (entities.isEmpty()) {
+            return;
+        }
+        Map<UniqueDataId, UniqueData> entityByIdentifier = new LinkedHashMap<>();
+        for (UniqueData entity : entities) {
+            entityByIdentifier.put(entity.identifier(), entity);
+        }
+        Map<UniqueDataId, List<UniqueData>> entitiesByData = entityByIdentifier
+            .values()
+            .stream()
+            .collect(
+                Collectors.groupingBy(
+                    it -> new UniqueDataId(
+                        it.getDataType(),
+                        it.getDataId(),
+                        null
+                    )
+                )
+            );
+        for (Map.Entry<UniqueDataId, List<UniqueData>> e : entitiesByData.entrySet()) {
+            UniqueDataId dataKey = e.getKey();
+            List<UniqueData> dataEntities = e.getValue();
+            Map<String, Long> idByUniqueKey = uniqueDataRepository
+                .findByDataTypeAndDataIdAndUniqueKeyIn(
+                    dataKey.getDataType(),
+                    dataKey.getDataId(),
+                    newArrayList(dataEntities, UniqueData::getUniqueKey)
+                )
+                .stream()
+                .collect(
+                    Collectors.toMap(
+                        UniqueData::getUniqueKey,
+                        UniqueData::getId,
+                        (o, n) -> o
+                    )
+                );
+            for (UniqueData entity : dataEntities) {
+                entity.setId(
+                    idByUniqueKey.getOrDefault(
+                        entity.getUniqueKey(),
+                        ZERO_LONG
+                    )
+                );
+            }
+        }
+        uniqueDataRepository.save(
+            new ArrayList<>(entityByIdentifier.values())
+        );
     }
 
     @Override
@@ -108,12 +166,10 @@ public class DefaultUniqueDataService implements UniqueDataService {
         String uniqueKey
     ) {
         return entityToModelConverter.toModel(
-            uniqueDataRepository.findById(
-                new UniqueDataId(
-                    dataType,
-                    dataId,
-                    uniqueKey
-                )
+            uniqueDataRepository.findByDataTypeAndDataIdAndUniqueKey(
+                dataType,
+                dataId,
+                uniqueKey
             )
         );
     }

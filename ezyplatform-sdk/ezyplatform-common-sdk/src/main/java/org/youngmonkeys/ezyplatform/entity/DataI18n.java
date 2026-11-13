@@ -26,24 +26,23 @@ import static org.youngmonkeys.ezyplatform.constant.CommonTableNames.TABLE_NAME_
 @Setter
 @ToString
 @Entity
-@IdClass(DataI18nId.class)
 @Table(name = TABLE_NAME_DATA_I18N)
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataI18n {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
     @Column(name = "data_type")
     private String dataType;
 
-    @Id
     @Column(name = "data_id")
     private long dataId;
 
-    @Id
     @Column(name = "language")
     private String language;
 
-    @Id
     @Column(name = "field_name")
     private String fieldName;
 

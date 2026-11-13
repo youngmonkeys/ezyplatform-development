@@ -19,9 +19,12 @@ package org.youngmonkeys.ezyplatform.service;
 import com.tvd12.ezyhttp.core.constant.HttpMethod;
 import org.youngmonkeys.ezyplatform.entity.TargetType;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.tvd12.ezyfox.io.EzyStrings.EMPTY_STRING;
 
 public interface RoleFeatureService {
 
@@ -49,4 +52,8 @@ public interface RoleFeatureService {
 
     Map<Long, Map<String, Map<String, Set<HttpMethod>>>>
         getMethodsUriMapByFeatureByRoleId();
+
+    default String getRoleFeaturesVersion(Collection<Long> roleIds) {
+        return EMPTY_STRING;
+    }
 }

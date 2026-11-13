@@ -19,14 +19,49 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.DataMapping;
-import org.youngmonkeys.ezyplatform.entity.DataMappingId;
 import org.youngmonkeys.ezyplatform.result.DataFromToIdResult;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface DataMappingRepository
-    extends EzyDatabaseRepository<DataMappingId, DataMapping> {
+    extends EzyDatabaseRepository<Long, DataMapping> {
+
+    DataMapping findByMappingNameAndFromDataIdAndToDataId(
+        String mappingName,
+        long fromDataId,
+        long toDataId
+    );
+
+    List<DataMapping> findByMappingNameAndFromDataIdAndToDataIdIn(
+        String mappingName,
+        long fromDataId,
+        Collection<Long> toDataIds
+    );
+
+    List<DataMapping> findByMappingNameAndFromDataIdInAndToDataId(
+        String mappingName,
+        Collection<Long> fromDataIds,
+        long toDataId
+    );
+
+    void deleteByMappingNameAndFromDataIdAndToDataId(
+        String mappingName,
+        long fromDataId,
+        long toDataId
+    );
+
+    void deleteByMappingNameAndFromDataIdAndToDataIdIn(
+        String mappingName,
+        long fromDataId,
+        Collection<Long> toDataIds
+    );
+
+    void deleteByMappingNameAndFromDataIdInAndToDataId(
+        String mappingName,
+        Collection<Long> fromDataIds,
+        long toDataId
+    );
 
     void deleteByMappingNameAndFromDataId(
         String mappingName,

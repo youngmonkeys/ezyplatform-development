@@ -19,7 +19,7 @@ package org.youngmonkeys.ezyplatform.service;
 import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
-import org.youngmonkeys.ezyplatform.entity.DataMappingId;
+import org.youngmonkeys.ezyplatform.entity.DataMapping;
 import org.youngmonkeys.ezyplatform.model.DataMappingModel;
 import org.youngmonkeys.ezyplatform.model.SaveDataMappingModel;
 import org.youngmonkeys.ezyplatform.repo.DataMappingRepository;
@@ -28,8 +28,8 @@ import org.youngmonkeys.ezyplatform.result.DataFromToIdResult;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.tvd12.ezyfox.io.EzyLists.newArrayList;
 import static com.tvd12.ezyfox.io.EzySets.newHashSet;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.ZERO_LONG;
 
 @AllArgsConstructor
 public class DefaultDataMappingService implements DataMappingService {
@@ -42,9 +42,17 @@ public class DefaultDataMappingService implements DataMappingService {
     public void saveDataMapping(
         SaveDataMappingModel model
     ) {
-        dataMappingRepository.save(
-            modelToEntityConverter.toEntity(model)
-        );
+        DataMapping entity = modelToEntityConverter.toEntity(model);
+        DataMapping existing = dataMappingRepository
+            .findByMappingNameAndFromDataIdAndToDataId(
+                entity.getMappingName(),
+                entity.getFromDataId(),
+                entity.getToDataId()
+            );
+        if (existing != null) {
+            entity.setId(existing.getId());
+        }
+        dataMappingRepository.save(entity);
     }
 
     @Override
@@ -68,13 +76,35 @@ public class DefaultDataMappingService implements DataMappingService {
         long fromDataId,
         Collection<Long> toDataIds
     ) {
-        dataMappingRepository.save(
-            modelToEntityConverter.toEntities(
+        if (toDataIds.isEmpty()) {
+            return;
+        }
+        Set<Long> distinctToDataIds = new LinkedHashSet<>(toDataIds);
+        Map<Long, Long> idByToDataId = dataMappingRepository
+            .findByMappingNameAndFromDataIdAndToDataIdIn(
                 mappingName,
                 fromDataId,
-                toDataIds
+                distinctToDataIds
             )
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    DataMapping::getToDataId,
+                    DataMapping::getId,
+                    (o, n) -> o
+                )
+            );
+        List<DataMapping> entities = modelToEntityConverter.toEntities(
+            mappingName,
+            fromDataId,
+            distinctToDataIds
         );
+        for (DataMapping entity : entities) {
+            entity.setId(
+                idByToDataId.getOrDefault(entity.getToDataId(), ZERO_LONG)
+            );
+        }
+        dataMappingRepository.save(entities);
     }
 
     @Override
@@ -83,13 +113,35 @@ public class DefaultDataMappingService implements DataMappingService {
         Collection<Long> fromDataIds,
         long toDataId
     ) {
-        dataMappingRepository.save(
-            modelToEntityConverter.toEntities(
+        if (fromDataIds.isEmpty()) {
+            return;
+        }
+        Set<Long> distinctFromDataIds = new LinkedHashSet<>(fromDataIds);
+        Map<Long, Long> idByFromDataId = dataMappingRepository
+            .findByMappingNameAndFromDataIdInAndToDataId(
                 mappingName,
-                fromDataIds,
+                distinctFromDataIds,
                 toDataId
             )
+            .stream()
+            .collect(
+                Collectors.toMap(
+                    DataMapping::getFromDataId,
+                    DataMapping::getId,
+                    (o, n) -> o
+                )
+            );
+        List<DataMapping> entities = modelToEntityConverter.toEntities(
+            mappingName,
+            distinctFromDataIds,
+            toDataId
         );
+        for (DataMapping entity : entities) {
+            entity.setId(
+                idByFromDataId.getOrDefault(entity.getFromDataId(), ZERO_LONG)
+            );
+        }
+        dataMappingRepository.save(entities);
     }
 
     @Override
@@ -97,12 +149,23 @@ public class DefaultDataMappingService implements DataMappingService {
         String mappingName,
         Map<Long, Long> toDataIdByFromDataId
     ) {
-        dataMappingRepository.save(
-            modelToEntityConverter.toEntities(
-                mappingName,
-                toDataIdByFromDataId
-            )
+        if (toDataIdByFromDataId.isEmpty()) {
+            return;
+        }
+        Map<Long, Long> idByFromDataId = getExistingIdByFromDataId(
+            mappingName,
+            toDataIdByFromDataId
         );
+        List<DataMapping> entities = modelToEntityConverter.toEntities(
+            mappingName,
+            toDataIdByFromDataId
+        );
+        for (DataMapping entity : entities) {
+            entity.setId(
+                idByFromDataId.getOrDefault(entity.getFromDataId(), ZERO_LONG)
+            );
+        }
+        dataMappingRepository.save(entities);
     }
 
     @Override
@@ -111,12 +174,10 @@ public class DefaultDataMappingService implements DataMappingService {
         long fromDataId,
         long toDataId
     ) {
-        dataMappingRepository.delete(
-            new DataMappingId(
-                mappingName,
-                fromDataId,
-                toDataId
-            )
+        dataMappingRepository.deleteByMappingNameAndFromDataIdAndToDataId(
+            mappingName,
+            fromDataId,
+            toDataId
         );
     }
 
@@ -151,15 +212,10 @@ public class DefaultDataMappingService implements DataMappingService {
         if (toDataIds.isEmpty()) {
             return;
         }
-        dataMappingRepository.deleteByIds(
-            newArrayList(
-                toDataIds,
-                toDataId -> new DataMappingId(
-                    mappingName,
-                    fromDataId,
-                    toDataId
-                )
-            )
+        dataMappingRepository.deleteByMappingNameAndFromDataIdAndToDataIdIn(
+            mappingName,
+            fromDataId,
+            toDataIds
         );
     }
 
@@ -172,15 +228,10 @@ public class DefaultDataMappingService implements DataMappingService {
         if (fromDataIds.isEmpty()) {
             return;
         }
-        dataMappingRepository.deleteByIds(
-            newArrayList(
-                fromDataIds,
-                fromDataId -> new DataMappingId(
-                    mappingName,
-                    fromDataId,
-                    toDataId
-                )
-            )
+        dataMappingRepository.deleteByMappingNameAndFromDataIdInAndToDataId(
+            mappingName,
+            fromDataIds,
+            toDataId
         );
     }
 
@@ -192,16 +243,38 @@ public class DefaultDataMappingService implements DataMappingService {
         if (toDataIdByFromDataId.isEmpty()) {
             return;
         }
-        dataMappingRepository.deleteByIds(
-            newArrayList(
-                toDataIdByFromDataId.entrySet(),
-                e -> new DataMappingId(
-                    mappingName,
-                    e.getKey(),
-                    e.getValue()
+        Collection<Long> ids = getExistingIdByFromDataId(
+            mappingName,
+            toDataIdByFromDataId
+        ).values();
+        if (!ids.isEmpty()) {
+            dataMappingRepository.deleteByIds(new ArrayList<>(ids));
+        }
+    }
+
+    private Map<Long, Long> getExistingIdByFromDataId(
+        String mappingName,
+        Map<Long, Long> toDataIdByFromDataId
+    ) {
+        return dataMappingRepository
+            .findByMappingNameAndFromDataIdInOrderByMappedAtDesc(
+                mappingName,
+                toDataIdByFromDataId.keySet()
+            )
+            .stream()
+            .filter(it ->
+                Objects.equals(
+                    toDataIdByFromDataId.get(it.getFromDataId()),
+                    it.getToDataId()
                 )
             )
-        );
+            .collect(
+                Collectors.toMap(
+                    DataMapping::getFromDataId,
+                    DataMapping::getId,
+                    (o, n) -> o
+                )
+            );
     }
 
     @Override

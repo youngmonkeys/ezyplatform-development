@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.converter.DefaultModelToEntityConverter;
 import org.youngmonkeys.ezyplatform.entity.AdminRole;
-import org.youngmonkeys.ezyplatform.entity.AdminRoleId;
 import org.youngmonkeys.ezyplatform.entity.AdminRoleName;
 import org.youngmonkeys.ezyplatform.model.AdminRoleModel;
 import org.youngmonkeys.ezyplatform.model.AdminRoleNameModel;
@@ -56,11 +55,9 @@ public class DefaultAdminRoleService implements AdminRoleService {
         long adminId,
         long roleId
     ) {
-        AdminRole entity = adminRoleRepository.findById(
-            new AdminRoleId(
-                roleId,
-                adminId
-            )
+        AdminRole entity = adminRoleRepository.findByRoleIdAndAdminId(
+            roleId,
+            adminId
         );
         if (entity == null) {
             entity = modelToEntityConverter
@@ -115,9 +112,10 @@ public class DefaultAdminRoleService implements AdminRoleService {
         long roleId,
         long adminId
     ) {
-        return adminRoleRepository.containsById(
-            new AdminRoleId(roleId, adminId)
-        );
+        return adminRoleRepository.findByRoleIdAndAdminId(
+            roleId,
+            adminId
+        ) != null;
     }
 
     @Override

@@ -18,7 +18,6 @@ package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.AdminRole;
-import org.youngmonkeys.ezyplatform.entity.AdminRoleId;
 import org.youngmonkeys.ezyplatform.model.AdminRoleModel;
 import org.youngmonkeys.ezyplatform.pagination.AdminRoleFilter;
 import org.youngmonkeys.ezyplatform.pagination.AdminRolePaginationParameter;
@@ -30,7 +29,7 @@ public class PaginationAdminRoleService extends CommonPaginationService<
     AdminRoleModel,
     AdminRoleFilter,
     AdminRolePaginationParameter,
-    AdminRoleId,
+    Long,
     AdminRole> {
 
     private final DefaultEntityToModelConverter entityToModelConverter;

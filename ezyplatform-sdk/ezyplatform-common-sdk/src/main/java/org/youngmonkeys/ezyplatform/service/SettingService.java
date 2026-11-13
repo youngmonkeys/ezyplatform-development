@@ -20,6 +20,7 @@ import com.tvd12.ezyfox.exception.EzyNotImplementedException;
 import com.tvd12.ezyfox.function.EzyExceptionFunction;
 import com.tvd12.ezyhttp.core.codec.SingletonStringDeserializer;
 import com.tvd12.ezyhttp.core.util.FileSizes;
+import org.youngmonkeys.ezyplatform.constant.EnvironmentType;
 import org.youngmonkeys.ezyplatform.entity.DataType;
 import org.youngmonkeys.ezyplatform.model.SettingValueDataTypeModel;
 import org.youngmonkeys.ezyplatform.util.Uris;
@@ -62,8 +63,10 @@ import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_TIME_FORMAT;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ADMIN_URL;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ALLOW_SEND_STATISTICS_DATA;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_APP_LOGO_ID;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_DATA_KEYWORD_SPLIT_PATTERN;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_DATA_RANK_FUSION_CONSTANT;
+import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_ENVIRONMENT_TYPE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_KEEP_ORIGINAL_SIZE_IMAGE_FILE;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_DATA_SEARCH_KEYWORDS;
 import static org.youngmonkeys.ezyplatform.constant.CommonConstants.SETTING_NAME_MAX_REDUCED_IMAGE_FILE_SIZE;
@@ -617,6 +620,18 @@ public interface SettingService {
             SETTING_NAME_ALLOW_SEND_STATISTICS_DATA,
             Boolean.TRUE
         );
+    }
+
+    default String getEnvironmentType() {
+        String value = getTextValue(SETTING_NAME_ENVIRONMENT_TYPE);
+        if (isBlank(value)) {
+            value = EnvironmentType.PRODUCTION.toString();
+        }
+        return value;
+    }
+
+    default long getAppLogoId() {
+        return getLongValue(SETTING_NAME_APP_LOGO_ID);
     }
 
     default boolean containSetting(String settingName) {

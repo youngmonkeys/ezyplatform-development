@@ -18,7 +18,6 @@ package org.youngmonkeys.ezyplatform.service;
 
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
 import org.youngmonkeys.ezyplatform.entity.DataMapping;
-import org.youngmonkeys.ezyplatform.entity.DataMappingId;
 import org.youngmonkeys.ezyplatform.model.DataMappingModel;
 import org.youngmonkeys.ezyplatform.pagination.DataMappingFilter;
 import org.youngmonkeys.ezyplatform.pagination.DataMappingPaginationParameter;
@@ -30,7 +29,7 @@ public class PaginationDataMappingService extends CommonPaginationService<
     DataMappingModel,
     DataMappingFilter,
     DataMappingPaginationParameter,
-    DataMappingId,
+    Long,
     DataMapping> {
 
     private final DefaultEntityToModelConverter entityToModelConverter;
