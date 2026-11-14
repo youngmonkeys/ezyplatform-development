@@ -30,6 +30,7 @@ public class MediaDownloadArguments {
     private long byAdminId;
     private long byUserId;
     private MediaModel media;
+    private String requestedName;
     private boolean exposePrivateMedia;
     private Predicate<MediaModel> validMediaCondition;
 }

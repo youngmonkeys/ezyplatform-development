@@ -518,6 +518,10 @@ public interface SettingService {
         );
     }
 
+    default String getCurrentAdminServerUrl() {
+        return getAdminUrl();
+    }
+
     /**
      * Get the shared website URL path for all servers.
      *
