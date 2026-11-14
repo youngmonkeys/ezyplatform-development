@@ -50,6 +50,14 @@ public interface MediaUpDownloader {
         return Boolean.FALSE;
     }
 
+    default void delete(
+        MediaDeleteArguments arguments
+    ) {}
+
+    default boolean isDeleteSupported() {
+        return Boolean.FALSE;
+    }
+
     default MediaFileSizeReductionResult reduceMediaFileSize(
         long byAdminId,
         long byUserId,

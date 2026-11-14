@@ -19,12 +19,14 @@ package org.youngmonkeys.ezyplatform.media;
 import lombok.Builder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
+import org.youngmonkeys.ezyplatform.model.MediaModel;
 
 import java.io.File;
 
 @Getter
 @Builder
 public class MediaFileSizeReductionArguments {
+    private MediaModel media;
     private MediaType mediaType;
     private File mediaFilePath;
     private long expectedFileSize;
