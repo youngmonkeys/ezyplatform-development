@@ -25,7 +25,8 @@ public enum PackageType {
 
     PLATFORM("platform", "ezyplatform"),
     SDK("sdk", "ezyplatform-sdk"),
-    MODULE("module", NULL_STRING);
+    MODULE("module", NULL_STRING),
+    TOOL("tool", NULL_STRING);
 
     private final String value;
     private final String fixedPackageName;

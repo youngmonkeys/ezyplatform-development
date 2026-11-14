@@ -25,6 +25,8 @@ import org.youngmonkeys.ezyplatform.signature.PackageManifest;
 import org.youngmonkeys.ezyplatform.signature.PackageManifests;
 import org.youngmonkeys.ezyplatform.signature.PackageSignatureVerifier;
 import org.youngmonkeys.ezyplatform.signature.PackageSigner;
+import org.youngmonkeys.ezyplatform.signature.PackageSigningKeyList;
+import org.youngmonkeys.ezyplatform.signature.PackageSigningKeyRole;
 import org.youngmonkeys.ezyplatform.signature.PackageSigningKeys;
 import org.youngmonkeys.ezyplatform.signature.PackageType;
 
@@ -36,7 +38,9 @@ import java.security.KeyPair;
 import java.security.PublicKey;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -86,6 +90,78 @@ public class PackageSignatureTest {
             signer.getKeyId(),
             PackageSigningKeys.keyIdOf(keyPair.getPublic())
         );
+    }
+
+    @Test
+    public void toolMustBeSignedByPlatformKeyTest() throws Exception {
+        // given
+        KeyPair marketKeyPair = PackageSigningKeys.generateKeyPair();
+        KeyPair platformKeyPair = PackageSigningKeys.generateKeyPair();
+        Map<PackageSigningKeyRole, List<PublicKey>> keysByRole =
+            new EnumMap<>(PackageSigningKeyRole.class);
+        keysByRole.put(
+            PackageSigningKeyRole.MARKET,
+            Collections.singletonList(marketKeyPair.getPublic())
+        );
+        keysByRole.put(
+            PackageSigningKeyRole.PLATFORM,
+            Collections.singletonList(platformKeyPair.getPublic())
+        );
+        PackageSigningKeyList keyList = new PackageSigningKeyList(
+            1L,
+            1L,
+            Long.MAX_VALUE,
+            keysByRole,
+            ""
+        );
+        File file = createFile("tool content");
+        PackageManifest manifest = PackageManifests.create(
+            PackageType.TOOL,
+            "ezyplatform-backup",
+            "0.0.1",
+            file,
+            1000L
+        );
+        String platformJws = new PackageSigner(platformKeyPair).sign(manifest);
+        String marketJws = new PackageSigner(marketKeyPair).sign(manifest);
+        PackageSignatureVerifier toolVerifier = keyList.getVerifier(
+            PackageType.TOOL
+        );
+
+        // when
+        PackageManifest actual = toolVerifier.verify(
+            platformJws,
+            PackageType.TOOL,
+            "ezyplatform-backup",
+            "0.0.1"
+        );
+        Throwable marketError = Asserts.assertThrows(() ->
+            toolVerifier.verify(
+                marketJws,
+                PackageType.TOOL,
+                "ezyplatform-backup",
+                "0.0.1"
+            )
+        );
+        Throwable moduleError = Asserts.assertThrows(() ->
+            keyList.getVerifier(PackageType.MODULE).verify(
+                marketJws,
+                PackageType.MODULE,
+                "ezyplatform-backup",
+                "0.0.1"
+            )
+        );
+
+        // then
+        Asserts.assertEquals(
+            PackageSigningKeyRole.of(PackageType.TOOL),
+            PackageSigningKeyRole.PLATFORM
+        );
+        Asserts.assertEquals(actual.getType(), PackageType.TOOL);
+        Asserts.assertEquals(actual.getName(), "ezyplatform-backup");
+        Asserts.assertEquals(PackageType.of("tool"), PackageType.TOOL);
+        assertReason(marketError, "untrustedKey");
+        assertReason(moduleError, "typeMismatch");
     }
 
     @Test
