@@ -3547,10 +3547,13 @@ public class MediaControllerServiceTest {
             "private-video.mp4"
         );
         verify(requestArguments).getAsyncContext();
+        verify(requestArguments).getMethod();
+        verify(requestArguments).getRequest();
         verify(asyncContext).getResponse();
         verify(requestArguments).getHeader("Range");
         verify(inputStreamLoader).load(mediaFilePath.toString());
         verify(response).setContentType("video/mp4");
+        verify(response).setHeader("accept-ranges", "bytes");
         verify(response).getOutputStream();
         verify(response).setStatus(200);
         verify(resourceDownloadManager).drainAsync(
@@ -3589,6 +3592,8 @@ public class MediaControllerServiceTest {
             "private-video.mp4"
         );
         inOrder.verify(requestArguments).getAsyncContext();
+        inOrder.verify(requestArguments).getMethod();
+        inOrder.verify(requestArguments).getRequest();
         inOrder.verify(requestArguments).getHeader("Range");
         inOrder.verify(inputStreamLoader).load(mediaFilePath.toString());
         inOrder.verify(resourceDownloadManager).drainAsync(
