@@ -36,6 +36,7 @@ import java.util.List;
     "platform.properties",
     "setup.properties",
     "platform.properties",
+    "server.properties",
     "setup.properties"
 })
 public class IntegrationTestRunner {

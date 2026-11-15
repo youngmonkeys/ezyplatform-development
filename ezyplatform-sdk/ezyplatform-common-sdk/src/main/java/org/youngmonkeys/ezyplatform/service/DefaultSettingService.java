@@ -25,6 +25,7 @@ import com.tvd12.ezyfox.security.EzyAesCrypt;
 import com.tvd12.ezyfox.security.EzyBase64;
 import com.tvd12.ezyfox.util.EzyLoggable;
 import com.tvd12.properties.file.reader.BaseFileReader;
+import lombok.Getter;
 import lombok.Setter;
 import org.youngmonkeys.ezyplatform.concurrent.Scheduler;
 import org.youngmonkeys.ezyplatform.converter.DefaultEntityToModelConverter;
@@ -64,10 +65,17 @@ public abstract class DefaultSettingService
     extends EzyLoggable
     implements SettingService {
 
+    @Getter
+    @Setter
+    @EzyProperty("server.admin_url")
+    protected String serverAdminUrl;
+
+    @Getter
     @Setter
     @EzyProperty("server.web_url")
     protected String serverWebUrl;
 
+    @Getter
     @Setter
     @EzyProperty("server.websocket_url")
     protected String serverWebsocketUrl;
@@ -231,6 +239,13 @@ public abstract class DefaultSettingService
             .map(TypeResult::getType)
             .filter(EzyStrings::isNotBlank)
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public String getCurrentAdminServerUrl() {
+        return isNotBlank(serverAdminUrl)
+            ? serverAdminUrl
+            : getAdminUrl();
     }
 
     @Override

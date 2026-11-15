@@ -383,6 +383,7 @@ public class DefaultEntityToModelConverter {
     ) {
         return LetterModel.builder()
             .id(letter.getId())
+            .type(letter.getType())
             .title(letter.getTitle())
             .content(letter.getContent())
             .contentType(letter.getContentType())

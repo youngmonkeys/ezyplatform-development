@@ -58,6 +58,7 @@ import org.youngmonkeys.ezyplatform.exception.MediaNotFoundException;
 import org.youngmonkeys.ezyplatform.exception.ResourceNotFoundException;
 import org.youngmonkeys.ezyplatform.io.FolderProxy;
 import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
+import org.youngmonkeys.ezyplatform.media.MediaDeleteArguments;
 import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
 import org.youngmonkeys.ezyplatform.media.MediaFileSizeReductionArguments;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloader;
@@ -553,8 +554,10 @@ public class MediaControllerService extends EzyLoggable {
                 MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
                     ownerAdminId,
                     ownerUserId,
+                    media,
                     fileMetadata.getMediaType(),
-                    mediaFilePath
+                    mediaFilePath,
+                    ZERO_LONG
                 );
                 String storedFileName = reduceResult
                     .getNewFileNameOrDefault(fileName);
@@ -840,6 +843,7 @@ public class MediaControllerService extends EzyLoggable {
         MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
             byAdminId,
             byUserId,
+            media,
             mediaType,
             mediaFilePath,
             expectedFileSize
@@ -863,7 +867,9 @@ public class MediaControllerService extends EzyLoggable {
                 )
                 .fileSize(
                     reduceResult.getNewFileSizeOrDefault(
-                        storedMediaFilePath.length()
+                        storedMediaFilePath.exists()
+                            ? storedMediaFilePath.length()
+                            : media.getFileSize()
                     )
                 )
                 .build()
@@ -906,6 +912,24 @@ public class MediaControllerService extends EzyLoggable {
         File mediaFilePath,
         long expectedFileSize
     ) {
+        return reduceMediaFileSize(
+            byAdminId,
+            byUserId,
+            null,
+            mediaType,
+            mediaFilePath,
+            expectedFileSize
+        );
+    }
+
+    public MediaFileSizeReductionResult reduceMediaFileSize(
+        long byAdminId,
+        long byUserId,
+        MediaModel media,
+        MediaType mediaType,
+        File mediaFilePath,
+        long expectedFileSize
+    ) {
         if (!settingService.isAllowReduceMediaFileSize()) {
             return MediaFileSizeReductionResult.builder().build();
         }
@@ -920,6 +944,7 @@ public class MediaControllerService extends EzyLoggable {
                 byAdminId,
                 byUserId,
                 MediaFileSizeReductionArguments.builder()
+                    .media(media)
                     .mediaType(mediaType)
                     .mediaFilePath(mediaFilePath)
                     .expectedFileSize(expectedFileSize)
@@ -1160,7 +1185,9 @@ public class MediaControllerService extends EzyLoggable {
             containerFolder,
             fileName
         );
-        return mediaFilePath.length();
+        return mediaFilePath.exists()
+            ? mediaFilePath.length()
+            : media.getFileSize();
     }
 
     public void removeMediaById(
@@ -1187,11 +1214,7 @@ public class MediaControllerService extends EzyLoggable {
             && DELETED.equals(media.getStatus())
         ) {
             mediaService.removeMediaPermanently(media.getId());
-            File file = fileSystemManager.getMediaFilePath(
-                media.getType().getFolder(),
-                media.getName()
-            );
-            FolderProxy.deleteFile(file);
+            deleteMediaFile(byAdminId, byUserId, media);
         }
         eventHandlerManager.handleEvent(
             MediaRemovedEvent.builder()
@@ -1230,12 +1253,7 @@ public class MediaControllerService extends EzyLoggable {
             && DELETED.equals(media.getStatus())
         ) {
             mediaService.removeMediaPermanently(media.getId());
-            String containerFolder = media.getType().getFolder();
-            File filePath = fileSystemManager.getMediaFilePath(
-                containerFolder,
-                media.getName()
-            );
-            FolderProxy.deleteFile(filePath);
+            deleteMediaFile(byAdminId, byUserId, media);
         }
         eventHandlerManager.handleEvent(
             MediaRemovedEvent.builder()
@@ -1244,6 +1262,34 @@ public class MediaControllerService extends EzyLoggable {
                 .media(media)
                 .build()
         );
+    }
+
+    public void deleteMediaFile(
+        long byAdminId,
+        long byUserId,
+        MediaModel media
+    ) {
+        String mediaUploaderName = settingService
+            .getMediaUpDownloaderName();
+        MediaUpDownloader mediaUpDownloader = mediaUpDownloaderManager
+            .getMediaUpDownloaderByName(mediaUploaderName);
+        if (mediaUpDownloader != null
+            && mediaUpDownloader.isDeleteSupported()
+        ) {
+            mediaUpDownloader.delete(
+                MediaDeleteArguments.builder()
+                    .byAdminId(byAdminId)
+                    .byUserId(byUserId)
+                    .media(media)
+                    .build()
+            );
+            return;
+        }
+        File filePath = fileSystemManager.getMediaFilePath(
+            media.getType().getFolder(),
+            media.getName()
+        );
+        FolderProxy.deleteFile(filePath);
     }
 
     @SuppressWarnings("MethodLength")
@@ -1291,6 +1337,7 @@ public class MediaControllerService extends EzyLoggable {
                     .byAdminId(byAdminId)
                     .byUserId(byUserId)
                     .media(media)
+                    .requestedName(name)
                     .exposePrivateMedia(exposePrivateMedia)
                     .validMediaCondition(validMediaCondition)
                     .build()

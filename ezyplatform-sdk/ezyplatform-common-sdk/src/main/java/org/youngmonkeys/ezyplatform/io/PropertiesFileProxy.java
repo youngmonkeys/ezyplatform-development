@@ -103,4 +103,19 @@ public final class PropertiesFileProxy {
             );
         }
     }
+
+    public static String escapePropertyValue(String value) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < value.length(); ++i) {
+            char ch = value.charAt(i);
+            if (ch == '\\') {
+                builder.append("\\\\");
+            } else if (ch < 0x20 || ch > 0x7e) {
+                builder.append(String.format("\\u%04x", (int) ch));
+            } else {
+                builder.append(ch);
+            }
+        }
+        return builder.toString();
+    }
 }
