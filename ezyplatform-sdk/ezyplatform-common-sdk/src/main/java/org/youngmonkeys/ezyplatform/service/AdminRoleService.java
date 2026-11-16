@@ -54,6 +54,11 @@ public interface AdminRoleService {
         long roleId
     );
 
+    boolean hasAnyRoleName(
+        long adminId,
+        Collection<String> roleNames
+    );
+
     boolean containsAllAdminRoleIds(
         Collection<Long> roleIds
     );
