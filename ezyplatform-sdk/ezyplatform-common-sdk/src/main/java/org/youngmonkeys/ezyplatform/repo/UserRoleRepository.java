@@ -19,6 +19,7 @@ package org.youngmonkeys.ezyplatform.repo;
 import com.tvd12.ezydata.database.EzyDatabaseRepository;
 import com.tvd12.ezyfox.database.annotation.EzyQuery;
 import org.youngmonkeys.ezyplatform.entity.UserRole;
+import org.youngmonkeys.ezyplatform.result.IdResult;
 
 import java.util.Collection;
 
@@ -48,6 +49,16 @@ public interface UserRoleRepository
     UserRole findByUsernameAndRoleName(
         String username,
         String roleName
+    );
+
+    @EzyQuery(
+        "SELECT e.id FROM UserRole e " +
+            "INNER JOIN UserRoleName a ON e.roleId = a.id " +
+            "WHERE e.userId = ?0 AND a.name IN ?1"
+    )
+    IdResult findIdByUserIdAndRoleNameIn(
+        long userId,
+        Collection<String> roleNames
     );
 
     int countByRoleId(long roleId);

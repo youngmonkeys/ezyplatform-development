@@ -216,4 +216,18 @@ public class DefaultUserRoleService implements UserRoleService {
             roleName
         ) != null;
     }
+
+    @Override
+    public boolean hasAnyRoleName(
+        long userId,
+        Collection<String> roleNames
+    ) {
+        if (EzyCollections.isEmpty(roleNames)) {
+            return false;
+        }
+        return userRoleRepository.findIdByUserIdAndRoleNameIn(
+            userId,
+            roleNames
+        ) != null;
+    }
 }

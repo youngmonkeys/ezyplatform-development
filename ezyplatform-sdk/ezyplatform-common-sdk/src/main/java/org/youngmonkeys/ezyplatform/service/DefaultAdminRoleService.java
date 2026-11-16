@@ -127,6 +127,20 @@ public class DefaultAdminRoleService implements AdminRoleService {
     }
 
     @Override
+    public boolean hasAnyRoleName(
+        long adminId,
+        Collection<String> roleNames
+    ) {
+        if (EzyCollections.isEmpty(roleNames)) {
+            return false;
+        }
+        return adminRoleRepository.findIdByAdminIdAndRoleNameIn(
+            adminId,
+            roleNames
+        ) != null;
+    }
+
+    @Override
     public boolean containsAllAdminRoleIds(
         Collection<Long> roleIds
     ) {

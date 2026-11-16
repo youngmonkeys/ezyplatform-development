@@ -92,4 +92,9 @@ public interface UserRoleService {
     boolean containsUserRole(long userId, String roleName);
 
     boolean containsUserRole(String username, String roleName);
+
+    boolean hasAnyRoleName(
+        long userId,
+        Collection<String> roleNames
+    );
 }

@@ -22,6 +22,7 @@ import org.youngmonkeys.ezyplatform.service.LanguageService;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
+import static com.tvd12.ezyfox.io.EzyStrings.isBlank;
 import static org.youngmonkeys.ezyplatform.util.HttpRequests.getLanguage;
 
 @AllArgsConstructor
@@ -34,6 +35,6 @@ public class RequestLocalFetcher {
         if (lang == null) {
             lang = languageService.getDefaultLanguageCode();
         }
-        return new Locale(lang);
+        return isBlank(lang) ? Locale.ROOT : new Locale(lang);
     }
 }
