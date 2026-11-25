@@ -4115,6 +4115,80 @@ public class MediaControllerServiceTest {
     }
 
     @Test
+    public void getMediaDetailsCustomMediaTypeReadsSizeFromCustomFolderTest()
+        throws Exception {
+        // given
+        MediaModel media = MediaModel.builder()
+            .id(908L)
+            .name("home-banner.png")
+            .uploadFrom("ADMIN")
+            .type(MediaType.FILE)
+            .typeText("BANNER")
+            .mimeType("image/png")
+            .build();
+        File mediaFilePath = File.createTempFile("media-details-banner-", ".png");
+        mediaFilePath.deleteOnExit();
+        Files.write(mediaFilePath.toPath(), new byte[] {1, 2, 3, 4, 5});
+        when(fileSystemManager.getMediaFilePath("banners", "home-banner.png"))
+            .thenReturn(mediaFilePath);
+
+        // when
+        MediaDetailsModel actual = instance.getMediaDetails(media);
+
+        // then
+        Asserts.assertEquals(actual.getType(), "BANNER");
+        Asserts.assertEquals(actual.getSize(), 5L);
+        Asserts.assertEquals(actual.getWidth(), 0L);
+        Asserts.assertEquals(actual.getHeight(), 0L);
+
+        verify(fileSystemManager).getMediaFilePath("banners", "home-banner.png");
+        verify(mediaService, never()).getMediaFileLengthOrNegative(
+            any(MediaType.class),
+            any(String.class)
+        );
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
+        verify(mediaService).isPaymentRequiredByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+    }
+
+    @Test
+    public void getMediaDetailsCustomMediaTypeFileNotFoundFallbackToEventTest() {
+        // given
+        MediaModel media = MediaModel.builder()
+            .id(909L)
+            .name("missing-banner.png")
+            .uploadFrom("ADMIN")
+            .type(MediaType.FILE)
+            .typeText("BANNER")
+            .mimeType("image/png")
+            .build();
+        File notExistsFilePath = new File(
+            "target/not-exists-banners",
+            "missing-banner.png"
+        );
+        File eventFilePath = new File("target/event-banner.png");
+        when(fileSystemManager.getMediaFilePath("banners", "missing-banner.png"))
+            .thenReturn(notExistsFilePath);
+        when(eventHandlerManager.handleEvent(any(GetMediaFilePathEvent.class)))
+            .thenReturn(eventFilePath);
+        when(mediaService.getMediaFileLengthOrZero(eventFilePath))
+            .thenReturn(77L);
+
+        // when
+        MediaDetailsModel actual = instance.getMediaDetails(media);
+
+        // then
+        Asserts.assertEquals(actual.getSize(), 77L);
+
+        verify(fileSystemManager).getMediaFilePath("banners", "missing-banner.png");
+        verify(eventHandlerManager).handleEvent(any(GetMediaFilePathEvent.class));
+        verify(mediaService).getMediaFileLengthOrZero(eventFilePath);
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
+        verify(mediaService).isPaymentRequiredByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+    }
+
+    @Test
     public void getMediaReplacedFileHistoryTest() {
         // given
         PaginationDataMetaRepository paginationDataMetaRepository =

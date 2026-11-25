@@ -1600,10 +1600,21 @@ public class MediaControllerService extends EzyLoggable {
             height = imageSize.getHeight();
             size = imageSize.getSize();
         } else {
-            size = mediaService.getMediaFileLengthOrNegative(
-                mediaType,
-                media.getName()
-            );
+            String mediaTypeText = media.getTypeText();
+            if (isCustomMediaType(mediaTypeText)) {
+                File mediaFilePath = fileSystemManager.getMediaFilePath(
+                    getMediaFolder(mediaTypeText),
+                    media.getName()
+                );
+                size = mediaFilePath.exists()
+                    ? mediaFilePath.length()
+                    : -1L;
+            } else {
+                size = mediaService.getMediaFileLengthOrNegative(
+                    mediaType,
+                    media.getName()
+                );
+            }
             if (size < ZERO) {
                 File mediaFilePath = eventHandlerManager.handleEvent(
                     GetMediaFilePathEvent.builder()
