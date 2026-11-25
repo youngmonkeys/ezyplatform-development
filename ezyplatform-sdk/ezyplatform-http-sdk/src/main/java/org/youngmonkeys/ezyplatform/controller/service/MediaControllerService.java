@@ -446,7 +446,6 @@ public class MediaControllerService extends EzyLoggable {
         );
     }
 
-    @SuppressWarnings("MethodLength")
     public void replaceMedia(
         HttpServletRequest request,
         HttpServletResponse response,
@@ -454,6 +453,27 @@ public class MediaControllerService extends EzyLoggable {
         long byUserId,
         MediaModel media,
         Predicate<MediaModel> validMediaCondition
+    ) throws Exception {
+        replaceMedia(
+            request,
+            response,
+            byAdminId,
+            byUserId,
+            media,
+            validMediaCondition,
+            settingService.getMaxUploadFileSize()
+        );
+    }
+
+    @SuppressWarnings("MethodLength")
+    public void replaceMedia(
+        HttpServletRequest request,
+        HttpServletResponse response,
+        long byAdminId,
+        long byUserId,
+        MediaModel media,
+        Predicate<MediaModel> validMediaCondition,
+        long maxFileSize
     ) throws Exception {
         if (media == null || !validMediaCondition.test(media)) {
             throw new ResourceNotFoundException("media");
@@ -549,7 +569,7 @@ public class MediaControllerService extends EzyLoggable {
             asyncContext,
             filePart,
             mediaFilePath,
-            settingService.getMaxUploadFileSize(),
+            maxFileSize,
             () -> {
                 MediaFileSizeReductionResult reduceResult = reduceMediaFileSize(
                     ownerAdminId,
