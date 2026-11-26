@@ -16,17 +16,28 @@
 
 package org.youngmonkeys.ezyplatform.data;
 
-import lombok.Builder;
+import com.tvd12.ezyfox.builder.EzyBuilder;
 import lombok.Getter;
 import org.youngmonkeys.ezyplatform.entity.MediaType;
+import org.youngmonkeys.ezyplatform.util.MediaTypes;
+
+import static org.youngmonkeys.ezyplatform.util.MediaTypes.isCustomMediaType;
 
 @Getter
-@Builder
 public class FileMetadata {
     private final String mimeType;
     private final String extension;
     private final MediaType mediaType;
+    private final String customMediaType;
     private final long fileSize;
+
+    protected FileMetadata(FileMetadataBuilder builder) {
+        this.mimeType = builder.mimeType;
+        this.extension = builder.extension;
+        this.mediaType = builder.mediaType;
+        this.customMediaType = builder.customMediaType;
+        this.fileSize = builder.fileSize;
+    }
 
     public MediaType getMediaType() {
         return mediaType != null
@@ -35,6 +46,64 @@ public class FileMetadata {
     }
 
     public String getMediaTypeText() {
-        return getMediaType().toString();
+        return isCustomMediaType(customMediaType)
+            ? customMediaType
+            : getMediaType().toString();
+    }
+
+    public String getMediaFolder() {
+        return MediaTypes.getMediaFolder(getMediaTypeText());
+    }
+
+    public static FileMetadataBuilder builder() {
+        return new FileMetadataBuilder();
+    }
+
+    public static class FileMetadataBuilder
+        implements EzyBuilder<FileMetadata> {
+        private String mimeType;
+        private String extension;
+        private MediaType mediaType;
+        private String customMediaType;
+        private long fileSize;
+
+        public FileMetadataBuilder fileMetadata(FileMetadata fileMetadata) {
+            this.mimeType = fileMetadata.mimeType;
+            this.extension = fileMetadata.extension;
+            this.mediaType = fileMetadata.mediaType;
+            this.customMediaType = fileMetadata.customMediaType;
+            this.fileSize = fileMetadata.fileSize;
+            return this;
+        }
+
+        public FileMetadataBuilder mimeType(String mimeType) {
+            this.mimeType = mimeType;
+            return this;
+        }
+
+        public FileMetadataBuilder extension(String extension) {
+            this.extension = extension;
+            return this;
+        }
+
+        public FileMetadataBuilder mediaType(MediaType mediaType) {
+            this.mediaType = mediaType;
+            return this;
+        }
+
+        public FileMetadataBuilder customMediaType(String customMediaType) {
+            this.customMediaType = customMediaType;
+            return this;
+        }
+
+        public FileMetadataBuilder fileSize(long fileSize) {
+            this.fileSize = fileSize;
+            return this;
+        }
+
+        @Override
+        public FileMetadata build() {
+            return new FileMetadata(this);
+        }
     }
 }

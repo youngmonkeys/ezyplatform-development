@@ -63,6 +63,7 @@ import org.youngmonkeys.ezyplatform.manager.FileSystemManager;
 import org.youngmonkeys.ezyplatform.media.MediaDeleteArguments;
 import org.youngmonkeys.ezyplatform.media.MediaDownloadArguments;
 import org.youngmonkeys.ezyplatform.media.MediaFileSizeReductionArguments;
+import org.youngmonkeys.ezyplatform.media.MediaTypeResolver;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloader;
 import org.youngmonkeys.ezyplatform.media.MediaUpDownloaderManager;
 import org.youngmonkeys.ezyplatform.media.MediaUploadArguments;
@@ -110,6 +111,7 @@ import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Predicate;
@@ -407,6 +409,7 @@ public class MediaControllerServiceTest {
         verify(mediaUpDownloader).isReduceMediaSupported();
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(filePart).getSubmittedFileName();
         verify(mediaService).generateMediaFileName("banner.png", "png");
@@ -619,6 +622,7 @@ public class MediaControllerServiceTest {
         verify(mediaUpDownloader).isReduceMediaSupported();
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(filePart).getSubmittedFileName();
         verify(mediaService).generateMediaFileName("banner.png", "png");
@@ -778,6 +782,7 @@ public class MediaControllerServiceTest {
         verify(request).getPart("file");
         verify(request).getParts();
         verify(mediaValidator).validateFilePart(filePart, false);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(filePart).getSubmittedFileName();
         verify(mediaService).generateMediaFileName("first-part.png", "png");
@@ -1036,6 +1041,7 @@ public class MediaControllerServiceTest {
         verify(mediaUpDownloader).isReduceMediaSupported();
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
@@ -1257,6 +1263,7 @@ public class MediaControllerServiceTest {
         );
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
         verify(eventHandlerManager, times(2)).handleEvent(eventCaptor.capture());
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
@@ -1420,6 +1427,7 @@ public class MediaControllerServiceTest {
         verify(request).getPart("file");
         verify(request).getParts();
         verify(mediaValidator).validateFilePart(filePart, false);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
@@ -1582,6 +1590,7 @@ public class MediaControllerServiceTest {
         verify(singletonFactory).getSingletonCast(FileUploader.class);
         verify(request).getPart("file");
         verify(mediaValidator).validateFilePart(filePart, false);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
         verify(eventHandlerManager, times(3)).handleEvent(eventCaptor.capture());
         verify(request).getAsyncContext();
         verify(fileSystemManager).getMediaFilePath(
@@ -2263,7 +2272,7 @@ public class MediaControllerServiceTest {
         when(settingService.getMediaUpDownloaderName()).thenReturn("local");
         when(mediaUpDownloaderManager.getMediaUpDownloaderByName("local"))
             .thenReturn(null);
-        when(fileSystemManager.getMediaFolderPath(MediaType.IMAGE))
+        when(fileSystemManager.getMediaFolderPath(MediaType.IMAGE.getFolder()))
             .thenReturn(mediaFolder);
         when(mediaService.generateMediaFileName(mediaUrl, "png"))
             .thenReturn("stored-logo.png");
@@ -2301,7 +2310,7 @@ public class MediaControllerServiceTest {
         Asserts.assertEquals(actual, 345L);
         verify(settingService).getMediaUpDownloaderName();
         verify(mediaUpDownloaderManager).getMediaUpDownloaderByName("local");
-        verify(fileSystemManager).getMediaFolderPath(MediaType.IMAGE);
+        verify(fileSystemManager).getMediaFolderPath(MediaType.IMAGE.getFolder());
         verify(mediaService).generateMediaFileName(mediaUrl, "png");
         verify(httpClient).download(
             mediaUrl,
@@ -4106,6 +4115,80 @@ public class MediaControllerServiceTest {
     }
 
     @Test
+    public void getMediaDetailsCustomMediaTypeReadsSizeFromCustomFolderTest()
+        throws Exception {
+        // given
+        MediaModel media = MediaModel.builder()
+            .id(908L)
+            .name("home-banner.png")
+            .uploadFrom("ADMIN")
+            .type(MediaType.FILE)
+            .typeText("BANNER")
+            .mimeType("image/png")
+            .build();
+        File mediaFilePath = File.createTempFile("media-details-banner-", ".png");
+        mediaFilePath.deleteOnExit();
+        Files.write(mediaFilePath.toPath(), new byte[] {1, 2, 3, 4, 5});
+        when(fileSystemManager.getMediaFilePath("banners", "home-banner.png"))
+            .thenReturn(mediaFilePath);
+
+        // when
+        MediaDetailsModel actual = instance.getMediaDetails(media);
+
+        // then
+        Asserts.assertEquals(actual.getType(), "BANNER");
+        Asserts.assertEquals(actual.getSize(), 5L);
+        Asserts.assertEquals(actual.getWidth(), 0L);
+        Asserts.assertEquals(actual.getHeight(), 0L);
+
+        verify(fileSystemManager).getMediaFilePath("banners", "home-banner.png");
+        verify(mediaService, never()).getMediaFileLengthOrNegative(
+            any(MediaType.class),
+            any(String.class)
+        );
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
+        verify(mediaService).isPaymentRequiredByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+    }
+
+    @Test
+    public void getMediaDetailsCustomMediaTypeFileNotFoundFallbackToEventTest() {
+        // given
+        MediaModel media = MediaModel.builder()
+            .id(909L)
+            .name("missing-banner.png")
+            .uploadFrom("ADMIN")
+            .type(MediaType.FILE)
+            .typeText("BANNER")
+            .mimeType("image/png")
+            .build();
+        File notExistsFilePath = new File(
+            "target/not-exists-banners",
+            "missing-banner.png"
+        );
+        File eventFilePath = new File("target/event-banner.png");
+        when(fileSystemManager.getMediaFilePath("banners", "missing-banner.png"))
+            .thenReturn(notExistsFilePath);
+        when(eventHandlerManager.handleEvent(any(GetMediaFilePathEvent.class)))
+            .thenReturn(eventFilePath);
+        when(mediaService.getMediaFileLengthOrZero(eventFilePath))
+            .thenReturn(77L);
+
+        // when
+        MediaDetailsModel actual = instance.getMediaDetails(media);
+
+        // then
+        Asserts.assertEquals(actual.getSize(), 77L);
+
+        verify(fileSystemManager).getMediaFilePath("banners", "missing-banner.png");
+        verify(eventHandlerManager).handleEvent(any(GetMediaFilePathEvent.class));
+        verify(mediaService).getMediaFileLengthOrZero(eventFilePath);
+        verify(mediaService).getOriginalSizeFileNameByMediaId(media.getId());
+        verify(mediaService).isPaymentRequiredByMediaId(media.getId());
+        verify(mediaService).isAccessToOwnerOnlyByMediaId(media.getId());
+    }
+
+    @Test
     public void getMediaReplacedFileHistoryTest() {
         // given
         PaginationDataMetaRepository paginationDataMetaRepository =
@@ -4613,6 +4696,152 @@ public class MediaControllerServiceTest {
                 StandardCharsets.UTF_8
             );
         }
+    }
+
+    @Test
+    public void resolveMediaTypeShouldUseHighestPriorityCustomTypeTest() {
+        // given
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("model/gltf-binary")
+            .extension("glb")
+            .mediaType(MediaType.FILE)
+            .fileSize(100L)
+            .build();
+        MediaTypeResolver lowPriorityResolver = mock(MediaTypeResolver.class);
+        when(lowPriorityResolver.getPriority()).thenReturn(1);
+        when(lowPriorityResolver.resolveMediaType("ADMIN", fileMetadata))
+            .thenReturn("EBOOK");
+        MediaTypeResolver highPriorityResolver = mock(MediaTypeResolver.class);
+        when(highPriorityResolver.getPriority()).thenReturn(5);
+        when(highPriorityResolver.resolveMediaType("ADMIN", fileMetadata))
+            .thenReturn("MODEL_3D");
+        when(singletonFactory.getSingletonsOf(MediaTypeResolver.class))
+            .thenReturn(Arrays.asList(lowPriorityResolver, highPriorityResolver));
+
+        // when
+        FileMetadata actual = instance.resolveMediaType(
+            "ADMIN",
+            fileMetadata,
+            false
+        );
+
+        // then
+        Asserts.assertEquals(actual.getMediaTypeText(), "MODEL_3D");
+        Asserts.assertEquals(actual.getMediaFolder(), "model_3ds");
+        Asserts.assertEquals(actual.getMediaType(), MediaType.FILE);
+        Asserts.assertEquals(actual.getMimeType(), "model/gltf-binary");
+        Asserts.assertEquals(actual.getExtension(), "glb");
+        Asserts.assertEquals(actual.getFileSize(), 100L);
+        Asserts.assertEquals(fileMetadata.getMediaTypeText(), "FILE");
+        verify(lowPriorityResolver, never()).resolveMediaType(
+            any(String.class),
+            any(FileMetadata.class)
+        );
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
+        verifyNoMoreInteractions(singletonFactory);
+    }
+
+    @Test
+    public void resolveMediaTypeShouldSkipInvalidAndBuiltInTypesTest() {
+        // given
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("application/epub+zip")
+            .extension("epub")
+            .mediaType(MediaType.DOCUMENT)
+            .fileSize(100L)
+            .build();
+        MediaTypeResolver builtInResolver = mock(MediaTypeResolver.class);
+        when(builtInResolver.getPriority()).thenReturn(10);
+        when(builtInResolver.resolveMediaType("USER", fileMetadata))
+            .thenReturn("IMAGE");
+        MediaTypeResolver invalidResolver = mock(MediaTypeResolver.class);
+        when(invalidResolver.getPriority()).thenReturn(9);
+        when(invalidResolver.resolveMediaType("USER", fileMetadata))
+            .thenReturn("../ebook");
+        MediaTypeResolver blankResolver = mock(MediaTypeResolver.class);
+        when(blankResolver.getPriority()).thenReturn(8);
+        when(blankResolver.resolveMediaType("USER", fileMetadata))
+            .thenReturn("");
+        MediaTypeResolver validResolver = mock(MediaTypeResolver.class);
+        when(validResolver.getPriority()).thenReturn(1);
+        when(validResolver.resolveMediaType("USER", fileMetadata))
+            .thenReturn("EBOOK");
+        when(singletonFactory.getSingletonsOf(MediaTypeResolver.class))
+            .thenReturn(
+                Arrays.asList(
+                    validResolver,
+                    blankResolver,
+                    invalidResolver,
+                    builtInResolver
+                )
+            );
+
+        // when
+        FileMetadata actual = instance.resolveMediaType(
+            "USER",
+            fileMetadata,
+            false
+        );
+
+        // then
+        Asserts.assertEquals(actual.getMediaTypeText(), "EBOOK");
+        Asserts.assertEquals(actual.getMediaFolder(), "ebooks");
+        Asserts.assertEquals(actual.getMediaType(), MediaType.DOCUMENT);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
+        verifyNoMoreInteractions(singletonFactory);
+    }
+
+    @Test
+    public void resolveMediaTypeShouldKeepBuiltInTypeWhenNoResolverMatchesTest() {
+        // given
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("video/mp4")
+            .extension("mp4")
+            .mediaType(MediaType.VIDEO)
+            .fileSize(100L)
+            .build();
+        MediaTypeResolver resolver = mock(MediaTypeResolver.class);
+        when(singletonFactory.getSingletonsOf(MediaTypeResolver.class))
+            .thenReturn(Collections.singletonList(resolver));
+
+        // when
+        FileMetadata actual = instance.resolveMediaType(
+            "USER",
+            fileMetadata,
+            false
+        );
+
+        // then
+        Asserts.assertTrue(actual == fileMetadata);
+        Asserts.assertEquals(actual.getMediaTypeText(), "VIDEO");
+        Asserts.assertEquals(actual.getMediaFolder(), "videos");
+        verify(resolver).resolveMediaType("USER", fileMetadata);
+        verify(singletonFactory).getSingletonsOf(MediaTypeResolver.class);
+        verifyNoMoreInteractions(singletonFactory);
+    }
+
+    @Test
+    public void resolveMediaTypeShouldNotChangeAvatarTest() {
+        // given
+        FileMetadata fileMetadata = FileMetadata.builder()
+            .mimeType("image/png")
+            .extension("png")
+            .mediaType(MediaType.AVATAR)
+            .fileSize(100L)
+            .build();
+
+        // when
+        FileMetadata actual = instance.resolveMediaType(
+            "USER",
+            fileMetadata,
+            true
+        );
+
+        // then
+        Asserts.assertTrue(actual == fileMetadata);
+        Asserts.assertEquals(actual.getMediaTypeText(), "AVATAR");
+        Asserts.assertEquals(actual.getMediaFolder(), "avatars");
+        verifyNoMoreInteractions(singletonFactory);
     }
 
     private static byte[] pngFileBytes() {

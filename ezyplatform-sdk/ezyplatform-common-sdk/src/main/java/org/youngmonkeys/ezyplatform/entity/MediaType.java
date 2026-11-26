@@ -46,7 +46,7 @@ public enum MediaType {
             .toMap();
 
     private static final Map<String, MediaType> MAP_BY_MIME_TYPE_NAME =
-        EzyEnums.enumMap(MediaType.class, it -> it.name);
+        EzyEnums.enumMap(MediaType.class, it -> it.mimeTypeName);
 
     MediaType(String mimeTypeName, String name, String folder) {
         this.name = name;
@@ -55,8 +55,12 @@ public enum MediaType {
     }
 
     public static MediaType ofName(String name) {
-        MediaType answer = name == null ? null : MAP_BY_NAME.get(name);
+        MediaType answer = ofNameOrNull(name);
         return answer == null ? FILE : answer;
+    }
+
+    public static MediaType ofNameOrNull(String name) {
+        return name == null ? null : MAP_BY_NAME.get(name);
     }
 
     public static MediaType ofMimeTypeName(String name) {
