@@ -50,7 +50,7 @@
         <hibernate.version>5.6.15.Final</hibernate.version>
         <hikaricp.version>4.0.3</hikaricp.version>
         <thymeleaf.layout.version>3.4.0</thymeleaf.layout.version>
-        <thymeleaf.version>3.1.5.RELEASE</thymeleaf.version>
+        <thymeleaf.version>3.1.7.RELEASE</thymeleaf.version>
         <mariadb.connector.version>3.5.10</mariadb.connector.version>
         <tika.version>2.9.4</tika.version>
         <rhino.version>1.7.15.1</rhino.version>
